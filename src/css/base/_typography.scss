@@ -1,0 +1,58 @@
+@import 'variables';
+@import '../quasar.variables';
+
+$text-sizes: (
+  'h1': (
+    2.2rem,
+    2.2rem,
+    2.2rem,
+    2.2rem,
+  ),
+  'h2': (
+    1.6rem,
+    1.6rem,
+    1.6rem,
+    1.6rem,
+  ),
+  'h3': (
+    1.4rem,
+    1.4rem,
+    1.4rem,
+    1.4rem,
+  ),
+  'body1': (
+    1.2rem,
+    1.2rem,
+    1.2rem,
+    1.2rem,
+  ),
+  'body2': (
+    1rem,
+    1rem,
+    1rem,
+    1rem,
+  ),
+  'caption': (
+    0.7rem,
+    0.7rem,
+    0.7rem,
+    0.7rem,
+  ),
+);
+
+@each $class, $sizes in $text-sizes {
+  .text-#{$class} {
+    font-size: nth($sizes, 1);
+    line-height: 2.5rem;
+
+    @media (min-width: $breakpoint-sm) {
+      font-size: nth($sizes, 2);
+    }
+    @media (min-width: $breakpoint-md) {
+      font-size: nth($sizes, 3);
+    }
+    @media (min-width: $breakpoint-lg) {
+      font-size: nth($sizes, 4);
+    }
+  }
+}
