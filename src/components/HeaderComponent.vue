@@ -19,7 +19,12 @@ const tabs = [
   <q-toolbar class="bg-transparent q-pa-lg">
     <!-- Logo / Title -->
     <q-toolbar-title>
-      <img class="q-pt-sm" style="max-width: 200px" src="../assets/logo.png" alt="" />
+      <img
+        class="q-pt-sm"
+        style="max-width: 200px"
+        src="../assets/logo.png"
+        alt="glkFreelance logo"
+      />
     </q-toolbar-title>
     <!-- Mobile Menu Button -->
     <q-btn
@@ -54,10 +59,4 @@ const tabs = [
 
 <style scoped lang="scss">
 @import '../css/main.scss';
-
-.menu-button {
-  @media (min-width: $breakpoint-md) {
-    display: none;
-  }
-}
 </style>

@@ -30,7 +30,7 @@ import HeaderComponent from 'src/components/HeaderComponent.vue';
   background-color: rgba($color: black, $alpha: 0.5) !important;
   border-bottom: 2px solid var(--q-primary);
 
-  @media (min-width: $breakpoint-md) {
+  @media (min-width: $breakpoint-sm) {
     display: none;
   }
 }

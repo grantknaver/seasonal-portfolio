@@ -8,24 +8,27 @@ const topics = [
 </script>
 
 <template>
-  <div class="container column justify-start items-center full-width">
+  <div class="container column justify-center items-center full-width">
     <img class="hidden q-pt-sm" style="max-width: 200px" src="../assets/logo.png" alt="" />
     <!-- <h1 class="text-primary text-center q-mt-md q-mb-md">Grant Knaver</h1>
     <p class="text-secondary q-mb-md">Fullstack Developer</p>
     <hr />
     <a flat size="lg">Resume</a> -->
-    <div class="simon-circle">
-      <div v-for="topic in topics" :key="topic.name" class="quadrant-wrapper">
-        <div :class="['simon-quadrant', topic.name]">
-          <a :href="topic.href" class="simon-link">
-            <q-icon :name="topic.icon" size="32px" />
-            <q-tooltip anchor="center middle" self="top start">
-              {{ topic.label }}
-            </q-tooltip>
-          </a>
-        </div>
+    <div class="simon-circle hidden">
+      <div
+        v-for="topic in topics"
+        :key="topic.name"
+        :class="['simon-quadrant', topic.name]"
+        tabindex="0"
+        style="padding: 1rem"
+      >
+        <a :href="topic.href" class="simon-link">
+          <q-icon :name="topic.icon" size="32px" />
+          <q-tooltip anchor="center middle" self="top left">
+            {{ topic.label }}
+          </q-tooltip>
+        </a>
       </div>
-      <div class="simon-center" />
     </div>
   </div>
 </template>
@@ -35,9 +38,7 @@ const topics = [
   background-image: url('../assets/autumn-forestry.jpg');
   background-size: cover;
   background-position: center;
-  border-bottom: 4px solid var(--q-primary);
-  padding-top: 5rem;
-  min-height: calc(100vh - 94px);
+  min-height: 100vh;
 
   @media (min-width: $breakpoint-sm) {
     border-bottom: 2px solid var(--q-primary);
@@ -54,7 +55,7 @@ const topics = [
     position: absolute;
     top: 2%;
     left: 2%;
-    @media (min-width: $breakpoint-md) {
+    @media (min-width: $breakpoint-xs) {
       display: initial !important;
     }
   }
@@ -62,7 +63,6 @@ const topics = [
   h1 {
     font-size: 4.5rem;
     text-shadow: 2px 2px 5px var(--q-dark);
-
     @media (min-width: $breakpoint-md) {
       font-size: 6rem;
     }
@@ -71,11 +71,9 @@ const topics = [
   p {
     font-size: 1.25rem;
     text-shadow: 2px 2px 2px var(--q-dark);
-
     @media (min-width: $breakpoint-md) {
       font-size: 1.5rem;
     }
-
     span {
       color: var(--q-secondary);
       font-size: 1.5rem;
@@ -103,55 +101,70 @@ const topics = [
   position: relative;
   width: 300px;
   height: 300px;
-  border-radius: 50%;
-  background: conic-gradient(
-    rgba(0, 255, 0, 0.25) 0% 25%,
-    rgba(255, 0, 0, 0.25) 25% 50%,
-    rgba(255, 255, 0, 0.25) 50% 75%,
-    rgba(0, 128, 255, 0.25) 75% 100%
-  );
-  backdrop-filter: blur(8px);
-  box-shadow: 0 0 30px rgba(0, 0, 0, 0.4);
-  margin: 3rem auto;
-  padding: 10px; // allows quadrants to grow without clipping
+  border-radius: 10px;
+  overflow: visible;
+
+  @media (min-width: $breakpoint-xs) {
+    display: initial !important;
+    width: 350px;
+    height: 350px;
+  }
 }
 
 .simon-quadrant {
   position: absolute;
-  width: 50%;
-  height: 50%;
+  width: 49%;
+  height: 49%;
   display: flex;
   align-items: center;
   justify-content: center;
-  z-index: 1;
   transition: transform 0.3s ease;
-  transform-origin: center center;
+  transform-origin: center;
+  border-radius: 10px;
+  border: solid 4px rgba($color: #f4e7e1, $alpha: 0.5);
+  background-color: rgba($color: #521c0d, $alpha: 0.5);
 
   &:hover,
   &:focus-within {
-    transform: scale(1.1);
-    z-index: 2;
+    transform: scale(1.25);
+    z-index: 1002;
+
+    &.home {
+      background-color: var(--q-accent);
+    }
+
+    &.about {
+      background-color: var(--q-secondary);
+    }
+
+    &.projects {
+      background-color: var(--q-accent);
+    }
+
+    &.contact {
+      background-color: var(--q-secondary);
+    }
   }
-}
 
-.home {
-  top: 0;
-  left: 0;
-}
+  &.home {
+    top: 0;
+    left: 0;
+  }
 
-.about {
-  top: 0;
-  right: 0;
-}
+  &.about {
+    top: 0;
+    right: 0;
+  }
 
-.projects {
-  bottom: 0;
-  left: 0;
-}
+  &.projects {
+    bottom: 0;
+    left: 0;
+  }
 
-.contact {
-  bottom: 0;
-  right: 0;
+  &.contact {
+    bottom: 0;
+    right: 0;
+  }
 }
 
 .simon-link {
@@ -168,19 +181,12 @@ const topics = [
   &:focus {
     outline: none;
   }
-}
 
-.simon-center {
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  width: 100px;
-  height: 100px;
-  background: rgba(10, 10, 10, 0.5);
-  border-radius: 50%;
-  transform: translate(-50%, -50%);
-  z-index: 2;
-  backdrop-filter: blur(6px);
-  box-shadow: inset 0 0 10px rgba(255, 255, 255, 0.2);
+  &:hover {
+    .q-icon {
+      transform: scale(1.25);
+      z-index: 5;
+    }
+  }
 }
 </style>
