@@ -30,7 +30,14 @@ const topics = [
     </div>
     <hr class="hidden q-mt-lg" />
     <p class="q-ma-none text-primary text-center">Grant Knaver</p>
+    <hr />
     <p class="q-ma-none text-secondary text-center">Fullstack Developer</p>
+
+    <blockquote class="fancy-quote text-primary">
+      "Full-stack JavaScript developer with 7+ years of experience building responsive, real-world
+      apps using Angular, Vue, and Node.js."
+    </blockquote>
+
     <!-- <q-btn class="q-mt-md" size="md" icon="description" flat label="Resume" color="primary" /> -->
   </div>
 </template>
@@ -189,6 +196,20 @@ const topics = [
   }
 }
 
-.q-btn {
+.fancy-quote {
+  text-align: center;
+  width: 90%;
+  font-style: italic;
+  font-family: Georgia, serif;
+  border-left: 4px solid var(--q-primary);
+  padding: 1rem 1.5rem;
+  margin: 1.5rem 0;
+  background-color: rgba($color: #d5451b, $alpha: 0.5);
+  position: relative;
+  text-shadow: 1px 1px 2px var(--q-dark);
+
+  @media (min-width: $breakpoint-xs) {
+    display: none !important;
+  }
 }
 </style>
