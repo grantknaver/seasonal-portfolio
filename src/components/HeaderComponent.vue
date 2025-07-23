@@ -1,53 +1,59 @@
 <template>
-  <q-header class="bg-transparent text-black">
-    <q-toolbar class="bg-transparent q-pa-lg">
-      <!-- Logo / Title -->
-      <q-toolbar-title> My Portfolio </q-toolbar-title>
+  <q-toolbar class="bg-transparent q-pa-lg">
+    <!-- Logo / Title -->
+    <q-toolbar-title>
+      <img class="q-pt-sm" style="max-width: 200px" src="../assets/logo.png" alt="" />
+    </q-toolbar-title>
 
-      <!-- Desktop Tabs -->
-      <div class="tabs">
-        <q-tabs
-          v-model="tab"
-          dense
-          class="text-body1 text-primary"
-          align="right"
-          active-color="primary"
-          indicator-color="primary"
+    <!-- Desktop Tabs -->
+    <div class="tabs">
+      <q-tabs
+        v-model="tab"
+        dense
+        class="text-body1 text-primary"
+        align="right"
+        active-color="primary"
+        indicator-color="primary"
+      >
+        <q-tab
+          v-for="item in tabs"
+          class="text-primary"
+          :key="item.name"
+          :name="item.name"
+          :label="item.label"
+        />
+      </q-tabs>
+    </div>
+
+    <!-- Mobile Menu Button -->
+    <q-btn
+      color="primary"
+      class="menu-button"
+      flat
+      dense
+      round
+      icon="menu"
+      @click="mobileMenu = !mobileMenu"
+    />
+
+    <!-- Mobile Drawer Menu -->
+    <q-drawer v-model="mobileMenu" side="right" overlay behavior="mobile" bordered>
+      <q-list>
+        <q-item
+          v-for="item in tabs"
+          :key="item.name"
+          clickable
+          @click="
+            () => {
+              mobileMenu = false;
+            }
+          "
         >
-          <q-tab
-            v-for="item in tabs"
-            class="text-primary"
-            :key="item.name"
-            :name="item.name"
-            :label="item.label"
-            @click="goTo(item.href)"
-          />
-        </q-tabs>
-      </div>
-
-      <!-- Mobile Menu Button -->
-      <q-btn class="menu-button" flat dense round icon="menu" @click="mobileMenu = !mobileMenu" />
-
-      <!-- Mobile Drawer Menu -->
-      <q-drawer v-model="mobileMenu" side="right" overlay behavior="mobile" bordered>
-        <q-list>
-          <q-item
-            v-for="item in tabs"
-            :key="item.name"
-            clickable
-            @click="
-              () => {
-                goTo(item.href);
-                mobileMenu = false;
-              }
-            "
-          >
-            <q-item-section>{{ item.label }}</q-item-section>
-          </q-item>
-        </q-list>
-      </q-drawer>
-    </q-toolbar>
-  </q-header>
+          <q-item-section>{{ item.label }}</q-item-section>
+        </q-item>
+      </q-list>
+    </q-drawer>
+  </q-toolbar>
 </template>
 
 <script lang="ts" setup>
@@ -63,18 +69,14 @@ const tabs = [
   { name: 'contact', label: 'Contact', href: '#contact' },
 ];
 
-function goTo(href: string) {
-  const el = document.querySelector(href);
-  if (el) el.scrollIntoView({ behavior: 'smooth' });
-}
+// function goTo(href: string) {
+//   const el = document.querySelector(href);
+//   if (el) el.scrollIntoView({ behavior: 'smooth' });
+// }
 </script>
 
 <style scoped lang="scss">
 @import '../css/main.scss';
-
-.q-header {
-  border-bottom: 5px solid var(--q-primary);
-}
 
 .menu-button {
   @media (min-width: $breakpoint-md) {

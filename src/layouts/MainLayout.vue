@@ -1,31 +1,18 @@
 <script lang="ts" setup>
-// import { ref } from 'vue';
 import HeaderComponent from 'src/components/HeaderComponent.vue';
-
-// const leftDrawerOpen = ref(false);
-// const rightDrawerOpen = ref(false);
 </script>
 
 <template>
-  <q-layout view="lHr Lpr lFr">
+  <q-layout class="bg-black" view="lHr Lpr lFr">
     <!-- HEADER -->
 
-    <HeaderComponent></HeaderComponent>
-    <!-- <q-btn flat dense icon="menu" @click="leftDrawerOpen = !leftDrawerOpen" />
-        <q-toolbar-title>My App</q-toolbar-title>
-        <q-btn flat dense icon="menu_open" @click="rightDrawerOpen = !rightDrawerOpen" /> -->
-
-    <!-- <q-drawer show-if-above v-model="rightDrawerOpen" side="right" bordered>
-      <q-list>
-        <q-item clickable>
-          <q-item-section>Right Drawer</q-item-section>
-        </q-item>
-      </q-list>
-    </q-drawer> -->
+    <q-header class="text-black">
+      <HeaderComponent></HeaderComponent>
+    </q-header>
 
     <!-- PAGE CONTENT -->
     <q-page-container>
-      <q-page padding> Your page content goes here. </q-page>
+      <router-view />
     </q-page-container>
 
     <!-- FOOTER -->
@@ -36,3 +23,17 @@ import HeaderComponent from 'src/components/HeaderComponent.vue';
     </q-footer>
   </q-layout>
 </template>
+
+<style scoped lang="scss">
+.q-header {
+  background-color: rgba($color: black, $alpha: 0.5) !important;
+  border-bottom: 5px solid var(--q-primary);
+}
+
+.container {
+  background-image: url('../assets/autumn-wisconsin.jpg');
+  background-size: cover;
+  background-position: 50% 50%;
+  min-height: 100vh; /* or whatever size you want */
+}
+</style>
