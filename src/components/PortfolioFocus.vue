@@ -29,14 +29,15 @@ const topics = [
       </div>
     </div>
     <hr class="hidden q-mt-lg" />
-    <p class="q-ma-none text-primary text-center">Grant Knaver</p>
+    <p class="q-ma-none text-primary text-center bounce-text">Grant Knaver</p>
     <hr />
-    <p class="q-ma-none text-secondary text-center">Fullstack Developer</p>
-
-    <blockquote class="fancy-quote text-primary">
-      "Full-stack JavaScript developer with 7+ years of experience building responsive, real-world
-      apps using Angular, Vue, and Node.js."
-    </blockquote>
+    <p class="q-ma-none text-secondary text-center bounce-text">Fullstack Developer</p>
+    <transition name="fade-up" appear>
+      <blockquote class="fancy-quote text-primary">
+        "Full-stack JavaScript developer with 7+ years of experience building responsive, real-world
+        apps using Angular, Vue, and Node.js."
+      </blockquote>
+    </transition>
 
     <!-- <q-btn class="q-mt-md" size="md" icon="description" flat label="Resume" color="primary" /> -->
   </div>
@@ -210,6 +211,50 @@ const topics = [
 
   @media (min-width: $breakpoint-xs) {
     display: none !important;
+  }
+}
+
+.fade-up-enter-active {
+  animation: fadeUp 0.8s ease-out both;
+}
+
+@keyframes fadeUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.bounce-text {
+  transition: all 0.3s ease;
+  outline: none;
+  cursor: pointer;
+  display: inline-block;
+
+  &:focus {
+    animation: bounce 0.6s ease;
+  }
+}
+
+@keyframes bounce {
+  0% {
+    transform: translateY(0);
+  }
+  30% {
+    transform: translateY(-10px);
+  }
+  50% {
+    transform: translateY(0);
+  }
+  70% {
+    transform: translateY(-5px);
+  }
+  100% {
+    transform: translateY(0);
   }
 }
 </style>
