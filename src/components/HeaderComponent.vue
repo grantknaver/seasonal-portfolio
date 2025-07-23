@@ -1,30 +1,26 @@
+<script lang="ts" setup>
+import { ref } from 'vue';
+const mobileMenu = ref(false);
+
+const tabs = [
+  { name: 'home', label: 'Home', href: '#home' },
+  { name: 'about', label: 'About', href: '#about' },
+  { name: 'projects', label: 'Projects', href: '#projects' },
+  { name: 'contact', label: 'Contact', href: '#contact' },
+];
+
+// function goTo(href: string) {
+//   const el = document.querySelector(href);
+//   if (el) el.scrollIntoView({ behavior: 'smooth' });
+// }
+</script>
+
 <template>
   <q-toolbar class="bg-transparent q-pa-lg">
     <!-- Logo / Title -->
     <q-toolbar-title>
       <img class="q-pt-sm" style="max-width: 200px" src="../assets/logo.png" alt="" />
     </q-toolbar-title>
-
-    <!-- Desktop Tabs -->
-    <div class="tabs">
-      <q-tabs
-        v-model="tab"
-        dense
-        class="text-body1 text-primary"
-        align="right"
-        active-color="primary"
-        indicator-color="primary"
-      >
-        <q-tab
-          v-for="item in tabs"
-          class="text-primary"
-          :key="item.name"
-          :name="item.name"
-          :label="item.label"
-        />
-      </q-tabs>
-    </div>
-
     <!-- Mobile Menu Button -->
     <q-btn
       color="primary"
@@ -56,38 +52,12 @@
   </q-toolbar>
 </template>
 
-<script lang="ts" setup>
-import { ref } from 'vue';
-
-const tab = ref('');
-const mobileMenu = ref(false);
-
-const tabs = [
-  { name: 'home', label: 'Home', href: '#home' },
-  { name: 'about', label: 'About', href: '#about' },
-  { name: 'projects', label: 'Projects', href: '#projects' },
-  { name: 'contact', label: 'Contact', href: '#contact' },
-];
-
-// function goTo(href: string) {
-//   const el = document.querySelector(href);
-//   if (el) el.scrollIntoView({ behavior: 'smooth' });
-// }
-</script>
-
 <style scoped lang="scss">
 @import '../css/main.scss';
 
 .menu-button {
   @media (min-width: $breakpoint-md) {
     display: none;
-  }
-}
-
-.tabs {
-  display: none;
-  @media (min-width: $breakpoint-md) {
-    display: initial;
   }
 }
 </style>

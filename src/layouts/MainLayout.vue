@@ -25,9 +25,14 @@ import HeaderComponent from 'src/components/HeaderComponent.vue';
 </template>
 
 <style scoped lang="scss">
+@import '../css/main.scss';
 .q-header {
   background-color: rgba($color: black, $alpha: 0.5) !important;
   border-bottom: 2px solid var(--q-primary);
+
+  @media (min-width: $breakpoint-md) {
+    display: none;
+  }
 }
 
 .container {
