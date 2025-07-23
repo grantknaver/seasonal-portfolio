@@ -8,12 +8,9 @@ const topics = [
 </script>
 
 <template>
-  <div class="container column justify-center items-center full-width">
+  <div class="container column items-center full-width">
     <img class="hidden q-pt-sm" style="max-width: 200px" src="../assets/logo.png" alt="" />
-    <!-- <h1 class="text-primary text-center q-mt-md q-mb-md">Grant Knaver</h1>
-    <p class="text-secondary q-mb-md">Fullstack Developer</p>
-    <hr />
-    <a flat size="lg">Resume</a> -->
+
     <div class="simon-circle hidden">
       <div
         v-for="topic in topics"
@@ -30,6 +27,9 @@ const topics = [
         </a>
       </div>
     </div>
+    <hr class="q-mt-lg" />
+    <p class="q-ma-none text-primary text-center">Grant Knaver</p>
+    <p class="q-ma-none text-secondary text-center">Fullstack Developer</p>
   </div>
 </template>
 
@@ -39,6 +39,7 @@ const topics = [
   background-size: cover;
   background-position: center;
   min-height: 100vh;
+  justify-content: center;
 
   @media (min-width: $breakpoint-sm) {
     border-bottom: 2px solid var(--q-primary);
@@ -48,32 +49,26 @@ const topics = [
     position: relative;
     min-height: 100vh;
     padding: initial;
-    justify-content: center;
   }
 
   img {
     position: absolute;
-    top: 2%;
-    left: 2%;
+    top: 3%;
+    left: 3%;
     @media (min-width: $breakpoint-xs) {
       display: initial !important;
     }
   }
 
-  h1 {
-    font-size: 4.5rem;
-    text-shadow: 2px 2px 5px var(--q-dark);
-    @media (min-width: $breakpoint-md) {
-      font-size: 6rem;
-    }
-  }
-
   p {
+    line-height: normal;
     font-size: 1.25rem;
     text-shadow: 2px 2px 2px var(--q-dark);
+
     @media (min-width: $breakpoint-md) {
       font-size: 1.5rem;
     }
+
     span {
       color: var(--q-secondary);
       font-size: 1.5rem;
@@ -97,10 +92,20 @@ const topics = [
   }
 }
 
+.container p:nth-of-type(1) {
+  font-weight: bold;
+  font-size: 1.5rem;
+  line-height: 2.2rem;
+  text-transform: uppercase;
+}
+
+.container p:nth-of-type(2) {
+  font-size: 1rem;
+  color: var(--q-secondary);
+}
+
 .simon-circle {
   position: relative;
-  width: 300px;
-  height: 300px;
   border-radius: 10px;
   overflow: visible;
 
@@ -108,6 +113,12 @@ const topics = [
     display: initial !important;
     width: 350px;
     height: 350px;
+    margin-top: 3%;
+  }
+
+  @media (min-width: $breakpoint-sm) {
+    width: 375px;
+    height: 375px;
   }
 }
 
