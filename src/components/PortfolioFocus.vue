@@ -1,6 +1,6 @@
 <script lang="ts" setup>
 const topics = [
-  { name: 'home', icon: 'home', label: 'Home', href: '#home' },
+  { name: 'resume', icon: 'description', label: 'Resume', href: '' },
   { name: 'about', icon: 'info', label: 'About', href: '#about' },
   { name: 'projects', icon: 'folder', label: 'Projects', href: '#projects' },
   { name: 'contact', icon: 'mail', label: 'Contact', href: '#contact' },
@@ -8,7 +8,7 @@ const topics = [
 </script>
 
 <template>
-  <div class="container column items-center full-width">
+  <div class="container col column items-center full-width">
     <img class="hidden q-pt-sm" style="max-width: 200px" src="../assets/logo.png" alt="" />
 
     <div class="simon-circle hidden">
@@ -19,17 +19,19 @@ const topics = [
         tabindex="0"
         style="padding: 1rem"
       >
-        <a :href="topic.href" class="simon-link">
+        <a v-if="topic.name !== 'resume'" :href="topic.href" class="simon-link">
           <q-icon :name="topic.icon" size="32px" />
           <q-tooltip anchor="center middle" self="top left">
             {{ topic.label }}
           </q-tooltip>
         </a>
+        <q-btn v-else class="q-mt-md" square size="md" label="Resume" flat color="primary" />
       </div>
     </div>
-    <hr class="q-mt-lg" />
+    <hr class="hidden q-mt-lg" />
     <p class="q-ma-none text-primary text-center">Grant Knaver</p>
     <p class="q-ma-none text-secondary text-center">Fullstack Developer</p>
+    <!-- <q-btn class="q-mt-md" size="md" icon="description" flat label="Resume" color="primary" /> -->
   </div>
 </template>
 
@@ -38,16 +40,10 @@ const topics = [
   background-image: url('../assets/autumn-forestry.jpg');
   background-size: cover;
   background-position: center;
-  min-height: 100vh;
   justify-content: center;
-
-  @media (min-width: $breakpoint-sm) {
-    border-bottom: 2px solid var(--q-primary);
-  }
 
   @media (min-width: $breakpoint-md) {
     position: relative;
-    min-height: 100vh;
     padding: initial;
   }
 
@@ -62,17 +58,7 @@ const topics = [
 
   p {
     line-height: normal;
-    font-size: 1.25rem;
     text-shadow: 2px 2px 2px var(--q-dark);
-
-    @media (min-width: $breakpoint-md) {
-      font-size: 1.5rem;
-    }
-
-    span {
-      color: var(--q-secondary);
-      font-size: 1.5rem;
-    }
   }
 
   a {
@@ -89,6 +75,10 @@ const topics = [
   hr {
     background-color: var(--q-primary);
     width: 100px;
+
+    @media (min-width: $breakpoint-xs) {
+      display: initial !important;
+    }
   }
 }
 
@@ -140,10 +130,6 @@ const topics = [
     transform: scale(1.25);
     z-index: 1002;
 
-    &.home {
-      background-color: var(--q-accent);
-    }
-
     &.about {
       background-color: var(--q-secondary);
     }
@@ -157,7 +143,9 @@ const topics = [
     }
   }
 
-  &.home {
+  &.resume {
+    background-color: transparent !important;
+    border: none;
     top: 0;
     left: 0;
   }
@@ -199,5 +187,8 @@ const topics = [
       z-index: 5;
     }
   }
+}
+
+.q-btn {
 }
 </style>
