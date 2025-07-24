@@ -1,15 +1,15 @@
 <script lang="ts" setup>
-import { Season } from '../shared/constants/season';
+import { Theme } from '../shared/constants/themes';
 
 const emit = defineEmits<{
-  (e: 'change-season', season: Season): void;
+  (e: 'change-season', theme: Theme): void;
 }>();
 
 const topics = [
   { name: 'resume', icon: 'description', label: 'Resume' },
-  { name: 'about', icon: 'info', label: 'About', season: Season.Winter },
-  { name: 'projects', icon: 'folder', label: 'Projects', season: Season.Spring },
-  { name: 'contact', icon: 'mail', label: 'Contact', season: Season.Summer },
+  { name: 'about', icon: 'info', label: 'About', season: Theme.Winter },
+  { name: 'projects', icon: 'folder', label: 'Projects', season: Theme.Spring },
+  { name: 'contact', icon: 'mail', label: 'Contact', season: Theme.Summer },
 ];
 </script>
 

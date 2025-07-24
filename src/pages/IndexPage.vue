@@ -2,7 +2,7 @@
 import { ref, onMounted } from 'vue';
 import PortfolioFocus from '../components/PortfolioFocus.vue';
 // import ContentOutlet from '../components/ContentOutlet.vue';
-import { Season } from '../shared/constants/season';
+import { Theme } from '../shared/constants/themes';
 
 // Refs for background state
 const currentBg = ref<string>('');
@@ -10,20 +10,20 @@ const nextBg = ref<string>('');
 const fading = ref(false);
 
 // Mapping of seasons to image URLs (resolved at build time)
-const backgroundMap: Record<Season, string> = {
-  [Season.Fall]: new URL('../assets/autumn-forestry.jpg', import.meta.url).href,
-  [Season.Winter]: new URL('../assets/snowy-winter-landscape.jpg', import.meta.url).href,
-  [Season.Spring]: new URL('../assets/beautiful-forest-spring-season.jpg', import.meta.url).href,
-  [Season.Summer]: new URL('../assets/beautiful-shot-forest.jpg', import.meta.url).href,
+const backgroundMap: Record<Theme, string> = {
+  [Theme.Fall]: new URL('../assets/autumn-forestry.jpg', import.meta.url).href,
+  [Theme.Winter]: new URL('../assets/snowy-winter-landscape.jpg', import.meta.url).href,
+  [Theme.Spring]: new URL('../assets/beautiful-forest-spring-season.jpg', import.meta.url).href,
+  [Theme.Summer]: new URL('../assets/beautiful-shot-forest.jpg', import.meta.url).href,
 };
 
 // Set default background on page load
 onMounted(() => {
-  currentBg.value = backgroundMap[Season.Fall];
+  currentBg.value = backgroundMap[Theme.Fall];
 });
 
 // Handle background switching with smooth transition
-const updateActiveSeason = (season: Season) => {
+const updateActiveSeason = (season: Theme) => {
   const newImage = backgroundMap[season];
   if (!newImage || newImage === currentBg.value) return;
 
