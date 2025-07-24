@@ -1,5 +1,5 @@
 <script lang="ts" setup>
-import { Theme } from '../shared/constants/themes';
+import { Theme } from '../shared/constants/theme';
 
 const emit = defineEmits<{
   (e: 'change-season', theme: Theme): void;

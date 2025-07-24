@@ -2,7 +2,8 @@
 import { ref, onMounted } from 'vue';
 import PortfolioFocus from '../components/PortfolioFocus.vue';
 // import ContentOutlet from '../components/ContentOutlet.vue';
-import { Theme } from '../shared/constants/themes';
+import { Theme } from '../shared/constants/theme';
+import { setTheme } from '../shared/utils/theme';
 
 // Refs for background state
 const currentBg = ref<string>('');
@@ -23,8 +24,10 @@ onMounted(() => {
 });
 
 // Handle background switching with smooth transition
-const updateActiveSeason = (season: Theme) => {
-  const newImage = backgroundMap[season];
+const updateActiveSeason = (theme: Theme) => {
+  const newImage = backgroundMap[theme];
+  setTheme(theme);
+
   if (!newImage || newImage === currentBg.value) return;
 
   nextBg.value = newImage;
