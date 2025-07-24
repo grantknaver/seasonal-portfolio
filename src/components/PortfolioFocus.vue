@@ -1,9 +1,15 @@
 <script lang="ts" setup>
+import { Season } from '../shared/constants/season';
+
+const emit = defineEmits<{
+  (e: 'change-season', season: Season): void;
+}>();
+
 const topics = [
-  { name: 'resume', icon: 'description', label: 'Resume', href: '' },
-  { name: 'about', icon: 'info', label: 'About', href: '#about' },
-  { name: 'projects', icon: 'folder', label: 'Projects', href: '#projects' },
-  { name: 'contact', icon: 'mail', label: 'Contact', href: '#contact' },
+  { name: 'resume', icon: 'description', label: 'Resume' },
+  { name: 'about', icon: 'info', label: 'About', season: Season.Winter },
+  { name: 'projects', icon: 'folder', label: 'Projects', season: Season.Spring },
+  { name: 'contact', icon: 'mail', label: 'Contact', season: Season.Summer },
 ];
 </script>
 
@@ -18,8 +24,9 @@ const topics = [
         :class="['simon-quadrant', topic.name]"
         tabindex="0"
         style="padding: 1rem"
+        @click="emit('change-season', topic.season!!)"
       >
-        <a v-if="topic.name !== 'resume'" :href="topic.href" class="simon-link">
+        <a v-if="topic.name !== 'resume'" class="simon-link">
           <q-icon :name="topic.icon" size="32px" />
           <q-tooltip anchor="center middle" self="top left">
             {{ topic.label }}
@@ -45,9 +52,6 @@ const topics = [
 
 <style scoped lang="scss">
 .container {
-  background-image: url('../assets/autumn-forestry.jpg');
-  background-size: cover;
-  background-position: center;
   justify-content: center;
 
   @media (min-width: $breakpoint-md) {
@@ -87,6 +91,10 @@ const topics = [
     @media (min-width: $breakpoint-xs) {
       display: initial !important;
     }
+  }
+
+  hr:nth-of-type(2) {
+    display: none !important;
   }
 }
 
@@ -225,35 +233,6 @@ const topics = [
   }
   to {
     opacity: 1;
-    transform: translateY(0);
-  }
-}
-
-.bounce-text {
-  transition: all 0.3s ease;
-  outline: none;
-  cursor: pointer;
-  display: inline-block;
-
-  &:focus {
-    animation: bounce 0.6s ease;
-  }
-}
-
-@keyframes bounce {
-  0% {
-    transform: translateY(0);
-  }
-  30% {
-    transform: translateY(-10px);
-  }
-  50% {
-    transform: translateY(0);
-  }
-  70% {
-    transform: translateY(-5px);
-  }
-  100% {
     transform: translateY(0);
   }
 }

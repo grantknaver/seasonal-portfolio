@@ -23,3 +23,38 @@ $positive: #21ba45;
 $negative: #c10015;
 $info: #31ccec;
 $warning: #f2c037;
+
+// === Base Theme Maps ===
+$fall-theme: (
+  primary: #f4e7e1,
+  secondary: #ff9b45,
+  accent: #d5451b,
+  dark: #521c0d,
+);
+
+$winter-theme: (
+  primary: #e0f7fa,
+  secondary: #81d4fa,
+  accent: #00acc1,
+  dark: #37474f,
+);
+
+$spring-theme: (
+  primary: #dcedc8,
+  secondary: #aed581,
+  accent: #8bc34a,
+  dark: #33691e,
+);
+
+$summer-theme: (
+  primary: #fff9c4,
+  secondary: #ffe082,
+  accent: #ffca28,
+  dark: #ef6c00,
+);
+
+// === Default Theme (Fall)
+$primary: map-get($fall-theme, primary);
+$secondary: map-get($fall-theme, secondary);
+$accent: map-get($fall-theme, accent);
+$dark: map-get($fall-theme, dark);
