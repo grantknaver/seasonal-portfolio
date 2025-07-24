@@ -205,6 +205,8 @@ onBeforeUnmount(() => {
   &.active-topic {
     background-color: var(--q-dark);
     border: solid 5px var(--q-accent);
+    transform: scale(0.9);
+    transition: transform 0.7s ease-in;
   }
 }
 
