@@ -1,7 +1,6 @@
 <script setup lang="ts">
 import { ref, onMounted, watch } from 'vue';
 import PortfolioFocus from '../components/PortfolioFocus.vue';
-// import ContentOutlet from '../components/ContentOutlet.vue';
 import { Theme } from '../shared/constants/theme';
 import { setTheme } from '../shared/utils/theme';
 import { useThemeStore } from '../stores/theme';
@@ -9,12 +8,12 @@ import { storeToRefs } from 'pinia';
 
 const themeStore = useThemeStore();
 const { activeTheme } = storeToRefs(themeStore);
-// Refs for background state
-const currentBg = ref<string>('');
-const nextBg = ref<string>('');
-const fading = ref(false);
 
-// Mapping of seasons to image URLs (resolved at build time)
+const currentBg = ref('');
+const nextBg = ref('');
+const showNext = ref(false);
+
+// Map each theme to its background image URL
 const backgroundMap: Record<Theme, string> = {
   [Theme.Fall]: new URL('../assets/autumn-forestry.jpg', import.meta.url).href,
   [Theme.Winter]: new URL('../assets/snowy-winter-landscape.jpg', import.meta.url).href,
@@ -22,34 +21,29 @@ const backgroundMap: Record<Theme, string> = {
   [Theme.Summer]: new URL('../assets/beautiful-shot-forest.jpg', import.meta.url).href,
 };
 
-// Set default background on page load
+// Initialize with Fall background
 onMounted(() => {
   currentBg.value = backgroundMap[Theme.Fall];
 });
 
+// Watch for theme changes and trigger fade transition
 watch(
   () => activeTheme.value,
   (newTheme) => {
-    updateActiveBackground(newTheme);
+    const newImage = backgroundMap[newTheme];
+    if (!newImage || newImage === currentBg.value) return;
+
+    nextBg.value = newImage;
+    showNext.value = true;
+    setTheme(newTheme);
+
+    setTimeout(() => {
+      currentBg.value = newImage;
+      showNext.value = false;
+      nextBg.value = '';
+    }, 800); // duration must match animation
   },
 );
-
-// Handle background switching with smooth transition
-const updateActiveBackground = (theme: Theme) => {
-  const newImage = backgroundMap[theme];
-  setTheme(theme);
-
-  if (!newImage || newImage === currentBg.value) return;
-
-  nextBg.value = newImage;
-  fading.value = true;
-
-  setTimeout(() => {
-    currentBg.value = newImage;
-    nextBg.value = '';
-    fading.value = false;
-  }, 700); // matches CSS animation duration
-};
 </script>
 
 <template>
@@ -57,15 +51,14 @@ const updateActiveBackground = (theme: Theme) => {
     <!-- Background layers -->
     <div class="background-layer" :style="{ backgroundImage: `url('${currentBg}')` }" />
     <div
-      v-if="fading"
-      class="background-layer fade"
+      v-show="showNext"
+      class="background-layer fade-layer"
       :style="{ backgroundImage: `url('${nextBg}')` }"
     />
 
     <!-- Foreground content -->
     <div class="content-wrapper">
       <PortfolioFocus />
-      <!-- <ContentOutlet /> -->
     </div>
   </q-page>
 </template>
@@ -74,6 +67,8 @@ const updateActiveBackground = (theme: Theme) => {
 .page-container {
   position: relative;
   overflow: hidden;
+  height: 100vh;
+  width: 100%;
 }
 
 .background-layer {
@@ -85,15 +80,15 @@ const updateActiveBackground = (theme: Theme) => {
   background-size: cover;
   background-position: center;
   background-repeat: no-repeat;
-  transition: opacity 0.7s ease-in-out;
   z-index: 0;
   opacity: 1;
+  transition: opacity 0.8s ease-in-out;
 }
 
-.background-layer.fade {
+.fade-layer {
   z-index: 1;
-  opacity: 1;
-  animation: fadeIn 0.7s forwards;
+  opacity: 0;
+  animation: fadeIn 0.8s forwards;
 }
 
 @keyframes fadeIn {
@@ -111,5 +106,6 @@ const updateActiveBackground = (theme: Theme) => {
   width: 100%;
   display: flex;
   flex-grow: 1;
+  flex-direction: column;
 }
 </style>

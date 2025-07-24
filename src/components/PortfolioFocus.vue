@@ -1,15 +1,34 @@
 <script lang="ts" setup>
+import { storeToRefs } from 'pinia';
 import { Theme } from '../shared/constants/theme';
 import { useThemeStore } from '../stores/theme';
+import { onMounted, onBeforeUnmount } from 'vue';
 
 const themeStore = useThemeStore();
+const { activeTheme } = storeToRefs(themeStore);
 
 const topics = [
   { name: 'resume', icon: 'description', label: 'Resume' },
-  { name: 'about', icon: 'info', label: 'About', season: Theme.Winter },
-  { name: 'projects', icon: 'folder', label: 'Projects', season: Theme.Spring },
-  { name: 'contact', icon: 'mail', label: 'Contact', season: Theme.Summer },
+  { name: 'about', icon: 'info', label: 'About', theme: Theme.Winter },
+  { name: 'projects', icon: 'folder', label: 'Projects', theme: Theme.Spring },
+  { name: 'contact', icon: 'mail', label: 'Contact', theme: Theme.Summer },
 ];
+
+// Click outside handler
+const handleClickOutside = (event: MouseEvent) => {
+  const simonCircle = document.querySelector('.simon-circle');
+  if (simonCircle && !simonCircle.contains(event.target as Node)) {
+    themeStore.SET_ACTIVE_THEME(Theme.Fall);
+  }
+};
+
+onMounted(() => {
+  window.addEventListener('click', handleClickOutside);
+});
+
+onBeforeUnmount(() => {
+  window.removeEventListener('click', handleClickOutside);
+});
 </script>
 
 <template>
@@ -20,10 +39,11 @@ const topics = [
       <div
         v-for="topic in topics"
         :key="topic.name"
-        :class="['simon-quadrant', topic.name]"
+        class="simon-quadrant"
+        :class="[topic.name, { 'active-topic': topic.theme === activeTheme }]"
         tabindex="0"
         style="padding: 1rem"
-        @click="themeStore.SET_ACTIVE_THEME(topic.season!!)"
+        @click.stop="themeStore.SET_ACTIVE_THEME(topic.theme ?? Theme.Fall)"
       >
         <a v-if="topic.name !== 'resume'" class="simon-link">
           <q-icon :name="topic.icon" size="32px" />
@@ -34,6 +54,7 @@ const topics = [
         <a v-else class="text-primary text-body2" label="Resume" flat>Resume</a>
       </div>
     </div>
+
     <hr class="hidden q-mt-lg" />
     <p class="q-ma-none text-primary text-center bounce-text">Grant Knaver</p>
     <hr />
@@ -44,8 +65,6 @@ const topics = [
         apps using Angular, Vue, and Node.js."
       </blockquote>
     </transition>
-
-    <!-- <q-btn class="q-mt-md" size="md" icon="description" flat label="Resume" color="primary" /> -->
   </div>
 </template>
 
@@ -140,8 +159,7 @@ const topics = [
   border: solid 4px rgba($color: #f4e7e1, $alpha: 0.5);
   background-color: rgba($color: #521c0d, $alpha: 0.5);
 
-  &:hover,
-  &:focus-within {
+  &:hover {
     transform: scale(1.25);
     z-index: 10;
 
@@ -159,10 +177,14 @@ const topics = [
   }
 
   &.resume {
-    background-color: transparent !important;
+    background-color: transparent;
     border: none;
     top: 0;
     left: 0;
+
+    a {
+      text-shadow: 2px 2px var(--q-dark);
+    }
   }
 
   &.about {
@@ -178,6 +200,11 @@ const topics = [
   &.contact {
     bottom: 0;
     right: 0;
+  }
+
+  &.active-topic {
+    background-color: var(--q-dark);
+    border: solid 5px var(--q-accent);
   }
 }
 
