@@ -1,10 +1,14 @@
 <script setup lang="ts">
-import { ref, onMounted } from 'vue';
+import { ref, onMounted, watch } from 'vue';
 import PortfolioFocus from '../components/PortfolioFocus.vue';
 // import ContentOutlet from '../components/ContentOutlet.vue';
 import { Theme } from '../shared/constants/theme';
 import { setTheme } from '../shared/utils/theme';
+import { useThemeStore } from '../stores/theme';
+import { storeToRefs } from 'pinia';
 
+const themeStore = useThemeStore();
+const { activeTheme } = storeToRefs(themeStore);
 // Refs for background state
 const currentBg = ref<string>('');
 const nextBg = ref<string>('');
@@ -23,8 +27,15 @@ onMounted(() => {
   currentBg.value = backgroundMap[Theme.Fall];
 });
 
+watch(
+  () => activeTheme.value,
+  (newTheme) => {
+    updateActiveBackground(newTheme);
+  },
+);
+
 // Handle background switching with smooth transition
-const updateActiveSeason = (theme: Theme) => {
+const updateActiveBackground = (theme: Theme) => {
   const newImage = backgroundMap[theme];
   setTheme(theme);
 
@@ -53,7 +64,7 @@ const updateActiveSeason = (theme: Theme) => {
 
     <!-- Foreground content -->
     <div class="content-wrapper">
-      <PortfolioFocus @change-season="updateActiveSeason" />
+      <PortfolioFocus />
       <!-- <ContentOutlet /> -->
     </div>
   </q-page>

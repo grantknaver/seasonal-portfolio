@@ -1,9 +1,8 @@
 <script lang="ts" setup>
 import { Theme } from '../shared/constants/theme';
+import { useThemeStore } from '../stores/theme';
 
-const emit = defineEmits<{
-  (e: 'change-season', theme: Theme): void;
-}>();
+const themeStore = useThemeStore();
 
 const topics = [
   { name: 'resume', icon: 'description', label: 'Resume' },
@@ -24,7 +23,7 @@ const topics = [
         :class="['simon-quadrant', topic.name]"
         tabindex="0"
         style="padding: 1rem"
-        @click="emit('change-season', topic.season!!)"
+        @click="themeStore.SET_ACTIVE_THEME(topic.season!!)"
       >
         <a v-if="topic.name !== 'resume'" class="simon-link">
           <q-icon :name="topic.icon" size="32px" />
@@ -32,7 +31,7 @@ const topics = [
             {{ topic.label }}
           </q-tooltip>
         </a>
-        <q-btn v-else class="q-mt-md" square size="md" label="Resume" flat color="primary" />
+        <a v-else class="text-primary text-body2" label="Resume" flat>Resume</a>
       </div>
     </div>
     <hr class="hidden q-mt-lg" />
@@ -144,7 +143,7 @@ const topics = [
   &:hover,
   &:focus-within {
     transform: scale(1.25);
-    z-index: 1002;
+    z-index: 10;
 
     &.about {
       background-color: var(--q-secondary);
