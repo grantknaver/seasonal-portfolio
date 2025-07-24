@@ -1,5 +1,13 @@
 <script lang="ts" setup>
-import { ref } from 'vue';
+import { computed, ref } from 'vue';
+import { useMainStore } from '../stores/main';
+import { storeToRefs } from 'pinia';
+
+const mainStore = useMainStore();
+const { activeTopic } = storeToRefs(mainStore);
+
+const showTopicPanel = computed(() => !!activeTopic.value);
+const drawerWidth = computed(() => window.innerWidth * 0.5);
 
 const mobileMenu = ref(false);
 
@@ -73,6 +81,16 @@ const tabs = [
     <q-page-container>
       <router-view />
     </q-page-container>
+
+    <q-drawer :model-value="showTopicPanel" side="right" behavior="desktop" :width="drawerWidth">
+      <q-scroll-area class="fit q-pa-md">
+        <div class="text-white">
+          <!-- Your panel content here -->
+          <!-- <q-btn icon="close" flat dense class="q-mb-md" @click="showPanel = false" /> -->
+          <p class="text-h6">Panel Content</p>
+        </div>
+      </q-scroll-area>
+    </q-drawer>
 
     <!-- FOOTER -->
     <q-footer>

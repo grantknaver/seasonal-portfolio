@@ -6,8 +6,8 @@ import { setTheme } from '../shared/utils/theme';
 import { useMainStore } from '../stores/main';
 import { storeToRefs } from 'pinia';
 
-const themeStore = useMainStore();
-const { activeTheme } = storeToRefs(themeStore);
+const mainStore = useMainStore();
+const { activeTheme } = storeToRefs(mainStore);
 
 const currentBg = ref('');
 const nextBg = ref('');
@@ -48,6 +48,7 @@ watch(
 
 <template>
   <q-page class="page-container flex column">
+    <img class="hidden q-pt-sm" style="max-width: 200px" src="../assets/logo.png" alt="" />
     <!-- Background layers -->
     <div class="background-layer" :style="{ backgroundImage: `url('${currentBg}')` }" />
     <div
@@ -69,20 +70,39 @@ watch(
   overflow: hidden;
   height: 100vh;
   width: 100%;
-}
 
-.background-layer {
-  position: absolute;
-  top: 0;
-  left: 0;
-  height: 100%;
-  width: 100%;
-  background-size: cover;
-  background-position: center;
-  background-repeat: no-repeat;
-  z-index: 0;
-  opacity: 1;
-  transition: opacity 0.8s ease-in-out;
+  img {
+    position: absolute;
+    top: 3%;
+    left: 3%;
+    @media (min-width: $breakpoint-xs) {
+      display: initial !important;
+      z-index: 10;
+    }
+  }
+
+  .background-layer {
+    position: absolute;
+    top: 0;
+    left: 0;
+    height: 100%;
+    width: 100%;
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+    z-index: 0;
+    opacity: 1;
+    transition: opacity 0.8s ease-in-out;
+  }
+
+  .content-wrapper {
+    position: relative;
+    z-index: 2;
+    width: 100%;
+    display: flex;
+    flex-grow: 1;
+    justify-content: start;
+  }
 }
 
 .fade-layer {
@@ -98,14 +118,5 @@ watch(
   to {
     opacity: 1;
   }
-}
-
-.content-wrapper {
-  position: relative;
-  z-index: 2;
-  width: 100%;
-  display: flex;
-  flex-grow: 1;
-  flex-direction: column;
 }
 </style>

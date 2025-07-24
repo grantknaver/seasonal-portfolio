@@ -48,8 +48,6 @@ const handleClickOutside = (event: MouseEvent) => {
 
 <template>
   <div class="container col column items-center full-width">
-    <img class="hidden q-pt-sm" style="max-width: 200px" src="../assets/logo.png" alt="" />
-
     <div class="simon-circle hidden">
       <div
         v-for="topic in topics"
@@ -90,15 +88,6 @@ const handleClickOutside = (event: MouseEvent) => {
   @media (min-width: $breakpoint-md) {
     position: relative;
     padding: initial;
-  }
-
-  img {
-    position: absolute;
-    top: 3%;
-    left: 3%;
-    @media (min-width: $breakpoint-xs) {
-      display: initial !important;
-    }
   }
 
   p {

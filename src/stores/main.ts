@@ -9,7 +9,6 @@ export const useMainStore = defineStore('main', () => {
 
   const SET_ACTIVE_TOPIC = (topicName: string | null) => {
     activeTopic.value = topicName;
-    console.log('activeTopic', activeTopic.value);
   };
 
   const SET_ACTIVE_THEME = (theme: Theme) => {
