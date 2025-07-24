@@ -1,26 +1,26 @@
 <script lang="ts" setup>
 import { storeToRefs } from 'pinia';
 import { Theme } from '../shared/constants/theme';
-import { useThemeStore } from '../stores/theme';
+import { useMainStore } from '../stores/main';
 import { onMounted, onBeforeUnmount } from 'vue';
+import { type Topic } from '../shared/models/topic';
+import { v4 as uuidv4 } from 'uuid';
 
-const themeStore = useThemeStore();
-const { activeTheme } = storeToRefs(themeStore);
+const mainStore = useMainStore();
+const { activeTheme } = storeToRefs(mainStore);
 
-const topics = [
-  { name: 'resume', icon: 'description', label: 'Resume' },
-  { name: 'about', icon: 'info', label: 'About', theme: Theme.Winter },
-  { name: 'projects', icon: 'folder', label: 'Projects', theme: Theme.Spring },
-  { name: 'contact', icon: 'mail', label: 'Contact', theme: Theme.Summer },
+const topics: Topic[] = [
+  { id: uuidv4(), name: 'resume', icon: 'description', label: '' },
+  { id: uuidv4(), name: 'about', icon: 'info', label: 'About', theme: Theme.Winter },
+  {
+    id: uuidv4(),
+    name: 'projects',
+    icon: 'folder',
+    label: 'Projects',
+    theme: Theme.Spring,
+  },
+  { id: uuidv4(), name: 'contact', icon: 'mail', label: 'Contact', theme: Theme.Summer },
 ];
-
-// Click outside handler
-const handleClickOutside = (event: MouseEvent) => {
-  const simonCircle = document.querySelector('.simon-circle');
-  if (simonCircle && !simonCircle.contains(event.target as Node)) {
-    themeStore.SET_ACTIVE_THEME(Theme.Fall);
-  }
-};
 
 onMounted(() => {
   window.addEventListener('click', handleClickOutside);
@@ -29,6 +29,21 @@ onMounted(() => {
 onBeforeUnmount(() => {
   window.removeEventListener('click', handleClickOutside);
 });
+
+const selectTopic = (name: string, theme?: Theme) => {
+  if (name !== 'resume') {
+    mainStore.SET_ACTIVE_TOPIC(name);
+  }
+  mainStore.SET_ACTIVE_THEME(theme ?? Theme.Fall);
+};
+// Click outside handler
+const handleClickOutside = (event: MouseEvent) => {
+  const simonCircle = document.querySelector('.simon-circle');
+  if (simonCircle && !simonCircle.contains(event.target as Node)) {
+    mainStore.SET_ACTIVE_TOPIC(null);
+    mainStore.SET_ACTIVE_THEME(Theme.Fall);
+  }
+};
 </script>
 
 <template>
@@ -38,12 +53,12 @@ onBeforeUnmount(() => {
     <div class="simon-circle hidden">
       <div
         v-for="topic in topics"
-        :key="topic.name"
+        :key="topic.id"
         class="simon-quadrant"
         :class="[topic.name, { 'active-topic': topic.theme === activeTheme }]"
         tabindex="0"
         style="padding: 1rem"
-        @click.stop="themeStore.SET_ACTIVE_THEME(topic.theme ?? Theme.Fall)"
+        @click.stop="selectTopic(topic.name, topic.theme)"
       >
         <a v-if="topic.name !== 'resume'" class="simon-link">
           <q-icon :name="topic.icon" size="32px" />

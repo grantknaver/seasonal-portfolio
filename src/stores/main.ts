@@ -1,17 +1,25 @@
 import { ref } from 'vue';
 import { defineStore } from 'pinia';
+
 import { Theme } from '../shared/constants/theme';
 
-export const useThemeStore = defineStore('user', () => {
+export const useMainStore = defineStore('main', () => {
+  const activeTopic = ref<string | null>(null);
   const activeTheme = ref<Theme>(Theme.Fall);
 
+  const SET_ACTIVE_TOPIC = (topicName: string | null) => {
+    activeTopic.value = topicName;
+    console.log('activeTopic', activeTopic.value);
+  };
+
   const SET_ACTIVE_THEME = (theme: Theme) => {
-    console.log('SET_ACTIVE_THEME', theme);
     activeTheme.value = theme;
   };
 
   return {
+    activeTopic,
     activeTheme,
+    SET_ACTIVE_TOPIC,
     SET_ACTIVE_THEME,
   };
 });

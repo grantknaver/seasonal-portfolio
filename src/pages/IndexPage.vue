@@ -3,10 +3,10 @@ import { ref, onMounted, watch } from 'vue';
 import PortfolioFocus from '../components/PortfolioFocus.vue';
 import { Theme } from '../shared/constants/theme';
 import { setTheme } from '../shared/utils/theme';
-import { useThemeStore } from '../stores/theme';
+import { useMainStore } from '../stores/main';
 import { storeToRefs } from 'pinia';
 
-const themeStore = useThemeStore();
+const themeStore = useMainStore();
 const { activeTheme } = storeToRefs(themeStore);
 
 const currentBg = ref('');
