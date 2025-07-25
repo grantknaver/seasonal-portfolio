@@ -71,7 +71,7 @@ const handleClickOutside = (event: MouseEvent) => {
     <hr class="hidden q-mt-lg" />
     <p class="q-ma-none text-primary text-center bounce-text">Grant Knaver</p>
     <hr />
-    <p class="q-ma-none text-secondary text-center bounce-text">Fullstack Developer</p>
+    <p class="q-ma-none text-secondary text-center">Fullstack Developer</p>
     <transition name="fade-up" appear>
       <blockquote class="fancy-quote text-primary">
         "Full-stack JavaScript developer with 7+ years of experience building responsive, real-world
@@ -130,6 +130,7 @@ const handleClickOutside = (event: MouseEvent) => {
 .container p:nth-of-type(2) {
   font-size: 1rem;
   color: var(--q-secondary);
+  text-shadow: 2px 2px 2px var(--q-dark);
 }
 
 .simon-circle {
