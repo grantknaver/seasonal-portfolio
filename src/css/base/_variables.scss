@@ -4,4 +4,22 @@ $breakpoint-md: 1024px;
 $breakpoint-lg: 1440px;
 $breakpoint-xl: 1920px;
 
+$breakpoints: (
+  'breakpoint-xs': $breakpoint-xs,
+  'breakpoint-sm': $breakpoint-sm,
+  'breakpoint-md': $breakpoint-md,
+  'breakpoint-lg': $breakpoint-lg,
+  'breakpoint-xl': $breakpoint-xl,
+);
+
+@mixin export-css-vars($map) {
+  @each $key, $value in $map {
+    --#{$key}: #{$value};
+  }
+}
+
+:root {
+  @include export-css-vars($breakpoints);
+}
+
 $font-stack: 'Roboto', sans-serif;

@@ -18,7 +18,7 @@ onMounted(() => {
 
 <template>
   <q-page class="page-container flex column">
-    <img class="hidden q-pt-sm" style="max-width: 200px" src="../assets/logo.png" alt="" />
+    <img class="q-pt-sm" style="max-width: 200px" src="../assets/logo.png" alt="" />
     <div class="content-wrapper">
       <PortfolioFocus />
     </div>

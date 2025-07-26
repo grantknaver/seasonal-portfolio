@@ -1,23 +1,36 @@
 <script lang="ts" setup>
-import { computed, ref, onMounted, watch } from 'vue';
+import { computed, ref, onMounted, watch, onBeforeUnmount } from 'vue';
 import { useMainStore } from '../stores/main';
 import { storeToRefs } from 'pinia';
 import { Theme } from '../shared/constants/theme';
 import { setTheme } from '../shared/utils/theme';
+import { getCustomCssVar } from '../shared/utils/getCustomCssVar';
 
 const mainStore = useMainStore();
 const { activeTheme, activeTopic } = storeToRefs(mainStore);
+const windowWidth = ref(window.innerWidth);
+const desktopDrawerWidth = ref(window.innerWidth * 0.5);
+const showTopicBreakpoint = +`${getCustomCssVar('breakpoint-md')}`.slice(0, -2);
+const showTopicPanel = computed(
+  () => !!activeTopic.value && windowWidth.value > showTopicBreakpoint,
+);
 
-const showTopicPanel = computed(() => !!activeTopic.value);
-const drawerWidth = computed(() => window.innerWidth * 0.5);
+const updateWidths = () => {
+  desktopDrawerWidth.value = window.innerWidth * 0.5;
+  windowWidth.value = window.innerWidth;
+};
 
-const mobileMenu = ref(false);
+onMounted(() => window.addEventListener('resize', updateWidths));
 
-const tabs = [
-  { name: 'about', label: 'About', href: '#about' },
-  { name: 'projects', label: 'Projects', href: '#projects' },
-  { name: 'contact', label: 'Contact', href: '#contact' },
-];
+onBeforeUnmount(() => window.removeEventListener('resize', updateWidths));
+
+// const mobileMenu = ref(false);
+
+// const tabs = [
+//   { name: 'about', label: 'About', href: '#about' },
+//   { name: 'projects', label: 'Projects', href: '#projects' },
+//   { name: 'contact', label: 'Contact', href: '#contact' },
+// ];
 
 // Background image logic
 const currentBg = ref('');
@@ -67,9 +80,9 @@ watch(
     <!-- Main Layout -->
     <q-layout view="lHh Lpr lFf" class="column">
       <!-- HEADER -->
-      <q-header class="text-black">
+      <!-- <q-header class="text-black">
         <q-toolbar class="bg-dark q-pa-lg">
-          <!-- Logo -->
+
           <q-toolbar-title>
             <img
               class="q-pt-sm"
@@ -78,8 +91,6 @@ watch(
               alt="glkFreelance logo"
             />
           </q-toolbar-title>
-
-          <!-- Mobile Menu Button -->
           <q-btn
             color="primary"
             class="menu-button"
@@ -89,8 +100,6 @@ watch(
             icon="menu"
             @click="mobileMenu = !mobileMenu"
           />
-
-          <!-- Mobile Drawer Menu -->
           <q-drawer v-model="mobileMenu" side="right" overlay behavior="mobile" bordered>
             <q-list>
               <q-item
@@ -109,7 +118,7 @@ watch(
             </q-list>
           </q-drawer>
         </q-toolbar>
-      </q-header>
+      </q-header> -->
 
       <!-- PAGE CONTAINER -->
       <q-page-container>
@@ -121,8 +130,8 @@ watch(
         :model-value="showTopicPanel"
         side="right"
         behavior="desktop"
-        :width="drawerWidth"
-        class="transparent-drawer"
+        :width="desktopDrawerWidth"
+        class="desktop-drawer"
       >
         <q-scroll-area class="fit q-pa-md">
           <div class="text-white"></div>
@@ -140,7 +149,7 @@ watch(
 </template>
 
 <style lang="scss">
-@import '../css/main.scss';
+@import '../css/base/variables';
 
 html,
 body,
@@ -199,7 +208,7 @@ aside {
   }
 }
 
-.transparent-drawer {
+.desktop-drawer {
   background-color: rgba(black, 0.5);
   box-shadow: none !important;
 }

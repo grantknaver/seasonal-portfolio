@@ -48,18 +48,10 @@ const handleClickOutside = (event: MouseEvent) => {
 
 <template>
   <div class="container col column justify-center items-center">
-    <div class="mobile-view col column items-center justify-center">
-      <p class="q-ma-none text-primary bounce-text">Grant Knaver - Mobile</p>
+    <!-- <div class="mobile-view col column items-center justify-center">
+      <p class="q-ma-none text-primary bounce-text">Grant Knaver - mobile</p>
       <p class="q-ma-none text-secondary">Fullstack Developer</p>
-      <hr />
-
-      <transition name="fade-up" appear>
-        <blockquote class="fancy-quote text-primary">
-          "Full-stack JavaScript developer with 7+ years of experience building responsive,
-          real-world apps using Angular, Vue, and Node.js."
-        </blockquote>
-      </transition>
-    </div>
+    </div> -->
     <div class="desktop-view col column justify-center items-center full-width">
       <div class="simon-circle">
         <div
@@ -81,22 +73,19 @@ const handleClickOutside = (event: MouseEvent) => {
         </div>
       </div>
       <hr class="q-mt-lg" />
-      <p class="q-ma-none text-primary">Grant Knaver</p>
+      <p class="q-ma-none text-primary">Grant Knaver - Desktop</p>
       <p class="q-ma-none text-secondary">Fullstack Developer</p>
     </div>
   </div>
 </template>
 
 <style scoped lang="scss">
+@import '../css/base/_variables.scss';
+
 .container {
   @media (min-width: $breakpoint-md) {
     position: relative;
     padding: initial;
-  }
-
-  p {
-    line-height: normal;
-    text-shadow: 2px 2px 2px var(--q-dark);
   }
 
   hr {
@@ -104,21 +93,25 @@ const handleClickOutside = (event: MouseEvent) => {
     width: 100px;
   }
 
-  // p:nth-of-type(1) {
-  //   font-weight: bold;
-  //   font-size: 1.5rem;
-  //   line-height: 2.2rem;
-  //   text-transform: uppercase;
-  // }
+  p {
+    text-shadow: 2px 2px 2px var(--q-dark);
+  }
 
-  // p:nth-of-type(2) {
-  //   font-size: 1rem;
-  //   color: var(--q-secondary);
-  //   text-shadow: 2px 2px 2px var(--q-dark);
-  // }
+  p:nth-of-type(1) {
+    font-weight: bold;
+    font-size: 1.5rem;
+    line-height: 2.2rem;
+    text-transform: uppercase;
+  }
+
+  p:nth-of-type(2) {
+    font-size: 1rem;
+    color: var(--q-secondary);
+    text-shadow: 2px 2px 2px var(--q-dark);
+  }
 
   .mobile-view {
-    @media (min-width: $breakpoint-md) {
+    @media (min-width: $breakpoint-xs) {
       display: none;
     }
 
@@ -153,9 +146,11 @@ const handleClickOutside = (event: MouseEvent) => {
 
   .desktop-view {
     display: none;
+
     @media (min-width: $breakpoint-md) {
       display: flex;
     }
+
     .simon-circle {
       position: relative;
       border-radius: 10px;
@@ -264,12 +259,6 @@ const handleClickOutside = (event: MouseEvent) => {
       color: var(--q-primary);
       font-size: 2rem;
       cursor: pointer;
-    }
-
-    p {
-      @media (min-width: $breakpoint-md) {
-        color: pink;
-      }
     }
   }
 }
