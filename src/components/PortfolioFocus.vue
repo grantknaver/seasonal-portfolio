@@ -5,31 +5,32 @@ import { onMounted, onBeforeUnmount } from 'vue';
 import { type Topic } from '../shared/models/topic';
 import { v4 as uuidv4 } from 'uuid';
 import { storeToRefs } from 'pinia';
+import { TopicName } from 'src/shared/constants/topicName';
 
 const mainStore = useMainStore();
 const topics: Topic[] = [
-  { id: uuidv4(), name: 'resume', icon: 'description', label: '' },
+  { id: uuidv4(), name: TopicName.Resume, icon: 'description', label: '' },
   {
     id: uuidv4(),
-    name: 'about',
+    name: TopicName.About,
     icon: 'info',
-    label: 'About',
+    label: TopicName.About,
     theme: Theme.Winter,
     seasonIcon: 'ac_unit',
   },
   {
     id: uuidv4(),
-    name: 'projects',
+    name: TopicName.Projects,
     icon: 'folder',
-    label: 'Projects',
+    label: TopicName.Projects,
     theme: Theme.Spring,
     seasonIcon: 'eco',
   },
   {
     id: uuidv4(),
-    name: 'contact',
+    name: TopicName.Contact,
     icon: 'mail',
-    label: 'Contact',
+    label: TopicName.Contact,
     theme: Theme.Summer,
     seasonIcon: 'wb_sunny',
   },
@@ -43,8 +44,8 @@ onBeforeUnmount(() => {
   window.removeEventListener('click', handleClickOutside);
 });
 
-const selectTopic = (name: string, theme?: Theme) => {
-  if (name !== 'resume') {
+const selectTopic = (name: TopicName, theme?: Theme) => {
+  if (name !== TopicName.Resume) {
     mainStore.SET_ACTIVE_TOPIC(name);
   }
   mainStore.SET_ACTIVE_THEME(theme ?? Theme.Fall);
@@ -52,10 +53,13 @@ const selectTopic = (name: string, theme?: Theme) => {
 
 const { activeTheme } = storeToRefs(mainStore);
 
-// Click outside handler
 const handleClickOutside = (event: MouseEvent) => {
-  const simonCircle = document.querySelector('.simon-circle');
-  if (simonCircle && !simonCircle.contains(event.target as Node)) {
+  const target = event.target as HTMLElement;
+
+  const insideSimonCircle = target.closest('.simon-circle');
+  const insideExpansionItem = target.closest('.q-expansion-item');
+
+  if (!insideSimonCircle && !insideExpansionItem) {
     mainStore.SET_ACTIVE_TOPIC(null);
     mainStore.SET_ACTIVE_THEME(Theme.Fall);
   }
@@ -64,10 +68,20 @@ const handleClickOutside = (event: MouseEvent) => {
 
 <template>
   <div class="container col column justify-center items-center">
-    <div class="mobile-view col column items-center justify-center full-width">
-      <p class="q-ma-none text-primary bounce-text">Grant Knaver</p>
-      <p class="q-ma-none text-secondary">Fullstack Developer</p>
-      <hr />
+    <div class="mobile-view col column items-center justify-start full-width">
+      <div inline-actions class="full-width text-white bg-accent q-mt-lg q-mb-sm q-pa-md">
+        <p class="q-ma-none text-primary bounce-text">Grant Knaver</p>
+        <p class="q-ma-none text-secondary">Fullstack Developer</p>
+      </div>
+      <blockquote
+        class="full-width q-pa-md text-center"
+        cite="http://www.worldwildlife.org/who/index.html"
+      >
+        "For 50 years, WWF has been protecting the future of nature. The world's leading
+        conservation organization, WWF works in 100 countries and is supported by 1.2 million
+        members in the United States and close to 5 million globally."
+      </blockquote>
+      <hr class="full-width" />
       <q-list padding class="full-width">
         <q-item
           v-for="topic in topics.slice(1)"
@@ -76,10 +90,10 @@ const handleClickOutside = (event: MouseEvent) => {
           class="full-width bg-transparent q-pa-none q-mb-sm"
         >
           <q-expansion-item
-            class="full-width"
+            class="full-width bg-primary text-dark"
             :icon="topic.seasonIcon"
             :label="topic.label"
-            :id="topic.name"
+            @click.stop="selectTopic(topic.name, topic.theme)"
           >
             <q-card>
               <q-card-section>
@@ -103,7 +117,7 @@ const handleClickOutside = (event: MouseEvent) => {
           style="padding: 1rem"
           @click.stop="selectTopic(topic.name, topic.theme)"
         >
-          <a v-if="topic.name !== 'resume'" class="simon-link">
+          <a v-if="topic.name !== TopicName.Resume" class="simon-link">
             <q-icon :name="topic.icon" size="32px" />
             <q-tooltip anchor="center middle" self="top left">
               {{ topic.label }}
@@ -122,25 +136,10 @@ const handleClickOutside = (event: MouseEvent) => {
 <style scoped lang="scss">
 @import '../css/main.scss';
 
-$winterBackground: map-get($winter-theme, accent);
-$winterColor: map-get($winter-theme, primary);
-$winterCardColor: map-get($winter-theme, dark);
-
-$springBackground: map-get($spring-theme, accent);
-$springColor: map-get($spring-theme, dark);
-
-$summerBackground: map-get($summer-theme, secondary);
-$summerColor: map-get($summer-theme, dark);
-
 .container {
   @media (min-width: $breakpoint-md) {
     position: relative;
     padding: initial;
-  }
-
-  hr {
-    background-color: var(--q-primary);
-    width: 100px;
   }
 
   p {
@@ -166,23 +165,13 @@ $summerColor: map-get($summer-theme, dark);
       display: none;
     }
 
-    #about {
-      background-color: $winterBackground;
-      color: $winterColor;
-
-      .q-card {
-        color: $winterCardColor;
-      }
-    }
-
-    #projects {
-      background-color: $springBackground;
-      color: $springColor;
-    }
-
-    #contact {
-      background-color: $summerBackground;
-      color: $summerColor;
+    blockquote {
+      border-left: 4px solid var(--q-primary);
+      padding: 1rem 1.5rem;
+      font-style: italic;
+      background-color: rgba(0, 0, 0, 0.5);
+      color: var(--q-primary);
+      text-shadow: 1px 1px 20px var(--q-dark);
     }
   }
 
@@ -191,6 +180,11 @@ $summerColor: map-get($summer-theme, dark);
 
     @media (min-width: $breakpoint-md) {
       display: flex;
+    }
+
+    hr {
+      background-color: var(--q-primary);
+      width: 100px;
     }
 
     .simon-circle {
@@ -227,20 +221,20 @@ $summerColor: map-get($summer-theme, dark);
         transform: scale(1.25);
         z-index: 10;
 
-        &.about {
+        &.About {
           background-color: var(--q-secondary);
         }
 
-        &.projects {
+        &.Projects {
           background-color: var(--q-accent);
         }
 
-        &.contact {
+        &.Contact {
           background-color: var(--q-secondary);
         }
       }
 
-      &.resume {
+      &.Resume {
         background-color: transparent;
         border: none;
         top: 0;
@@ -251,17 +245,17 @@ $summerColor: map-get($summer-theme, dark);
         }
       }
 
-      &.about {
+      &.About {
         top: 0;
         right: 0;
       }
 
-      &.projects {
+      &.Projects {
         bottom: 0;
         left: 0;
       }
 
-      &.contact {
+      &.Contact {
         bottom: 0;
         right: 0;
       }

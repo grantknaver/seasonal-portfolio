@@ -27,6 +27,12 @@ onBeforeUnmount(() => window.removeEventListener('resize', updateWidths));
 const currentBg = ref('');
 const nextBg = ref('');
 const showNext = ref(false);
+const mobileMenu = ref(false);
+const tabs = [
+  { name: 'about', label: 'About', href: '#about' },
+  { name: 'projects', label: 'Projects', href: '#projects' },
+  { name: 'contact', label: 'Contact', href: '#contact' },
+];
 
 const backgroundMap: Record<Theme, string> = {
   [Theme.Fall]: new URL('../assets/autumn-forestry.jpg', import.meta.url).href,
@@ -64,12 +70,51 @@ watch(
     <div class="background-layer" :style="{ backgroundImage: `url('${currentBg}')` }" />
     <div
       v-show="showNext"
-      class="background-layer fade-layer"
+      class="background-layer"
       :style="{ backgroundImage: `url('${nextBg}')` }"
     />
 
     <!-- Main Layout -->
     <q-layout view="lHh Lpr lFf" class="column">
+      <!-- HEADER -->
+      <q-header class="text-black">
+        <q-toolbar class="bg-dark q-pa-lg">
+          <q-toolbar-title>
+            <img
+              class="q-pt-sm"
+              style="max-width: 200px"
+              src="../assets/logo.png"
+              alt="glkFreelance logo"
+            />
+          </q-toolbar-title>
+          <q-btn
+            color="primary"
+            class="menu-button"
+            flat
+            dense
+            round
+            icon="menu"
+            @click="mobileMenu = !mobileMenu"
+          />
+          <q-drawer v-model="mobileMenu" side="right" overlay behavior="mobile" bordered>
+            <q-list>
+              <q-item
+                v-for="item in tabs"
+                :key="item.name"
+                class="text-dark"
+                clickable
+                @click="mobileMenu = false"
+              >
+                <q-item-section>{{ item.label }}</q-item-section>
+              </q-item>
+              <hr />
+              <q-item key="resume" clickable @click="mobileMenu = false">
+                <q-item-section class="text-bold text-secondary">Download Resume</q-item-section>
+              </q-item>
+            </q-list>
+          </q-drawer>
+        </q-toolbar>
+      </q-header>
       <!-- PAGE CONTAINER -->
       <q-page-container>
         <router-view />
@@ -128,26 +173,11 @@ body,
   transition: opacity 0.8s ease-in-out;
 }
 
-.fade-layer {
-  z-index: 1;
-  opacity: 0;
-  animation: fadeIn 0.8s forwards;
-}
-
-@keyframes fadeIn {
-  from {
-    opacity: 0;
-  }
-  to {
-    opacity: 1;
-  }
-}
-
 .q-header {
   background-color: rgba($color: black, $alpha: 0.5) !important;
   border-bottom: 2px solid var(--q-primary);
 
-  @media (min-width: $breakpoint-sm) {
+  @media (min-width: $breakpoint-md) {
     display: none;
   }
 }

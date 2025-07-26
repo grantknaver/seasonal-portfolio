@@ -18,8 +18,7 @@ onMounted(() => {
 
 <template>
   <q-page class="page-container flex column">
-    <div class="logo-bcg full-width"></div>
-    <img class="q-pt-sm" style="max-width: 200px" src="../assets/logo.png" alt="" />
+    <img class="q-pt-sm" style="max-width: 200px" src="../assets/logo.png" alt="logo" />
     <div class="content-wrapper">
       <PortfolioFocus />
     </div>
@@ -34,11 +33,13 @@ onMounted(() => {
   width: 100%;
 
   img {
+    display: none;
     position: absolute;
     top: 3%;
     left: 3%;
-    @media (min-width: $breakpoint-xs) {
-      display: initial !important;
+
+    @media (min-width: $breakpoint-sm) {
+      display: flex !important;
       z-index: 10;
     }
   }
