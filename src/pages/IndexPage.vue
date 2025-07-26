@@ -18,6 +18,7 @@ onMounted(() => {
 
 <template>
   <q-page class="page-container flex column">
+    <div class="logo-bcg full-width"></div>
     <img class="q-pt-sm" style="max-width: 200px" src="../assets/logo.png" alt="" />
     <div class="content-wrapper">
       <PortfolioFocus />
@@ -56,6 +57,13 @@ onMounted(() => {
     transition: opacity 0.8s ease-in-out;
   }
 
+  .logo-bcg {
+    @media (min-width: $breakpoint-sm) {
+      height: 95px;
+      background-color: rgba($color: #000000, $alpha: 0.4);
+    }
+  }
+
   .content-wrapper {
     position: relative;
     z-index: 2;
@@ -63,21 +71,6 @@ onMounted(() => {
     display: flex;
     flex-grow: 1;
     justify-content: start;
-  }
-}
-
-.fade-layer {
-  z-index: 1;
-  opacity: 0;
-  animation: fadeIn 0.8s forwards;
-}
-
-@keyframes fadeIn {
-  from {
-    opacity: 0;
-  }
-  to {
-    opacity: 1;
   }
 }
 </style>

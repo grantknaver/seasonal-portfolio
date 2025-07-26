@@ -24,15 +24,6 @@ onMounted(() => window.addEventListener('resize', updateWidths));
 
 onBeforeUnmount(() => window.removeEventListener('resize', updateWidths));
 
-// const mobileMenu = ref(false);
-
-// const tabs = [
-//   { name: 'about', label: 'About', href: '#about' },
-//   { name: 'projects', label: 'Projects', href: '#projects' },
-//   { name: 'contact', label: 'Contact', href: '#contact' },
-// ];
-
-// Background image logic
 const currentBg = ref('');
 const nextBg = ref('');
 const showNext = ref(false);
@@ -79,47 +70,6 @@ watch(
 
     <!-- Main Layout -->
     <q-layout view="lHh Lpr lFf" class="column">
-      <!-- HEADER -->
-      <!-- <q-header class="text-black">
-        <q-toolbar class="bg-dark q-pa-lg">
-
-          <q-toolbar-title>
-            <img
-              class="q-pt-sm"
-              style="max-width: 200px"
-              src="../assets/logo.png"
-              alt="glkFreelance logo"
-            />
-          </q-toolbar-title>
-          <q-btn
-            color="primary"
-            class="menu-button"
-            flat
-            dense
-            round
-            icon="menu"
-            @click="mobileMenu = !mobileMenu"
-          />
-          <q-drawer v-model="mobileMenu" side="right" overlay behavior="mobile" bordered>
-            <q-list>
-              <q-item
-                v-for="item in tabs"
-                :key="item.name"
-                class="text-dark"
-                clickable
-                @click="mobileMenu = false"
-              >
-                <q-item-section>{{ item.label }}</q-item-section>
-              </q-item>
-              <hr />
-              <q-item key="resume" clickable @click="mobileMenu = false">
-                <q-item-section class="text-bold text-secondary">Download Resume</q-item-section>
-              </q-item>
-            </q-list>
-          </q-drawer>
-        </q-toolbar>
-      </q-header> -->
-
       <!-- PAGE CONTAINER -->
       <q-page-container>
         <router-view />

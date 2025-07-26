@@ -6,4 +6,5 @@ export interface Topic {
   icon?: string;
   label?: string;
   theme?: Theme;
+  seasonIcon?: string;
 }

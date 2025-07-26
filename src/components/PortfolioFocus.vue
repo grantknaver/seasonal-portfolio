@@ -1,25 +1,38 @@
 <script lang="ts" setup>
-import { storeToRefs } from 'pinia';
 import { Theme } from '../shared/constants/theme';
 import { useMainStore } from '../stores/main';
 import { onMounted, onBeforeUnmount } from 'vue';
 import { type Topic } from '../shared/models/topic';
 import { v4 as uuidv4 } from 'uuid';
+import { storeToRefs } from 'pinia';
 
 const mainStore = useMainStore();
-const { activeTheme } = storeToRefs(mainStore);
-
 const topics: Topic[] = [
   { id: uuidv4(), name: 'resume', icon: 'description', label: '' },
-  { id: uuidv4(), name: 'about', icon: 'info', label: 'About', theme: Theme.Winter },
+  {
+    id: uuidv4(),
+    name: 'about',
+    icon: 'info',
+    label: 'About',
+    theme: Theme.Winter,
+    seasonIcon: 'ac_unit',
+  },
   {
     id: uuidv4(),
     name: 'projects',
     icon: 'folder',
     label: 'Projects',
     theme: Theme.Spring,
+    seasonIcon: 'eco',
   },
-  { id: uuidv4(), name: 'contact', icon: 'mail', label: 'Contact', theme: Theme.Summer },
+  {
+    id: uuidv4(),
+    name: 'contact',
+    icon: 'mail',
+    label: 'Contact',
+    theme: Theme.Summer,
+    seasonIcon: 'wb_sunny',
+  },
 ];
 
 onMounted(() => {
@@ -36,6 +49,9 @@ const selectTopic = (name: string, theme?: Theme) => {
   }
   mainStore.SET_ACTIVE_THEME(theme ?? Theme.Fall);
 };
+
+const { activeTheme } = storeToRefs(mainStore);
+
 // Click outside handler
 const handleClickOutside = (event: MouseEvent) => {
   const simonCircle = document.querySelector('.simon-circle');
@@ -48,10 +64,34 @@ const handleClickOutside = (event: MouseEvent) => {
 
 <template>
   <div class="container col column justify-center items-center">
-    <!-- <div class="mobile-view col column items-center justify-center">
-      <p class="q-ma-none text-primary bounce-text">Grant Knaver - mobile</p>
+    <div class="mobile-view col column items-center justify-center full-width">
+      <p class="q-ma-none text-primary bounce-text">Grant Knaver</p>
       <p class="q-ma-none text-secondary">Fullstack Developer</p>
-    </div> -->
+      <hr />
+      <q-list padding class="full-width">
+        <q-item
+          v-for="topic in topics.slice(1)"
+          :key="topic.id"
+          :name="topic.name"
+          class="full-width bg-transparent q-pa-none q-mb-sm"
+        >
+          <q-expansion-item
+            class="full-width"
+            :icon="topic.seasonIcon"
+            :label="topic.label"
+            :id="topic.name"
+          >
+            <q-card>
+              <q-card-section>
+                Lorem ipsum dolor sit amet, consectetur adipisicing elit. Quidem, eius reprehenderit
+                eos corrupti commodi magni quaerat ex numquam, dolorum officiis modi facere maiores
+                architecto suscipit iste eveniet doloribus ullam aliquid.
+              </q-card-section>
+            </q-card>
+          </q-expansion-item>
+        </q-item>
+      </q-list>
+    </div>
     <div class="desktop-view col column justify-center items-center full-width">
       <div class="simon-circle">
         <div
@@ -80,7 +120,17 @@ const handleClickOutside = (event: MouseEvent) => {
 </template>
 
 <style scoped lang="scss">
-@import '../css/base/_variables.scss';
+@import '../css/main.scss';
+
+$winterBackground: map-get($winter-theme, accent);
+$winterColor: map-get($winter-theme, primary);
+$winterCardColor: map-get($winter-theme, dark);
+
+$springBackground: map-get($spring-theme, accent);
+$springColor: map-get($spring-theme, dark);
+
+$summerBackground: map-get($summer-theme, secondary);
+$summerColor: map-get($summer-theme, dark);
 
 .container {
   @media (min-width: $breakpoint-md) {
@@ -111,37 +161,29 @@ const handleClickOutside = (event: MouseEvent) => {
   }
 
   .mobile-view {
-    @media (min-width: $breakpoint-xs) {
+    max-width: 90%;
+    @media (min-width: $breakpoint-md) {
       display: none;
     }
 
-    .fancy-quote {
-      text-align: center;
-      width: 90%;
-      font-style: italic;
-      font-family: Georgia, serif;
-      border-left: 4px solid var(--q-primary);
-      padding: 1rem 1.5rem;
-      margin: 1.5rem 0;
-      background-color: rgba($color: #d5451b, $alpha: 0.5);
-      position: relative;
-      text-shadow: 1px 1px 2px var(--q-dark);
+    #about {
+      background-color: $winterBackground;
+      color: $winterColor;
+
+      .q-card {
+        color: $winterCardColor;
+      }
     }
 
-    // .fade-up-enter-active {
-    //   animation: fadeUp 0.8s ease-out both;
-    // }
+    #projects {
+      background-color: $springBackground;
+      color: $springColor;
+    }
 
-    // @keyframes fadeUp {
-    //   from {
-    //     opacity: 0;
-    //     transform: translateY(20px);
-    //   }
-    //   to {
-    //     opacity: 1;
-    //     transform: translateY(0);
-    //   }
-    // }
+    #contact {
+      background-color: $summerBackground;
+      color: $summerColor;
+    }
   }
 
   .desktop-view {
