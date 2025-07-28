@@ -5,6 +5,9 @@ import { storeToRefs } from 'pinia';
 import { Theme } from '../shared/constants/theme';
 import { setTheme } from '../shared/utils/theme';
 import { getCustomCssVar } from '../shared/utils/getCustomCssVar';
+import { TopicName } from 'src/shared/constants/topicName';
+import { type Topic } from '../shared/models/topic';
+import { v4 as uuidv4 } from 'uuid';
 
 const mainStore = useMainStore();
 const { activeTheme, activeTopic } = storeToRefs(mainStore);
@@ -14,26 +17,37 @@ const showTopicBreakpoint = +`${getCustomCssVar('breakpoint-md')}`.slice(0, -2);
 const showTopicPanel = computed(
   () => !!activeTopic.value && windowWidth.value > showTopicBreakpoint,
 );
-
 const updateWidths = () => {
   desktopDrawerWidth.value = window.innerWidth * 0.5;
   windowWidth.value = window.innerWidth;
 };
-
-onMounted(() => window.addEventListener('resize', updateWidths));
-
-onBeforeUnmount(() => window.removeEventListener('resize', updateWidths));
-
 const currentBg = ref('');
 const nextBg = ref('');
 const showNext = ref(false);
 const mobileMenu = ref(false);
-const tabs = [
-  { name: 'about', label: 'About', href: '#about' },
-  { name: 'projects', label: 'Projects', href: '#projects' },
-  { name: 'contact', label: 'Contact', href: '#contact' },
-];
-
+const topics = ref<Topic[]>([
+  {
+    id: uuidv4(),
+    name: TopicName.About,
+    icon: 'info',
+    label: TopicName.About,
+    theme: Theme.Winter,
+  },
+  {
+    id: uuidv4(),
+    name: TopicName.Projects,
+    icon: 'folder',
+    label: TopicName.Projects,
+    theme: Theme.Spring,
+  },
+  {
+    id: uuidv4(),
+    name: TopicName.Contact,
+    icon: 'mail',
+    label: TopicName.Contact,
+    theme: Theme.Summer,
+  },
+]);
 const backgroundMap: Record<Theme, string> = {
   [Theme.Fall]: new URL('../assets/autumn-forestry.jpg', import.meta.url).href,
   [Theme.Winter]: new URL('../assets/snowy-winter-landscape.jpg', import.meta.url).href,
@@ -42,8 +56,11 @@ const backgroundMap: Record<Theme, string> = {
 };
 
 onMounted(() => {
+  window.addEventListener('resize', updateWidths);
   currentBg.value = backgroundMap[Theme.Fall];
 });
+
+onBeforeUnmount(() => window.removeEventListener('resize', updateWidths));
 
 watch(
   () => activeTheme.value,
@@ -62,6 +79,13 @@ watch(
     }, 800);
   },
 );
+
+const selectTopic = (name: TopicName, theme?: Theme) => {
+  mainStore.SET_ACTIVE_TOPIC(name);
+  if (theme) {
+    mainStore.SET_ACTIVE_THEME(theme);
+  }
+};
 </script>
 
 <template>
@@ -75,9 +99,9 @@ watch(
     />
 
     <!-- Main Layout -->
-    <q-layout view="lHh Lpr lFf" class="column">
+    <q-layout view="lhh LpR lff" class="column">
       <!-- HEADER -->
-      <q-header class="text-black">
+      <q-header class="main-header text-black">
         <q-toolbar class="bg-dark q-pa-lg">
           <q-toolbar-title>
             <img
@@ -96,16 +120,23 @@ watch(
             icon="menu"
             @click="mobileMenu = !mobileMenu"
           />
-          <q-drawer v-model="mobileMenu" side="right" overlay behavior="mobile" bordered>
+          <q-drawer
+            class="bg-primary"
+            v-model="mobileMenu"
+            side="right"
+            overlay
+            behavior="mobile"
+            bordered
+          >
             <q-list>
               <q-item
-                v-for="item in tabs"
-                :key="item.name"
+                v-for="topic in topics"
+                :key="topic.name"
                 class="text-dark"
                 clickable
-                @click="mobileMenu = false"
+                @click="selectTopic(topic.name, topic.theme)"
               >
-                <q-item-section>{{ item.label }}</q-item-section>
+                <q-item-section>{{ topic.label }}</q-item-section>
               </q-item>
               <hr />
               <q-item key="resume" clickable @click="mobileMenu = false">
@@ -154,9 +185,9 @@ body,
 
 .bg-container {
   position: relative;
-  height: 100%;
+  min-height: 100vh;
   width: 100%;
-  overflow: hidden;
+  overflow: auto;
 }
 
 .background-layer {

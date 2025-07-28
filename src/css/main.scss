@@ -1,3 +1,7 @@
 @import 'base/variables';
 @import 'base/typography';
 @import './quasar.variables.scss';
+
+.q-item__section--side > .q-icon {
+  color: var(--q-accent);
+}

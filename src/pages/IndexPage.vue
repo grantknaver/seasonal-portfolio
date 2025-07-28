@@ -17,8 +17,8 @@ onMounted(() => {
 </script>
 
 <template>
-  <q-page class="page-container flex column">
-    <img class="q-pt-sm" style="max-width: 200px" src="../assets/logo.png" alt="logo" />
+  <q-page class="page-container q-pa-md column">
+    <img class="q-pt-sm logo" style="max-width: 200px" src="../assets/logo.png" alt="logo" />
     <div class="content-wrapper">
       <PortfolioFocus />
     </div>
@@ -27,12 +27,10 @@ onMounted(() => {
 
 <style scoped lang="scss">
 .page-container {
-  position: relative;
-  overflow: hidden;
-  height: 100vh;
   width: 100%;
+  min-height: 100%;
 
-  img {
+  .logo {
     display: none;
     position: absolute;
     top: 3%;
@@ -44,34 +42,12 @@ onMounted(() => {
     }
   }
 
-  .background-layer {
-    position: absolute;
-    top: 0;
-    left: 0;
-    height: 100%;
-    width: 100%;
-    background-size: cover;
-    background-position: center;
-    background-repeat: no-repeat;
-    z-index: 0;
-    opacity: 1;
-    transition: opacity 0.8s ease-in-out;
-  }
-
-  .logo-bcg {
-    @media (min-width: $breakpoint-sm) {
-      height: 95px;
-      background-color: rgba($color: #000000, $alpha: 0.4);
-    }
-  }
-
   .content-wrapper {
     position: relative;
     z-index: 2;
     width: 100%;
     display: flex;
-    flex-grow: 1;
-    justify-content: start;
+    flex-direction: column;
   }
 }
 </style>

@@ -1,7 +1,6 @@
 <script lang="ts" setup>
 import { Theme } from '../shared/constants/theme';
 import { useMainStore } from '../stores/main';
-import { onMounted, onBeforeUnmount } from 'vue';
 import { type Topic } from '../shared/models/topic';
 import { v4 as uuidv4 } from 'uuid';
 import { storeToRefs } from 'pinia';
@@ -36,39 +35,24 @@ const topics: Topic[] = [
   },
 ];
 
-onMounted(() => {
-  window.addEventListener('click', handleClickOutside);
-});
-
-onBeforeUnmount(() => {
-  window.removeEventListener('click', handleClickOutside);
-});
-
 const selectTopic = (name: TopicName, theme?: Theme) => {
-  if (name !== TopicName.Resume) {
-    mainStore.SET_ACTIVE_TOPIC(name);
-  }
-  mainStore.SET_ACTIVE_THEME(theme ?? Theme.Fall);
-};
-
-const { activeTheme } = storeToRefs(mainStore);
-
-const handleClickOutside = (event: MouseEvent) => {
-  const target = event.target as HTMLElement;
-
-  const insideSimonCircle = target.closest('.simon-circle');
-  const insideExpansionItem = target.closest('.q-expansion-item');
-
-  if (!insideSimonCircle && !insideExpansionItem) {
+  if (name === activeTopic.value) {
     mainStore.SET_ACTIVE_TOPIC(null);
     mainStore.SET_ACTIVE_THEME(Theme.Fall);
+  } else {
+    if (name !== TopicName.Resume) {
+      mainStore.SET_ACTIVE_TOPIC(name);
+    }
+    mainStore.SET_ACTIVE_THEME(theme ?? Theme.Fall);
   }
 };
+
+const { activeTheme, activeTopic } = storeToRefs(mainStore);
 </script>
 
 <template>
-  <div class="container col column justify-center items-center">
-    <div class="mobile-view col column items-center justify-start full-width">
+  <div class="container column justify-center items-center">
+    <div class="mobile-view column items-center justify-start full-width">
       <div inline-actions class="full-width text-white bg-accent q-mt-lg q-mb-sm q-pa-md">
         <p class="q-ma-none text-primary bounce-text">Grant Knaver</p>
         <p class="q-ma-none text-secondary">Fullstack Developer</p>
@@ -90,10 +74,12 @@ const handleClickOutside = (event: MouseEvent) => {
           class="full-width bg-transparent q-pa-none q-mb-sm"
         >
           <q-expansion-item
-            class="full-width bg-primary text-dark"
+            class="full-width"
             :icon="topic.seasonIcon"
             :label="topic.label"
             @click.stop="selectTopic(topic.name, topic.theme)"
+            :model-value="topic.name === activeTopic"
+            :header-class="['text-dark', 'bg-secondary']"
           >
             <q-card>
               <q-card-section>
@@ -107,7 +93,7 @@ const handleClickOutside = (event: MouseEvent) => {
       </q-list>
     </div>
     <div class="desktop-view col column justify-center items-center full-width">
-      <div class="simon-circle">
+      <div class="simon-circle q-mt-xl">
         <div
           v-for="topic in topics"
           :key="topic.id"
@@ -127,7 +113,7 @@ const handleClickOutside = (event: MouseEvent) => {
         </div>
       </div>
       <hr class="q-mt-lg" />
-      <p class="q-ma-none text-primary">Grant Knaver - Desktop</p>
+      <p class="q-ma-none text-primary">Grant Knaver</p>
       <p class="q-ma-none text-secondary">Fullstack Developer</p>
     </div>
   </div>
@@ -191,17 +177,9 @@ const handleClickOutside = (event: MouseEvent) => {
       position: relative;
       border-radius: 10px;
       overflow: visible;
-
-      @media (min-width: $breakpoint-xs) {
-        width: 350px;
-        height: 350px;
-        margin-top: 3%;
-      }
-
-      @media (min-width: $breakpoint-sm) {
-        width: 375px;
-        height: 375px;
-      }
+      width: 375px;
+      height: 375px;
+      margin-top: 6rem;
     }
 
     .simon-quadrant {
