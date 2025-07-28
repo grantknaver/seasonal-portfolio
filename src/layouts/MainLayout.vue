@@ -132,9 +132,10 @@ const selectTopic = (name: TopicName, theme?: Theme) => {
               <q-item
                 v-for="topic in topics"
                 :key="topic.name"
-                class="text-dark"
+                class="menu-item text-dark"
                 clickable
                 @click="selectTopic(topic.name, topic.theme)"
+                :class="{ activeTopic: topic.name === activeTopic }"
               >
                 <q-item-section>{{ topic.label }}</q-item-section>
               </q-item>
@@ -222,9 +223,15 @@ aside {
 .desktop-drawer {
   background-color: rgba(black, 0.5);
   box-shadow: none !important;
+  border-left: solid 4px var(--q-primary);
 }
 
 .q-footer {
   border-top: 1px solid var(--q-primary);
+}
+
+.activeTopic {
+  color: var(--q-accent);
+  font-weight: bold;
 }
 </style>
