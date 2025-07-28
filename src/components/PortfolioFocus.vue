@@ -51,7 +51,7 @@ const { activeTheme, activeTopic } = storeToRefs(mainStore);
 </script>
 
 <template>
-  <div class="container column justify-center items-center">
+  <div class="container column col justify-center items-center">
     <div class="mobile-view column items-center justify-start full-width">
       <div inline-actions class="full-width text-white bg-accent q-mt-lg q-mb-sm q-pa-md">
         <p class="q-ma-none text-primary bounce-text">Grant Knaver</p>
@@ -92,7 +92,7 @@ const { activeTheme, activeTopic } = storeToRefs(mainStore);
         </q-item>
       </q-list>
     </div>
-    <div class="desktop-view col column justify-center items-center full-width">
+    <div class="desktop-view flex col column justify-center items-center full-width">
       <div class="simon-circle q-mt-xl">
         <div
           v-for="topic in topics"
@@ -166,6 +166,8 @@ const { activeTheme, activeTopic } = storeToRefs(mainStore);
 
     @media (min-width: $breakpoint-md) {
       display: flex;
+      justify-content: center;
+      align-items: center;
     }
 
     hr {
@@ -177,9 +179,8 @@ const { activeTheme, activeTopic } = storeToRefs(mainStore);
       position: relative;
       border-radius: 10px;
       overflow: visible;
-      width: 375px;
-      height: 375px;
-      margin-top: 6rem;
+      width: 325px;
+      height: 325px;
     }
 
     .simon-quadrant {
@@ -271,7 +272,7 @@ const { activeTheme, activeTopic } = storeToRefs(mainStore);
 
     a {
       color: var(--q-primary);
-      font-size: 2rem;
+      font-size: 1.8rem;
       cursor: pointer;
     }
   }

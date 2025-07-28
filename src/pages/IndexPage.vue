@@ -19,7 +19,7 @@ onMounted(() => {
 <template>
   <q-page class="page-container q-pa-md column">
     <img class="q-pt-sm logo" style="max-width: 200px" src="../assets/logo.png" alt="logo" />
-    <div class="content-wrapper">
+    <div class="content-wrapper col">
       <PortfolioFocus />
     </div>
   </q-page>
