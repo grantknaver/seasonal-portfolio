@@ -1,8 +1,8 @@
 <script lang="ts" setup>
-import { ref } from 'vue';
+import { reactive, ref } from 'vue';
 import { v4 as uuidv4 } from 'uuid';
 
-const employers = ref([
+const employers = reactive([
   {
     id: uuidv4(),
     link: 'https://www.amtrak.com/home',
@@ -12,7 +12,7 @@ const employers = ref([
   {
     id: uuidv4(),
     link: 'https://www.lockheedmartin.com/en-us/index.html',
-    img: new URL('../assets/lockheed-martin.svg', import.meta.url).href,
+    img: new URL('../assets/lockheed-martin.png', import.meta.url).href,
     alt: 'Lockheed Martin',
   },
   {
@@ -34,39 +34,35 @@ const employers = ref([
     alt: 'Gametime Hero',
   },
 ]);
+
+const slide = ref(employers[0]?.id);
 </script>
 
 <template>
-  <!-- Start Works Area -->
-
-  <section class="mobile-view"></section>
-  <section class="desktop-view column col items-center bg-primary">
-    <div>
-      <div v-for="employer in employers" :key="employer.id" class="q-pa-md">
-        <div>
-          <a :href="employer.link">
-            <img :src="employer.img" :alt="employer.alt" />
-          </a>
-        </div>
-      </div>
-    </div>
-  </section>
-
-  <!-- <div class="desktop-view">
-    <section class="container column col justify-center items-center bg-primary">
-      <div class="container">
-        <div v-for="employer in employers" :key="employer.id">
-          <div class="">
-            <div class="">
-              <a :href="employer.link">
-                <img :src="employer.img" :alt="employer.alt" />
-              </a>
-            </div>
-          </div>
-        </div>
-      </div>
-    </section>
-  </div> -->
+  <q-carousel
+    v-model="slide"
+    swipeable
+    animated
+    infinite
+    control-type="flat"
+    arrows
+    navigation
+    height="300px"
+    class="bg-grey-1 text-dark"
+    dark
+    control-color="dark"
+  >
+    <q-carousel-slide
+      v-for="employer in employers"
+      :key="employer.id"
+      :name="employer.id"
+      class="column items-center justify-center"
+    >
+      <a :href="employer.link" target="_blank" rel="noopener">
+        <img :src="employer.img" :alt="employer.alt" style="max-height: 150px; max-width: 100%" />
+      </a>
+    </q-carousel-slide>
+  </q-carousel>
 </template>
 
 <style scoped lang="scss">
