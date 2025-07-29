@@ -5,6 +5,7 @@ import { type Topic } from '../shared/models/topic';
 import { v4 as uuidv4 } from 'uuid';
 import { storeToRefs } from 'pinia';
 import { TopicName } from 'src/shared/constants/topicName';
+import AboutSection from './AboutSection.vue';
 
 const mainStore = useMainStore();
 const topics: Topic[] = [
@@ -51,8 +52,8 @@ const { activeTheme, activeTopic } = storeToRefs(mainStore);
 </script>
 
 <template>
-  <div class="container column col justify-center items-center">
-    <div class="mobile-view column items-center justify-start full-width">
+  <div class="container column col">
+    <section class="mobile-view column items-center justify-start full-width">
       <div inline-actions class="full-width text-white bg-accent q-mt-lg q-mb-sm q-pa-md">
         <p class="q-ma-none text-primary bounce-text">Grant Knaver</p>
         <p class="q-ma-none text-secondary">Fullstack Developer</p>
@@ -81,18 +82,13 @@ const { activeTheme, activeTopic } = storeToRefs(mainStore);
             :model-value="topic.name === activeTopic"
             :header-class="['text-dark', 'bg-secondary']"
           >
-            <q-card>
-              <q-card-section>
-                Lorem ipsum dolor sit amet, consectetur adipisicing elit. Quidem, eius reprehenderit
-                eos corrupti commodi magni quaerat ex numquam, dolorum officiis modi facere maiores
-                architecto suscipit iste eveniet doloribus ullam aliquid.
-              </q-card-section>
-            </q-card>
+            <!-- <AboutSection v-if="topic.name === TopicName.About" /> -->
+            <AboutSection />
           </q-expansion-item>
         </q-item>
       </q-list>
-    </div>
-    <div class="desktop-view flex col column justify-center items-center full-width">
+    </section>
+    <section class="desktop-view flex col column justify-center items-center full-width">
       <div class="simon-circle q-mt-xl">
         <div
           v-for="topic in topics"
@@ -115,7 +111,7 @@ const { activeTheme, activeTopic } = storeToRefs(mainStore);
       <hr class="q-mt-lg" />
       <p class="q-ma-none text-primary">Grant Knaver</p>
       <p class="q-ma-none text-secondary">Fullstack Developer</p>
-    </div>
+    </section>
   </div>
 </template>
 
@@ -146,7 +142,7 @@ const { activeTheme, activeTopic } = storeToRefs(mainStore);
   }
 
   .mobile-view {
-    max-width: 90%;
+    max-width: 100%;
     @media (min-width: $breakpoint-md) {
       display: none;
     }

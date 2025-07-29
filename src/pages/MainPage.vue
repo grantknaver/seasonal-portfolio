@@ -17,7 +17,7 @@ onMounted(() => {
 </script>
 
 <template>
-  <q-page class="page-container q-pa-md column">
+  <q-page class="page-container column col q-pa-md">
     <img class="q-pt-sm logo" style="max-width: 200px" src="../assets/logo.png" alt="logo" />
     <div class="content-wrapper col">
       <PortfolioFocus />
@@ -27,9 +27,6 @@ onMounted(() => {
 
 <style scoped lang="scss">
 .page-container {
-  width: 100%;
-  min-height: 100%;
-
   .logo {
     display: none;
     position: absolute;
