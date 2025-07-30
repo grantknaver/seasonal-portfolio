@@ -133,6 +133,12 @@ const selectTopic = (name: TopicName, theme?: Theme) => {
 @import '../css/main.scss';
 
 .page-container {
+  background-color: rgba($color: white, $alpha: 0.7);
+
+  @media (min-width: $breakpoint-md) {
+    background-color: initial;
+  }
+
   .logo {
     display: none;
     position: absolute;
@@ -175,7 +181,7 @@ const selectTopic = (name: TopicName, theme?: Theme) => {
       }
 
       blockquote {
-        border-left: 4px solid var(--q-primary);
+        border-left: 4px solid var(--q-dark);
         padding: 1rem 1.5rem;
         font-style: italic;
         background-color: rgba(0, 0, 0, 0.5);

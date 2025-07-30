@@ -179,6 +179,7 @@ $spring-mobile-background: map-get($spring-theme, secondary);
 
   .q-card {
     background-color: rgba(black, 0.5);
+    padding: 1rem;
 
     h1 {
       font-size: 3rem;
@@ -191,6 +192,7 @@ $spring-mobile-background: map-get($spring-theme, secondary);
 
     .section-container {
       background-color: var(--q-accent);
+      border-radius: 10px;
 
       p {
         font-size: 1rem;
