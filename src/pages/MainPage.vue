@@ -95,8 +95,7 @@ const selectTopic = (name: TopicName, theme?: Theme) => {
               :model-value="topic.name === activeTopic"
               :header-class="['text-dark', 'bg-secondary']"
             >
-              <!-- <AboutSection v-if="topic.name === TopicName.About" /> -->
-              <AboutSection />
+              <AboutSection v-if="topic.name === TopicName.About" />
             </q-expansion-item>
           </q-item>
         </q-list>

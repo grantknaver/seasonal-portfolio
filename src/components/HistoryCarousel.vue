@@ -44,7 +44,7 @@ const slide = ref(employers[0]?.id);
     swipeable
     animated
     infinite
-    control-type="flat"
+    control-type="regular"
     arrows
     navigation
     height="300px"

@@ -8,6 +8,7 @@ import { getCustomCssVar } from '../shared/utils/getCustomCssVar';
 import { TopicName } from 'src/shared/constants/topicName';
 import { type Topic } from '../shared/models/topic';
 import { v4 as uuidv4 } from 'uuid';
+import AboutSection from 'src/components/AboutSection.vue';
 
 const mainStore = useMainStore();
 const { activeTheme, activeTopic } = storeToRefs(mainStore);
@@ -161,7 +162,7 @@ const selectTopic = (name: TopicName, theme?: Theme) => {
         class="desktop-drawer"
       >
         <q-scroll-area class="fit q-pa-md">
-          <div class="text-white"></div>
+          <AboutSection v-if="activeTopic === TopicName.About" />
         </q-scroll-area>
       </q-drawer>
 
