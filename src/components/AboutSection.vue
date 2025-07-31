@@ -1,5 +1,90 @@
 <script lang="ts" setup>
-import HistoryCarousel from './HistoryCarousel.vue';
+import { ref } from 'vue';
+import { v4 as uuidv4 } from 'uuid';
+// import { type CarouselSlide } from 'src/shared/models/carouselSlide';
+
+import { type TimelineEntry } from '../shared/models/timelineEntry';
+// const workHistorySlides = ref<CarouselSlide[]>([
+//   {
+//     id: uuidv4(),
+//     link: 'https://www.amtrak.com/home',
+//     img: new URL('../assets/amtrak.svg', import.meta.url).href,
+//     alt: 'Amtrak',
+//   },
+//   {
+//     id: uuidv4(),
+//     link: 'https://www.lockheedmartin.com/en-us/index.html',
+//     img: new URL('../assets/lockheed-martin.png', import.meta.url).href,
+//     alt: 'Lockheed Martin',
+//   },
+//   {
+//     id: uuidv4(),
+//     link: 'https://www.labcorp.com/',
+//     img: new URL('../assets/labcorp.png', import.meta.url).href,
+//     alt: 'Labcorp',
+//   },
+//   {
+//     id: uuidv4(),
+//     link: 'https://www.ornl.gov/',
+//     img: new URL('../assets/ornl.png', import.meta.url).href,
+//     alt: 'ORNL',
+//   },
+//   {
+//     id: uuidv4(),
+//     link: 'https://gametimehero-coming-soon.web.app/',
+//     img: new URL('../assets/gametime-hero.png', import.meta.url).href,
+//     alt: 'Gametime Hero',
+//   },
+// ]);
+const workHistoryTimeline = ref<TimelineEntry[]>([
+  {
+    id: uuidv4(),
+    heading: false,
+    icon: 'work',
+    color: 'dark',
+    subtitle: '2024 - 2025',
+    title: 'L&G Devworks',
+    body: 'Currently developing Draindata, a surgical drain tracking app in open beta with active users. Also working on StorytAIm, an AI narration suite now being migrated to the MEAN stack for enhanced scalability.',
+  },
+  {
+    id: uuidv4(),
+    heading: false,
+    avatar: new URL('../assets/ornl-icon.png', import.meta.url).href,
+    color: 'dark',
+    subtitle: '2023 - 2024',
+    title: 'ONRL',
+    body: 'Developed a comprehensive tool set for the Veterans Association, enabling multivariate analysis to optimize resource allocation.',
+  },
+  {
+    id: uuidv4(),
+    heading: false,
+    icon: 'business',
+    color: 'dark',
+    subtitle: '2023',
+    title: 'T2',
+    body: 'I upgraded their payment system to streamline the process, reducing the average customer payment time from 3.5 minutes to just over 1 minute.',
+  },
+  {
+    id: uuidv4(),
+    heading: false,
+    avatar: new URL('../assets/labcorp-icon.jpeg', import.meta.url).href,
+    color: 'dark',
+    subtitle: '2022 - 2023',
+    title: 'Labcorp',
+    body: 'Collaborated with a team to modernize the entire specimen collection workflow, resulting in a reduction of processing time by over 60% on average for specimen reviews.',
+  },
+
+  {
+    id: uuidv4(),
+    heading: false,
+    icon: 'more_horiz',
+    color: 'dark',
+    subtitle: '2017 - 2022',
+    title: 'Review Resume',
+  },
+]);
+
+// const activeSlide = ref(workHistorySlides.value[0]?.id);
 </script>
 
 <template>
@@ -54,11 +139,25 @@ import HistoryCarousel from './HistoryCarousel.vue';
         </ul>
       </q-card-section> -->
 
-        <q-card-section class="section-container work-history-section q-pa-lg bg-accent">
-          <h2 class="q-ma-none q-mt-lg q-mb-xl text-center text-primary">Work History</h2>
+        <q-card-section class="section-container work-history-section q-pa-lg bg-primary">
+          <h2 class="q-ma-none q-mt-lg q-mb-xl text-center text-dark">Recent Work History</h2>
 
-          <HistoryCarousel />
-          <p class="history-context text-center text-primary q-pt-lg">
+          <q-timeline layout="dense" color="primary">
+            <q-timeline-entry
+              v-for="employer in workHistoryTimeline"
+              :key="employer.id"
+              :heading="employer.heading"
+              :icon="employer.icon"
+              :tag="employer.tag"
+              :color="employer.color"
+              :subtitle="employer.subtitle"
+              :avatar="employer.avatar"
+            >
+              <template v-slot:title> {{ employer.title }} </template>
+              {{ employer.body }}
+            </q-timeline-entry>
+          </q-timeline>
+          <p class="history-context text-center text-accent">
             I've built high-performance web apps and streamlining complex systems. I’ve worked in
             environments ranging from government labs to startups, with recent experience converting
             legacy systems, integrating Epic OAuth for medical software, and building scalable
@@ -88,9 +187,9 @@ import HistoryCarousel from './HistoryCarousel.vue';
             Projects Under Development
           </h2>
           <div class="projects-container full-width q-pb-xl">
-            <ul class="full-width q-pl-none justify-between">
+            <ul class="column full-width q-pl-none justify-center">
               <li
-                class="column items-center justify-between text-accent text-center bg-primary q-pa-md"
+                class="full-width column items-center justify-between text-accent text-center bg-primary q-pa-md"
               >
                 <img
                   class="logo q-pt-lg q-pb-md"
@@ -105,7 +204,7 @@ import HistoryCarousel from './HistoryCarousel.vue';
               </li>
               <br />
               <li
-                class="column items-center justify-between text-primary text-center bg-accent q-pa-md"
+                class="column full-width items-center justify-between text-primary text-center bg-accent q-pa-md"
               >
                 <img class="logo q-pb-md" src="../assets/logo-storytAIm.png" alt="StorytAIm logo" />
                 <span class="q-pa-md">
@@ -120,10 +219,27 @@ import HistoryCarousel from './HistoryCarousel.vue';
 
         <hr class="separator full-width" />
 
-        <q-card-section class="section-container work-history-section column items-center q-pa-xl">
+        <q-card-section
+          class="section-container work-history-section bg-transparent column items-center q-pa-xl"
+        >
           <h2 class="q-ma-none q-mt-none q-mb-xl text-center text-secondary">Work History</h2>
-          <div class="carousel-container full-width">
-            <HistoryCarousel />
+          <q-separator></q-separator>
+          <div class="full-width">
+            <q-timeline dark>
+              <q-timeline-entry
+                v-for="employer in workHistoryTimeline"
+                :key="employer.id"
+                :heading="employer.heading"
+                :icon="employer.icon"
+                :tag="employer.tag"
+                color="dark"
+                :subtitle="employer.subtitle"
+                :avatar="employer.avatar"
+              >
+                <template v-slot:title> <span></span>{{ employer.title }} </template>
+                {{ employer.body }}
+              </q-timeline-entry>
+            </q-timeline>
           </div>
 
           <p class="text-primary q-pt-xl text-center">
@@ -191,7 +307,6 @@ $spring-mobile-background: map-get($spring-theme, secondary);
       .history-context {
         font-size: 1.2rem;
         line-height: 1.5rem;
-        text-shadow: 2px 2px 5px var(--q-dark);
       }
 
       .projects-container {
@@ -238,6 +353,7 @@ $spring-mobile-background: map-get($spring-theme, secondary);
 
 .desktop-view {
   display: none;
+
   @media (min-width: $breakpoint-md) {
     display: flex;
   }
@@ -247,7 +363,7 @@ $spring-mobile-background: map-get($spring-theme, secondary);
   }
 
   h2 {
-    font-size: 2rem;
+    font-size: 2.2rem;
   }
 
   .summary {
@@ -259,32 +375,26 @@ $spring-mobile-background: map-get($spring-theme, secondary);
     }
   }
 
-  .work-history-section {
-    font-size: 1.3rem;
-
-    p:nth-child(1) {
-      font-size: 1.5rem;
-    }
-
-    .carousel-container {
-      max-width: 750px;
-    }
-  }
-
   .projects-container {
     border-radius: 20px;
 
     ul {
-      display: flex;
       list-style-type: none;
 
+      @media (min-width: 1280px) {
+        flex-direction: row;
+        justify-content: space-between;
+      }
+
       li {
-        width: 48%;
         font-size: 1.1rem;
         line-height: 1.3rem;
         border: 1px solid var(--q-primary);
-
         border-radius: 10px;
+
+        @media (min-width: 1280px) {
+          width: 48% !important;
+        }
 
         .logo {
           max-width: 150px;
@@ -305,6 +415,22 @@ $spring-mobile-background: map-get($spring-theme, secondary);
         transform: scale(1.02);
         box-shadow: 5px 10px 20px var(--q-dark);
       }
+    }
+  }
+
+  .work-history-section {
+    font-size: 1.3rem;
+
+    h2 {
+      margin-bottom: 2rem;
+    }
+
+    p:nth-child(1) {
+      font-size: 1.5rem;
+    }
+
+    .carousel-container {
+      max-width: 750px;
     }
   }
 }
