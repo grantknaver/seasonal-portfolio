@@ -7,6 +7,7 @@ import { v4 as uuidv4 } from 'uuid';
 import { storeToRefs } from 'pinia';
 import { TopicName } from 'src/shared/constants/topicName';
 import AboutSection from '../components/AboutSection.vue';
+import ContactSection from '../components/ContactSection.vue';
 
 const currentBg = ref('');
 const backgroundMap: Record<Theme, string> = {
@@ -66,7 +67,7 @@ const selectTopic = (name: TopicName, theme?: Theme) => {
   <q-page class="page-container column col q-pa-md">
     <img class="q-pt-sm logo" style="max-width: 200px" src="../assets/logo.png" alt="logo" />
     <div class="sub-container column col items-center">
-      <section class="mobile-view column items-center justify-start full-width">
+      <section class="mobile-view column items-center full-width">
         <div inline-actions class="flex full-width text-white bg-accent q-mt-lg q-mb-sm q-pa-md">
           <span>
             <p class="q-ma-none text-primary bounce-text">Grant Knaver</p>
@@ -83,8 +84,8 @@ const selectTopic = (name: TopicName, theme?: Theme) => {
           conservation organization, WWF works in 100 countries and is supported by 1.2 million
           members in the United States and close to 5 million globally."
         </blockquote>
-        <hr class="full-width" />
-        <q-list padding class="full-width">
+
+        <q-list padding class="full-width q-pa-none">
           <q-item
             v-for="topic in topics.slice(1)"
             :key="topic.id"
@@ -103,7 +104,10 @@ const selectTopic = (name: TopicName, theme?: Theme) => {
             </q-expansion-item>
           </q-item>
         </q-list>
+        <q-separator color="secondary" class="full-width q-mt-xs q-mb-lg"></q-separator>
+        <ContactSection />
       </section>
+
       <section class="desktop-view flex col column justify-center items-center full-width">
         <div class="simon-circle q-mt-xl">
           <div
@@ -129,7 +133,14 @@ const selectTopic = (name: TopicName, theme?: Theme) => {
         <p class="q-ma-none text-secondary">Fullstack Developer</p>
       </section>
     </div>
-    <q-btn round class="contact-btn" color="accent" size="xl" icon="mail">
+    <q-btn
+      @click.stop="selectTopic(TopicName.Contact)"
+      round
+      class="contact-btn"
+      color="accent"
+      size="xl"
+      icon="mail"
+    >
       <q-tooltip anchor="center middle" self="top left"> Contact </q-tooltip>
     </q-btn>
   </q-page>

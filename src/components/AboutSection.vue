@@ -89,7 +89,7 @@ const workHistoryTimeline = ref<TimelineEntry[]>([
 
 <template>
   <section>
-    <div class="mobile-view">
+    <div class="mobile-view full-width">
       <q-card class="full-width q-pa-sm">
         <q-card-section class="section-container text-primary q-pa-lg">
           <h1 class="q-mt-md text-primary">About Me</h1>
@@ -167,7 +167,7 @@ const workHistoryTimeline = ref<TimelineEntry[]>([
       </q-card>
     </div>
 
-    <div class="desktop-view">
+    <div class="desktop-view full-width">
       <q-card class="full-width q-pa-sm bg-transparent">
         <q-card-section class="section-container text-primary q-pa-lg">
           <h1 class="q-mt-none q-mb-xl text-primary text-center">About Me</h1>

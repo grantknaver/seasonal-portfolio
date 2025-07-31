@@ -1,5 +1,5 @@
 <script lang="ts" setup>
-import { computed, ref, onMounted, watch, onBeforeUnmount } from 'vue';
+import { computed, ref, onMounted, watch, onBeforeUnmount, nextTick } from 'vue';
 import { useMainStore } from '../stores/main';
 import { storeToRefs } from 'pinia';
 import { Theme } from '../shared/constants/theme';
@@ -9,6 +9,7 @@ import { TopicName } from 'src/shared/constants/topicName';
 import { type Topic } from '../shared/models/topic';
 import { v4 as uuidv4 } from 'uuid';
 import AboutSection from 'src/components/AboutSection.vue';
+import ContactSection from 'src/components/ContactSection.vue';
 
 const mainStore = useMainStore();
 const { activeTheme, activeTopic } = storeToRefs(mainStore);
@@ -47,12 +48,6 @@ const topics = ref<Topic[]>([
     icon: 'mail',
     label: TopicName.Skills,
     theme: Theme.Summer,
-  },
-  {
-    id: uuidv4(),
-    name: TopicName.Contact,
-    icon: 'mail',
-    label: TopicName.Contact,
   },
 ]);
 const backgroundMap: Record<Theme, string> = {
@@ -93,6 +88,21 @@ const selectTopic = (name: TopicName, theme?: Theme) => {
     mainStore.SET_ACTIVE_THEME(theme);
   }
 };
+
+const scrollToContact = async () => {
+  mobileMenu.value = false;
+  await nextTick();
+
+  setTimeout(() => {
+    const el = document.getElementById('contact');
+    console.log('el...', el);
+    if (el) {
+      el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    } else {
+      console.warn('Contact element not found');
+    }
+  }, 200);
+};
 </script>
 
 <template>
@@ -106,7 +116,7 @@ const selectTopic = (name: TopicName, theme?: Theme) => {
     />
 
     <!-- Main Layout -->
-    <q-layout view="lhh LpR lff" class="column">
+    <q-layout view="Hhh LpR lff" class="column">
       <!-- HEADER -->
       <q-header class="main-header text-black">
         <q-toolbar class="bg-dark q-pa-lg">
@@ -146,6 +156,14 @@ const selectTopic = (name: TopicName, theme?: Theme) => {
               >
                 <q-item-section>{{ topic.label }}</q-item-section>
               </q-item>
+              <q-item
+                class="menu-item text-dark"
+                clickable
+                @click="scrollToContact"
+                :class="{ activeTopic: TopicName.Contact === activeTopic }"
+              >
+                <q-item-section>{{ TopicName.Contact }}</q-item-section>
+              </q-item>
               <hr />
               <q-item key="resume" clickable @click="mobileMenu = false">
                 <q-item-section class="text-bold text-secondary">Download Resume</q-item-section>
@@ -169,6 +187,7 @@ const selectTopic = (name: TopicName, theme?: Theme) => {
       >
         <q-scroll-area class="fit q-pa-md">
           <AboutSection v-if="activeTopic === TopicName.About" />
+          <ContactSection v-if="activeTopic === TopicName.Contact" />
         </q-scroll-area>
       </q-drawer>
 
