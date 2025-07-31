@@ -219,9 +219,7 @@ const workHistoryTimeline = ref<TimelineEntry[]>([
 
         <hr class="separator full-width" />
 
-        <q-card-section
-          class="section-container work-history-section bg-transparent column items-center q-pa-xl"
-        >
+        <q-card-section class="section-container work-history-section column items-center q-pa-xl">
           <h2 class="q-ma-none q-mt-none q-mb-xl text-center text-secondary">Work History</h2>
           <q-separator></q-separator>
           <div class="full-width">
@@ -242,7 +240,7 @@ const workHistoryTimeline = ref<TimelineEntry[]>([
             </q-timeline>
           </div>
 
-          <p class="text-primary q-pt-xl text-center">
+          <p class="text-primary q-pt-lg text-center">
             I've built high-performance web apps and streamlining complex systems. I’ve worked in
             environments ranging from government labs to startups, with recent experience converting
             legacy systems, integrating Epic OAuth for medical software, and building scalable
@@ -258,7 +256,7 @@ const workHistoryTimeline = ref<TimelineEntry[]>([
 
 <style scoped lang="scss">
 @import '../css/main.scss';
-$winter-mobile-background: map-get($winter-theme, secondary);
+$winter-mobile-background: map-get($winter-theme, primary);
 $summer-mobile-background: map-get($summer-theme, secondary);
 $spring-mobile-background: map-get($spring-theme, secondary);
 
@@ -420,7 +418,6 @@ $spring-mobile-background: map-get($spring-theme, secondary);
 
   .work-history-section {
     font-size: 1.3rem;
-
     h2 {
       margin-bottom: 2rem;
     }
