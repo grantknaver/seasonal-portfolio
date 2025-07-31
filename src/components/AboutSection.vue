@@ -381,21 +381,21 @@ $spring-mobile-background: map-get($spring-theme, secondary);
 
       @media (min-width: 1280px) {
         flex-direction: row;
-        justify-content: space-between;
+        justify-content: space-around;
       }
 
       li {
-        font-size: 1.1rem;
+        font-size: 1rem;
         line-height: 1.3rem;
         border: 1px solid var(--q-primary);
         border-radius: 10px;
 
         @media (min-width: 1280px) {
-          width: 48% !important;
+          width: 45% !important;
         }
 
         .logo {
-          max-width: 150px;
+          max-width: 100px;
         }
 
         a {
@@ -417,7 +417,7 @@ $spring-mobile-background: map-get($spring-theme, secondary);
   }
 
   .work-history-section {
-    font-size: 1.3rem;
+    font-size: 1rem;
     h2 {
       margin-bottom: 2rem;
     }
