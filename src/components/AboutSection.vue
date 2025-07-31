@@ -21,7 +21,9 @@ import HistoryCarousel from './HistoryCarousel.vue';
         <q-separator color="primary q-mt-sm q-mb-sm"></q-separator>
 
         <q-card-section class="section-container bg-transparent text-primary q-pa-sm">
-          <p class="text-body1 q-mb-sm">Projects currently under development.</p>
+          <h2 class="q-ma-none q-mt-lg q-mb-md text-center text-primary">
+            Projects Under Development
+          </h2>
           <div class="projects-container full-width column col justify-center items-center">
             <ul class="q-pl-none q-pt-sm q-pb-md">
               <li class="column text-accent items-center q-pa-lg text-center bg-primary full-width">
@@ -53,13 +55,10 @@ import HistoryCarousel from './HistoryCarousel.vue';
       </q-card-section> -->
 
         <q-card-section class="section-container work-history-section q-pa-lg bg-accent">
-          <p class="text-primary">
-            Before that, I worked with teams at
-            <strong>Lockheed Martin, Labcorp, Amtrak and more.</strong>
-          </p>
+          <h2 class="q-ma-none q-mt-lg q-mb-xl text-center text-primary">Work History</h2>
 
-          <WorkHistory />
-          <p class="history-context text-primary q-pt-md">
+          <HistoryCarousel />
+          <p class="history-context text-center text-primary q-pt-lg">
             I've built high-performance web apps and streamlining complex systems. I’ve worked in
             environments ranging from government labs to startups, with recent experience converting
             legacy systems, integrating Epic OAuth for medical software, and building scalable
@@ -161,6 +160,10 @@ $spring-mobile-background: map-get($spring-theme, secondary);
       margin-bottom: 2rem;
     }
 
+    h2 {
+      font-size: 2rem;
+    }
+
     .section-container {
       background-color: var(--q-accent);
       border-radius: 10px;
@@ -186,6 +189,8 @@ $spring-mobile-background: map-get($spring-theme, secondary);
       }
 
       .history-context {
+        font-size: 1.2rem;
+        line-height: 1.5rem;
         text-shadow: 2px 2px 5px var(--q-dark);
       }
 
