@@ -36,9 +36,9 @@ const topics: Topic[] = [
   },
   {
     id: uuidv4(),
-    name: TopicName.Contact,
-    icon: 'mail',
-    label: TopicName.Contact,
+    name: TopicName.Skills,
+    icon: 'code',
+    label: TopicName.Skills,
     theme: Theme.Summer,
     seasonIcon: 'wb_sunny',
   },
@@ -129,6 +129,9 @@ const selectTopic = (name: TopicName, theme?: Theme) => {
         <p class="q-ma-none text-secondary">Fullstack Developer</p>
       </section>
     </div>
+    <q-btn round class="contact-btn" color="accent" size="xl" icon="mail">
+      <q-tooltip anchor="center middle" self="top left"> Contact </q-tooltip>
+    </q-btn>
   </q-page>
 </template>
 
@@ -137,6 +140,7 @@ const selectTopic = (name: TopicName, theme?: Theme) => {
 
 .page-container {
   background-color: rgba($color: white, $alpha: 0.7);
+  position: relative;
 
   @media (min-width: $breakpoint-md) {
     background-color: initial;
@@ -240,7 +244,7 @@ const selectTopic = (name: TopicName, theme?: Theme) => {
             background-color: var(--q-accent);
           }
 
-          &.Contact {
+          &.Skills {
             background-color: var(--q-secondary);
           }
         }
@@ -266,7 +270,7 @@ const selectTopic = (name: TopicName, theme?: Theme) => {
           left: 0;
         }
 
-        &.Contact {
+        &.Skills {
           bottom: 0;
           right: 0;
         }
@@ -307,6 +311,18 @@ const selectTopic = (name: TopicName, theme?: Theme) => {
         font-size: 1.8rem;
         cursor: pointer;
       }
+    }
+  }
+
+  .contact-btn {
+    display: none;
+    position: absolute;
+    max-width: 80px;
+    bottom: 2rem;
+    right: 2rem;
+
+    @media (min-width: $breakpoint-md) {
+      display: initial;
     }
   }
 }

@@ -43,10 +43,16 @@ const topics = ref<Topic[]>([
   },
   {
     id: uuidv4(),
+    name: TopicName.Skills,
+    icon: 'mail',
+    label: TopicName.Skills,
+    theme: Theme.Summer,
+  },
+  {
+    id: uuidv4(),
     name: TopicName.Contact,
     icon: 'mail',
     label: TopicName.Contact,
-    theme: Theme.Summer,
   },
 ]);
 const backgroundMap: Record<Theme, string> = {

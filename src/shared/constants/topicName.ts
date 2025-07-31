@@ -3,4 +3,5 @@ export enum TopicName {
   Projects = 'Projects',
   About = 'About',
   Contact = 'Contact',
+  Skills = 'Skills',
 }
