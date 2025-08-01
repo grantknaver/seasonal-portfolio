@@ -138,7 +138,7 @@ const selectTopic = (name: TopicName, theme?: Theme) => {
       round
       class="contact-btn"
       color="accent"
-      size="xl"
+      size="lg"
       icon="mail"
     >
       <q-tooltip anchor="center middle" self="top left"> Contact </q-tooltip>

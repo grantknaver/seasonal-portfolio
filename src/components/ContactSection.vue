@@ -91,32 +91,28 @@ const sendEmail = () => {
       <q-banner v-if="error" class="bg-red-2 text-black q-mt-sm">
         ❌ Failed to send. Please try again.
       </q-banner>
+
+      <q-btn class="q-ml-none full-width" color="dark" type="submit" size="lg">Submit</q-btn>
     </q-form>
   </div>
-
   <div class="desktop-view full-width">
     <q-form
       @submit.prevent="sendEmail"
-      class="full-width q-gutter-md bg-accent q-pt-md q-pr-xl q-pb-xl q-pl-xl"
+      class="full-width full-height q-gutter-md bg-gr q-pt-md q-pr-xl q-pb-xl q-pl-xl"
     >
       <h2 class="text-primary q-ml-none">Contact Me</h2>
-      <q-input
-        v-model="form.name"
-        label="Your Name"
-        bg-color="primary"
-        class="q-ml-none"
-        outlined
-        required
-      />
-      <q-input
-        v-model="form.email"
-        type="email"
-        label="Your Email"
-        bg-color="primary"
-        class="q-ml-none"
-        outlined
-        required
-      />
+
+      <q-input color="dark" bg-color="primary" filled v-model="form.name" label="Name">
+        <template v-slot:prepend>
+          <q-icon name="person" />
+        </template>
+      </q-input>
+
+      <q-input color="dark" bg-color="primary" filled v-model="form.email" label="Email">
+        <template v-slot:prepend>
+          <q-icon name="email" />
+        </template>
+      </q-input>
 
       <q-input
         v-model="form.message"
@@ -128,6 +124,8 @@ const sendEmail = () => {
         required
         autogrow
       />
+
+      <q-btn class="q-ml-none" color="accent" type="submit" size="lg">Submit</q-btn>
 
       <q-banner v-if="success" class="bg-green-2 text-black q-mt-sm">
         ✅ Message sent successfully!
@@ -161,7 +159,24 @@ const sendEmail = () => {
   display: none;
 
   @media (min-width: $breakpoint-md) {
-    display: initial;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
+
+  .q-form {
+    max-width: 600px;
+    h2 {
+      font-size: 2rem;
+    }
+
+    ::v-deep(.message textarea) {
+      min-height: 200px !important;
+    }
+
+    .q-input {
+      margin-left: 0;
+    }
   }
 }
 </style>

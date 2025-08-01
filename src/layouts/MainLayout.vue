@@ -183,12 +183,14 @@ const scrollToContact = async () => {
         side="right"
         behavior="desktop"
         :width="desktopDrawerWidth"
-        class="desktop-drawer"
+        class="desktop-drawer column col"
       >
-        <q-scroll-area class="fit q-pa-md">
+        <q-scroll-area v-if="activeTopic !== TopicName.Contact" class="fit q-pa-md">
           <AboutSection v-if="activeTopic === TopicName.About" />
-          <ContactSection v-if="activeTopic === TopicName.Contact" />
         </q-scroll-area>
+        <div v-else class="flex column col justify-center items-center">
+          <ContactSection v-if="activeTopic === TopicName.Contact" />
+        </div>
       </q-drawer>
 
       <!-- FOOTER -->
