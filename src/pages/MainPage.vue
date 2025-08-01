@@ -137,7 +137,7 @@ const selectTopic = (name: TopicName, theme?: Theme) => {
       @click.stop="selectTopic(TopicName.Contact)"
       round
       class="contact-btn"
-      color="accent"
+      :color="activeTopic === TopicName.Contact ? 'dark' : 'accent'"
       size="lg"
       icon="mail"
     >
