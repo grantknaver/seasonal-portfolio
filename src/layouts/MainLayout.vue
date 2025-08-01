@@ -9,6 +9,7 @@ import { TopicName } from 'src/shared/constants/topicName';
 import { type Topic } from '../shared/models/topic';
 import { v4 as uuidv4 } from 'uuid';
 import AboutSection from 'src/components/AboutSection.vue';
+import SkillsSection from 'src/components/SkillsSection.vue';
 import ContactSection from 'src/components/ContactSection.vue';
 
 const mainStore = useMainStore();
@@ -187,6 +188,7 @@ const scrollToContact = async () => {
       >
         <q-scroll-area v-if="activeTopic !== TopicName.Contact" class="fit q-pa-md">
           <AboutSection v-if="activeTopic === TopicName.About" />
+          <SkillsSection v-if="activeTopic === TopicName.Skills" />
         </q-scroll-area>
         <div v-else class="flex column col justify-center items-center">
           <ContactSection v-if="activeTopic === TopicName.Contact" />
