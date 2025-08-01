@@ -1,3 +1,5 @@
+@import '../mixins/export-css-vars.scss';
+
 $breakpoint-xs: 0px;
 $breakpoint-sm: 600px;
 $breakpoint-md: 1024px;
@@ -11,12 +13,6 @@ $breakpoints: (
   'breakpoint-lg': $breakpoint-lg,
   'breakpoint-xl': $breakpoint-xl,
 );
-
-@mixin export-css-vars($map) {
-  @each $key, $value in $map {
-    --#{$key}: #{$value};
-  }
-}
 
 :root {
   @include export-css-vars($breakpoints);

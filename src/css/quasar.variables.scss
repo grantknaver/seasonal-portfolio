@@ -1,17 +1,14 @@
+@import './mixins/export-css-vars.scss';
 // Quasar SCSS (& Sass) Variables
 // --------------------------------------------------
 // To customize the look and feel of this app, you can override
 // the Sass/SCSS variables found in Quasar's source Sass/SCSS files.
-
 // Check documentation for full list of Quasar variables
-
 // Your own variables (that are declared here) and Quasar's own
 // ones will be available out of the box in your .vue/.scss/.sass files
-
 // It's highly recommended to change the default colors
 // to match your app's branding.
 // Tip: Use the "Theme Builder" on Quasar's documentation website.
-
 $primary: #f4e7e1;
 $secondary: #ff9b45;
 $accent: #d5451b;
@@ -58,3 +55,14 @@ $primary: map-get($fall-theme, primary);
 $secondary: map-get($fall-theme, secondary);
 $accent: map-get($fall-theme, accent);
 $dark: map-get($fall-theme, dark);
+
+$themeColors: (
+  'primary': $primary,
+  'secondary': $secondary,
+  'accent': $accent,
+  'dark': $dark,
+);
+
+:root {
+  @include export-css-vars($themeColors);
+}

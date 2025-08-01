@@ -7,10 +7,28 @@ import chroma from 'chroma-js';
 
 const container = ref<HTMLElement | null>(null);
 const svg = ref(null);
+const generateRandomColor = () => chroma.random().hex();
 const skills = ref<SkillNode[]>([
-  { name: 'Vue', strength: 20, years: 3 },
-  { name: 'Quasar', strength: 8, years: 2 },
-  { name: 'Pinia', strength: 8, years: 2 },
+  { name: 'Angular', strength: 15, years: 3, fillColor: generateRandomColor() },
+  { name: 'Vue', strength: 13, years: 3, fillColor: generateRandomColor() },
+  { name: 'Quasar', strength: 10, years: 2, fillColor: generateRandomColor() },
+  { name: 'Pinia', strength: 13, years: 2, fillColor: generateRandomColor() },
+  { name: 'JavaScript', strength: 12, years: 7, fillColor: generateRandomColor() },
+  { name: 'TypeScript', strength: 15, years: 2, fillColor: generateRandomColor() },
+  { name: 'D3.js', strength: 9, years: 3, fillColor: generateRandomColor() },
+  { name: 'Highcharts', strength: 7, years: 2, fillColor: generateRandomColor() },
+  { name: 'Chart.js', strength: 6, years: 1, fillColor: generateRandomColor() },
+  { name: 'Firebase', strength: 2, years: 3, fillColor: generateRandomColor() },
+  { name: 'MongoDB', strength: 5, years: 2, fillColor: generateRandomColor() },
+  { name: 'Node.js', strength: 6, years: 2, fillColor: generateRandomColor() },
+  { name: 'HTML/CSS', strength: 9, years: 7, fillColor: generateRandomColor() },
+  { name: 'NgRx', strength: 5, years: 1, fillColor: generateRandomColor() },
+  { name: 'Adobe ', strength: 8, years: 6, fillColor: generateRandomColor() },
+  { name: 'Figma', strength: 6, years: 1, fillColor: generateRandomColor() },
+  { name: 'Git', strength: 8, years: 6, fillColor: generateRandomColor() },
+  { name: 'WordPress', strength: 7, years: 3, fillColor: generateRandomColor() },
+  { name: 'SEO', strength: 7, years: 3, fillColor: generateRandomColor() },
+  { name: 'Sales Marketing', strength: 9, years: 7, fillColor: generateRandomColor() },
 ]);
 
 const tooltip = reactive<{
@@ -37,10 +55,10 @@ onMounted(async () => {
   await nextTick();
   const data: SkillNode[] = skills.value.map((d) => ({
     ...d,
-    x: Math.random() * 300,
-    y: Math.random() * 300,
+    x: Math.random() * 0.01,
+    y: Math.random() * 10,
   }));
-
+  console.log('data', data);
   const width = container.value?.clientWidth || 800;
   const height = container.value?.clientHeight || 600;
 
@@ -82,7 +100,7 @@ onMounted(async () => {
   nodeGroup
     .append('circle')
     .attr('r', (d) => d.strength * 4)
-    .attr('fill', () => generateRandomColor());
+    .attr('fill', (d) => d.fillColor);
 
   nodeGroup
     .append('text')
@@ -94,22 +112,18 @@ onMounted(async () => {
     .attr('pointer-events', 'none');
 
   function ticked() {
+    nodeGroup.each((d: SkillNode) => {
+      const r = d.strength * 4;
+
+      // Clamp x
+      d.x = Math.max(r, Math.min(width - r, d.x ?? 0));
+      // Clamp y
+      d.y = Math.max(r, Math.min(height - r, d.y ?? 0));
+    });
+
     nodeGroup.attr('transform', (d) => `translate(${d.x},${d.y})`);
   }
 });
-
-// const categoryColor = (cat: SkillCatagory) => {
-//   const colors = {
-//     Frontend: '#00bcd4',
-//     Backend: '#4caf50',
-//     Tools: '#ff9800',
-//     'Data Viz': '#e91e63',
-//     Other: '#9c27b0',
-//   };
-//   return colors[cat] || '#ccc';
-// };
-
-const generateRandomColor = () => chroma.random().hex();
 </script>
 
 <template>
@@ -121,7 +135,7 @@ const generateRandomColor = () => chroma.random().hex();
     <div
       v-if="tooltip.visible && tooltip.data"
       :style="tooltipStyle"
-      class="bg-primary text-white shadow-2 rounded q-pa-sm z-50"
+      class="bg-dark text-white shadow-2 rounded q-pa-sm z-50"
     >
       <div>Years: {{ tooltip.data.years }}</div>
     </div>
