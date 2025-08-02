@@ -14,13 +14,13 @@ const generateRandomColor = (themeColor: string) => chroma(themeColor).darken().
 const skills = ref<SkillNode[]>([
   {
     name: 'Angular',
-    strength: 17,
+    strength: 18,
     years: 7,
     fillColor: generateRandomColor(getCustomCssVar('dark')),
   },
   {
     name: 'Vue',
-    strength: 17,
+    strength: 20,
     years: 3,
     fillColor: generateRandomColor(getCustomCssVar('accent')),
   },
@@ -32,7 +32,7 @@ const skills = ref<SkillNode[]>([
   },
   {
     name: 'Pinia',
-    strength: 13,
+    strength: 15,
     years: 3,
     fillColor: generateRandomColor(getCustomCssVar('accent')),
   },
@@ -46,7 +46,7 @@ const skills = ref<SkillNode[]>([
     name: 'TypeScript',
     strength: 15,
     years: 8,
-    fillColor: generateRandomColor(getCustomCssVar('accent')),
+    fillColor: generateRandomColor(getCustomCssVar('secondary')),
   },
   {
     name: 'D3.js',
@@ -84,7 +84,7 @@ const skills = ref<SkillNode[]>([
     years: 4,
     fillColor: generateRandomColor(getCustomCssVar('accent')),
   },
-  { name: 'NgRx', strength: 7, years: 5, fillColor: generateRandomColor(getCustomCssVar('dark')) },
+  { name: 'NgRx', strength: 10, years: 5, fillColor: generateRandomColor(getCustomCssVar('dark')) },
   {
     name: 'Figma',
     strength: 8,
@@ -258,7 +258,7 @@ onMounted(async () => {
       <q-card-section class="card-section q-pa-lg bg-accent">
         <h1 class="q-mt-none text-primary">Skills</h1>
         <q-separator color="primary" class="full-width q-mb-md" />
-        <p class="text-primary text-center">
+        <p class="text-primary">
           I'm a full-stack JavaScript developer focused on front-end architecture and UX. I began
           with the MEAN stack, later shifting to the Vue ecosystem to build responsive,
           component-driven UIs. My backend work centers on MongoDB, recently expanding into DynamoDB
@@ -266,8 +266,20 @@ onMounted(async () => {
           component is fast, purposeful, and polished.
         </p>
       </q-card-section>
+      <small class="text-primary bg-dark q-pa-lg full-width text-center"
+        >Toolkit shows my level of expertise in multiple different areas.</small
+      >
+      <q-card-section class="card-section full-width bg-secondary">
+        <h2 class="text-primary q-mt-md">Toolkit</h2>
 
-      <q-card-section class="q-mt-lg bg-secondary">
+        <q-separator color="primary" class="full-width q-mb-lg" />
+        <div v-for="skill in skills" :key="skill.name" class="q-mb-sm">
+          <div class="text-bold text-dark">{{ skill.name }}</div>
+          <q-linear-progress :value="skill.strength / 20" color="primary" rounded />
+        </div>
+      </q-card-section>
+
+      <q-card-section class="card-section bg-accent">
         <p class="text-primary text-center">
           With a background in fine arts and sales, I bring a strong creative lens and user-focused
           mindset to my work. I enjoy prototyping in Figma, am proficient with Adobe Creative Suite,
@@ -316,14 +328,13 @@ onMounted(async () => {
           <div>Years: {{ tooltip.data.years }}</div>
         </div>
       </q-card-section>
-      <q-card-section class="q-mt-lg">
+      <q-card-section class="card-section q-mt-lg">
         <p class="text-primary text-center">
           With a background in fine arts and sales, I bring a strong creative lens and user-focused
           mindset to my work. I enjoy prototyping in Figma, am proficient with Adobe Creative Suite,
           and apply SEO best practices to help build and scale user-centric digital products.
         </p>
       </q-card-section>
-
       <q-card-section class="card-section q-pa-lg">
         <q-separator color="primary" class="full-width q-mb-lg" />
         <h2 class="q-mt-none text-secondary text-bold">Coming Soon</h2>
@@ -355,6 +366,9 @@ h2 {
   }
 }
 
+.mobile-view {
+}
+
 .desktop-view {
   display: none;
   position: relative;
@@ -380,9 +394,6 @@ h2 {
     justify-content: center;
     background-color: var(--q-primary);
     border-radius: 5px;
-  }
-
-  .card-section:nth-child(3) {
   }
 
   .tooltip {
