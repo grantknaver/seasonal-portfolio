@@ -22,41 +22,41 @@ const skills = ref<SkillNode[]>([
     name: 'Vue',
     strength: 17,
     years: 3,
-    fillColor: generateRandomColor(getCustomCssVar('primary')),
+    fillColor: generateRandomColor(getCustomCssVar('accent')),
   },
   {
     name: 'Quasar',
     strength: 10,
-    years: 2,
+    years: 3,
     fillColor: generateRandomColor(getCustomCssVar('secondary')),
   },
   {
     name: 'Pinia',
     strength: 13,
-    years: 2,
+    years: 3,
     fillColor: generateRandomColor(getCustomCssVar('accent')),
   },
   {
     name: 'JavaScript',
     strength: 15,
-    years: 7,
+    years: 8,
     fillColor: generateRandomColor(getCustomCssVar('dark')),
   },
   {
     name: 'TypeScript',
     strength: 15,
-    years: 2,
-    fillColor: generateRandomColor(getCustomCssVar('primary')),
+    years: 8,
+    fillColor: generateRandomColor(getCustomCssVar('accent')),
   },
   {
     name: 'D3.js',
-    strength: 5,
+    strength: 4,
     years: 2,
     fillColor: generateRandomColor(getCustomCssVar('secondary')),
   },
   {
     name: 'Highcharts',
-    strength: 4,
+    strength: 5,
     years: 1,
     fillColor: generateRandomColor(getCustomCssVar('accent')),
   },
@@ -70,7 +70,7 @@ const skills = ref<SkillNode[]>([
     name: 'Firebase',
     strength: 5,
     years: 3,
-    fillColor: generateRandomColor(getCustomCssVar('primary')),
+    fillColor: generateRandomColor(getCustomCssVar('secondary')),
   },
   {
     name: 'MongoDB',
@@ -84,12 +84,12 @@ const skills = ref<SkillNode[]>([
     years: 4,
     fillColor: generateRandomColor(getCustomCssVar('accent')),
   },
-  { name: 'NgRx', strength: 5, years: 1, fillColor: generateRandomColor(getCustomCssVar('dark')) },
+  { name: 'NgRx', strength: 7, years: 5, fillColor: generateRandomColor(getCustomCssVar('dark')) },
   {
     name: 'Figma',
     strength: 8,
     years: 4,
-    fillColor: generateRandomColor(getCustomCssVar('primary')),
+    fillColor: generateRandomColor(getCustomCssVar('accent')),
   },
   {
     name: 'Git',
@@ -110,7 +110,7 @@ const skills = ref<SkillNode[]>([
     name: 'DynamoDB',
     strength: 4,
     years: 1,
-    fillColor: generateRandomColor(getCustomCssVar('primary')),
+    fillColor: generateRandomColor(getCustomCssVar('dark')),
   },
 ]);
 
@@ -128,46 +128,71 @@ const tooltip = reactive<{
 
 const tooltipStyle = computed<CSSProperties>(() => ({
   position: 'absolute',
-  left: tooltip.x + 'px',
-  top: tooltip.y + 'px',
+  left: tooltip.x + 20 + 'px',
+  top: tooltip.y + 10 + 'px',
   pointerEvents: 'none',
   zIndex: 1000,
 }));
 
 const calculateFontSize = (strength: number) => {
-  const size = Math.floor((strength + 12) * 0.75);
+  const size = Math.floor((strength + 10) * 0.75);
   return Math.max(size, 10);
 };
 
+const width = container.value?.clientWidth || 800;
+const height = container.value?.clientHeight || 600;
+const data: SkillNode[] = skills.value.map((d) => ({
+  ...d,
+  x: Math.random() * width,
+  y: Math.random() * height,
+  vx: (Math.random() - 0.5) * 2,
+  vy: (Math.random() - 0.5) * 2,
+}));
+
+function repellingForce() {
+  let nodes: SkillNode[] = [];
+
+  function force(alpha: number) {
+    if (!tooltip.data) return;
+
+    const center = { x: tooltip.data.x!, y: tooltip.data.y! };
+
+    nodes.forEach((node) => {
+      if (node === tooltip.data) return;
+
+      const dx = node.x! - center.x;
+      const dy = node.y! - center.y;
+      const dist2 = dx * dx + dy * dy + 1;
+
+      const strength = 1000; // tweak as needed
+      node.vx! += (dx / dist2) * strength * alpha;
+      node.vy! += (dy / dist2) * strength * alpha;
+    });
+  }
+
+  force.initialize = (n: SkillNode[]) => {
+    nodes = n;
+  };
+
+  return force;
+}
+
 onMounted(async () => {
   await nextTick();
-  const width = container.value?.clientWidth || 800;
-  const height = container.value?.clientHeight || 600;
 
-  const data: SkillNode[] = skills.value.map((d) => ({
-    ...d,
-    x: Math.random() * width,
-    y: Math.random() * height,
-    vx: (Math.random() - 0.5) * 2,
-    vy: (Math.random() - 0.5) * 2,
-  }));
+  const svgEl = d3.select(svg.value).attr('viewBox', [0, 0, width, height]);
 
-  const svgEl = d3
-    .select(svg.value)
-    .attr('viewBox', [0, 0, width, height])
-    .style('background-color', 'red');
-
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const simulation = d3
     .forceSimulation<SkillNode>(data)
-    .alphaDecay(0) // prevent simulation from stopping
-    .velocityDecay(0.8) // some friction
+    .alphaDecay(0)
+    .velocityDecay(0.8)
     .force('x', d3.forceX(width / 2).strength(0.01))
     .force('y', d3.forceY(height / 2).strength(0.01))
     .force(
       'collision',
       d3.forceCollide<SkillNode>().radius((d) => d.strength * 4 + 1),
     )
+    .force('repel', repellingForce()) // 🔥 add this line
     .on('tick', ticked);
 
   const nodeGroup = svgEl
@@ -177,22 +202,30 @@ onMounted(async () => {
     .attr('class', 'node')
     .style('cursor', 'pointer')
     .on('mouseover', function (event, d) {
+      d.fx = d.x;
+      d.fy = d.y;
+
       tooltip.visible = true;
       tooltip.data = d;
       tooltip.x = event.offsetX + 10;
       tooltip.y = event.offsetY + 10;
+      simulation.alphaTarget(0.3).restart(); // 🔥 triggers the repel force
     })
+
     .on('mousemove', function (event) {
       tooltip.x = event.offsetX + 10;
       tooltip.y = event.offsetY + 10;
     })
-    .on('mouseleave', () => {
+    .on('mouseleave', function (event, d) {
+      // Release the node
+      d.fx = null;
+      d.fy = null;
+
       tooltip.visible = false;
     });
-
   nodeGroup
     .append('circle')
-    .attr('r', (d) => d.strength * 4.5)
+    .attr('r', (d) => d.strength * 6.5)
     .attr('fill', (d) => d.fillColor);
 
   nodeGroup
@@ -218,30 +251,142 @@ onMounted(async () => {
 </script>
 
 <template>
-  <div ref="container" class="skill-chart-container">
-    <svg ref="svg" class="chart-svg"></svg>
-
-    <div
-      v-if="tooltip.visible && tooltip.data"
-      :style="tooltipStyle"
-      class="bg-dark text-white shadow-2 rounded q-pa-sm z-50"
+  <div class="mobile-view full-width q-mb-xl">
+    <q-card
+      class="card full-width col flex column items-center justify-center q-pa-sm bg-transparent"
     >
-      <div>Years: {{ tooltip.data.years }}</div>
-    </div>
+      <q-card-section class="card-section q-pa-lg bg-accent">
+        <h1 class="q-mt-none text-primary">Skills</h1>
+        <q-separator color="primary" class="full-width q-mb-md" />
+        <p class="text-primary text-center">
+          I'm a full-stack JavaScript developer focused on front-end architecture and UX. I began
+          with the MEAN stack, later shifting to the Vue ecosystem to build responsive,
+          component-driven UIs. My backend work centers on MongoDB, recently expanding into DynamoDB
+          for cloud-native apps. I thrive at the intersection of design and data, ensuring every
+          component is fast, purposeful, and polished.
+        </p>
+      </q-card-section>
+
+      <q-card-section class="q-mt-lg bg-secondary">
+        <p class="text-primary text-center">
+          With a background in fine arts and sales, I bring a strong creative lens and user-focused
+          mindset to my work. I enjoy prototyping in Figma, am proficient with Adobe Creative Suite,
+          and apply SEO best practices to help build and scale user-centric digital products.
+        </p>
+      </q-card-section>
+
+      <q-card-section class="card-section bg-dark">
+        <h2 class="q-mt-none text-secondary">Coming Soon</h2>
+        <p class="text-primary">
+          I’m currently deepening my DynamoDB expertise, leveling up my Figma design skills, and
+          exploring Python for backend scripting and automation. This section will soon showcase new
+          projects, experiments, and lessons learned along the way — stay tuned.
+        </p>
+      </q-card-section>
+    </q-card>
+  </div>
+  <div ref="container" class="desktop-view full-width q-mb-xl">
+    <q-card
+      class="card full-width col flex column items-center justify-center q-pa-sm bg-transparent"
+    >
+      <q-card-section class="card-section q-pa-lg">
+        <h1 class="q-mt-none text-primary text-center">Skills</h1>
+        <q-separator color="primary" class="full-width q-mb-md" />
+        <p class="text-primary text-center">
+          I'm a full-stack JavaScript developer focused on front-end architecture and UX. I began
+          with the MEAN stack, later shifting into Vue 3, Pinia, and Quasar to build responsive,
+          component-driven UIs. My backend work centers on MongoDB, recently expanding into DynamoDB
+          for cloud-native apps. I thrive at the intersection of design and data, ensuring every
+          component is fast, purposeful, and polished.
+        </p>
+      </q-card-section>
+
+      <q-card-section class="card-section flex column col">
+        <p class="text-accent">
+          The graph below illustrates my current toolset. The size of each sphere represents my
+          level of expertise in that area.
+        </p>
+        <svg ref="svg" class="chart-svg"></svg>
+
+        <div
+          v-if="tooltip.visible && tooltip.data"
+          :style="tooltipStyle"
+          class="tooltip bg-accent text-white shadow-2 rounded q-pa-sm z-50"
+        >
+          <div>Years: {{ tooltip.data.years }}</div>
+        </div>
+      </q-card-section>
+      <q-card-section class="q-mt-lg">
+        <p class="text-primary text-center">
+          With a background in fine arts and sales, I bring a strong creative lens and user-focused
+          mindset to my work. I enjoy prototyping in Figma, am proficient with Adobe Creative Suite,
+          and apply SEO best practices to help build and scale user-centric digital products.
+        </p>
+      </q-card-section>
+
+      <q-card-section class="card-section q-pa-lg">
+        <q-separator color="primary" class="full-width q-mb-lg" />
+        <h2 class="q-mt-none text-secondary text-bold">Coming Soon</h2>
+
+        <p class="text-primary">
+          I’m currently deepening my DynamoDB expertise, leveling up my Figma design skills, and
+          exploring Python for backend scripting and automation. This section will soon showcase new
+          projects, experiments, and lessons learned along the way — stay tuned.
+        </p>
+      </q-card-section>
+    </q-card>
   </div>
 </template>
 
 <style scoped lang="scss">
-.skill-chart-container {
-  position: relative;
-  width: 100%;
-  height: 100%;
-  overflow: hidden;
-  display: flex;
+@import '../css/main.scss';
+
+h1 {
+  font-size: 3rem;
 }
 
-.chart-svg {
+h2 {
+  font-size: 2.2rem;
+}
+
+.mobile-view {
+  @media (min-width: $breakpoint-md) {
+    display: none;
+  }
+}
+
+.desktop-view {
+  display: none;
+  position: relative;
   width: 100%;
-  height: 100%;
+  min-height: 100%;
+
+  @media (min-width: $breakpoint-md) {
+    display: flex;
+  }
+
+  .chart-svg {
+    width: 100%;
+    height: auto;
+    max-width: 700px;
+    border: white solid 4px;
+    border-radius: 10px;
+    box-shadow: 5px 10px 10px var(--q-dark);
+  }
+
+  .card-section:nth-child(2) {
+    display: flex;
+    width: 90%;
+    justify-content: center;
+    background-color: var(--q-primary);
+    border-radius: 5px;
+  }
+
+  .card-section:nth-child(3) {
+  }
+
+  .tooltip {
+    font-size: 0.6rem;
+  }
 }
 </style>

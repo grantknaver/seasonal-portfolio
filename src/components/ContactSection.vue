@@ -162,7 +162,6 @@ const sendEmail = () => {
     display: flex;
     flex-direction: column;
     align-items: center;
-    background-color: purple !important;
   }
 
   .q-form {

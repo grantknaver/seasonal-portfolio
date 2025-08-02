@@ -7,6 +7,7 @@ import { v4 as uuidv4 } from 'uuid';
 import { storeToRefs } from 'pinia';
 import { TopicName } from 'src/shared/constants/topicName';
 import AboutSection from '../components/AboutSection.vue';
+import SkillsSection from '../components/SkillsSection.vue';
 import ContactSection from '../components/ContactSection.vue';
 
 const currentBg = ref('');
@@ -101,6 +102,7 @@ const selectTopic = (name: TopicName, theme?: Theme) => {
               :header-class="['text-dark', 'bg-secondary']"
             >
               <AboutSection v-if="topic.name === TopicName.About" />
+              <SkillsSection v-if="topic.name === TopicName.Skills" />
             </q-expansion-item>
           </q-item>
         </q-list>

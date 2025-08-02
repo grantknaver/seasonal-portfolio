@@ -117,7 +117,7 @@ const scrollToContact = async () => {
     />
 
     <!-- Main Layout -->
-    <q-layout view="Hhh LpR lff" class="column">
+    <q-layout view="Hhh LpR lfF" class="column">
       <!-- HEADER -->
       <q-header class="main-header text-black">
         <q-toolbar class="bg-dark q-pa-lg">
@@ -174,7 +174,7 @@ const scrollToContact = async () => {
         </q-toolbar>
       </q-header>
       <!-- PAGE CONTAINER -->
-      <q-page-container>
+      <q-page-container class="container">
         <router-view />
       </q-page-container>
 
