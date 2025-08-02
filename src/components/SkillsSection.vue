@@ -256,7 +256,7 @@ onMounted(async () => {
       class="card full-width col flex column items-center justify-center q-pa-sm bg-transparent"
     >
       <q-card-section class="card-section q-pa-lg bg-accent">
-        <h1 class="q-mt-none text-primary">Skills</h1>
+        <h1 class="q-mt-none q-mb-lg text-primary">Skills</h1>
         <q-separator color="primary" class="full-width q-mb-md" />
         <p class="text-primary">
           I'm a full-stack JavaScript developer focused on front-end architecture and UX. I began
@@ -272,9 +272,12 @@ onMounted(async () => {
       <q-card-section class="card-section full-width bg-secondary">
         <h2 class="text-primary q-mt-md">Toolkit</h2>
 
-        <q-separator color="primary" class="full-width q-mb-lg" />
+        <q-separator color="primary" class="skills-list full-width q-mb-lg" />
         <div v-for="skill in skills" :key="skill.name" class="q-mb-sm">
-          <div class="text-bold text-dark">{{ skill.name }}</div>
+          <div class="skillName text-bold text-dark">
+            {{ skill.name }}
+            <q-tooltip class="bg-dark" anchor="center middle">{{ skill.years }} years</q-tooltip>
+          </div>
           <q-linear-progress :value="skill.strength / 20" color="primary" rounded />
         </div>
       </q-card-section>
@@ -367,6 +370,9 @@ h2 {
 }
 
 .mobile-view {
+  .skillName {
+    cursor: pointer;
+  }
 }
 
 .desktop-view {
