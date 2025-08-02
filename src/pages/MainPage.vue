@@ -81,9 +81,9 @@ const selectTopic = (name: TopicName, theme?: Theme) => {
           class="full-width q-pa-md text-center"
           cite="http://www.worldwildlife.org/who/index.html"
         >
-          "For 50 years, WWF has been protecting the future of nature. The world's leading
-          conservation organization, WWF works in 100 countries and is supported by 1.2 million
-          members in the United States and close to 5 million globally."
+          "Successful software is built not just with code, but with trust. The best developers
+          listen first — not to respond, but to understand. Because building the right thing is just
+          as important as building it right."
         </blockquote>
 
         <q-list padding class="full-width q-pa-none">
