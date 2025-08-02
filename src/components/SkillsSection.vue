@@ -1,6 +1,6 @@
 <script lang="ts" setup>
-import { ref, onMounted, reactive, nextTick } from 'vue';
-// import type { CSSProperties } from 'vue';
+import { ref, onMounted, reactive, nextTick, computed } from 'vue';
+import type { CSSProperties } from 'vue';
 import type { SkillNode } from '../shared/models/skillNode';
 import * as d3 from 'd3';
 import chroma from 'chroma-js';
@@ -126,13 +126,13 @@ const tooltip = reactive<{
   data: null,
 });
 
-// const tooltipStyle = computed<CSSProperties>(() => ({
-//   position: 'absolute',
-//   left: tooltip.x + 20 + 'px',
-//   top: tooltip.y + 10 + 'px',
-//   pointerEvents: 'none',
-//   zIndex: 1000,
-// }));
+const tooltipStyle = computed<CSSProperties>(() => ({
+  position: 'absolute',
+  left: tooltip.x + 20 + 'px',
+  top: tooltip.y + 10 + 'px',
+  pointerEvents: 'none',
+  zIndex: 1000,
+}));
 
 const calculateFontSize = (strength: number) => {
   const size = Math.floor((strength + 10) * 0.75);
@@ -291,7 +291,7 @@ onMounted(async () => {
       </q-card-section>
 
       <q-card-section class="card-section bg-dark">
-        <h2 class="text-secondary">Coming Soon</h2>
+        <h2 class="q-mt-md text-secondary">Coming Soon</h2>
         <q-separator color="primary" class="skills-list full-width" />
         <p class="text-primary q-mt-lg">
           I’m currently deepening my DynamoDB expertise, leveling up my Figma design skills, and
@@ -301,7 +301,7 @@ onMounted(async () => {
       </q-card-section>
     </q-card>
   </div>
-  <!-- <div ref="container" class="desktop-view full-width q-mb-xl">
+  <div ref="container" class="desktop-view full-width q-mb-xl">
     <q-card
       class="card full-width col flex column items-center justify-center q-pa-sm bg-transparent"
     >
@@ -350,7 +350,7 @@ onMounted(async () => {
         </p>
       </q-card-section>
     </q-card>
-  </div> -->
+  </div>
 </template>
 
 <style scoped lang="scss">
