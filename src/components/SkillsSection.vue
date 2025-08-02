@@ -270,7 +270,7 @@ onMounted(async () => {
         >Toolkit shows my level of expertise in multiple different areas.</small
       >
       <q-card-section class="card-section full-width bg-secondary">
-        <h2 class="text-primary text-bold q-mt-md">Toolkit</h2>
+        <h2 class="text-dark text-bold q-mt-md">Toolkit</h2>
 
         <q-separator color="primary" class="skills-list full-width q-mb-lg" />
         <div v-for="skill in skills" :key="skill.name" class="q-mb-sm">
