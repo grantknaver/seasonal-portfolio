@@ -130,15 +130,6 @@ const workHistoryTimeline = ref<TimelineEntry[]>([
 
         <hr class="separator full-width" />
 
-        <!-- <q-card-section class="section-container bg-secondary text-dark q-pa-lg full-width">
-        <p class="text-body1 q-mb-sm">Tech I enjoy working with includes:</p>
-        <ul class="q-pl-md">
-          <li><strong>Frontend:</strong> Angular, Vue, Quasar, TailwindCSS, SCSS</li>
-          <li><strong>Backend:</strong> Node.js, Express, MongoDB</li>
-          <li><strong>Tools:</strong> NgRx, Pinia, Stripe, ElevenLabs, Figma, GSAP</li>
-        </ul>
-      </q-card-section> -->
-
         <q-card-section class="section-container work-history-section q-pa-lg bg-primary">
           <h2 class="q-ma-none q-mt-lg q-mb-xl text-center text-dark">Recent Work History</h2>
 
@@ -341,6 +332,10 @@ $spring-mobile-background: map-get($spring-theme, secondary);
           }
         }
       }
+    }
+
+    .section-container:nth-child(1) {
+      border: solid 4px var(--q-primary);
     }
 
     hr.separator {

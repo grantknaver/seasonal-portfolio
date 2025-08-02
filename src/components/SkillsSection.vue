@@ -255,7 +255,7 @@ onMounted(async () => {
     <q-card
       class="card full-width col flex column items-center justify-center q-pa-sm bg-transparent"
     >
-      <q-card-section class="card-section q-pa-lg bg-accent">
+      <q-card-section class="section-container q-pa-lg bg-accent">
         <h1 class="q-mt-none q-mb-lg text-primary">Skills</h1>
         <q-separator color="primary" class="full-width q-mb-md" />
         <p class="text-primary">
@@ -269,8 +269,8 @@ onMounted(async () => {
       <small class="full-width q-mt-md q-pa-lg full-width text-primary bg-dark text-center"
         >Toolkit shows my level of expertise in multiple different areas.</small
       >
-      <q-card-section class="card-section full-width bg-secondary">
-        <h2 class="text-dark text-bold q-mt-md">Toolkit</h2>
+      <q-card-section class="section-container full-width bg-secondary">
+        <h2 class="text-primary q-mt-md">Toolkit</h2>
 
         <q-separator color="primary" class="skills-list full-width q-mb-lg" />
         <div v-for="skill in skills" :key="skill.name" class="q-mb-sm">
@@ -282,7 +282,7 @@ onMounted(async () => {
         </div>
       </q-card-section>
 
-      <q-card-section class="card-section bg-accent q-mt-md q-pa-lg">
+      <q-card-section class="section-container bg-accent q-mt-md q-pa-lg">
         <p class="text-primary text-center q-ma-none">
           With a background in fine arts and sales, I bring a strong creative lens and user-focused
           mindset to my work. I enjoy prototyping in Figma, am proficient with Adobe Creative Suite,
@@ -290,7 +290,7 @@ onMounted(async () => {
         </p>
       </q-card-section>
 
-      <q-card-section class="card-section bg-dark">
+      <q-card-section class="section-container bg-dark">
         <h2 class="q-mt-md text-secondary">Coming Soon</h2>
         <q-separator color="primary" class="skills-list full-width" />
         <p class="text-primary q-mt-lg">
@@ -305,7 +305,7 @@ onMounted(async () => {
     <q-card
       class="card full-width col flex column items-center justify-center q-pa-sm bg-transparent"
     >
-      <q-card-section class="card-section q-pa-lg">
+      <q-card-section class="section-container q-pa-lg">
         <h1 class="q-mt-none text-primary text-center">Skills</h1>
         <q-separator color="primary" class="full-width q-mb-md" />
         <p class="text-primary text-center">
@@ -317,7 +317,7 @@ onMounted(async () => {
         </p>
       </q-card-section>
 
-      <q-card-section class="card-section flex column col">
+      <q-card-section class="section-container flex column col">
         <p class="text-accent">
           The graph below illustrates my current toolset. The size of each sphere represents my
           level of expertise in that area.
@@ -332,14 +332,14 @@ onMounted(async () => {
           <div>Years: {{ tooltip.data.years }}</div>
         </div>
       </q-card-section>
-      <q-card-section class="card-section q-mt-lg">
+      <q-card-section class="section-container q-mt-lg">
         <p class="text-primary text-center">
           With a background in fine arts and sales, I bring a strong creative lens and user-focused
           mindset to my work. I enjoy prototyping in Figma, am proficient with Adobe Creative Suite,
           and apply SEO best practices to help build and scale user-centric digital products.
         </p>
       </q-card-section>
-      <q-card-section class="card-section q-pa-lg">
+      <q-card-section class="section-container q-pa-lg">
         <q-separator color="primary" class="full-width q-mb-lg" />
         <h2 class="q-mt-none text-secondary text-bold">Coming Soon</h2>
 
@@ -356,30 +356,42 @@ onMounted(async () => {
 <style scoped lang="scss">
 @import '../css/main.scss';
 
-h1 {
-  font-size: 3rem;
-}
-
-h2 {
-  font-size: 2.2rem;
-}
-
 .mobile-view {
   @media (min-width: $breakpoint-md) {
     display: none;
   }
 
-  .card-section:nth-child(1) {
-    border-radius: 5px !important;
-  }
+  .q-card {
+    background-color: rgba(black, 0.5) !important;
+    padding: 1rem;
 
-  .card-section:nth-child(4) {
-    border-top-left-radius: 5px;
-    border-top-right-radius: 5px;
-  }
+    h1 {
+      font-size: 3rem;
+    }
 
-  .skillName {
-    cursor: pointer;
+    h2 {
+      font-size: 2rem;
+      text-shadow: 2px 2px 2px var(--q-dark);
+    }
+
+    .section-container:nth-child(1) {
+      border-radius: 5px !important;
+      border: solid 4px var(--q-primary);
+    }
+
+    .section-container:nth-child(3) {
+      border-bottom-left-radius: 5px;
+      border-bottom-right-radius: 5px;
+    }
+
+    .section-container:nth-child(4) {
+      border-top-left-radius: 5px;
+      border-top-right-radius: 5px;
+    }
+
+    .skillName {
+      cursor: pointer;
+    }
   }
 }
 
@@ -393,6 +405,14 @@ h2 {
     display: flex;
   }
 
+  h1 {
+    font-size: 3rem;
+  }
+
+  h2 {
+    font-size: 2rem;
+  }
+
   .chart-svg {
     width: 100%;
     height: auto;
@@ -402,7 +422,7 @@ h2 {
     box-shadow: 5px 10px 10px var(--q-dark);
   }
 
-  .card-section:nth-child(2) {
+  .section-container:nth-child(2) {
     display: flex;
     width: 90%;
     justify-content: center;
