@@ -341,7 +341,7 @@ onMounted(async () => {
       </q-card-section>
       <q-card-section class="section-container q-pa-lg">
         <q-separator color="primary" class="full-width q-mb-lg" />
-        <h2 class="q-mt-none text-secondary text-bold">Coming Soon</h2>
+        <h2 class="q-mt-none text-secondary">Coming Soon</h2>
 
         <p class="text-primary">
           I’m currently deepening my DynamoDB expertise, leveling up my Figma design skills, and
