@@ -246,11 +246,13 @@ body,
 
 aside {
   @media (min-width: $breakpoint-sm) {
+    height: 100%;
     background-color: transparent !important;
   }
 }
 
 .desktop-drawer {
+  height: 100%;
   background-color: rgba(black, 0.5);
   box-shadow: none !important;
   border-left: solid 4px var(--q-primary);
