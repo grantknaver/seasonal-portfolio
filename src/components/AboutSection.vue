@@ -241,8 +241,6 @@ const workHistoryTimeline = ref<TimelineEntry[]>([
       </q-card>
     </div>
   </section>
-
-  <section class="desktop-view"></section>
 </template>
 
 <style scoped lang="scss">

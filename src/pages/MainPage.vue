@@ -8,6 +8,7 @@ import { storeToRefs } from 'pinia';
 import { TopicName } from 'src/shared/constants/topicName';
 import AboutSection from '../components/AboutSection.vue';
 import SkillsSection from '../components/SkillsSection.vue';
+import ProjectSection from 'src/components/ProjectSection.vue';
 import ContactSection from '../components/ContactSection.vue';
 
 const currentBg = ref('');
@@ -103,13 +104,13 @@ const selectTopic = (name: TopicName, theme?: Theme) => {
             >
               <AboutSection v-if="topic.name === TopicName.About" />
               <SkillsSection v-if="topic.name === TopicName.Skills" />
+              <ProjectSection v-if="topic.name === TopicName.Projects" />
             </q-expansion-item>
           </q-item>
         </q-list>
         <q-separator color="secondary" class="full-width q-mt-xs q-mb-lg"></q-separator>
         <ContactSection />
       </section>
-
       <section class="desktop-view flex col column justify-center items-center full-width">
         <div class="simon-circle q-mt-xl">
           <div

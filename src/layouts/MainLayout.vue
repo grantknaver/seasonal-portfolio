@@ -5,12 +5,13 @@ import { storeToRefs } from 'pinia';
 import { Theme } from '../shared/constants/theme';
 import { setTheme } from '../shared/utils/theme';
 import { getCustomCssVar } from '../shared/utils/getCustomCssVar';
-import { TopicName } from 'src/shared/constants/topicName';
+import { TopicName } from '../shared/constants/topicName';
 import { type Topic } from '../shared/models/topic';
 import { v4 as uuidv4 } from 'uuid';
-import AboutSection from 'src/components/AboutSection.vue';
-import SkillsSection from 'src/components/SkillsSection.vue';
-import ContactSection from 'src/components/ContactSection.vue';
+import AboutSection from '../components/AboutSection.vue';
+import SkillsSection from '../components/SkillsSection.vue';
+import ContactSection from '../components/ContactSection.vue';
+import ProjectSection from '../components/ProjectSection.vue';
 
 const mainStore = useMainStore();
 const { activeTheme, activeTopic } = storeToRefs(mainStore);
@@ -186,9 +187,10 @@ const scrollToContact = async () => {
         :width="desktopDrawerWidth"
         class="desktop-drawer column col"
       >
-        <q-scroll-area v-if="activeTopic !== TopicName.Contact" class="fit q-pa-md">
+        <q-scroll-area v-if="activeTopic !== TopicName.Contact" class="scroll-area fit q-pa-md">
           <AboutSection v-if="activeTopic === TopicName.About" />
           <SkillsSection v-if="activeTopic === TopicName.Skills" />
+          <ProjectSection v-if="activeTopic === TopicName.Projects" />
         </q-scroll-area>
         <div v-else class="flex column col justify-center items-center">
           <ContactSection v-if="activeTopic === TopicName.Contact" />
@@ -256,6 +258,10 @@ aside {
   background-color: rgba(black, 0.5);
   box-shadow: none !important;
   border-left: solid 4px var(--q-primary);
+
+  // .scroll-area {
+  //   height: 100%;
+  // }
 }
 
 .q-footer {

@@ -251,106 +251,110 @@ onMounted(async () => {
 </script>
 
 <template>
-  <div class="mobile-view full-width q-mb-xl">
-    <q-card
-      class="card full-width col flex column items-center justify-center q-pa-sm bg-transparent"
-    >
-      <q-card-section class="section-container q-pa-lg bg-accent">
-        <h1 class="q-mt-none q-mb-lg text-primary">Skills</h1>
-        <q-separator color="primary" class="full-width q-mb-md" />
-        <p class="text-primary">
-          I'm a full-stack JavaScript developer focused on front-end architecture and UX. I began
-          with the MEAN stack, later shifting to the Vue ecosystem to build responsive,
-          component-driven UIs. My backend work centers on MongoDB, recently expanding into DynamoDB
-          for cloud-native apps. I thrive at the intersection of design and data, ensuring every
-          component is fast, purposeful, and polished.
-        </p>
-      </q-card-section>
-      <small class="full-width q-mt-md q-pa-lg full-width text-primary bg-dark text-center"
-        >Toolkit shows my level of expertise in multiple different areas.</small
+  <section class="full-width">
+    <div class="mobile-view full-width q-mb-xl">
+      <q-card
+        class="card full-width col flex column items-center justify-center q-pa-sm bg-transparent"
       >
-      <q-card-section class="section-container full-width bg-secondary">
-        <h2 class="text-primary q-mt-md">Toolkit</h2>
-
-        <q-separator color="primary" class="skills-list full-width q-mb-lg" />
-        <div v-for="skill in skills" :key="skill.name" class="q-mb-sm">
-          <div class="skillName text-bold text-dark">
-            {{ skill.name }}
-            <q-tooltip class="bg-dark" anchor="center middle">{{ skill.years }} years</q-tooltip>
-          </div>
-          <q-linear-progress :value="skill.strength / 20" color="primary" rounded />
-        </div>
-      </q-card-section>
-
-      <q-card-section class="section-container bg-accent q-mt-md q-pa-lg">
-        <p class="text-primary text-center q-ma-none">
-          With a background in fine arts and sales, I bring a strong creative lens and user-focused
-          mindset to my work. I enjoy prototyping in Figma, am proficient with Adobe Creative Suite,
-          and apply SEO best practices to help build and scale user-centric digital products.
-        </p>
-      </q-card-section>
-
-      <q-card-section class="section-container bg-dark">
-        <h2 class="q-mt-md text-secondary">Coming Soon</h2>
-        <q-separator color="primary" class="skills-list full-width" />
-        <p class="text-primary q-mt-lg">
-          I’m currently deepening my DynamoDB expertise, leveling up my Figma design skills, and
-          exploring Python for backend scripting and automation. This section will soon showcase new
-          projects, experiments, and lessons learned along the way — stay tuned.
-        </p>
-      </q-card-section>
-    </q-card>
-  </div>
-  <div ref="container" class="desktop-view full-width q-mb-xl">
-    <q-card
-      class="card full-width col flex column items-center justify-center q-pa-sm bg-transparent"
-    >
-      <q-card-section class="section-container q-pa-lg">
-        <h1 class="q-mt-none text-primary text-center">Skills</h1>
-        <q-separator color="primary" class="full-width q-mb-md" />
-        <p class="text-primary text-center">
-          I'm a full-stack JavaScript developer focused on front-end architecture and UX. I began
-          with the MEAN stack, later shifting into Vue 3, Pinia, and Quasar to build responsive,
-          component-driven UIs. My backend work centers on MongoDB, recently expanding into DynamoDB
-          for cloud-native apps. I thrive at the intersection of design and data, ensuring every
-          component is fast, purposeful, and polished.
-        </p>
-      </q-card-section>
-
-      <q-card-section class="section-container flex column col">
-        <p class="text-accent">
-          The graph below illustrates my current toolset. The size of each sphere represents my
-          level of expertise in that area.
-        </p>
-        <svg ref="svg" class="chart-svg"></svg>
-
-        <div
-          v-if="tooltip.visible && tooltip.data"
-          :style="tooltipStyle"
-          class="tooltip bg-accent text-white shadow-2 rounded q-pa-sm z-50"
+        <q-card-section class="section-container q-pa-lg bg-accent">
+          <h1 class="q-mt-none q-mb-lg text-primary">Skills</h1>
+          <q-separator color="primary" class="full-width q-mb-md" />
+          <p class="text-primary">
+            I'm a full-stack JavaScript developer focused on front-end architecture and UX. I began
+            with the MEAN stack, later shifting to the Vue ecosystem to build responsive,
+            component-driven UIs. My backend work centers on MongoDB, recently expanding into
+            DynamoDB for cloud-native apps. I thrive at the intersection of design and data,
+            ensuring every component is fast, purposeful, and polished.
+          </p>
+        </q-card-section>
+        <small class="full-width q-mt-md q-pa-lg full-width text-primary bg-dark text-center"
+          >Toolkit shows my level of expertise in multiple different areas.</small
         >
-          <div>Years: {{ tooltip.data.years }}</div>
-        </div>
-      </q-card-section>
-      <q-card-section class="section-container q-mt-lg">
-        <p class="text-primary text-center">
-          With a background in fine arts and sales, I bring a strong creative lens and user-focused
-          mindset to my work. I enjoy prototyping in Figma, am proficient with Adobe Creative Suite,
-          and apply SEO best practices to help build and scale user-centric digital products.
-        </p>
-      </q-card-section>
-      <q-card-section class="section-container q-pa-lg">
-        <q-separator color="primary" class="full-width q-mb-lg" />
-        <h2 class="q-mt-none text-secondary">Coming Soon</h2>
+        <q-card-section class="section-container full-width bg-secondary">
+          <h2 class="text-primary q-mt-md">Toolkit</h2>
 
-        <p class="text-primary">
-          I’m currently deepening my DynamoDB expertise, leveling up my Figma design skills, and
-          exploring Python for backend scripting and automation. This section will soon showcase new
-          projects, experiments, and lessons learned along the way — stay tuned.
-        </p>
-      </q-card-section>
-    </q-card>
-  </div>
+          <q-separator color="primary" class="skills-list full-width q-mb-lg" />
+          <div v-for="skill in skills" :key="skill.name" class="q-mb-sm">
+            <div class="skillName text-bold text-dark">
+              {{ skill.name }}
+              <q-tooltip class="bg-dark" anchor="center middle">{{ skill.years }} years</q-tooltip>
+            </div>
+            <q-linear-progress :value="skill.strength / 20" color="primary" rounded />
+          </div>
+        </q-card-section>
+
+        <q-card-section class="section-container bg-accent q-mt-md q-pa-lg">
+          <p class="text-primary text-center q-ma-none">
+            With a background in fine arts and sales, I bring a strong creative lens and
+            user-focused mindset to my work. I enjoy prototyping in Figma, am proficient with Adobe
+            Creative Suite, and apply SEO best practices to help build and scale user-centric
+            digital products.
+          </p>
+        </q-card-section>
+
+        <q-card-section class="section-container bg-dark">
+          <h2 class="q-mt-md text-secondary">Coming Soon</h2>
+          <q-separator color="primary" class="skills-list full-width" />
+          <p class="text-primary q-mt-lg">
+            I’m currently deepening my DynamoDB expertise, leveling up my Figma design skills, and
+            exploring Python for backend scripting and automation. This section will soon showcase
+            new projects, experiments, and lessons learned along the way — stay tuned.
+          </p>
+        </q-card-section>
+      </q-card>
+    </div>
+    <div ref="container" class="desktop-view full-width q-mb-xl">
+      <q-card
+        class="card full-width col flex column items-center justify-center q-pa-sm bg-transparent"
+      >
+        <q-card-section class="section-container q-pa-lg">
+          <h1 class="q-mt-none text-primary text-center">Skills</h1>
+          <q-separator color="primary" class="full-width q-mb-md" />
+          <p class="text-primary text-center">
+            I'm a full-stack JavaScript developer focused on front-end architecture and UX. I began
+            with the MEAN stack, later shifting into Vue 3, Pinia, and Quasar to build responsive,
+            component-driven UIs. My backend work centers on MongoDB, recently expanding into
+            DynamoDB for cloud-native apps. I thrive at the intersection of design and data,
+            ensuring every component is fast, purposeful, and polished.
+          </p>
+        </q-card-section>
+
+        <q-card-section class="section-container flex column col">
+          <p class="text-accent">
+            The graph below illustrates my current toolset. The size of each sphere represents my
+            level of expertise in that area.
+          </p>
+          <svg ref="svg" class="chart-svg"></svg>
+
+          <div
+            v-if="tooltip.visible && tooltip.data"
+            :style="tooltipStyle"
+            class="tooltip bg-accent text-white shadow-2 rounded q-pa-sm z-50"
+          >
+            <div>Years: {{ tooltip.data.years }}</div>
+          </div>
+        </q-card-section>
+        <q-card-section class="section-container q-mt-lg">
+          <p class="text-primary text-center">
+            With a background in fine arts and sales, I bring a strong creative lens and
+            user-focused mindset to my work. I enjoy prototyping in Figma, am proficient with Adobe
+            Creative Suite, and apply SEO best practices to help build and scale user-centric
+            digital products.
+          </p>
+        </q-card-section>
+        <q-card-section class="section-container q-pa-lg">
+          <q-separator color="primary" class="full-width q-mb-lg" />
+          <h2 class="q-mt-none text-secondary">Coming Soon</h2>
+
+          <p class="text-primary">
+            I’m currently deepening my DynamoDB expertise, leveling up my Figma design skills, and
+            exploring Python for backend scripting and automation. This section will soon showcase
+            new projects, experiments, and lessons learned along the way — stay tuned.
+          </p>
+        </q-card-section>
+      </q-card>
+    </div>
+  </section>
 </template>
 
 <style scoped lang="scss">
