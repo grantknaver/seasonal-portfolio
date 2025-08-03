@@ -217,7 +217,6 @@ onMounted(async () => {
       tooltip.y = event.offsetY + 10;
     })
     .on('mouseleave', function (event, d) {
-      // Release the node
       d.fx = null;
       d.fy = null;
 
@@ -238,7 +237,6 @@ onMounted(async () => {
     .attr('pointer-events', 'none');
 
   function ticked() {
-    // keep nodes inside bounds
     data.forEach((d) => {
       const r = d.strength * 4;
       d.x = Math.max(r, Math.min(width - r, d.x ?? 0));
@@ -251,13 +249,11 @@ onMounted(async () => {
 </script>
 
 <template>
-  <section class="full-width">
-    <div class="mobile-view full-width q-mb-xl">
-      <q-card
-        class="card full-width col flex column items-center justify-center q-pa-sm bg-transparent"
-      >
+  <section>
+    <div class="mobile-view full-width">
+      <q-card class="full-width">
         <q-card-section class="section-container q-pa-lg bg-accent">
-          <h1 class="q-mt-none q-mb-lg text-primary">Skills</h1>
+          <h1 class="q-mt-none text-primary">Skills</h1>
           <q-separator color="primary" class="full-width q-mb-md" />
           <p class="text-primary">
             I'm a full-stack JavaScript developer focused on front-end architecture and UX. I began
@@ -267,10 +263,8 @@ onMounted(async () => {
             ensuring every component is fast, purposeful, and polished.
           </p>
         </q-card-section>
-        <small class="full-width q-mt-md q-pa-lg full-width text-primary bg-dark text-center"
-          >Toolkit shows my level of expertise in multiple different areas.</small
-        >
-        <q-card-section class="section-container full-width bg-secondary">
+
+        <q-card-section class="section-container toolkit q-mt-md full-width bg-secondary">
           <h2 class="text-primary q-mt-md">Toolkit</h2>
 
           <q-separator color="primary" class="skills-list full-width q-mb-lg" />
@@ -368,9 +362,12 @@ onMounted(async () => {
   .q-card {
     background-color: rgba(black, 0.5) !important;
     padding: 1rem;
+    border-top-left-radius: 0;
+    border-top-right-radius: 0;
 
     h1 {
       font-size: 3rem;
+      margin-bottom: 2rem;
     }
 
     h2 {
@@ -379,18 +376,22 @@ onMounted(async () => {
     }
 
     .section-container:nth-child(1) {
-      border-radius: 5px !important;
+      border-radius: 10px;
       border: solid 4px var(--q-primary);
     }
 
+    .section-container:nth-child(2) {
+      border-radius: 10px;
+    }
+
     .section-container:nth-child(3) {
-      border-bottom-left-radius: 5px;
-      border-bottom-right-radius: 5px;
+      border-bottom-left-radius: 0;
+      border-bottom-right-radius: 0;
     }
 
     .section-container:nth-child(4) {
-      border-top-left-radius: 5px;
-      border-top-right-radius: 5px;
+      border-bottom-left-radius: 10px;
+      border-bottom-right-radius: 10px;
     }
 
     .skillName {

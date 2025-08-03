@@ -187,7 +187,7 @@ const scrollToContact = async () => {
         :width="desktopDrawerWidth"
         class="desktop-drawer column col"
       >
-        <q-scroll-area v-if="activeTopic !== TopicName.Contact" class="scroll-area fit q-pa-md">
+        <q-scroll-area v-if="activeTopic !== TopicName.Contact" class="scroll-area q-pa-md">
           <AboutSection v-if="activeTopic === TopicName.About" />
           <SkillsSection v-if="activeTopic === TopicName.Skills" />
           <ProjectSection v-if="activeTopic === TopicName.Projects" />
@@ -259,9 +259,14 @@ aside {
   box-shadow: none !important;
   border-left: solid 4px var(--q-primary);
 
-  // .scroll-area {
-  //   height: 100%;
-  // }
+  // Footer
+  .scroll-area {
+    height: calc(100% - 72px);
+
+    @media (min-width: $breakpoint-md) {
+      height: calc(100% - 50px);
+    }
+  }
 }
 
 .q-footer {

@@ -83,16 +83,14 @@ const workHistoryTimeline = ref<TimelineEntry[]>([
     title: 'Review Resume',
   },
 ]);
-
-// const activeSlide = ref(workHistorySlides.value[0]?.id);
 </script>
 
 <template>
   <section>
     <div class="mobile-view full-width">
-      <q-card class="full-width q-pa-sm">
-        <q-card-section class="section-container text-primary q-pa-lg">
-          <h1 class="q-mt-md text-primary">About Me</h1>
+      <q-card class="full-width">
+        <q-card-section class="section-container q-pa-lg text-primary">
+          <h1 class="q-mt-none text-primary">About Me</h1>
           <q-separator color="primary" class="q-mb-md" />
           <p>
             Hi, I'm <strong class="name">Grant Knaver</strong> — a full-stack JavaScript developer
@@ -159,7 +157,7 @@ const workHistoryTimeline = ref<TimelineEntry[]>([
     </div>
 
     <div class="desktop-view full-width">
-      <q-card class="full-width q-pa-sm bg-transparent">
+      <q-card class="full-width q-pa-sm">
         <q-card-section class="section-container text-primary q-pa-lg">
           <h1 class="q-mt-none q-mb-xl text-primary text-center">About Me</h1>
           <q-separator color="primary" class="q-mb-md" />
@@ -246,8 +244,6 @@ const workHistoryTimeline = ref<TimelineEntry[]>([
 <style scoped lang="scss">
 @import '../css/main.scss';
 $winter-mobile-background: map-get($winter-theme, primary);
-$summer-mobile-background: map-get($summer-theme, secondary);
-$spring-mobile-background: map-get($spring-theme, secondary);
 
 .mobile-view {
   @media (min-width: $breakpoint-md) {
@@ -257,6 +253,8 @@ $spring-mobile-background: map-get($spring-theme, secondary);
   .q-card {
     background-color: rgba(black, 0.5);
     padding: 1rem;
+    border-top-left-radius: 0;
+    border-top-right-radius: 0;
 
     h1 {
       font-size: 3rem;
@@ -349,78 +347,82 @@ $spring-mobile-background: map-get($spring-theme, secondary);
     display: flex;
   }
 
-  h1 {
-    font-size: 3rem;
-  }
+  .q-card {
+    background-color: transparent;
 
-  h2 {
-    font-size: 2.2rem;
-  }
-
-  .summary {
-    font-size: 1.2rem;
-    margin-bottom: 0;
-
-    .name {
-      font-size: 1.5rem;
+    h1 {
+      font-size: 3rem;
     }
-  }
 
-  .projects-container {
-    border-radius: 20px;
+    h2 {
+      font-size: 2.2rem;
+    }
 
-    ul {
-      list-style-type: none;
+    .summary {
+      font-size: 1.2rem;
+      margin-bottom: 0;
 
-      @media (min-width: 1280px) {
-        flex-direction: row;
-        justify-content: space-around;
+      .name {
+        font-size: 1.5rem;
       }
+    }
 
-      li {
-        font-size: 1rem;
-        line-height: 1.3rem;
-        border: 1px solid var(--q-primary);
-        border-radius: 10px;
+    .projects-container {
+      border-radius: 20px;
+
+      ul {
+        list-style-type: none;
 
         @media (min-width: 1280px) {
-          width: 45% !important;
+          flex-direction: row;
+          justify-content: space-around;
         }
 
-        .logo {
-          max-width: 100px;
-        }
-
-        a {
-          text-decoration: none;
-          font-weight: bold;
+        li {
           font-size: 1rem;
+          line-height: 1.3rem;
+          border: 1px solid var(--q-primary);
+          border-radius: 10px;
+
+          @media (min-width: 1280px) {
+            width: 45% !important;
+          }
+
+          .logo {
+            max-width: 100px;
+          }
+
+          a {
+            text-decoration: none;
+            font-weight: bold;
+            font-size: 1rem;
+          }
+
+          a:hover {
+            text-decoration: underline;
+          }
         }
 
-        a:hover {
-          text-decoration: underline;
+        li:hover {
+          transform: scale(1.02);
+          box-shadow: 5px 10px 20px var(--q-dark);
         }
       }
+    }
 
-      li:hover {
-        transform: scale(1.02);
-        box-shadow: 5px 10px 20px var(--q-dark);
+    .work-history-section {
+      font-size: 1rem;
+      h2 {
+        margin-bottom: 2rem;
       }
-    }
-  }
 
-  .work-history-section {
-    font-size: 1rem;
-    h2 {
-      margin-bottom: 2rem;
-    }
+      p:nth-child(1) {
+        font-size: 1.5rem;
+      }
 
-    p:nth-child(1) {
-      font-size: 1.5rem;
-    }
-
-    .carousel-container {
-      max-width: 750px;
+      .carousel-container {
+        max-width: 750px;
+      }
     }
   }
 }
@@ -428,20 +430,6 @@ $spring-mobile-background: map-get($spring-theme, secondary);
 .winter-mobile-background {
   background-color: rgba($winter-mobile-background, $alpha: 0.8);
 
-  @media (min-width: $breakpoint-md) {
-    background-color: initial;
-  }
-}
-
-.summer-mobile-background {
-  background-color: rgba($summer-mobile-background, $alpha: 0.8);
-  @media (min-width: $breakpoint-md) {
-    background-color: initial;
-  }
-}
-
-.spring-mobile-background {
-  background-color: rgba($spring-mobile-background, $alpha: 0.8);
   @media (min-width: $breakpoint-md) {
     background-color: initial;
   }

@@ -2,15 +2,15 @@
 <!-- Created with Inkscape (http://www.inkscape.org/) -->
 
 <svg
-   width="179.09242mm"
-   height="122.52215mm"
-   viewBox="0 0 179.09242 122.52215"
+   width="200mm"
+   height="200mm"
+   viewBox="0 0 200 200"
    version="1.1"
    id="svg1"
    xml:space="preserve"
    inkscape:version="1.3.2 (091e20e, 2023-11-25, custom)"
    sodipodi:docname="drainData.svg"
-   inkscape:export-filename="..\..\..\..\..\OneDrive\Desktop\drainData.png"
+   inkscape:export-filename="..\..\..\..\..\OneDrive\Desktop\drainData.svg"
    inkscape:export-xdpi="41.461887"
    inkscape:export-ydpi="41.461887"
    xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
@@ -28,25 +28,30 @@
      inkscape:deskcolor="#d1d1d1"
      inkscape:document-units="mm"
      inkscape:zoom="0.48693448"
-     inkscape:cx="-120.13937"
+     inkscape:cx="-119.11254"
      inkscape:cy="270.05687"
-     inkscape:window-width="1920"
-     inkscape:window-height="991"
-     inkscape:window-x="-9"
-     inkscape:window-y="-9"
-     inkscape:window-maximized="1"
+     inkscape:window-width="958"
+     inkscape:window-height="471"
+     inkscape:window-x="952"
+     inkscape:window-y="0"
+     inkscape:window-maximized="0"
      inkscape:current-layer="layer2" /><defs
      id="defs1"><rect
        x="181.7493"
        y="534.46613"
        width="327.04605"
        height="64.69043"
-       id="rect29" /></defs><g
+       id="rect29" /><rect
+       x="200.7457"
+       y="508.28192"
+       width="114.49179"
+       height="35.425713"
+       id="rect28" /></defs><g
      inkscape:label="Reference"
      inkscape:groupmode="layer"
      id="layer1"
      style="display:none"
-     transform="translate(-21.288979,-75.731548)"><image
+     transform="translate(-10.835189,-40.956165)"><image
        width="112.18333"
        height="90.169998"
        preserveAspectRatio="none"
@@ -59,7 +64,7 @@
      id="layer3"
      inkscape:label="Text"
      style="display:inline"
-     transform="translate(-21.288979,-75.731548)"><text
+     transform="translate(-10.835189,-40.956165)"><text
        xml:space="preserve"
        transform="matrix(0.78039536,0,0,0.78039536,-123.77256,-265.43462)"
        id="text29"
@@ -87,7 +92,7 @@
      id="layer2"
      inkscape:label="Dot Logo"
      style="display:inline"
-     transform="translate(-21.288979,-75.731548)"><g
+     transform="translate(-10.835189,-40.956165)"><g
        id="g1"
        transform="matrix(1.9549314,0,0,1.9549314,-80.476451,-91.438786)"><circle
          style="display:inline;fill:#21b8bf;fill-opacity:1;stroke-width:0.285556"
