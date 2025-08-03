@@ -25,7 +25,7 @@ const projects = ref<ProjectDetails[]>([
   {
     id: uuidv4(),
     url: 'https://www.draindata.org/',
-    src: new URL('../assets/drainData.svg', import.meta.url).href,
+    src: new URL('../assets/drainData-noSlogan.svg', import.meta.url).href,
     alt: 'DrainData',
   },
 ]);
@@ -50,8 +50,16 @@ const projects = ref<ProjectDetails[]>([
 
         <q-card-section class="section-container q-mt-md q-pa-sm bg-primary">
           <div class="project-container full-width q-pa-lg">
-            <a v-for="project in projects" :key="project.id" :href="project.url">
+            <a
+              v-for="project in projects"
+              :key="project.id"
+              :href="project.url"
+              class="project-tile"
+            >
               <img :src="project.src" :alt="project.alt" />
+              <div class="project-overlay text-primary">
+                {{ project.alt }}
+              </div>
             </a>
           </div>
         </q-card-section>
@@ -75,8 +83,16 @@ const projects = ref<ProjectDetails[]>([
 
         <q-card-section class="section-container q-pa-sm">
           <div class="project-container full-width q-pa-lg">
-            <a v-for="project in projects" :key="project.id" :href="project.url">
+            <a
+              v-for="project in projects"
+              :key="project.id"
+              :href="project.url"
+              class="project-tile"
+            >
               <img :src="project.src" :alt="project.alt" />
+              <div class="project-overlay text-primary">
+                {{ project.alt }}
+              </div>
             </a>
           </div>
         </q-card-section>
@@ -88,6 +104,41 @@ const projects = ref<ProjectDetails[]>([
 <style scoped lang="scss">
 @import '../css/main.scss';
 $projects-section-background-color: map-get($spring-theme, secondary);
+$project-overlay-background-color: map-get($spring-theme, dark);
+
+.project-container {
+  // ... existing styles
+
+  .project-tile {
+    position: relative;
+    max-width: 200px;
+    display: inline-block;
+    overflow: hidden;
+
+    img {
+      width: 100%;
+      height: auto;
+      display: block;
+    }
+
+    .project-overlay {
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      width: 100%;
+      background-color: rgba($project-overlay-background-color, $alpha: 1);
+      color: var(--q-accent);
+      text-align: center;
+      padding: 0.5rem;
+      opacity: 0;
+      transition: opacity 1s ease;
+    }
+
+    &:hover .project-overlay {
+      opacity: 1;
+    }
+  }
+}
 
 .mobile-view {
   @media (min-width: $breakpoint-md) {
