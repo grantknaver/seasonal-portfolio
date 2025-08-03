@@ -12,6 +12,7 @@ import AboutSection from '../components/AboutSection.vue';
 import SkillsSection from '../components/SkillsSection.vue';
 import ContactSection from '../components/ContactSection.vue';
 import ProjectSection from '../components/ProjectSection.vue';
+import Snowfall from '../components/SnowFall.vue';
 
 const mainStore = useMainStore();
 const { activeTheme, activeTopic } = storeToRefs(mainStore);
@@ -97,7 +98,6 @@ const scrollToContact = async () => {
 
   setTimeout(() => {
     const el = document.getElementById('contact');
-    console.log('el...', el);
     if (el) {
       el.scrollIntoView({ behavior: 'smooth', block: 'start' });
     } else {
@@ -116,6 +116,9 @@ const scrollToContact = async () => {
       class="background-layer"
       :style="{ backgroundImage: `url('${nextBg}')` }"
     />
+    <div class="snow-layer">
+      <Snowfall />
+    </div>
 
     <!-- Main Layout -->
     <q-layout view="Hhh LpR lfF" class="column">
@@ -174,6 +177,7 @@ const scrollToContact = async () => {
           </q-drawer>
         </q-toolbar>
       </q-header>
+
       <!-- PAGE CONTAINER -->
       <q-page-container class="container">
         <router-view />
@@ -259,7 +263,6 @@ aside {
   box-shadow: none !important;
   border-left: solid 4px var(--q-primary);
 
-  // Footer
   .scroll-area {
     height: calc(100% - 72px);
 
@@ -276,5 +279,16 @@ aside {
 .activeTopic {
   color: var(--q-accent);
   font-weight: bold;
+}
+
+.snow-layer {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 1; // Below layout, above background
+  pointer-events: none;
+  overflow: hidden;
 }
 </style>
