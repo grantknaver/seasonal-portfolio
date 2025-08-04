@@ -165,7 +165,7 @@ const workHistoryTimeline = ref<TimelineEntry[]>([
           <div class="projects-container full-width q-pb-xl">
             <ul class="column full-width q-pl-none justify-center">
               <li
-                class="full-width column items-center justify-between text-accent text-center bg-primary q-pa-md"
+                class="drainData full-width column items-center justify-between text-accent text-center bg-primary q-pa-md"
               >
                 <img
                   class="logo q-pt-lg q-pb-md"
@@ -179,8 +179,13 @@ const workHistoryTimeline = ref<TimelineEntry[]>([
               </li>
               <br />
               <li
-                class="column full-width items-center justify-between text-primary text-center bg-accent q-pa-md"
+                class="storytaim column full-width items-center justify-between text-primary text-center bg-accent q-pa-md"
               >
+                <div class="under-construction">
+                  <img src="../assets/under-construction.png" alt="under-construction" />
+                  <span class="under-construction-text text-primary">Under Construction</span>
+                </div>
+
                 <img class="logo q-pb-md" src="../assets/logo-storytAIm.png" alt="StorytAIm logo" />
                 <span class="q-pa-md">
                   An AI-powered narration toolkit designed for authors, complete with voice emotion
@@ -353,7 +358,6 @@ $winter-mobile-background: map-get($winter-theme, primary);
         li {
           font-size: 1rem;
           line-height: 1.3rem;
-          border: 1px solid var(--q-primary);
           border-radius: 10px;
 
           @media (min-width: 1280px) {
@@ -369,10 +373,40 @@ $winter-mobile-background: map-get($winter-theme, primary);
           }
         }
 
-        li:hover {
+        .drainData:hover {
           transform: scale(1.02);
           box-shadow: 5px 10px 20px var(--q-dark);
           cursor: pointer;
+        }
+
+        .storytaim {
+          position: relative;
+
+          &::after {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background-color: rgba(0, 0, 0, 0.6); // Your faded overlay
+            z-index: 1;
+            pointer-events: none;
+          }
+
+          .under-construction {
+            display: flex;
+            flex-direction: column;
+            position: absolute;
+            z-index: 2;
+            height: auto;
+            max-width: 150px;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+
+            .under-construction-text {
+              text-shadow: 2px 2px 5px var(--q-dark);
+              font-size: 1.2rem;
+            }
+          }
         }
       }
     }
