@@ -66,6 +66,12 @@ const workHistoryTimeline = ref<TimelineEntry[]>([
             command of state management libraries (NgRx, Pinia), RESTful APIs, responsive UI, and
             building apps that solve real-world problems.
           </p>
+          <p class="text-primary q-pt-lg">
+            I've built high-performance web apps and streamlining complex systems. I’ve worked in
+            environments ranging from government labs to startups, with recent experience converting
+            legacy systems, integrating Epic OAuth for medical software, and building scalable
+            monorepos.
+          </p>
         </q-card-section>
 
         <q-separator color="primary q-mt-sm q-mb-sm"></q-separator>
@@ -76,19 +82,32 @@ const workHistoryTimeline = ref<TimelineEntry[]>([
           </h2>
           <div class="projects-container full-width column col justify-center items-center">
             <ul class="q-pl-none q-pt-sm q-pb-md">
-              <li class="column text-accent items-center q-pa-lg text-center bg-primary full-width">
-                <img class="logo q-pb-md" src="../assets/logo-drainData.png" alt="Draindata logo" />
-                A surgery drain tracking tool aimed at improving patient recovery through better
-                data.
-                <a class="text-dark q-mt-md" href="">Website</a>
-              </li>
+              <a target="_blank">
+                <li
+                  class="column text-accent items-center q-pa-lg text-center bg-primary full-width"
+                >
+                  <img
+                    class="logo q-pb-md"
+                    src="../assets/logo-drainData.png"
+                    alt="Draindata logo"
+                  />
+                  A surgery drain tracking tool aimed at improving patient recovery through better
+                  data.
+                </li>
+              </a>
+
               <br />
-              <li class="bg-accent column text-primary items-center q-pa-lg text-center">
-                <img class="logo q-pb-md" src="../assets/logo-storytAIm.png" alt="StorytAIm logo" />
-                An AI-powered narration toolkit designed for authors, complete with voice emotion
-                control and audio stitching.
-                <a class="text-dark q-mt-md" href="">Website</a>
-              </li>
+              <a target="_blank">
+                <li class="bg-accent column text-primary items-center q-pa-lg text-center">
+                  <img
+                    class="logo q-pb-md"
+                    src="../assets/logo-storytAIm.png"
+                    alt="StorytAIm logo"
+                  />
+                  An AI-powered narration toolkit designed for authors, complete with voice emotion
+                  control and audio stitching.
+                </li>
+              </a>
             </ul>
           </div>
         </q-card-section>
@@ -108,17 +127,12 @@ const workHistoryTimeline = ref<TimelineEntry[]>([
               :color="employer.color"
               :subtitle="employer.subtitle"
               :avatar="employer.avatar"
+              class="my-timeline-entry"
             >
               <template v-slot:title> {{ employer.title }} </template>
               {{ employer.body }}
             </q-timeline-entry>
           </q-timeline>
-          <p class="history-context text-center text-accent">
-            I've built high-performance web apps and streamlining complex systems. I’ve worked in
-            environments ranging from government labs to startups, with recent experience converting
-            legacy systems, integrating Epic OAuth for medical software, and building scalable
-            monorepos.
-          </p>
         </q-card-section>
       </q-card>
     </div>
@@ -128,13 +142,19 @@ const workHistoryTimeline = ref<TimelineEntry[]>([
         <q-card-section class="section-container text-primary q-pa-lg">
           <h1 class="q-mt-none q-mb-xl text-primary text-center">About Me</h1>
           <q-separator color="primary" class="q-mb-md" />
-          <p class="summary text-center q-mb-none">
+          <p class="summary q-mb-none">
             Hi, I'm <strong class="name text-secondary">Grant Knaver</strong> — a full-stack
             JavaScript developer with <span class="years text-warning">7+ years</span> of
             professional experience, currently based in Eugene, Oregon. I specialize in modern
             frameworks like Angular and Vue, with a strong command of state management libraries
             (NgRx, Pinia), RESTful APIs, responsive UI, and building apps that solve real-world
             problems.
+          </p>
+          <p class="summary text-primary q-pt-lg">
+            I've built high-performance web apps and streamlining complex systems. I’ve worked in
+            environments ranging from government labs to startups, with recent experience converting
+            legacy systems, integrating Epic OAuth for medical software, and building scalable
+            monorepos.
           </p>
         </q-card-section>
 
@@ -156,7 +176,6 @@ const workHistoryTimeline = ref<TimelineEntry[]>([
                   >A surgery drain tracking tool aimed at improving patient recovery through better
                   data.</span
                 >
-                <a class="text-dark q-mt-lg" href="">Website</a>
               </li>
               <br />
               <li
@@ -167,7 +186,6 @@ const workHistoryTimeline = ref<TimelineEntry[]>([
                   An AI-powered narration toolkit designed for authors, complete with voice emotion
                   control and audio stitching.
                 </span>
-                <a class="text-dark q-mt-md" href="">Website</a>
               </li>
             </ul>
           </div>
@@ -175,7 +193,9 @@ const workHistoryTimeline = ref<TimelineEntry[]>([
 
         <hr class="separator full-width" />
 
-        <q-card-section class="section-container work-history-section column items-center q-pa-xl">
+        <q-card-section
+          class="section-container work-history-section column items-center q-pl-xl q-pt-xl q-pr-xl q-pb-none"
+        >
           <h2 class="q-ma-none q-mt-none q-mb-xl text-center text-secondary">Work History</h2>
           <q-separator></q-separator>
           <div class="full-width">
@@ -195,13 +215,6 @@ const workHistoryTimeline = ref<TimelineEntry[]>([
               </q-timeline-entry>
             </q-timeline>
           </div>
-
-          <p class="text-primary q-pt-lg text-center">
-            I've built high-performance web apps and streamlining complex systems. I’ve worked in
-            environments ranging from government labs to startups, with recent experience converting
-            legacy systems, integrating Epic OAuth for medical software, and building scalable
-            monorepos.
-          </p>
         </q-card-section>
       </q-card>
     </div>
@@ -278,20 +291,12 @@ $winter-mobile-background: map-get($winter-theme, primary);
             .logo {
               max-width: 100px;
             }
-
-            a {
-              text-decoration: none;
-              font-weight: bold;
-            }
-
-            a:hover {
-              text-decoration: underline;
-            }
           }
 
           li:hover {
             transform: scale(1.02);
             box-shadow: 5px 10px 15px var(--q-dark);
+            cursor: pointer;
           }
         }
       }
@@ -359,12 +364,6 @@ $winter-mobile-background: map-get($winter-theme, primary);
             max-width: 100px;
           }
 
-          a {
-            text-decoration: none;
-            font-weight: bold;
-            font-size: 1rem;
-          }
-
           a:hover {
             text-decoration: underline;
           }
@@ -373,6 +372,7 @@ $winter-mobile-background: map-get($winter-theme, primary);
         li:hover {
           transform: scale(1.02);
           box-shadow: 5px 10px 20px var(--q-dark);
+          cursor: pointer;
         }
       }
     }
@@ -393,7 +393,6 @@ $winter-mobile-background: map-get($winter-theme, primary);
     }
   }
 }
-
 .winter-mobile-background {
   background-color: rgba($winter-mobile-background, $alpha: 0.8);
 
