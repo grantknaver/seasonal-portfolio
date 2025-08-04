@@ -202,9 +202,35 @@ const scrollToContact = async () => {
       </q-drawer>
 
       <!-- FOOTER -->
-      <q-footer>
-        <q-toolbar class="bg-dark">
-          <q-toolbar-title></q-toolbar-title>
+      <q-footer class="bg-dark text-white">
+        <q-toolbar class="justify-between">
+          <q-toolbar-title class="text-subtitle2 text-weight-light">
+            © {{ new Date().getFullYear() }}
+            <span class="text-primary text-weight-light"
+              >glk<span style="color: #fc9944; font-size: 1em">Freelance</span></span
+            >
+          </q-toolbar-title>
+
+          <div class="q-gutter-sm">
+            <q-btn
+              flat
+              round
+              icon="fab fa-github"
+              :href="'https://github.com/your-username'"
+              target="_blank"
+              :class="activeTheme !== Theme.Spring ? 'text-accent' : 'text-secondary'"
+              aria-label="GitHub"
+            />
+            <q-btn
+              flat
+              round
+              icon="fab fa-linkedin"
+              :href="'https://linkedin.com/in/your-linkedin-id'"
+              target="_blank"
+              :class="[activeTheme !== Theme.Spring ? 'text-accent' : 'text-secondary']"
+              aria-label="LinkedIn"
+            />
+          </div>
         </q-toolbar>
       </q-footer>
     </q-layout>
@@ -294,6 +320,13 @@ aside {
 
 .q-footer {
   border-top: 1px solid var(--q-primary);
+
+  .prefix-text {
+    font-size: 0.8rem;
+  }
+  .q-btn:hover {
+    color: var(--q-primary) !important;
+  }
 }
 
 .activeTopic {
