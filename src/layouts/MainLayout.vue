@@ -29,6 +29,7 @@ const currentBg = ref('');
 const nextBg = ref('');
 const showNext = ref(false);
 const mobileMenu = ref(false);
+
 const topics = ref<Topic[]>([
   {
     id: uuidv4(),
@@ -60,19 +61,23 @@ onMounted(() => {
 
 onBeforeUnmount(() => window.removeEventListener('resize', updateWidths));
 
+const fadeBackground = (newImage: string) => {
+  if (!newImage || newImage === currentBg.value) return;
+  nextBg.value = newImage;
+  showNext.value = true;
+
+  setTimeout(() => {
+    currentBg.value = newImage;
+    showNext.value = false;
+    nextBg.value = '';
+  }, 500);
+};
+
 watch(
   () => activeTheme.value,
   () => {
     const newImage = activeThemeBackground.value;
-    if (!newImage || newImage === currentBg.value) return;
-    nextBg.value = newImage;
-    showNext.value = true;
-
-    setTimeout(() => {
-      currentBg.value = newImage;
-      showNext.value = false;
-      nextBg.value = '';
-    }, 1000);
+    fadeBackground(newImage);
   },
 );
 
