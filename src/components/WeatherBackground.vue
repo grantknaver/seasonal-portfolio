@@ -70,13 +70,11 @@ function animateArtifacts() {
 
     const startX = Math.random() * window.innerWidth;
     const startY = -window.innerHeight - Math.random() * 400;
-    const horizontalDrift = 100 + Math.random() * 200;
     const verticalDrop = window.innerHeight + 300;
     const duration = 6 + (30 - artifact.size) * 0.2;
     const delay = Math.random() * 5;
     const rotation = Math.random() * 360;
 
-    // Initial position
     gsap.set(domEl, {
       x: startX,
       y: startY,
@@ -84,36 +82,38 @@ function animateArtifacts() {
       scale: artifact.size / 24,
     });
 
-    // Main falling animation
     gsap.to(domEl, {
-      x: isFall ? startX + (Math.random() > 0.5 ? horizontalDrift : -horizontalDrift) : startX,
       y: verticalDrop,
-      rotation: `+=${isFall ? 180 : 90}`,
+      rotation: `+=${isFall ? 360 : 90}`,
       duration,
       delay,
       repeat: -1,
       ease: isFall ? 'sine.inOut' : 'none',
     });
 
-    // Fluttering side-to-side if Fall
     if (isFall) {
+      const horizontalDrift = 200 + Math.random() * 200;
+
       gsap.to(domEl, {
-        x: `+=${Math.random() * 30 + 20}`,
-        duration: 2 + Math.random() * 2,
-        repeat: -1,
-        yoyo: true,
-        ease: 'sine.inOut',
+        x: `+=${Math.random() > 0.5 ? horizontalDrift : -horizontalDrift}`,
+        y: verticalDrop,
+        rotation: `+=360`,
+        duration,
         delay,
+        repeat: -1,
+        ease: 'sine.inOut',
       });
     }
   });
 }
 
 onMounted(async () => {
-  createArtifacts();
-  await nextTick();
-  artifactRefs.value = artifactRefs.value.slice(0, artifacts.value.length);
-  animateArtifacts();
+  if (activeTheme.value === Theme.Winter || activeTheme.value === Theme.Fall) {
+    createArtifacts();
+    await nextTick();
+    artifactRefs.value = artifactRefs.value.slice(0, artifacts.value.length);
+    animateArtifacts();
+  }
 });
 
 onBeforeUnmount(() => {
@@ -129,17 +129,18 @@ watch(activeTheme, async () => {
   artifactRefs.value = [];
 
   await nextTick();
-  createArtifacts();
-  await nextTick();
+  if (activeTheme.value === Theme.Winter || activeTheme.value === Theme.Fall) {
+    createArtifacts();
+    await nextTick();
 
-  artifactRefs.value = artifactRefs.value.slice(0, artifacts.value.length);
-  animateArtifacts();
+    artifactRefs.value = artifactRefs.value.slice(0, artifacts.value.length);
+    animateArtifacts();
+  }
 });
 </script>
 
 <template>
   <div class="weather-artifact-container">
-    <h1>{{ activeTheme }}</h1>
     <div
       v-for="(artifact, index) in artifacts"
       :key="artifact.id"
