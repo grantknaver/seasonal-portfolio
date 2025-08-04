@@ -1,41 +1,8 @@
 <script lang="ts" setup>
 import { ref } from 'vue';
 import { v4 as uuidv4 } from 'uuid';
-// import { type CarouselSlide } from 'src/shared/models/carouselSlide';
 
 import { type TimelineEntry } from '../shared/models/timelineEntry';
-// const workHistorySlides = ref<CarouselSlide[]>([
-//   {
-//     id: uuidv4(),
-//     link: 'https://www.amtrak.com/home',
-//     img: new URL('../assets/amtrak.svg', import.meta.url).href,
-//     alt: 'Amtrak',
-//   },
-//   {
-//     id: uuidv4(),
-//     link: 'https://www.lockheedmartin.com/en-us/index.html',
-//     img: new URL('../assets/lockheed-martin.png', import.meta.url).href,
-//     alt: 'Lockheed Martin',
-//   },
-//   {
-//     id: uuidv4(),
-//     link: 'https://www.labcorp.com/',
-//     img: new URL('../assets/labcorp.png', import.meta.url).href,
-//     alt: 'Labcorp',
-//   },
-//   {
-//     id: uuidv4(),
-//     link: 'https://www.ornl.gov/',
-//     img: new URL('../assets/ornl.png', import.meta.url).href,
-//     alt: 'ORNL',
-//   },
-//   {
-//     id: uuidv4(),
-//     link: 'https://gametimehero-coming-soon.web.app/',
-//     img: new URL('../assets/gametime-hero.png', import.meta.url).href,
-//     alt: 'Gametime Hero',
-//   },
-// ]);
 const workHistoryTimeline = ref<TimelineEntry[]>([
   {
     id: uuidv4(),

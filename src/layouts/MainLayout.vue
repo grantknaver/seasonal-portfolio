@@ -12,7 +12,7 @@ import AboutSection from '../components/AboutSection.vue';
 import SkillsSection from '../components/SkillsSection.vue';
 import ContactSection from '../components/ContactSection.vue';
 import ProjectSection from '../components/ProjectSection.vue';
-import Snowfall from '../components/SnowFall.vue';
+import WeatherBackground from '../components/WeatherBackground.vue';
 
 const mainStore = useMainStore();
 const { activeTheme, activeTopic } = storeToRefs(mainStore);
@@ -116,8 +116,8 @@ const scrollToContact = async () => {
       class="background-layer"
       :style="{ backgroundImage: `url('${nextBg}')` }"
     />
-    <div class="snow-layer">
-      <Snowfall />
+    <div class="weather-layer">
+      <WeatherBackground />
     </div>
 
     <!-- Main Layout -->
@@ -241,6 +241,17 @@ body,
   transition: opacity 0.8s ease-in-out;
 }
 
+.weather-layer {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 1; // Below layout, above background
+  pointer-events: none;
+  overflow: hidden;
+}
+
 .q-header {
   background-color: rgba($color: black, $alpha: 0.5) !important;
   border-bottom: 2px solid var(--q-primary);
@@ -279,16 +290,5 @@ aside {
 .activeTopic {
   color: var(--q-accent);
   font-weight: bold;
-}
-
-.snow-layer {
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  z-index: 1; // Below layout, above background
-  pointer-events: none;
-  overflow: hidden;
 }
 </style>
