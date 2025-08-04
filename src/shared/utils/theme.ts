@@ -27,11 +27,11 @@ export const themeMap: Record<Theme, Record<string, string>> = {
   },
 };
 
-export function setTheme(themeName: Theme) {
+export const syncThemeGlobals = (themeName: Theme) => {
   const root = document.documentElement;
   const themeVars = themeMap[themeName];
 
   Object.entries(themeVars).forEach(([key, value]) => {
     root.style.setProperty(key, value);
   });
-}
+};

@@ -121,6 +121,7 @@ const selectTopic = (name: TopicName, theme?: Theme) => {
       </section>
       <section class="desktop-view flex col column justify-center items-center full-width">
         <div class="simon-circle q-mt-xl">
+          {{ activeTheme }}
           <div
             v-for="topic in topics"
             :key="topic.id"
@@ -253,6 +254,7 @@ const selectTopic = (name: TopicName, theme?: Theme) => {
         border-radius: 10px;
         border: solid 4px rgba($color: white, $alpha: 0.7);
         background-color: rgba($color: #521c0d, $alpha: 0.5);
+        z-index: 1;
 
         &:hover {
           transform: scale(1.25);

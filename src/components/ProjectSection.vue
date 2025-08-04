@@ -33,6 +33,7 @@ const projects = ref<ProjectDetails[]>([
 
 <template>
   <section>
+    <!-- Mobile -->
     <div class="mobile-view full-width">
       <q-card class="full-width">
         <q-card-section class="section-container q-pa-lg">
@@ -66,6 +67,7 @@ const projects = ref<ProjectDetails[]>([
       </q-card>
     </div>
 
+    <!-- Desktop -->
     <div class="desktop-view full-width">
       <q-card class="full-width q-pa-sm bg-transparent">
         <q-card-section class="section-container text-primary q-pa-lg">
@@ -107,8 +109,6 @@ $projects-section-background-color: map-get($spring-theme, secondary);
 $project-overlay-background-color: map-get($spring-theme, dark);
 
 .project-container {
-  // ... existing styles
-
   .project-tile {
     position: relative;
     max-width: 200px;
@@ -204,6 +204,7 @@ $project-overlay-background-color: map-get($spring-theme, dark);
     }
   }
 }
+
 .desktop-view {
   display: none;
 

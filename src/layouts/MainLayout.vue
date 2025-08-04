@@ -3,7 +3,6 @@ import { computed, ref, onMounted, watch, onBeforeUnmount, nextTick } from 'vue'
 import { useMainStore } from '../stores/main';
 import { storeToRefs } from 'pinia';
 import { Theme } from '../shared/constants/theme';
-import { setTheme } from '../shared/utils/theme';
 import { getCustomCssVar } from '../shared/utils/getCustomCssVar';
 import { TopicName } from '../shared/constants/topicName';
 import { type Topic } from '../shared/models/topic';
@@ -13,6 +12,7 @@ import SkillsSection from '../components/SkillsSection.vue';
 import ContactSection from '../components/ContactSection.vue';
 import ProjectSection from '../components/ProjectSection.vue';
 import WeatherBackground from '../components/WeatherBackground.vue';
+import { syncThemeGlobals } from '../shared/utils/theme';
 
 const mainStore = useMainStore();
 const { activeTheme, activeTopic } = storeToRefs(mainStore);
@@ -72,10 +72,9 @@ watch(
   (newTheme) => {
     const newImage = backgroundMap[newTheme];
     if (!newImage || newImage === currentBg.value) return;
-
     nextBg.value = newImage;
     showNext.value = true;
-    setTheme(newTheme);
+    syncThemeGlobals(newTheme);
 
     setTimeout(() => {
       currentBg.value = newImage;
@@ -110,10 +109,14 @@ const scrollToContact = async () => {
 <template>
   <div class="bg-container">
     <!-- Background Layers -->
-    <div class="background-layer" :style="{ backgroundImage: `url('${currentBg}')` }" />
     <div
-      v-show="showNext"
       class="background-layer"
+      :class="{ active: !showNext }"
+      :style="{ backgroundImage: `url('${currentBg}')` }"
+    />
+    <div
+      class="background-layer"
+      :class="{ active: showNext }"
       :style="{ backgroundImage: `url('${nextBg}')` }"
     />
     <div class="weather-layer">
@@ -237,17 +240,26 @@ body,
   background-position: center;
   background-repeat: no-repeat;
   z-index: 0;
-  opacity: 1;
-  transition: opacity 0.8s ease-in-out;
+  opacity: 0;
+  transition: opacity 1s ease-in-out;
+  pointer-events: none;
 }
 
+.background-layer:first-of-type {
+  opacity: 1;
+}
+
+.background-layer.active {
+  opacity: 1;
+  z-index: 1;
+}
 .weather-layer {
   position: absolute;
   top: 0;
   left: 0;
   width: 100%;
   height: 100%;
-  z-index: 1; // Below layout, above background
+  z-index: 2; // Below layout, above background
   pointer-events: none;
   overflow: hidden;
 }
