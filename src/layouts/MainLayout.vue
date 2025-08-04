@@ -12,10 +12,9 @@ import SkillsSection from '../components/SkillsSection.vue';
 import ContactSection from '../components/ContactSection.vue';
 import ProjectSection from '../components/ProjectSection.vue';
 import WeatherBackground from '../components/WeatherBackground.vue';
-import { syncThemeGlobals } from '../shared/utils/theme';
 
 const mainStore = useMainStore();
-const { activeTheme, activeTopic } = storeToRefs(mainStore);
+const { activeTheme, activeTopic, activeThemeBackground } = storeToRefs(mainStore);
 const windowWidth = ref(window.innerWidth);
 const desktopDrawerWidth = ref(window.innerWidth * 0.5);
 const showTopicBreakpoint = +`${getCustomCssVar('breakpoint-md')}`.slice(0, -2);
@@ -53,34 +52,27 @@ const topics = ref<Topic[]>([
     theme: Theme.Summer,
   },
 ]);
-const backgroundMap: Record<Theme, string> = {
-  [Theme.Fall]: new URL('../assets/autumn-forestry.jpg', import.meta.url).href,
-  [Theme.Winter]: new URL('../assets/snowy-winter-landscape.jpg', import.meta.url).href,
-  [Theme.Spring]: new URL('../assets/beautiful-forest-spring-season.jpg', import.meta.url).href,
-  [Theme.Summer]: new URL('../assets/beautiful-shot-forest.jpg', import.meta.url).href,
-};
 
 onMounted(() => {
   window.addEventListener('resize', updateWidths);
-  currentBg.value = backgroundMap[Theme.Fall];
+  currentBg.value = activeThemeBackground.value;
 });
 
 onBeforeUnmount(() => window.removeEventListener('resize', updateWidths));
 
 watch(
   () => activeTheme.value,
-  (newTheme) => {
-    const newImage = backgroundMap[newTheme];
+  () => {
+    const newImage = activeThemeBackground.value;
     if (!newImage || newImage === currentBg.value) return;
     nextBg.value = newImage;
     showNext.value = true;
-    syncThemeGlobals(newTheme);
 
     setTimeout(() => {
       currentBg.value = newImage;
       showNext.value = false;
       nextBg.value = '';
-    }, 800);
+    }, 1000);
   },
 );
 
