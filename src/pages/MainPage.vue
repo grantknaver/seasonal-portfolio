@@ -121,7 +121,6 @@ const selectTopic = (name: TopicName, theme?: Theme) => {
       </section>
       <section class="desktop-view flex col column justify-center items-center full-width">
         <div class="simon-circle q-mt-xl">
-          {{ activeTheme }}
           <div
             v-for="topic in topics"
             :key="topic.id"
