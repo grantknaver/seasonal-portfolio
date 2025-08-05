@@ -15,7 +15,7 @@ import { debounce } from 'quasar';
 
 const mainStore = useMainStore();
 const { activeTheme } = storeToRefs(mainStore);
-// import { getCustomCssVar } from '../shared/utils/getCustomCssVar';
+import { getCustomCssVar } from '../shared/utils/getCustomCssVar';
 
 interface Artifact {
   id: string;
@@ -49,76 +49,86 @@ function createArtifacts() {
   }
 }
 
-const getFooterTop = async (): Promise<number> => {
-  await nextTick();
-
-  const footerEl = document.querySelector('footer.q-footer');
-  if (!footerEl) {
-    console.warn('Footer not found.');
-    return window.innerHeight;
+const getAbsoluteOffsetTop = (el: HTMLElement): number => {
+  let top = el.offsetTop;
+  let parent = el.offsetParent as HTMLElement | null;
+  while (parent) {
+    top += parent.offsetTop;
+    parent = parent.offsetParent as HTMLElement | null;
   }
-
-  const rect = footerEl.getBoundingClientRect();
-  console.log('Footer top:', rect.top);
-  return rect.top;
+  return top;
 };
 
-const animateArtifacts = async () => {
+const assignFallDuration = (artifactSize: number) => {
+  let duration = 6 + (30 - artifactSize) * 0.2;
+  const smallBreakpoint = +getCustomCssVar('breakpoint-sm').slice(0, -2);
+  const isMobile = smallBreakpoint < 600;
+
+  if (isMobile) {
+    duration = 6 + (30 - artifactSize) * 0.6;
+  } else if (activeTheme.value === Theme.Fall) {
+    duration = 6 + (30 - artifactSize) * 1.5;
+  }
+  return duration;
+};
+
+const animateArtifacts = () => {
   gsap.killTweensOf('*');
 
-  // const breakpointMd = +getCustomCssVar('breakpoint-md').slice(0, -2);
-  // const isMobile = () => window.innerWidth < breakpointMd;
-  const verticalDrop = await getFooterTop();
+  const footerEl = document.querySelector('footer.q-footer');
+  if (footerEl instanceof HTMLElement) {
+    const verticalDrop = getAbsoluteOffsetTop(footerEl);
 
-  for (let index = 0; index < artifactRefs.value.length; index++) {
-    const el = artifactRefs.value[index];
-    let domEl: HTMLElement | null = null;
+    for (let index = 0; index < artifactRefs.value.length; index++) {
+      const el = artifactRefs.value[index];
+      let domEl: HTMLElement | null = null;
 
-    if (el instanceof HTMLElement) {
-      domEl = el;
-    } else if (el && '$el' in el && el.$el instanceof HTMLElement) {
-      domEl = el.$el;
-    }
+      if (el instanceof HTMLElement) {
+        domEl = el;
+      } else if (el && '$el' in el && el.$el instanceof HTMLElement) {
+        domEl = el.$el;
+      }
 
-    if (!domEl) continue;
+      if (!domEl) continue;
 
-    const artifact = artifacts.value[index];
-    if (!artifact) continue;
+      const artifact = artifacts.value[index];
+      if (!artifact) continue;
 
-    const isFall = activeTheme.value === Theme.Fall;
-    const startX = Math.random() * window.innerWidth;
-    const startY = -window.innerHeight - Math.random() * 400;
-    const duration = 6 + (30 - artifact.size) * 0.2;
-    const delay = Math.random() * 6;
-    const rotation = Math.random() * 360;
+      const isFall = activeTheme.value === Theme.Fall;
+      const startX = Math.random() * window.innerWidth;
+      const startY = -window.innerHeight - Math.random() * 400;
+      const duration = 6 + (30 - assignFallDuration(artifact.size)) * 0.2;
+      const delay = Math.random() * 6;
+      const rotation = Math.random() * 360;
 
-    gsap.set(domEl, {
-      x: startX,
-      y: startY,
-      rotation,
-      scale: artifact.size / 24,
-    });
+      gsap.set(domEl, {
+        x: startX,
+        y: startY,
+        rotation,
+        scale: artifact.size / 24,
+      });
 
-    gsap.to(domEl, {
-      y: verticalDrop,
-      rotation: `+=${isFall ? 360 : 90}`,
-      duration,
-      delay,
-      repeat: -1,
-      ease: isFall ? 'sine.inOut' : 'none',
-    });
-
-    if (isFall) {
-      const horizontalDrift = 200 + Math.random() * 200;
       gsap.to(domEl, {
-        x: `+=${Math.random() > 0.5 ? horizontalDrift : -horizontalDrift}`,
         y: verticalDrop,
-        rotation: `+=360`,
+        rotation: `+=${isFall ? 360 : 90}`,
         duration,
         delay,
         repeat: -1,
-        ease: 'sine.inOut',
+        ease: isFall ? 'sine.inOut' : 'none',
       });
+
+      if (isFall) {
+        const horizontalDrift = 200 + Math.random() * 200;
+        gsap.to(domEl, {
+          x: `+=${Math.random() > 0.5 ? horizontalDrift : -horizontalDrift}`,
+          y: verticalDrop,
+          rotation: `+=360`,
+          duration,
+          delay,
+          repeat: -1,
+          ease: 'sine.inOut',
+        });
+      }
     }
   }
 };
@@ -135,7 +145,7 @@ const handleResize = debounce(async () => {
     createArtifacts();
     await nextTick();
     artifactRefs.value = artifactRefs.value.slice(0, artifacts.value.length);
-    await animateArtifacts();
+    animateArtifacts();
   }
 }, 1);
 
@@ -144,7 +154,7 @@ onMounted(async () => {
     createArtifacts();
     await nextTick();
     artifactRefs.value = artifactRefs.value.slice(0, artifacts.value.length);
-    await animateArtifacts();
+    animateArtifacts();
   }
   window.addEventListener('resize', handleResize);
 });
@@ -165,7 +175,7 @@ watch(activeTheme, async () => {
     await nextTick();
 
     artifactRefs.value = artifactRefs.value.slice(0, artifacts.value.length);
-    await animateArtifacts();
+    animateArtifacts();
   }
 });
 </script>
