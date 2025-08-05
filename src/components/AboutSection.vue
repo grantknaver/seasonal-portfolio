@@ -164,11 +164,10 @@ const workHistoryTimeline = ref<TimelineEntry[]>([
           </h2>
           <div class="projects-container full-width q-pb-xl">
             <ul class="column full-width q-pl-none justify-center">
-              <a
-                href="https://www.draindata.org/"
-                class="drainData column text-accent bg-primary q-pa-md"
-              >
-                <li class="col column items-center justify-center">
+              <a href="https://www.draindata.org/" class="column">
+                <li
+                  class="drainData col column items-center justify-center text-accent bg-primary q-pa-md"
+                >
                   <img
                     class="logo q-pt-lg q-pb-md"
                     src="../assets/logo-drainData.png"
@@ -180,9 +179,8 @@ const workHistoryTimeline = ref<TimelineEntry[]>([
                   >
                 </li>
               </a>
-
               <br />
-              <a href="">
+              <a href="" class="column">
                 <li
                   class="storytaim column full-width items-center justify-between text-primary text-center bg-accent q-pa-md"
                 >
