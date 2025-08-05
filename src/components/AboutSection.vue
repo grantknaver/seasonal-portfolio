@@ -82,7 +82,7 @@ const workHistoryTimeline = ref<TimelineEntry[]>([
           </h2>
           <div class="projects-container full-width column col justify-center items-center">
             <ul class="q-pl-none q-pt-sm q-pb-md">
-              <a target="_blank">
+              <a href="https://www.draindata.org/" target="_blank" class="drainData project column">
                 <li
                   class="column text-accent items-center q-pa-lg text-center bg-primary full-width"
                 >
@@ -95,19 +95,27 @@ const workHistoryTimeline = ref<TimelineEntry[]>([
                   data.
                 </li>
               </a>
-
               <br />
-              <a target="_blank">
-                <li class="bg-accent column text-primary items-center q-pa-lg text-center">
+              <a href="#" class="project column">
+                <li
+                  class="storytaim column full-width items-center justify-between text-primary text-center bg-accent q-pa-md"
+                >
+                  <div class="under-construction">
+                    <img src="../assets/under-construction.png" alt="under-construction" />
+                    <span class="under-construction-text text-primary">Under Construction</span>
+                  </div>
+
                   <img
                     class="logo q-pb-md"
                     src="../assets/logo-storytAIm.png"
                     alt="StorytAIm logo"
                   />
-                  An AI-powered narration toolkit designed for authors, complete with voice emotion
-                  control and audio stitching.
-                </li>
-              </a>
+                  <span class="q-pa-md">
+                    An AI-powered narration toolkit designed for authors, complete with voice
+                    emotion control and audio stitching.
+                  </span>
+                </li></a
+              >
             </ul>
           </div>
         </q-card-section>
@@ -164,7 +172,7 @@ const workHistoryTimeline = ref<TimelineEntry[]>([
           </h2>
           <div class="projects-container full-width q-pb-xl">
             <ul class="column full-width q-pl-none justify-center">
-              <a href="https://www.draindata.org/" class="column">
+              <a href="https://www.draindata.org/" class="project column">
                 <li
                   class="drainData col column items-center justify-center text-accent bg-primary q-pa-md"
                 >
@@ -180,7 +188,7 @@ const workHistoryTimeline = ref<TimelineEntry[]>([
                 </li>
               </a>
               <br />
-              <a href="" class="column">
+              <span class="project column">
                 <li
                   class="storytaim column full-width items-center justify-between text-primary text-center bg-accent q-pa-md"
                 >
@@ -198,7 +206,7 @@ const workHistoryTimeline = ref<TimelineEntry[]>([
                     An AI-powered narration toolkit designed for authors, complete with voice
                     emotion control and audio stitching.
                   </span>
-                </li></a
+                </li></span
               >
             </ul>
           </div>
@@ -294,22 +302,59 @@ $winter-mobile-background: map-get($winter-theme, primary);
           max-width: 600px;
           list-style-type: none;
 
-          li {
+          .project {
             font-size: 1rem;
-            line-height: 1.4rem;
-            border: 1px solid var(--q-primary);
-
+            line-height: 1.3rem;
+            text-decoration: none;
             border-radius: 10px;
 
-            .logo {
-              max-width: 100px;
+            li {
+              border-radius: 10px;
+              .logo {
+                max-width: 100px;
+              }
             }
           }
 
-          li:hover {
+          .drainData:hover {
             transform: scale(1.02);
-            box-shadow: 5px 10px 15px var(--q-dark);
+            box-shadow: 5px 10px 20px var(--q-dark);
             cursor: pointer;
+          }
+
+          .storytaim {
+            position: relative;
+
+            &::after {
+              content: '';
+              position: absolute;
+              inset: 0;
+              background-color: rgba(0, 0, 0, 0.6); // Your faded overlay
+              z-index: 1;
+              pointer-events: none;
+              border-radius: 10px;
+            }
+
+            .under-construction {
+              display: flex;
+              flex-direction: column;
+              position: absolute;
+              z-index: 2;
+              height: auto;
+              max-width: 125px;
+              top: 50%;
+              left: 50%;
+              transform: translate(-50%, -50%);
+
+              .under-construction-text {
+                text-shadow: 2px 2px 5px var(--q-dark);
+                font-size: 1.2rem;
+              }
+            }
+          }
+
+          .storytaim:hover {
+            cursor: auto;
           }
         }
       }
@@ -362,7 +407,7 @@ $winter-mobile-background: map-get($winter-theme, primary);
           flex-direction: row;
           justify-content: space-around;
         }
-        a {
+        .project {
           font-size: 1rem;
           line-height: 1.3rem;
           text-decoration: none;
