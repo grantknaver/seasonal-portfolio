@@ -11,9 +11,11 @@ import { gsap } from 'gsap';
 import { useMainStore } from '../stores/main';
 import { storeToRefs } from 'pinia';
 import { Theme } from 'src/shared/constants/theme';
+import { debounce } from 'quasar';
 
 const mainStore = useMainStore();
 const { activeTheme } = storeToRefs(mainStore);
+// import { getCustomCssVar } from '../shared/utils/getCustomCssVar';
 
 interface Artifact {
   id: string;
@@ -47,12 +49,29 @@ function createArtifacts() {
   }
 }
 
-function animateArtifacts() {
-  artifactRefs.value.forEach((el) => {
-    if (el) gsap.killTweensOf(el);
-  });
+const getFooterTop = async (): Promise<number> => {
+  await nextTick();
 
-  artifactRefs.value.forEach((el, index) => {
+  const footerEl = document.querySelector('footer.q-footer');
+  if (!footerEl) {
+    console.warn('Footer not found.');
+    return window.innerHeight;
+  }
+
+  const rect = footerEl.getBoundingClientRect();
+  console.log('Footer top:', rect.top);
+  return rect.top;
+};
+
+const animateArtifacts = async () => {
+  gsap.killTweensOf('*');
+
+  // const breakpointMd = +getCustomCssVar('breakpoint-md').slice(0, -2);
+  // const isMobile = () => window.innerWidth < breakpointMd;
+  const verticalDrop = await getFooterTop();
+
+  for (let index = 0; index < artifactRefs.value.length; index++) {
+    const el = artifactRefs.value[index];
     let domEl: HTMLElement | null = null;
 
     if (el instanceof HTMLElement) {
@@ -61,18 +80,16 @@ function animateArtifacts() {
       domEl = el.$el;
     }
 
-    if (!domEl) return;
+    if (!domEl) continue;
 
     const artifact = artifacts.value[index];
-    if (!artifact) return;
+    if (!artifact) continue;
 
     const isFall = activeTheme.value === Theme.Fall;
-
     const startX = Math.random() * window.innerWidth;
     const startY = -window.innerHeight - Math.random() * 400;
-    const verticalDrop = window.innerHeight + 300;
     const duration = 6 + (30 - artifact.size) * 0.2;
-    const delay = Math.random() * 5;
+    const delay = Math.random() * 6;
     const rotation = Math.random() * 360;
 
     gsap.set(domEl, {
@@ -93,7 +110,6 @@ function animateArtifacts() {
 
     if (isFall) {
       const horizontalDrift = 200 + Math.random() * 200;
-
       gsap.to(domEl, {
         x: `+=${Math.random() > 0.5 ? horizontalDrift : -horizontalDrift}`,
         y: verticalDrop,
@@ -104,16 +120,33 @@ function animateArtifacts() {
         ease: 'sine.inOut',
       });
     }
-  });
-}
+  }
+};
+
+const handleResize = debounce(async () => {
+  gsap.killTweensOf('*');
+
+  artifacts.value = [];
+  artifactRefs.value = [];
+
+  await nextTick();
+
+  if (activeTheme.value === Theme.Winter || activeTheme.value === Theme.Fall) {
+    createArtifacts();
+    await nextTick();
+    artifactRefs.value = artifactRefs.value.slice(0, artifacts.value.length);
+    await animateArtifacts();
+  }
+}, 1);
 
 onMounted(async () => {
   if (activeTheme.value === Theme.Winter || activeTheme.value === Theme.Fall) {
     createArtifacts();
     await nextTick();
     artifactRefs.value = artifactRefs.value.slice(0, artifacts.value.length);
-    animateArtifacts();
+    await animateArtifacts();
   }
+  window.addEventListener('resize', handleResize);
 });
 
 onBeforeUnmount(() => {
@@ -121,9 +154,7 @@ onBeforeUnmount(() => {
 });
 
 watch(activeTheme, async () => {
-  artifactRefs.value.forEach((el) => {
-    if (el) gsap.killTweensOf(el);
-  });
+  gsap.killTweensOf('*');
 
   artifacts.value = [];
   artifactRefs.value = [];
@@ -134,7 +165,7 @@ watch(activeTheme, async () => {
     await nextTick();
 
     artifactRefs.value = artifactRefs.value.slice(0, artifacts.value.length);
-    animateArtifacts();
+    await animateArtifacts();
   }
 });
 </script>

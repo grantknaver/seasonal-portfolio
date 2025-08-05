@@ -104,137 +104,134 @@ const scrollToContact = async () => {
 </script>
 
 <template>
-  <div class="bg-container">
-    <!-- Background Layers -->
-    <div
-      class="background-layer"
-      :class="{ active: !showNext }"
-      :style="{ backgroundImage: `url('${currentBg}')` }"
-    />
-    <div
-      class="background-layer"
-      :class="{ active: showNext }"
-      :style="{ backgroundImage: `url('${nextBg}')` }"
-    />
-    <div class="weather-layer">
-      <WeatherBackground />
-    </div>
-
-    <!-- Main Layout -->
-    <q-layout view="Hhh LpR lfF" class="column">
-      <!-- HEADER -->
-      <q-header class="main-header text-black">
-        <q-toolbar class="bg-dark q-pa-lg">
-          <q-toolbar-title>
-            <img
-              class="q-pt-sm"
-              style="max-width: 200px"
-              src="../assets/logo.png"
-              alt="glkFreelance logo"
-            />
-          </q-toolbar-title>
-          <q-btn
-            color="primary"
-            class="menu-button"
-            flat
-            dense
-            round
-            icon="menu"
-            @click="mobileMenu = !mobileMenu"
+  <!-- Main Layout -->
+  <q-layout view="Hhh LpR lff">
+    <!-- HEADER -->
+    <q-header class="main-header text-black">
+      <q-toolbar class="bg-dark q-pa-lg">
+        <q-toolbar-title>
+          <img
+            class="q-pt-sm"
+            style="max-width: 200px"
+            src="../assets/logo.png"
+            alt="glkFreelance logo"
           />
-          <q-drawer
-            class="bg-primary"
-            v-model="mobileMenu"
-            side="right"
-            overlay
-            behavior="mobile"
-            bordered
-          >
-            <q-list>
-              <q-item
-                v-for="topic in topics"
-                :key="topic.name"
-                class="menu-item text-dark"
-                clickable
-                @click="selectTopic(topic.name, topic.theme)"
-                :class="{ activeTopic: topic.name === activeTopic }"
-              >
-                <q-item-section>{{ topic.label }}</q-item-section>
-              </q-item>
-              <q-item
-                class="menu-item text-dark"
-                clickable
-                @click="scrollToContact"
-                :class="{ activeTopic: TopicName.Contact === activeTopic }"
-              >
-                <q-item-section>{{ TopicName.Contact }}</q-item-section>
-              </q-item>
-              <hr />
-              <q-item key="resume" clickable @click="mobileMenu = false">
-                <q-item-section class="text-bold text-secondary">Download Resume</q-item-section>
-              </q-item>
-            </q-list>
-          </q-drawer>
-        </q-toolbar>
-      </q-header>
-
-      <!-- PAGE CONTAINER -->
-      <q-page-container class="container">
-        <router-view />
-      </q-page-container>
-
-      <!-- RIGHT DRAWER (Desktop Panel) -->
-      <q-drawer
-        :model-value="showTopicPanel"
-        side="right"
-        behavior="desktop"
-        :width="desktopDrawerWidth"
-        class="desktop-drawer column col"
-      >
-        <q-scroll-area v-if="activeTopic !== TopicName.Contact" class="scroll-area q-pa-md">
-          <AboutSection v-if="activeTopic === TopicName.About" />
-          <SkillsSection v-if="activeTopic === TopicName.Skills" />
-          <ProjectSection v-if="activeTopic === TopicName.Projects" />
-        </q-scroll-area>
-        <div v-else class="flex column col justify-center items-center">
-          <ContactSection v-if="activeTopic === TopicName.Contact" />
-        </div>
-      </q-drawer>
-
-      <!-- FOOTER -->
-      <q-footer class="bg-dark text-white">
-        <q-toolbar class="justify-between">
-          <q-toolbar-title class="text-subtitle2 text-weight-light">
-            © {{ new Date().getFullYear() }}
-            <span class="text-primary text-weight-light"
-              >glk<span style="color: #fc9944; font-size: 1em">Freelance</span></span
+        </q-toolbar-title>
+        <q-btn
+          color="primary"
+          class="menu-button"
+          flat
+          dense
+          round
+          icon="menu"
+          @click="mobileMenu = !mobileMenu"
+        />
+        <q-drawer
+          class="bg-primary"
+          v-model="mobileMenu"
+          side="right"
+          overlay
+          behavior="mobile"
+          bordered
+        >
+          <q-list>
+            <q-item
+              v-for="topic in topics"
+              :key="topic.name"
+              class="menu-item text-dark"
+              clickable
+              @click="selectTopic(topic.name, topic.theme)"
+              :class="{ activeTopic: topic.name === activeTopic }"
             >
-          </q-toolbar-title>
+              <q-item-section>{{ topic.label }}</q-item-section>
+            </q-item>
+            <q-item
+              class="menu-item text-dark"
+              clickable
+              @click="scrollToContact"
+              :class="{ activeTopic: TopicName.Contact === activeTopic }"
+            >
+              <q-item-section>{{ TopicName.Contact }}</q-item-section>
+            </q-item>
+            <hr />
+            <q-item key="resume" clickable @click="mobileMenu = false">
+              <q-item-section class="text-bold text-secondary">Download Resume</q-item-section>
+            </q-item>
+          </q-list>
+        </q-drawer>
+      </q-toolbar>
+    </q-header>
 
-          <div class="q-gutter-sm">
-            <q-btn
-              flat
-              round
-              icon="fab fa-github"
-              :href="'https://github.com/your-username'"
-              target="_blank"
-              :class="activeTheme !== Theme.Spring ? 'text-accent' : 'text-secondary'"
-              aria-label="GitHub"
-            />
-            <q-btn
-              flat
-              round
-              icon="fab fa-linkedin"
-              :href="'https://linkedin.com/in/your-linkedin-id'"
-              target="_blank"
-              :class="[activeTheme !== Theme.Spring ? 'text-accent' : 'text-secondary']"
-              aria-label="LinkedIn"
-            />
-          </div>
-        </q-toolbar>
-      </q-footer>
-    </q-layout>
-  </div>
+    <!-- PAGE CONTAINER -->
+    <q-page-container>
+      <!-- Background Layers -->
+      <div
+        class="background-layer"
+        :class="{ active: !showNext }"
+        :style="{ backgroundImage: `url('${currentBg}')` }"
+      />
+      <div
+        class="background-layer"
+        :class="{ active: showNext }"
+        :style="{ backgroundImage: `url('${nextBg}')` }"
+      />
+      <div class="weather-layer">
+        <WeatherBackground />
+      </div>
+      <router-view />
+    </q-page-container>
+
+    <!-- RIGHT DRAWER (Desktop Panel) -->
+    <q-drawer
+      :model-value="showTopicPanel"
+      side="right"
+      behavior="desktop"
+      :width="desktopDrawerWidth"
+      class="desktop-drawer column col"
+    >
+      <q-scroll-area v-if="activeTopic !== TopicName.Contact" class="scroll-area q-pa-md">
+        <AboutSection v-if="activeTopic === TopicName.About" />
+        <SkillsSection v-if="activeTopic === TopicName.Skills" />
+        <ProjectSection v-if="activeTopic === TopicName.Projects" />
+      </q-scroll-area>
+      <div v-else class="flex column col justify-center items-center">
+        <ContactSection v-if="activeTopic === TopicName.Contact" />
+      </div>
+    </q-drawer>
+
+    <!-- FOOTER -->
+    <q-footer class="bg-dark text-white">
+      <q-toolbar class="justify-between">
+        <q-toolbar-title class="text-subtitle2 text-weight-light">
+          © {{ new Date().getFullYear() }}
+          <span class="text-primary text-weight-light"
+            >glk<span style="color: #fc9944; font-size: 1em">Freelance</span></span
+          >
+        </q-toolbar-title>
+
+        <div class="q-gutter-sm">
+          <q-btn
+            flat
+            round
+            icon="fab fa-github"
+            :href="'https://github.com/your-username'"
+            target="_blank"
+            :class="activeTheme !== Theme.Spring ? 'text-accent' : 'text-secondary'"
+            aria-label="GitHub"
+          />
+          <q-btn
+            flat
+            round
+            icon="fab fa-linkedin"
+            :href="'https://linkedin.com/in/your-linkedin-id'"
+            target="_blank"
+            :class="[activeTheme !== Theme.Spring ? 'text-accent' : 'text-secondary']"
+            aria-label="LinkedIn"
+          />
+        </div>
+      </q-toolbar>
+    </q-footer>
+  </q-layout>
 </template>
 
 <style lang="scss">
@@ -244,13 +241,6 @@ html,
 body,
 #q-app {
   height: 100%;
-}
-
-.bg-container {
-  position: relative;
-  min-height: 100vh;
-  width: 100%;
-  overflow: auto;
 }
 
 .background-layer {
