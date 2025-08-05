@@ -164,34 +164,44 @@ const workHistoryTimeline = ref<TimelineEntry[]>([
           </h2>
           <div class="projects-container full-width q-pb-xl">
             <ul class="column full-width q-pl-none justify-center">
-              <li
-                class="drainData full-width column items-center justify-between text-accent text-center bg-primary q-pa-md"
+              <a
+                href="https://www.draindata.org/"
+                class="drainData column text-accent bg-primary q-pa-md"
               >
-                <img
-                  class="logo q-pt-lg q-pb-md"
-                  src="../assets/logo-drainData.png"
-                  alt="Draindata logo"
-                />
-                <span
-                  >A surgery drain tracking tool aimed at improving patient recovery through better
-                  data.</span
-                >
-              </li>
-              <br />
-              <li
-                class="storytaim column full-width items-center justify-between text-primary text-center bg-accent q-pa-md"
-              >
-                <div class="under-construction">
-                  <img src="../assets/under-construction.png" alt="under-construction" />
-                  <span class="under-construction-text text-primary">Under Construction</span>
-                </div>
+                <li class="col column items-center justify-center">
+                  <img
+                    class="logo q-pt-lg q-pb-md"
+                    src="../assets/logo-drainData.png"
+                    alt="Draindata logo"
+                  />
+                  <span class="text-center"
+                    >A surgery drain tracking tool aimed at improving patient recovery through
+                    better data.</span
+                  >
+                </li>
+              </a>
 
-                <img class="logo q-pb-md" src="../assets/logo-storytAIm.png" alt="StorytAIm logo" />
-                <span class="q-pa-md">
-                  An AI-powered narration toolkit designed for authors, complete with voice emotion
-                  control and audio stitching.
-                </span>
-              </li>
+              <br />
+              <a href="">
+                <li
+                  class="storytaim column full-width items-center justify-between text-primary text-center bg-accent q-pa-md"
+                >
+                  <div class="under-construction">
+                    <img src="../assets/under-construction.png" alt="under-construction" />
+                    <span class="under-construction-text text-primary">Under Construction</span>
+                  </div>
+
+                  <img
+                    class="logo q-pb-md"
+                    src="../assets/logo-storytAIm.png"
+                    alt="StorytAIm logo"
+                  />
+                  <span class="q-pa-md">
+                    An AI-powered narration toolkit designed for authors, complete with voice
+                    emotion control and audio stitching.
+                  </span>
+                </li></a
+              >
             </ul>
           </div>
         </q-card-section>
@@ -354,22 +364,21 @@ $winter-mobile-background: map-get($winter-theme, primary);
           flex-direction: row;
           justify-content: space-around;
         }
-
-        li {
+        a {
           font-size: 1rem;
           line-height: 1.3rem;
+          text-decoration: none;
           border-radius: 10px;
 
           @media (min-width: 1280px) {
-            width: 45% !important;
+            width: 45%;
           }
 
-          .logo {
-            max-width: 100px;
-          }
-
-          a:hover {
-            text-decoration: underline;
+          li {
+            border-radius: 10px;
+            .logo {
+              max-width: 100px;
+            }
           }
         }
 
@@ -389,6 +398,7 @@ $winter-mobile-background: map-get($winter-theme, primary);
             background-color: rgba(0, 0, 0, 0.6); // Your faded overlay
             z-index: 1;
             pointer-events: none;
+            border-radius: 10px;
           }
 
           .under-construction {
