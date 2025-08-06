@@ -81,25 +81,32 @@ watch(
   },
 );
 
-const selectTopic = (name: TopicName, theme?: Theme) => {
-  mainStore.SET_ACTIVE_TOPIC(name);
-  if (theme) {
-    mainStore.SET_ACTIVE_THEME(theme);
-  }
-};
+watch(activeTopic, async (newTopic) => {
+  if (!newTopic) return;
 
-const scrollToContact = async () => {
-  mobileMenu.value = false;
-  await nextTick();
-
+  await nextTick(); // DOM updates
   setTimeout(() => {
-    const el = document.getElementById('contact');
-    if (el) {
-      el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    const target = document.getElementById(newTopic);
+    const header = document.querySelector('.q-header');
+    const headerHeight = header?.clientHeight ?? 0;
+
+    if (target) {
+      const offsetTop = target.getBoundingClientRect().top + window.pageYOffset;
+
+      window.scrollTo({
+        top: offsetTop - headerHeight,
+        behavior: 'smooth',
+      });
     } else {
-      console.warn('Contact element not found');
+      console.warn(`Section with id ${newTopic} not found`);
     }
-  }, 200);
+  }, 350); // Wait for q-expansion-item animation
+});
+
+const selectTopic = (name: TopicName, theme?: Theme) => {
+  mainStore.SET_ACTIVE_TOPIC(name); // 💡 Do this first
+  if (theme) mainStore.SET_ACTIVE_THEME(theme);
+  mobileMenu.value = false;
 };
 </script>
 
@@ -148,7 +155,7 @@ const scrollToContact = async () => {
             <q-item
               class="menu-item text-dark"
               clickable
-              @click="scrollToContact"
+              @click="selectTopic(TopicName.Contact)"
               :class="{ activeTopic: TopicName.Contact === activeTopic }"
             >
               <q-item-section>{{ TopicName.Contact }}</q-item-section>

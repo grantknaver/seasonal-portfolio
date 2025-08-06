@@ -110,14 +110,29 @@ const selectTopic = (name: TopicName, theme?: Theme) => {
               :model-value="topic.name === activeTopic"
               :header-class="['text-dark', 'bg-secondary']"
             >
-              <AboutSection v-if="topic.name === TopicName.About" />
-              <SkillsSection v-if="topic.name === TopicName.Skills" />
-              <ProjectSection v-if="topic.name === TopicName.Projects" />
+              <template v-if="topic.name === TopicName.About">
+                <div :id="TopicName.About">
+                  <AboutSection />
+                </div>
+              </template>
+              <template v-if="topic.name === TopicName.Skills">
+                <div :id="TopicName.Skills">
+                  <SkillsSection />
+                </div>
+              </template>
+              <template v-if="topic.name === TopicName.Projects">
+                <div :id="TopicName.Projects">
+                  <ProjectSection />
+                </div>
+              </template>
             </q-expansion-item>
           </q-item>
         </q-list>
         <q-separator color="secondary" class="full-width q-mt-xs q-mb-lg"></q-separator>
-        <ContactSection />
+
+        <div class="full-width" :id="TopicName.Contact">
+          <ContactSection />
+        </div>
       </section>
       <section class="desktop-view flex col column justify-center items-center full-width">
         <div class="simon-circle q-mt-xl">
