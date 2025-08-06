@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref, onMounted } from 'vue';
+import { ref, onMounted, watch } from 'vue';
 import { Theme } from '../shared/constants/theme';
 import { useMainStore } from '../stores/main';
 import { type Topic } from '../shared/models/topic';
@@ -47,9 +47,36 @@ const topics: Topic[] = [
   },
 ];
 const { activeTheme, activeTopic } = storeToRefs(mainStore);
+const expandedPanel = ref<TopicName | null>(null);
 
 onMounted(() => {
   currentBg.value = backgroundMap[Theme.Fall];
+});
+
+watch(activeTopic, (newTopic) => {
+  if (!newTopic) return;
+
+  // await nextTick(); // Wait for initial DOM update
+
+  // const attempts = 0;
+  // const maxAttempts = 15;
+
+  const tryScroll = () => {
+    const target = document.getElementById(newTopic);
+    const header = document.querySelector('.q-header');
+    const headerHeight = header?.clientHeight ?? 0;
+
+    if (target) {
+      const offsetTop = target.getBoundingClientRect().top + window.pageYOffset;
+
+      window.scrollTo({
+        top: offsetTop - headerHeight,
+        behavior: 'smooth',
+      });
+    }
+  };
+
+  tryScroll();
 });
 
 const selectTopic = (name: TopicName, theme?: Theme) => {
@@ -103,15 +130,24 @@ const selectTopic = (name: TopicName, theme?: Theme) => {
             class="full-width bg-transparent q-pa-none q-mb-sm"
           >
             <q-expansion-item
-              class="full-width"
+              :model-value="expandedPanel === topic.name"
+              @update:model-value="
+                (val) => {
+                  if (val) {
+                    expandedPanel = topic.name;
+                    selectTopic(topic.name, topic.theme); // only when opening
+                  } else {
+                    expandedPanel = null;
+                  }
+                }
+              "
               :icon="topic.seasonIcon"
               :label="topic.label"
-              @click.stop="selectTopic(topic.name, topic.theme)"
-              :model-value="topic.name === activeTopic"
               :header-class="['text-dark', 'bg-secondary']"
+              class="full-width"
             >
               <template v-if="topic.name === TopicName.About">
-                <div :id="TopicName.About">
+                <div class="full-width" :id="TopicName.About">
                   <AboutSection />
                 </div>
               </template>
@@ -121,7 +157,7 @@ const selectTopic = (name: TopicName, theme?: Theme) => {
                 </div>
               </template>
               <template v-if="topic.name === TopicName.Projects">
-                <div :id="TopicName.Projects">
+                <div class="bg-green full-width" :id="TopicName.Projects">
                   <ProjectSection />
                 </div>
               </template>
@@ -129,7 +165,6 @@ const selectTopic = (name: TopicName, theme?: Theme) => {
           </q-item>
         </q-list>
         <q-separator color="secondary" class="full-width q-mt-xs q-mb-lg"></q-separator>
-
         <div class="full-width" :id="TopicName.Contact">
           <ContactSection />
         </div>
@@ -364,4 +399,8 @@ const selectTopic = (name: TopicName, theme?: Theme) => {
     }
   }
 }
+
+// .q-expansion-item {
+//   width: 100%;
+// }
 </style>

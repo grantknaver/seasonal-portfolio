@@ -104,6 +104,7 @@ watch(activeTopic, async (newTopic) => {
 });
 
 const selectTopic = (name: TopicName, theme?: Theme) => {
+  console.log('selectTopic MainLayout');
   mainStore.SET_ACTIVE_TOPIC(name); // 💡 Do this first
   if (theme) mainStore.SET_ACTIVE_THEME(theme);
   mobileMenu.value = false;
