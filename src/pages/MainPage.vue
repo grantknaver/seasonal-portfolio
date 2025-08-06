@@ -56,11 +56,6 @@ onMounted(() => {
 watch(activeTopic, (newTopic) => {
   if (!newTopic) return;
 
-  // await nextTick(); // Wait for initial DOM update
-
-  // const attempts = 0;
-  // const maxAttempts = 15;
-
   const tryScroll = () => {
     const target = document.getElementById(newTopic);
     const header = document.querySelector('.q-header');
