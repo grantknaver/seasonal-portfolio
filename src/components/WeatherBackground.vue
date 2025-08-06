@@ -64,10 +64,8 @@ const assignFallDuration = (artifactSize: number) => {
   const smallBreakpoint = +getCustomCssVar('breakpoint-sm').slice(0, -2);
   const isMobile = smallBreakpoint < 600;
 
-  if (isMobile) {
-    duration = 6 + (30 - artifactSize) * 0.6;
-  } else if (activeTheme.value === Theme.Fall) {
-    duration = 6 + (30 - artifactSize) * 1.5;
+  if (isMobile && activeTheme.value === Theme.Fall) {
+    duration = 6 + (30 - artifactSize) * 0.15;
   }
   return duration;
 };
