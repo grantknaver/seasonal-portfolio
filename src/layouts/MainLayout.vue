@@ -1,5 +1,5 @@
 <script lang="ts" setup>
-import { computed, ref, onMounted, watch, onBeforeUnmount, nextTick } from 'vue';
+import { computed, ref, onMounted, watch, onBeforeUnmount } from 'vue';
 import { useMainStore } from '../stores/main';
 import { storeToRefs } from 'pinia';
 import { Theme } from '../shared/constants/theme';
@@ -81,34 +81,32 @@ watch(
   },
 );
 
-watch(activeTopic, async (newTopic) => {
-  if (!newTopic) return;
-
-  await nextTick(); // DOM updates
-  setTimeout(() => {
-    const target = document.getElementById(newTopic);
-    const header = document.querySelector('.q-header');
-    const headerHeight = header?.clientHeight ?? 0;
-
-    if (target) {
-      const offsetTop = target.getBoundingClientRect().top + window.pageYOffset;
-
-      window.scrollTo({
-        top: offsetTop - headerHeight,
-        behavior: 'smooth',
-      });
-    } else {
-      console.warn(`Section with id ${newTopic} not found`);
-    }
-  }, 350); // Wait for q-expansion-item animation
+watch(activeTopic, async () => {
+  // console.log('activeTopic', )
+  // if (!newTopic) return;
+  // await nextTick(); // DOM updates
+  // setTimeout(() => {
+  //   const target = document.getElementById(newTopic);
+  //   const header = document.querySelector('.q-header');
+  //   const headerHeight = header?.clientHeight ?? 0;
+  //   if (target) {
+  //     const offsetTop = target.getBoundingClientRect().top + window.pageYOffset;
+  //     window.scrollTo({
+  //       top: offsetTop - headerHeight,
+  //       behavior: 'smooth',
+  //     });
+  //   } else {
+  //     console.warn(`Section with id ${newTopic} not found`);
+  //   }
+  // }, 350); // Wait for q-expansion-item animation
 });
 
-const selectTopic = (name: TopicName, theme?: Theme) => {
-  console.log('selectTopic MainLayout');
-  mainStore.SET_ACTIVE_TOPIC(name); // 💡 Do this first
-  if (theme) mainStore.SET_ACTIVE_THEME(theme);
-  mobileMenu.value = false;
-};
+// const selectTopic = (name: TopicName, theme?: Theme) => {
+//   console.log('selectTopic MainLayout');
+//   mainStore.SET_ACTIVE_TOPIC(name); // 💡 Do this first
+//   if (theme) mainStore.SET_ACTIVE_THEME(theme);
+//   mobileMenu.value = false;
+// };
 </script>
 
 <template>
@@ -148,7 +146,6 @@ const selectTopic = (name: TopicName, theme?: Theme) => {
               :key="topic.name"
               class="menu-item text-dark"
               clickable
-              @click="selectTopic(topic.name, topic.theme)"
               :class="{ activeTopic: topic.name === activeTopic }"
             >
               <q-item-section>{{ topic.label }}</q-item-section>
@@ -156,7 +153,6 @@ const selectTopic = (name: TopicName, theme?: Theme) => {
             <q-item
               class="menu-item text-dark"
               clickable
-              @click="selectTopic(TopicName.Contact)"
               :class="{ activeTopic: TopicName.Contact === activeTopic }"
             >
               <q-item-section>{{ TopicName.Contact }}</q-item-section>

@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref, onMounted, watch } from 'vue';
+import { ref, onMounted } from 'vue';
 import { Theme } from '../shared/constants/theme';
 import { useMainStore } from '../stores/main';
 import { type Topic } from '../shared/models/topic';
@@ -10,6 +10,7 @@ import AboutSection from '../components/AboutSection.vue';
 import SkillsSection from '../components/SkillsSection.vue';
 import ProjectSection from 'src/components/ProjectSection.vue';
 import ContactSection from '../components/ContactSection.vue';
+import { scrollTo } from '../shared/utils/scrollTo';
 
 const currentBg = ref('');
 const backgroundMap: Record<Theme, string> = {
@@ -51,27 +52,6 @@ const expandedPanel = ref<TopicName | null>(null);
 
 onMounted(() => {
   currentBg.value = backgroundMap[Theme.Fall];
-});
-
-watch(activeTopic, (newTopic) => {
-  if (!newTopic) return;
-
-  const tryScroll = () => {
-    const target = document.getElementById(newTopic);
-    const header = document.querySelector('.q-header');
-    const headerHeight = header?.clientHeight ?? 0;
-
-    if (target) {
-      const offsetTop = target.getBoundingClientRect().top + window.pageYOffset;
-
-      window.scrollTo({
-        top: offsetTop - headerHeight,
-        behavior: 'smooth',
-      });
-    }
-  };
-
-  tryScroll();
 });
 
 const selectTopic = (name: TopicName, theme?: Theme) => {
@@ -128,12 +108,19 @@ const selectTopic = (name: TopicName, theme?: Theme) => {
               :model-value="expandedPanel === topic.name"
               @update:model-value="
                 (val) => {
-                  if (val) {
-                    expandedPanel = topic.name;
-                    selectTopic(topic.name, topic.theme); // only when opening
-                  } else {
-                    expandedPanel = null;
+                  expandedPanel = val ? topic.name : null;
+                  if (!val) {
+                    // closing
+                    // selectTopic(null);
                   }
+                }
+              "
+              @after-show="
+                () => {
+                  if (activeTopic !== topic.name) {
+                    selectTopic(topic.name, topic.theme);
+                  }
+                  scrollTo(topic.name);
                 }
               "
               :icon="topic.seasonIcon"
