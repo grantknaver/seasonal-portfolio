@@ -80,33 +80,6 @@ watch(
     fadeBackground(newImage);
   },
 );
-
-watch(activeTopic, async () => {
-  // console.log('activeTopic', )
-  // if (!newTopic) return;
-  // await nextTick(); // DOM updates
-  // setTimeout(() => {
-  //   const target = document.getElementById(newTopic);
-  //   const header = document.querySelector('.q-header');
-  //   const headerHeight = header?.clientHeight ?? 0;
-  //   if (target) {
-  //     const offsetTop = target.getBoundingClientRect().top + window.pageYOffset;
-  //     window.scrollTo({
-  //       top: offsetTop - headerHeight,
-  //       behavior: 'smooth',
-  //     });
-  //   } else {
-  //     console.warn(`Section with id ${newTopic} not found`);
-  //   }
-  // }, 350); // Wait for q-expansion-item animation
-});
-
-// const selectTopic = (name: TopicName, theme?: Theme) => {
-//   console.log('selectTopic MainLayout');
-//   mainStore.SET_ACTIVE_TOPIC(name); // 💡 Do this first
-//   if (theme) mainStore.SET_ACTIVE_THEME(theme);
-//   mobileMenu.value = false;
-// };
 </script>
 
 <template>
@@ -146,6 +119,7 @@ watch(activeTopic, async () => {
               :key="topic.name"
               class="menu-item text-dark"
               clickable
+              @click="mainStore.SET_MOBILE_SCROLL_TARGET(topic.name)"
               :class="{ activeTopic: topic.name === activeTopic }"
             >
               <q-item-section>{{ topic.label }}</q-item-section>
@@ -154,6 +128,7 @@ watch(activeTopic, async () => {
               class="menu-item text-dark"
               clickable
               :class="{ activeTopic: TopicName.Contact === activeTopic }"
+              @click="mainStore.SET_MOBILE_SCROLL_TARGET(TopicName.Contact)"
             >
               <q-item-section>{{ TopicName.Contact }}</q-item-section>
             </q-item>

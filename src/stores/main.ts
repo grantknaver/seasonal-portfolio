@@ -3,6 +3,7 @@ import { defineStore } from 'pinia';
 
 import { Theme } from '../shared/constants/theme';
 import { syncThemeGlobals } from '../shared/utils/theme';
+import { type TopicName } from 'src/shared/constants/topicName';
 
 export const useMainStore = defineStore('main', () => {
   const activeTopic = ref<string | null>(null);
@@ -16,6 +17,11 @@ export const useMainStore = defineStore('main', () => {
     [Theme.Winter]: new URL('../assets/snowy-winter-landscape.jpg', import.meta.url).href,
     [Theme.Spring]: new URL('../assets/beautiful-forest-spring-season.jpg', import.meta.url).href,
     [Theme.Summer]: new URL('../assets/beautiful-shot-forest.jpg', import.meta.url).href,
+  };
+  const mobileScrollTarget = ref<TopicName | null>(null);
+
+  const SET_MOBILE_SCROLL_TARGET = (topicName: TopicName) => {
+    mobileScrollTarget.value = topicName;
   };
 
   const SET_ACTIVE_TOPIC = (topicName: string | null) => {
@@ -41,9 +47,11 @@ export const useMainStore = defineStore('main', () => {
     activeTheme,
     contactSectionRef,
     activeThemeBackground,
+    mobileScrollTarget,
     SET_ACTIVE_TOPIC,
     SET_ACTIVE_THEME,
     SET_CONTACT_SECTION_REF,
     SET_THEME_BACKGROUND,
+    SET_MOBILE_SCROLL_TARGET,
   };
 });

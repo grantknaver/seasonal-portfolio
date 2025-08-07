@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref, onMounted } from 'vue';
+import { ref, onMounted, watch } from 'vue';
 import { Theme } from '../shared/constants/theme';
 import { useMainStore } from '../stores/main';
 import { type Topic } from '../shared/models/topic';
@@ -47,11 +47,46 @@ const topics: Topic[] = [
     seasonIcon: 'wb_sunny',
   },
 ];
-const { activeTheme, activeTopic } = storeToRefs(mainStore);
+const { activeTheme, activeTopic, mobileScrollTarget } = storeToRefs(mainStore);
 const expandedPanel = ref<TopicName | null>(null);
 
 onMounted(() => {
   currentBg.value = backgroundMap[Theme.Fall];
+});
+
+watch(mobileScrollTarget, (newTopic) => {
+  console.log('newTopic', newTopic);
+  if (newTopic) {
+    const scrollTo3 = (): void => {
+      console.log('Firing scrollTo');
+      console.log('scrollHeight', document.querySelector('.q-page-container')?.scrollHeight);
+      console.log('.q-page-container', document.querySelector('.q-page-container')?.clientHeight);
+      // Try scrolling multiple places
+      const scrollableContainers = [
+        document.scrollingElement, // fallback
+        document.querySelector('.q-page-container'),
+        document.querySelector('.q-page'),
+        window,
+      ];
+
+      for (const container of scrollableContainers) {
+        if (container && 'scrollTo' in container) {
+          console.log('Trying scroll on', container);
+          try {
+            container.scrollTo({
+              top: 500,
+              behavior: 'smooth',
+            });
+          } catch (err) {
+            console.warn('Failed scroll attempt', err);
+          }
+        }
+      }
+      document.body.classList.remove('q-body--prevent-scroll');
+    };
+
+    scrollTo3();
+  }
 });
 
 const selectTopic = (name: TopicName, theme?: Theme) => {
@@ -68,7 +103,7 @@ const selectTopic = (name: TopicName, theme?: Theme) => {
 </script>
 
 <template>
-  <q-page class="page-container column col q-pa-md">
+  <q-page class="page-container scroll column col q-pa-md">
     <img class="q-pt-sm logo" style="max-width: 200px" src="../assets/logo.png" alt="logo" />
     <div class="sub-container column col items-center">
       <section class="mobile-view column items-center full-width">
@@ -110,8 +145,7 @@ const selectTopic = (name: TopicName, theme?: Theme) => {
                 (val) => {
                   expandedPanel = val ? topic.name : null;
                   if (!val) {
-                    // closing
-                    // selectTopic(null);
+                    console.log('No expanded panel');
                   }
                 }
               "
@@ -146,6 +180,7 @@ const selectTopic = (name: TopicName, theme?: Theme) => {
             </q-expansion-item>
           </q-item>
         </q-list>
+        <p id="test">TEST</p>
         <q-separator color="secondary" class="full-width q-mt-xs q-mb-lg"></q-separator>
         <div class="full-width" :id="TopicName.Contact">
           <ContactSection />
