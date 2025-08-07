@@ -12,6 +12,7 @@ import SkillsSection from '../components/SkillsSection.vue';
 import ContactSection from '../components/ContactSection.vue';
 import ProjectSection from '../components/ProjectSection.vue';
 import WeatherBackground from '../components/WeatherBackground.vue';
+import { QCarousel } from 'quasar';
 
 const mainStore = useMainStore();
 const { activeTheme, activeTopic, activeThemeBackground } = storeToRefs(mainStore);
@@ -29,6 +30,41 @@ const currentBg = ref('');
 const nextBg = ref('');
 const showNext = ref(false);
 const mobileMenu = ref(false);
+
+export interface Slide {
+  id: string;
+  topic: TopicName | 'Landing';
+  src: string;
+  theme: Theme;
+}
+
+const slide = ref<TopicName | 'Landing'>('Landing');
+const slides = ref<Slide[]>([
+  {
+    id: uuidv4(),
+    topic: 'Landing',
+    src: new URL('../assets/autumn-forestry.jpg', import.meta.url).href,
+    theme: Theme.Fall,
+  },
+  {
+    id: uuidv4(),
+    topic: TopicName.About,
+    src: new URL('../assets/snowy-winter-landscape.jpg', import.meta.url).href,
+    theme: Theme.Winter,
+  },
+  {
+    id: uuidv4(),
+    topic: TopicName.Projects,
+    src: new URL('../assets/beautiful-forest-spring-season.jpg', import.meta.url).href,
+    theme: Theme.Spring,
+  },
+  {
+    id: uuidv4(),
+    topic: TopicName.Skills,
+    src: new URL('../assets/beautiful-shot-forest.jpg', import.meta.url).href,
+    theme: Theme.Summer,
+  },
+]);
 
 const topics = ref<Topic[]>([
   {
@@ -85,6 +121,21 @@ watch(
 <template>
   <!-- Main Layout -->
   <q-layout view="Hhh LpR lff">
+    <div class="carousel-background">
+      <q-carousel
+        v-model="slide"
+        transition-prev="fade"
+        transition-next="fade"
+        animated
+        infinite
+        :autoplay="15000"
+        height="100%"
+        class="carousel-absolute bg-dark"
+        :transition-duration="2500"
+      >
+        <q-carousel-slide v-for="s in slides" :key="s.id" :name="s.topic" :img-src="s.src" />
+      </q-carousel>
+    </div>
     <!-- HEADER -->
     <q-header class="main-header text-black">
       <q-toolbar class="bg-dark q-pa-lg">
@@ -143,17 +194,6 @@ watch(
 
     <!-- PAGE CONTAINER -->
     <q-page-container>
-      <!-- Background Layers -->
-      <div
-        class="background-layer"
-        :class="{ active: !showNext }"
-        :style="{ backgroundImage: `url('${currentBg}')` }"
-      />
-      <div
-        class="background-layer"
-        :class="{ active: showNext }"
-        :style="{ backgroundImage: `url('${nextBg}')` }"
-      />
       <div class="weather-layer">
         <WeatherBackground />
       </div>
@@ -218,32 +258,24 @@ watch(
 
 html,
 body,
-#q-app {
+#q-app,
+.q-layout,
+.q-page-container,
+.q-page {
   height: 100%;
+  margin: 0;
+  padding: 0;
 }
 
-.background-layer {
-  position: absolute;
+.carousel-background {
+  position: fixed;
   top: 0;
   left: 0;
-  height: 100%;
+  z-index: 0;
   width: 100%;
-  background-size: cover;
-  background-position: center;
-  background-repeat: no-repeat;
-  z-index: 0;
-  opacity: 0;
-  transition: opacity 1s ease-in-out;
+  height: 100%;
   pointer-events: none;
-}
-
-.background-layer:first-of-type {
-  opacity: 1;
-}
-
-.background-layer.active {
-  opacity: 1;
-  z-index: 0;
+  overflow: hidden;
 }
 
 .weather-layer {
@@ -290,6 +322,10 @@ aside {
 
 .q-footer {
   border-top: 1px solid var(--q-primary);
+
+  @media (min-width: $breakpoint-md) {
+    background-color: rgba($color: black, $alpha: 0.8) !important;
+  }
 
   .prefix-text {
     font-size: 0.8rem;
