@@ -15,7 +15,7 @@ import WeatherBackground from '../components/WeatherBackground.vue';
 import { QCarousel } from 'quasar';
 
 const mainStore = useMainStore();
-const { activeTheme, activeTopic, activeThemeBackground } = storeToRefs(mainStore);
+const { activeTheme, activeTopic } = storeToRefs(mainStore);
 const windowWidth = ref(window.innerWidth);
 const desktopDrawerWidth = ref(window.innerWidth * 0.5);
 const showTopicBreakpoint = +`${getCustomCssVar('breakpoint-md')}`.slice(0, -2);
@@ -26,41 +26,33 @@ const updateWidths = () => {
   desktopDrawerWidth.value = window.innerWidth * 0.5;
   windowWidth.value = window.innerWidth;
 };
-const currentBg = ref('');
-const nextBg = ref('');
-const showNext = ref(false);
 const mobileMenu = ref(false);
 
 export interface Slide {
   id: string;
-  topic: TopicName | 'Landing';
   src: string;
   theme: Theme;
 }
 
-const slide = ref<TopicName | 'Landing'>('Landing');
+const slide = ref<Theme>(Theme.Fall);
 const slides = ref<Slide[]>([
   {
     id: uuidv4(),
-    topic: 'Landing',
     src: new URL('../assets/autumn-forestry.jpg', import.meta.url).href,
     theme: Theme.Fall,
   },
   {
     id: uuidv4(),
-    topic: TopicName.About,
     src: new URL('../assets/snowy-winter-landscape.jpg', import.meta.url).href,
     theme: Theme.Winter,
   },
   {
     id: uuidv4(),
-    topic: TopicName.Projects,
     src: new URL('../assets/beautiful-forest-spring-season.jpg', import.meta.url).href,
     theme: Theme.Spring,
   },
   {
     id: uuidv4(),
-    topic: TopicName.Skills,
     src: new URL('../assets/beautiful-shot-forest.jpg', import.meta.url).href,
     theme: Theme.Summer,
   },
@@ -92,30 +84,15 @@ const topics = ref<Topic[]>([
 
 onMounted(() => {
   window.addEventListener('resize', updateWidths);
-  currentBg.value = activeThemeBackground.value;
 });
 
 onBeforeUnmount(() => window.removeEventListener('resize', updateWidths));
 
-const fadeBackground = (newImage: string) => {
-  if (!newImage || newImage === currentBg.value) return;
-  nextBg.value = newImage;
-  showNext.value = true;
-
+watch(slide, (newVal) => {
   setTimeout(() => {
-    currentBg.value = newImage;
-    showNext.value = false;
-    nextBg.value = '';
-  }, 500);
-};
-
-watch(
-  () => activeTheme.value,
-  () => {
-    const newImage = activeThemeBackground.value;
-    fadeBackground(newImage);
-  },
-);
+    mainStore.SET_ACTIVE_THEME(newVal);
+  }, 2000);
+});
 </script>
 
 <template>
@@ -133,7 +110,7 @@ watch(
         class="carousel-absolute bg-dark"
         :transition-duration="2500"
       >
-        <q-carousel-slide v-for="s in slides" :key="s.id" :name="s.topic" :img-src="s.src" />
+        <q-carousel-slide v-for="s in slides" :key="s.id" :name="s.theme" :img-src="s.src" />
       </q-carousel>
     </div>
     <!-- HEADER -->
@@ -324,7 +301,7 @@ aside {
   border-top: 1px solid var(--q-primary);
 
   @media (min-width: $breakpoint-md) {
-    background-color: rgba($color: black, $alpha: 0.8) !important;
+    background-color: rgba($color: black, $alpha: 0.5) !important;
   }
 
   .prefix-text {

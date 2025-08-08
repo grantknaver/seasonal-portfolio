@@ -2,6 +2,12 @@
 import { ref } from 'vue';
 import { v4 as uuidv4 } from 'uuid';
 import { type ProjectDetails } from '../shared/models/projectDetails';
+import { themeMap } from 'src/shared/constants/theme';
+import { useMainStore } from '../stores/main';
+import { storeToRefs } from 'pinia';
+
+const mainStore = useMainStore();
+const { activeTheme } = storeToRefs(mainStore);
 
 const projects = ref<ProjectDetails[]>([
   {
@@ -49,7 +55,10 @@ const projects = ref<ProjectDetails[]>([
           </p>
         </q-card-section>
 
-        <q-card-section class="section-container q-mt-md q-pa-sm bg-primary">
+        <q-card-section
+          class="section-container q-mt-md q-pa-sm"
+          :style="{ backgroundColor: themeMap[activeTheme]['--q-primary'] }"
+        >
           <div class="project-container full-width q-pa-lg">
             <a
               v-for="project in projects"
@@ -58,7 +67,10 @@ const projects = ref<ProjectDetails[]>([
               class="project-tile"
             >
               <img :src="project.src" :alt="project.alt" />
-              <div class="project-overlay text-primary">
+              <div
+                class="project-overlay text-primary"
+                :style="{ backgroundColor: themeMap[activeTheme]['--q-dark'] }"
+              >
                 {{ project.alt }}
               </div>
             </a>
@@ -83,7 +95,10 @@ const projects = ref<ProjectDetails[]>([
           </p>
         </q-card-section>
 
-        <q-card-section class="section-container q-pa-sm">
+        <q-card-section
+          class="section-container q-pa-sm"
+          :style="{ backgroundColor: themeMap[activeTheme]['--q-primary'] }"
+        >
           <div class="project-container full-width q-pa-lg">
             <a
               v-for="project in projects"
@@ -92,7 +107,10 @@ const projects = ref<ProjectDetails[]>([
               class="project-tile"
             >
               <img :src="project.src" :alt="project.alt" />
-              <div class="project-overlay text-primary">
+              <div
+                class="project-overlay text-primary"
+                :style="{ backgroundColor: themeMap[activeTheme]['--q-dark'] }"
+              >
                 {{ project.alt }}
               </div>
             </a>
@@ -126,7 +144,6 @@ $project-overlay-background-color: map-get($spring-theme, dark);
       bottom: 0;
       left: 0;
       width: 100%;
-      background-color: rgba($project-overlay-background-color, $alpha: 1);
       color: var(--q-accent);
       text-align: center;
       padding: 0.5rem;
@@ -168,7 +185,6 @@ $project-overlay-background-color: map-get($spring-theme, dark);
 
     .section-container:nth-child(2) {
       border-radius: 10px;
-      background-color: rgba($color: $projects-section-background-color, $alpha: 1);
     }
 
     .project-container {
@@ -226,7 +242,6 @@ $project-overlay-background-color: map-get($spring-theme, dark);
 
     .section-container:nth-child(2) {
       border-radius: 10px;
-      background-color: rgba($color: $projects-section-background-color, $alpha: 1);
     }
 
     .project-container {

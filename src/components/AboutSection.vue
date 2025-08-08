@@ -66,7 +66,7 @@ const workHistoryTimeline = ref<TimelineEntry[]>([
             command of state management libraries (NgRx, Pinia), RESTful APIs, responsive UI, and
             building apps that solve real-world problems.
           </p>
-          <p class="text-primary q-pt-lg">
+          <p class="text-primary">
             I've built high-performance web apps and streamlining complex systems. I’ve worked in
             environments ranging from government labs to startups, with recent experience converting
             legacy systems, integrating Epic OAuth for medical software, and building scalable

@@ -27,7 +27,6 @@ const topics: Topic[] = [
     name: TopicName.About,
     icon: 'info',
     label: TopicName.About,
-    theme: Theme.Winter,
     seasonIcon: 'ac_unit',
   },
   {
@@ -35,7 +34,6 @@ const topics: Topic[] = [
     name: TopicName.Projects,
     icon: 'folder',
     label: TopicName.Projects,
-    theme: Theme.Spring,
     seasonIcon: 'eco',
   },
   {
@@ -43,7 +41,6 @@ const topics: Topic[] = [
     name: TopicName.Skills,
     icon: 'code',
     label: TopicName.Skills,
-    theme: Theme.Summer,
     seasonIcon: 'wb_sunny',
   },
 ];
@@ -89,15 +86,11 @@ watch(mobileScrollTarget, (newTopic) => {
   }
 });
 
-const selectTopic = (name: TopicName, theme?: Theme) => {
+const selectTopic = (name: TopicName) => {
   if (name === activeTopic.value) {
     mainStore.SET_ACTIVE_TOPIC(null);
-    mainStore.SET_ACTIVE_THEME(Theme.Fall);
-  } else {
-    if (name !== TopicName.Resume) {
-      mainStore.SET_ACTIVE_TOPIC(name);
-    }
-    mainStore.SET_ACTIVE_THEME(theme ?? Theme.Fall);
+  } else if (name !== TopicName.Resume) {
+    mainStore.SET_ACTIVE_TOPIC(name);
   }
 };
 </script>
@@ -152,7 +145,7 @@ const selectTopic = (name: TopicName, theme?: Theme) => {
               @after-show="
                 () => {
                   if (activeTopic !== topic.name) {
-                    selectTopic(topic.name, topic.theme);
+                    selectTopic(topic.name);
                   }
                   scrollTo(topic.name);
                 }
@@ -173,14 +166,13 @@ const selectTopic = (name: TopicName, theme?: Theme) => {
                 </div>
               </template>
               <template v-if="topic.name === TopicName.Projects">
-                <div class="bg-green full-width" :id="TopicName.Projects">
+                <div class="full-width" :id="TopicName.Projects">
                   <ProjectSection />
                 </div>
               </template>
             </q-expansion-item>
           </q-item>
         </q-list>
-        <p id="test">TEST</p>
         <q-separator color="secondary" class="full-width q-mt-xs q-mb-lg"></q-separator>
         <div class="full-width" :id="TopicName.Contact">
           <ContactSection />
@@ -192,10 +184,10 @@ const selectTopic = (name: TopicName, theme?: Theme) => {
             v-for="topic in topics"
             :key="topic.id"
             class="simon-quadrant"
-            :class="[topic.name, { 'active-topic': topic.theme === activeTheme }]"
+            :class="[topic.name, { 'active-topic': topic.name === activeTopic }]"
             tabindex="0"
             style="padding: 1rem"
-            @click.stop="selectTopic(topic.name, topic.theme)"
+            @click.stop="selectTopic(topic.name)"
           >
             <a v-if="topic.name !== TopicName.Resume" class="simon-link">
               <q-icon :name="topic.icon" size="32px" />

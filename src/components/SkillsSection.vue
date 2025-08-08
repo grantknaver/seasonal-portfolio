@@ -1,107 +1,118 @@
 <script lang="ts" setup>
-import { ref, onMounted, reactive, nextTick, computed } from 'vue';
+import { ref, onMounted, reactive, nextTick, computed, watch } from 'vue';
 import type { CSSProperties } from 'vue';
 import type { SkillNode } from '../shared/models/skillNode';
 import * as d3 from 'd3';
 import chroma from 'chroma-js';
-import { getCustomCssVar } from '../shared/utils/getCustomCssVar';
+import { useMainStore } from 'src/stores/main';
+import { storeToRefs } from 'pinia';
+import { themeMap } from 'src/shared/utils/themeMap';
+import type { Theme } from 'src/shared/constants/theme';
 
+const mainStore = useMainStore();
+const { activeTheme } = storeToRefs(mainStore);
 const container = ref<HTMLElement | null>(null);
 const svg = ref(null);
-
+const initialized = ref<boolean>(false);
 const generateRandomColor = (themeColor: string) => chroma(themeColor).darken().hex();
 
-const skills = ref<SkillNode[]>([
+watch(activeTheme, async (newTheme) => {
+  if (!initialized.value) return;
+  skills.value = generateSkills(newTheme);
+  await redrawElement();
+});
+
+const generateSkills = (theme: Theme): SkillNode[] => [
   {
     name: 'Angular',
     strength: 18,
     years: 7,
-    fillColor: generateRandomColor(getCustomCssVar('dark')),
+    fillColor: generateRandomColor(themeMap[theme].dark),
   },
   {
     name: 'Vue',
     strength: 20,
     years: 3,
-    fillColor: generateRandomColor(getCustomCssVar('accent')),
+    fillColor: generateRandomColor(themeMap[theme].accent),
   },
   {
     name: 'Quasar',
     strength: 10,
     years: 3,
-    fillColor: generateRandomColor(getCustomCssVar('secondary')),
+    fillColor: generateRandomColor(themeMap[theme].secondary),
   },
   {
     name: 'Pinia',
     strength: 15,
     years: 3,
-    fillColor: generateRandomColor(getCustomCssVar('accent')),
+    fillColor: generateRandomColor(themeMap[theme].accent),
   },
   {
     name: 'JavaScript',
     strength: 15,
     years: 8,
-    fillColor: generateRandomColor(getCustomCssVar('dark')),
+    fillColor: generateRandomColor(themeMap[theme].dark),
   },
   {
     name: 'TypeScript',
     strength: 15,
     years: 8,
-    fillColor: generateRandomColor(getCustomCssVar('secondary')),
+    fillColor: generateRandomColor(themeMap[theme].secondary),
   },
   {
     name: 'D3.js',
     strength: 4,
     years: 2,
-    fillColor: generateRandomColor(getCustomCssVar('secondary')),
+    fillColor: generateRandomColor(themeMap[theme].secondary),
   },
   {
     name: 'Highcharts',
     strength: 5,
     years: 1,
-    fillColor: generateRandomColor(getCustomCssVar('accent')),
+    fillColor: generateRandomColor(themeMap[theme].accent),
   },
   {
     name: 'Chart.js',
     strength: 4,
     years: 1,
-    fillColor: generateRandomColor(getCustomCssVar('dark')),
+    fillColor: generateRandomColor(themeMap[theme].dark),
   },
   {
     name: 'Firebase',
     strength: 5,
     years: 3,
-    fillColor: generateRandomColor(getCustomCssVar('secondary')),
+    fillColor: generateRandomColor(themeMap[theme].secondary),
   },
   {
     name: 'MongoDB',
     strength: 9,
     years: 4,
-    fillColor: generateRandomColor(getCustomCssVar('secondary')),
+    fillColor: generateRandomColor(themeMap[theme].secondary),
   },
   {
     name: 'Node.js',
     strength: 8,
     years: 4,
-    fillColor: generateRandomColor(getCustomCssVar('accent')),
+    fillColor: generateRandomColor(themeMap[theme].accent),
   },
-  { name: 'NgRx', strength: 10, years: 5, fillColor: generateRandomColor(getCustomCssVar('dark')) },
+  { name: 'NgRx', strength: 10, years: 5, fillColor: generateRandomColor(themeMap[theme].dark) },
   {
     name: 'Figma',
     strength: 8,
     years: 4,
-    fillColor: generateRandomColor(getCustomCssVar('accent')),
+    fillColor: generateRandomColor(themeMap[theme].accent),
   },
   {
     name: 'Git',
     strength: 12,
     years: 7,
-    fillColor: generateRandomColor(getCustomCssVar('secondary')),
+    fillColor: generateRandomColor(themeMap[theme].secondary),
   },
   {
     name: 'WordPress',
     strength: 8,
     years: 3,
-    fillColor: generateRandomColor(getCustomCssVar('dark')),
+    fillColor: generateRandomColor(themeMap[theme].dark),
   },
   { name: 'SEO', strength: 5, years: 1, fillColor: '#FF9705' },
   { name: 'Sales', strength: 15, years: 6, fillColor: '#FF9705' },
@@ -110,9 +121,10 @@ const skills = ref<SkillNode[]>([
     name: 'DynamoDB',
     strength: 4,
     years: 1,
-    fillColor: generateRandomColor(getCustomCssVar('dark')),
+    fillColor: generateRandomColor(themeMap[theme].dark),
   },
-]);
+];
+const skills = ref<SkillNode[]>([]);
 
 const tooltip = reactive<{
   visible: boolean;
@@ -134,53 +146,53 @@ const tooltipStyle = computed<CSSProperties>(() => ({
   zIndex: 1000,
 }));
 
-const calculateFontSize = (strength: number) => {
-  const size = Math.floor((strength + 10) * 0.75);
-  return Math.max(size, 10);
-};
-
 const width = container.value?.clientWidth || 800;
 const height = container.value?.clientHeight || 600;
-const data: SkillNode[] = skills.value.map((d) => ({
-  ...d,
-  x: Math.random() * width,
-  y: Math.random() * height,
-  vx: (Math.random() - 0.5) * 2,
-  vy: (Math.random() - 0.5) * 2,
-}));
 
-function repellingForce() {
-  let nodes: SkillNode[] = [];
+const redrawElement = async () => {
+  await nextTick();
+  skills.value = generateSkills(activeTheme.value);
+  const svgEl = d3.select(svg.value).attr('viewBox', [0, 0, width, height]);
+  const data: SkillNode[] = skills.value.map((d) => ({
+    ...d,
+    x: Math.random() * width,
+    y: Math.random() * height,
+    vx: (Math.random() - 0.5) * 2,
+    vy: (Math.random() - 0.5) * 2,
+  }));
 
-  function force(alpha: number) {
-    if (!tooltip.data) return;
+  const repellingForce = () => {
+    let nodes: SkillNode[] = [];
 
-    const center = { x: tooltip.data.x!, y: tooltip.data.y! };
+    function force(alpha: number) {
+      if (!tooltip.data) return;
 
-    nodes.forEach((node) => {
-      if (node === tooltip.data) return;
+      const center = { x: tooltip.data.x!, y: tooltip.data.y! };
 
-      const dx = node.x! - center.x;
-      const dy = node.y! - center.y;
-      const dist2 = dx * dx + dy * dy + 1;
+      nodes.forEach((node) => {
+        if (node === tooltip.data) return;
 
-      const strength = 1000; // tweak as needed
-      node.vx! += (dx / dist2) * strength * alpha;
-      node.vy! += (dy / dist2) * strength * alpha;
-    });
-  }
+        const dx = node.x! - center.x;
+        const dy = node.y! - center.y;
+        const dist2 = dx * dx + dy * dy + 1;
 
-  force.initialize = (n: SkillNode[]) => {
-    nodes = n;
+        const strength = 1000; // tweak as needed
+        node.vx! += (dx / dist2) * strength * alpha;
+        node.vy! += (dy / dist2) * strength * alpha;
+      });
+    }
+
+    force.initialize = (n: SkillNode[]) => {
+      nodes = n;
+    };
+
+    return force;
   };
 
-  return force;
-}
-
-onMounted(async () => {
-  await nextTick();
-
-  const svgEl = d3.select(svg.value).attr('viewBox', [0, 0, width, height]);
+  const calculateFontSize = (strength: number) => {
+    const size = Math.floor((strength + 10) * 0.75);
+    return Math.max(size, 10);
+  };
 
   const simulation = d3
     .forceSimulation<SkillNode>(data)
@@ -244,6 +256,13 @@ onMounted(async () => {
     });
 
     nodeGroup.attr('transform', (d) => `translate(${d.x},${d.y})`);
+  }
+};
+onMounted(async () => {
+  if (!initialized.value) {
+    initialized.value = true;
+    console.log('Running redrawElement only once');
+    await redrawElement();
   }
 });
 </script>
