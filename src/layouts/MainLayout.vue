@@ -97,7 +97,7 @@ watch(slide, (newVal) => {
 
 <template>
   <!-- Main Layout -->
-  <q-layout view="Hhh LpR lff">
+  <q-layout view="Hhh Lpr lff">
     <div class="carousel-background">
       <q-carousel
         v-model="slide"

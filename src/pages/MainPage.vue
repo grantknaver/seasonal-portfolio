@@ -96,9 +96,9 @@ const selectTopic = (name: TopicName) => {
 </script>
 
 <template>
-  <q-page class="page-container scroll column col q-pa-md">
+  <q-page class="page-container scroll column col">
     <img class="q-pt-sm logo" style="max-width: 200px" src="../assets/logo.png" alt="logo" />
-    <div class="sub-container column col items-center">
+    <div class="sub-container column col items-center q-pl-md q-pr-md">
       <section class="mobile-view column items-center full-width">
         <div inline-actions class="flex full-width text-white bg-accent q-mt-lg q-mb-sm q-pa-md">
           <span>
