@@ -65,9 +65,18 @@ const projects = ref<ProjectDetails[]>([
               :key="project.id"
               :href="project.url"
               class="project-tile"
+              :class="{ storytaim: project.alt === 'StorytAIm' }"
             >
+              <div v-if="project.alt === 'StorytAIm'" class="under-construction">
+                <img src="../assets/under-construction.png" alt="under-construction" />
+                <span class="under-construction-text text-primary text-center"
+                  >Under Construction</span
+                >
+                <q-tooltip class="bg-dark"> StorytAIm </q-tooltip>
+              </div>
               <img :src="project.src" :alt="project.alt" />
               <div
+                v-if="project.alt !== 'StorytAIm'"
                 class="project-overlay text-primary"
                 :style="{ backgroundColor: themeMap[activeTheme]['--q-dark'] }"
               >
@@ -105,9 +114,18 @@ const projects = ref<ProjectDetails[]>([
               :key="project.id"
               :href="project.url"
               class="project-tile"
+              :class="{ storytaim: project.alt === 'StorytAIm' }"
             >
+              <div v-if="project.alt === 'StorytAIm'" class="under-construction">
+                <img src="../assets/under-construction.png" alt="under-construction" />
+                <span class="under-construction-text text-primary text-center"
+                  >Under Construction</span
+                >
+                <q-tooltip class="bg-dark"> StorytAIm </q-tooltip>
+              </div>
               <img :src="project.src" :alt="project.alt" />
               <div
+                v-if="project.alt != 'StorytAIm'"
                 class="project-overlay text-primary"
                 :style="{ backgroundColor: themeMap[activeTheme]['--q-dark'] }"
               >
@@ -193,10 +211,19 @@ $project-overlay-background-color: map-get($spring-theme, dark);
       justify-content: center;
       gap: 1.5rem;
 
+      @media (max-width: $breakpoint-md) {
+        flex-direction: column;
+        align-items: center;
+      }
+
       a {
         display: inline-block;
         transition: transform 0.3s ease;
         max-width: 350px;
+
+        @media (max-width: $breakpoint-md) {
+          width: 80%;
+        }
 
         img {
           width: 100%;
@@ -209,12 +236,35 @@ $project-overlay-background-color: map-get($spring-theme, dark);
         }
       }
 
-      @media (max-width: $breakpoint-md) {
-        flex-direction: column;
-        align-items: center;
+      .storytaim {
+        position: relative;
 
-        a {
-          width: 80%;
+        &::after {
+          content: '';
+          position: absolute;
+          inset: 0;
+          background-color: rgba(0, 0, 0, 0.6); // Your faded overlay
+          z-index: 1;
+          pointer-events: none;
+          border-radius: 10px;
+        }
+
+        .under-construction {
+          display: flex;
+          flex-direction: column;
+          position: absolute;
+          z-index: 2;
+          height: auto;
+          max-width: 150px;
+          top: 50%;
+          left: 50%;
+          transform: translate(-50%, -50%);
+          width: 100%;
+
+          .under-construction-text {
+            text-shadow: 2px 2px 5px var(--q-dark);
+            font-size: 1rem;
+          }
         }
       }
     }
@@ -250,6 +300,15 @@ $project-overlay-background-color: map-get($spring-theme, dark);
       justify-content: center;
       gap: 1.5rem;
 
+      @media (max-width: $breakpoint-md) {
+        flex-direction: column;
+        align-items: center;
+
+        a {
+          width: 80%;
+        }
+      }
+
       a {
         display: inline-block;
         transition: transform 0.3s ease;
@@ -266,12 +325,35 @@ $project-overlay-background-color: map-get($spring-theme, dark);
         }
       }
 
-      @media (max-width: $breakpoint-md) {
-        flex-direction: column;
-        align-items: center;
+      .storytaim {
+        position: relative;
 
-        a {
-          width: 80%;
+        &::after {
+          content: '';
+          position: absolute;
+          inset: 0;
+          background-color: rgba(0, 0, 0, 0.6); // Your faded overlay
+          z-index: 1;
+          pointer-events: none;
+          border-radius: 10px;
+        }
+
+        .under-construction {
+          display: flex;
+          flex-direction: column;
+          position: absolute;
+          z-index: 2;
+          height: auto;
+          max-width: 150px;
+          top: 50%;
+          left: 50%;
+          transform: translate(-50%, -50%);
+          width: 100%;
+
+          .under-construction-text {
+            text-shadow: 2px 2px 5px var(--q-dark);
+            font-size: 1rem;
+          }
         }
       }
     }
