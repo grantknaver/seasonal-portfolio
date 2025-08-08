@@ -10,7 +10,7 @@ import AboutSection from '../components/AboutSection.vue';
 import SkillsSection from '../components/SkillsSection.vue';
 import ProjectSection from 'src/components/ProjectSection.vue';
 import ContactSection from '../components/ContactSection.vue';
-import { scrollTo } from '../shared/utils/scrollTo';
+import { scrollToElement } from '../shared/utils/scrollToElement';
 
 const currentBg = ref('');
 const backgroundMap: Record<Theme, string> = {
@@ -52,37 +52,9 @@ onMounted(() => {
 });
 
 watch(mobileScrollTarget, (newTopic) => {
-  console.log('newTopic', newTopic);
   if (newTopic) {
-    const scrollTo3 = (): void => {
-      console.log('Firing scrollTo');
-      console.log('scrollHeight', document.querySelector('.q-page-container')?.scrollHeight);
-      console.log('.q-page-container', document.querySelector('.q-page-container')?.clientHeight);
-      // Try scrolling multiple places
-      const scrollableContainers = [
-        document.scrollingElement, // fallback
-        document.querySelector('.q-page-container'),
-        document.querySelector('.q-page'),
-        window,
-      ];
-
-      for (const container of scrollableContainers) {
-        if (container && 'scrollTo' in container) {
-          console.log('Trying scroll on', container);
-          try {
-            container.scrollTo({
-              top: 500,
-              behavior: 'smooth',
-            });
-          } catch (err) {
-            console.warn('Failed scroll attempt', err);
-          }
-        }
-      }
-      document.body.classList.remove('q-body--prevent-scroll');
-    };
-
-    scrollTo3();
+    console.log('newTopic', newTopic);
+    // scrollToElement(newTopic);
   }
 });
 
@@ -102,7 +74,7 @@ const selectTopic = (name: TopicName) => {
       <section class="mobile-view column items-center full-width">
         <div inline-actions class="flex full-width text-white bg-accent q-mt-lg q-mb-sm q-pa-md">
           <span>
-            <p class="q-ma-none text-primary bounce-text">Grant Knaver</p>
+            <p class="q-ma-none text-primary bounce-text" @click="scrollToElement">Grant Knaver</p>
             <p
               class="q-ma-none"
               :class="{
@@ -134,39 +106,23 @@ const selectTopic = (name: TopicName) => {
           >
             <q-expansion-item
               :model-value="expandedPanel === topic.name"
-              @update:model-value="
-                (val) => {
-                  expandedPanel = val ? topic.name : null;
-                  if (!val) {
-                    console.log('No expanded panel');
-                  }
-                }
-              "
-              @after-show="
-                () => {
-                  if (activeTopic !== topic.name) {
-                    selectTopic(topic.name);
-                  }
-                  scrollTo(topic.name);
-                }
-              "
               :icon="topic.seasonIcon"
               :label="topic.label"
               :header-class="['text-dark', 'bg-secondary']"
               class="full-width"
             >
               <template v-if="topic.name === TopicName.About">
-                <div class="full-width" :id="TopicName.About">
+                <div :id="topic.name" class="full-width">
                   <AboutSection />
                 </div>
               </template>
               <template v-if="topic.name === TopicName.Skills">
-                <div :id="TopicName.Skills">
+                <div :id="topic.name" class="full-width">
                   <SkillsSection />
                 </div>
               </template>
               <template v-if="topic.name === TopicName.Projects">
-                <div class="full-width" :id="TopicName.Projects">
+                <div :id="topic.name" class="full-width">
                   <ProjectSection />
                 </div>
               </template>

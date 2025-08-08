@@ -75,7 +75,7 @@ const projects = ref<ProjectDetails[]>([
                 :src="project.src"
                 :alt="project.alt"
                 class="project-image"
-                v-tooltip="' '"
+                tooltip="kdfk"
                 ref="projectImgRefs"
               />
             </a>
@@ -131,7 +131,6 @@ const projects = ref<ProjectDetails[]>([
                 <span class="under-construction-text text-primary text-center"
                   >Under Construction</span
                 >
-                <q-tooltip class="bg-dark"> StorytAIm </q-tooltip>
               </div>
               <img :src="project.src" :alt="project.alt" />
               <div
