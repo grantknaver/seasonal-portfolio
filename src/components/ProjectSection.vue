@@ -5,34 +5,39 @@ import { type ProjectDetails } from '../shared/models/projectDetails';
 import { themeMap } from 'src/shared/constants/theme';
 import { useMainStore } from '../stores/main';
 import { storeToRefs } from 'pinia';
+import { Project } from '../shared/constants/projects';
 
 const mainStore = useMainStore();
 const { activeTheme } = storeToRefs(mainStore);
 
+const storytaimProject = ref<ProjectDetails>({
+  name: Project.StorytAIm,
+  id: uuidv4(),
+  src: new URL('../assets/storytaim.svg', import.meta.url).href,
+  alt: Project.StorytAIm,
+});
 const projects = ref<ProjectDetails[]>([
   {
+    name: Project.RxjsCatalog,
     id: uuidv4(),
     url: 'https://rxjs-wkwd2p.stackblitz.io/',
     src: new URL('../assets/rxjs.svg', import.meta.url).href,
-    alt: 'RxJS catalog',
+    alt: Project.RxjsCatalog,
   },
   {
+    name: Project.RockWatch,
     id: uuidv4(),
     url: 'https://rock-watch-frontend.vercel.app/landing',
     src: new URL('../assets/rock-watch.svg', import.meta.url).href,
-    alt: 'Rock Watch',
+    alt: Project.RockWatch,
   },
+
   {
-    id: uuidv4(),
-    url: '',
-    src: new URL('../assets/storytaim.svg', import.meta.url).href,
-    alt: 'StorytAIm',
-  },
-  {
+    name: Project.DrainData,
     id: uuidv4(),
     url: 'https://www.draindata.org/',
     src: new URL('../assets/drainData-noSlogan.svg', import.meta.url).href,
-    alt: 'DrainData',
+    alt: Project.DrainData,
   },
 ]);
 </script>
@@ -59,30 +64,35 @@ const projects = ref<ProjectDetails[]>([
           class="section-container q-mt-md q-pa-sm"
           :style="{ backgroundColor: themeMap[activeTheme]['--q-primary'] }"
         >
-          <div class="project-container full-width q-pa-lg">
+          <div class="project-container">
             <a
               v-for="project in projects"
               :key="project.id"
-              :href="project.url"
-              class="project-tile"
-              :class="{ storytaim: project.alt === 'StorytAIm' }"
+              :href="project.url!"
+              class="relative-position q-ma-md"
             >
-              <div v-if="project.alt === 'StorytAIm'" class="under-construction">
-                <img src="../assets/under-construction.png" alt="under-construction" />
-                <span class="under-construction-text text-primary text-center"
-                  >Under Construction</span
-                >
-                <q-tooltip class="bg-dark"> StorytAIm </q-tooltip>
-              </div>
-              <img :src="project.src" :alt="project.alt" />
-              <div
-                v-if="project.alt !== 'StorytAIm'"
-                class="project-overlay text-primary"
-                :style="{ backgroundColor: themeMap[activeTheme]['--q-dark'] }"
-              >
-                {{ project.alt }}
-              </div>
+              <img
+                :src="project.src"
+                :alt="project.alt"
+                class="project-image"
+                v-tooltip="' '"
+                ref="projectImgRefs"
+              />
             </a>
+
+            <div class="storytaim relative-position full-width q-ma-md">
+              <div class="under-construction">
+                <img src="../assets/under-construction.png" alt="under-construction" />
+                <span class="under-construction-text text-primary text-center text-bold">
+                  Under Construction
+                </span>
+              </div>
+              <img
+                class="storytaim-logo full-width"
+                :src="storytaimProject.src"
+                :alt="storytaimProject.alt"
+              />
+            </div>
           </div>
         </q-card-section>
       </q-card>
@@ -112,7 +122,7 @@ const projects = ref<ProjectDetails[]>([
             <a
               v-for="project in projects"
               :key="project.id"
-              :href="project.url"
+              :href="project.url!"
               class="project-tile"
               :class="{ storytaim: project.alt === 'StorytAIm' }"
             >
@@ -141,38 +151,27 @@ const projects = ref<ProjectDetails[]>([
 
 <style scoped lang="scss">
 @import '../css/main.scss';
-$projects-section-background-color: map-get($spring-theme, secondary);
-$project-overlay-background-color: map-get($spring-theme, dark);
 
-.project-container {
-  .project-tile {
-    position: relative;
-    max-width: 200px;
-    display: inline-block;
-    overflow: hidden;
+img {
+  width: 100%;
+  height: auto;
+  display: block;
+}
 
-    img {
-      width: 100%;
-      height: auto;
-      display: block;
-    }
+.project-overlay {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  color: var(--q-accent);
+  text-align: center;
+  padding: 0.5rem;
+  opacity: 0;
+  transition: opacity 1s ease;
+}
 
-    .project-overlay {
-      position: absolute;
-      bottom: 0;
-      left: 0;
-      width: 100%;
-      color: var(--q-accent);
-      text-align: center;
-      padding: 0.5rem;
-      opacity: 0;
-      transition: opacity 1s ease;
-    }
-
-    &:hover .project-overlay {
-      opacity: 1;
-    }
-  }
+.project-container:hover .project-overlay {
+  opacity: 1;
 }
 
 .mobile-view {
@@ -205,25 +204,14 @@ $project-overlay-background-color: map-get($spring-theme, dark);
       border-radius: 10px;
     }
 
-    .project-container {
-      display: flex;
-      flex-wrap: wrap;
-      justify-content: center;
-      gap: 1.5rem;
-
+    .project-tile {
       @media (max-width: $breakpoint-md) {
-        flex-direction: column;
-        align-items: center;
+        width: 80%;
       }
 
       a {
-        display: inline-block;
         transition: transform 0.3s ease;
         max-width: 350px;
-
-        @media (max-width: $breakpoint-md) {
-          width: 80%;
-        }
 
         img {
           width: 100%;
@@ -232,18 +220,22 @@ $project-overlay-background-color: map-get($spring-theme, dark);
         }
 
         &:hover {
-          transform: scale(1.05);
+          transform: scale(1.1);
         }
       }
 
       .storytaim {
         position: relative;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        max-width: 350px;
 
         &::after {
           content: '';
           position: absolute;
           inset: 0;
-          background-color: rgba(0, 0, 0, 0.6); // Your faded overlay
+          background-color: rgba(0, 0, 0, 0.2); // Your faded overlay
           z-index: 1;
           pointer-events: none;
           border-radius: 10px;
@@ -252,19 +244,27 @@ $project-overlay-background-color: map-get($spring-theme, dark);
         .under-construction {
           display: flex;
           flex-direction: column;
+          align-items: center;
           position: absolute;
           z-index: 2;
           height: auto;
-          max-width: 150px;
-          top: 50%;
+          max-width: 350px;
+          top: 60%;
           left: 50%;
           transform: translate(-50%, -50%);
           width: 100%;
 
-          .under-construction-text {
-            text-shadow: 2px 2px 5px var(--q-dark);
-            font-size: 1rem;
+          img {
+            max-width: 200px;
           }
+
+          .under-construction-text {
+            font-size: 1.2rem;
+          }
+        }
+
+        .storytaim-logo {
+          max-width: 350px;
         }
       }
     }
