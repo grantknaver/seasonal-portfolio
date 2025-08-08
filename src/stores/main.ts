@@ -6,16 +6,17 @@ import { syncThemeGlobals } from '../shared/utils/theme';
 import { type TopicName } from 'src/shared/constants/topicName';
 
 export const useMainStore = defineStore('main', () => {
-  const activeTopic = ref<string | null>(null);
+  const activeTopic = ref<TopicName | null>(null);
   const activeTheme = ref<Theme>(Theme.Fall);
   const contactSectionRef = ref<HTMLElement | null>(null);
   const mobileScrollTarget = ref<TopicName | null>(null);
 
-  const SET_MOBILE_SCROLL_TARGET = (topicName: TopicName) => {
+  const SET_MOBILE_SCROLL_TARGET = (topicName: TopicName | null) => {
     mobileScrollTarget.value = topicName;
   };
 
-  const SET_ACTIVE_TOPIC = (topicName: string | null) => {
+  const SET_ACTIVE_TOPIC = (topicName: TopicName | null) => {
+    console.log('SET_ACTIVE_TOPIC');
     activeTopic.value = topicName;
   };
 

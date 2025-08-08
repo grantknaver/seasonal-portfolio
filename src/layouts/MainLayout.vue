@@ -147,7 +147,12 @@ watch(slide, (newVal) => {
               :key="topic.name"
               class="menu-item text-dark"
               clickable
-              @click="mainStore.SET_MOBILE_SCROLL_TARGET(topic.name)"
+              @click="
+                {
+                  mainStore.SET_ACTIVE_TOPIC(topic.name);
+                  mobileMenu = false;
+                }
+              "
               :class="{ activeTopic: topic.name === activeTopic }"
             >
               <q-item-section>{{ topic.label }}</q-item-section>
@@ -156,7 +161,12 @@ watch(slide, (newVal) => {
               class="menu-item text-dark"
               clickable
               :class="{ activeTopic: TopicName.Contact === activeTopic }"
-              @click="mainStore.SET_MOBILE_SCROLL_TARGET(TopicName.Contact)"
+              @click="
+                {
+                  mainStore.SET_MOBILE_SCROLL_TARGET(TopicName.Contact);
+                  mobileMenu = false;
+                }
+              "
             >
               <q-item-section>{{ TopicName.Contact }}</q-item-section>
             </q-item>

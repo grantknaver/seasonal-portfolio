@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref, onMounted, watch } from 'vue';
+import { ref, onMounted, nextTick, watch } from 'vue';
 import { Theme } from '../shared/constants/theme';
 import { useMainStore } from '../stores/main';
 import { type Topic } from '../shared/models/topic';
@@ -45,18 +45,31 @@ const topics: Topic[] = [
   },
 ];
 const { activeTheme, activeTopic, mobileScrollTarget } = storeToRefs(mainStore);
-const expandedPanel = ref<TopicName | null>(null);
+const expandedPanel = ref<TopicName | null>(null); // mobile accordion state
+
+watch(mobileScrollTarget, (newTopic) => {
+  if (!newTopic) return;
+  expandedPanel.value = newTopic; // opens the matching expansion
+  // drawer can close itself in MainLayout when you set the target
+});
 
 onMounted(() => {
   currentBg.value = backgroundMap[Theme.Fall];
 });
 
-watch(mobileScrollTarget, (newTopic) => {
-  if (newTopic) {
-    console.log('newTopic', newTopic);
-    // scrollToElement(newTopic);
-  }
+watch(activeTopic, (newTopic: TopicName | null) => {
+  if (!newTopic) return;
+
+  // open the panel
+  expandedPanel.value = newTopic;
 });
+
+const handleAfterShow = async (id: TopicName) => {
+  await nextTick(); // wait for Vue to flush DOM changes after expansion
+  scrollToElement(id); // now measure & scroll
+  // optionally:
+  // mainStore.SET_MOBILE_SCROLL_TARGET(null);
+};
 
 const selectTopic = (name: TopicName) => {
   if (name === activeTopic.value) {
@@ -74,7 +87,7 @@ const selectTopic = (name: TopicName) => {
       <section class="mobile-view column items-center full-width">
         <div inline-actions class="flex full-width text-white bg-accent q-mt-lg q-mb-sm q-pa-md">
           <span>
-            <p class="q-ma-none text-primary bounce-text" @click="scrollToElement">Grant Knaver</p>
+            <p class="q-ma-none text-primary bounce-text">Grant Knaver {{ expandedPanel }}</p>
             <p
               class="q-ma-none"
               :class="{
@@ -102,14 +115,26 @@ const selectTopic = (name: TopicName) => {
             v-for="topic in topics.slice(1)"
             :key="topic.id"
             :name="topic.name"
+            v-model="expandedPanel"
             class="full-width bg-transparent q-pa-none q-mb-sm"
           >
             <q-expansion-item
-              :model-value="expandedPanel === topic.name"
               :icon="topic.seasonIcon"
               :label="topic.label"
+              :model-value="expandedPanel === topic.name"
+              @update:model-value="
+                (val) => {
+                  console.log('val', val);
+                  expandedPanel = val
+                    ? topic.name
+                    : expandedPanel === topic.name
+                      ? null
+                      : expandedPanel;
+                }
+              "
               :header-class="['text-dark', 'bg-secondary']"
-              class="full-width"
+              class="expansion-item full-width"
+              @after-show="() => handleAfterShow(topic.name)"
             >
               <template v-if="topic.name === TopicName.About">
                 <div :id="topic.name" class="full-width">
@@ -117,12 +142,12 @@ const selectTopic = (name: TopicName) => {
                 </div>
               </template>
               <template v-if="topic.name === TopicName.Skills">
-                <div :id="topic.name" class="full-width">
+                <div :id="topic.name" class="anchor full-width">
                   <SkillsSection />
                 </div>
               </template>
               <template v-if="topic.name === TopicName.Projects">
-                <div :id="topic.name" class="full-width">
+                <div :id="topic.name" class="anchor full-width">
                   <ProjectSection />
                 </div>
               </template>
@@ -231,6 +256,16 @@ const selectTopic = (name: TopicName) => {
         background-color: rgba(0, 0, 0, 0.5);
         color: var(--q-primary);
         text-shadow: 1px 1px 20px var(--q-dark);
+      }
+
+      .expansion-item {
+        .anchor {
+          scroll-margin-top: 72px;
+
+          @media (min-width: $breakpoint-md) {
+            scroll-margin-top: 0;
+          }
+        }
       }
     }
 
@@ -364,8 +399,4 @@ const selectTopic = (name: TopicName) => {
     }
   }
 }
-
-// .q-expansion-item {
-//   width: 100%;
-// }
 </style>
