@@ -3,6 +3,13 @@ import { ref } from 'vue';
 import { v4 as uuidv4 } from 'uuid';
 
 import { type TimelineEntry } from '../shared/models/timelineEntry';
+import { setSeasonClasses } from 'src/shared/utils/setSeasonColors';
+import { useMainStore } from '../stores/main';
+import { storeToRefs } from 'pinia';
+
+const mainStore = useMainStore();
+const { activeTheme } = storeToRefs(mainStore);
+
 const workHistoryTimeline = ref<TimelineEntry[]>([
   {
     id: uuidv4(),
@@ -56,15 +63,28 @@ const workHistoryTimeline = ref<TimelineEntry[]>([
   <section>
     <div class="mobile-view full-width">
       <q-card class="full-width">
-        <q-card-section class="section-container q-pa-lg text-primary">
-          <h1 class="q-mt-none text-primary">About Me</h1>
+        <q-card-section
+          class="section-container q-pa-lg text-primary"
+          :class="
+            setSeasonClasses(
+              {
+                Fall: 'bg-accent text-primary',
+                Winter: 'bg-accent',
+                Spring: 'bg-green text-primary',
+                Summer: 'bg-dark',
+              },
+              activeTheme,
+            )
+          "
+        >
+          <h1 class="q-mt-none">About Me</h1>
           <q-separator color="primary" class="q-mb-md" />
           <p>
             Hi, I'm <strong class="name">Grant Knaver</strong> — a full-stack JavaScript developer
-            with <span class="years">7+ years</span> of professional experience, currently based in
-            Eugene, Oregon. I specialize in modern frameworks like Angular and Vue, with a strong
-            command of state management libraries (NgRx, Pinia), RESTful APIs, responsive UI, and
-            building apps that solve real-world problems.
+            with <span class="years text-warning">7+ years</span> of professional experience,
+            currently based in Eugene, Oregon. I specialize in modern frameworks like Angular and
+            Vue, with a strong command of state management libraries (NgRx, Pinia), RESTful APIs,
+            responsive UI, and building apps that solve real-world problems.
           </p>
           <p class="text-primary">
             I've built high-performance web apps and streamlining complex systems. I’ve worked in
@@ -84,7 +104,18 @@ const workHistoryTimeline = ref<TimelineEntry[]>([
             <ul class="q-pl-none q-pt-sm q-pb-md">
               <a href="https://www.draindata.org/" target="_blank" class="drainData project column">
                 <li
-                  class="column text-accent items-center q-pa-lg text-center bg-primary full-width"
+                  class="column items-center q-pa-lg text-center full-width"
+                  :class="
+                    setSeasonClasses(
+                      {
+                        Fall: 'bg-primary text-accent',
+                        Winter: 'bg-primary text-accent',
+                        Spring: 'bg-primary text-dark',
+                        Summer: 'bg-primary text-red',
+                      },
+                      activeTheme,
+                    )
+                  "
                 >
                   <img
                     class="logo q-pb-md"
@@ -152,11 +183,10 @@ const workHistoryTimeline = ref<TimelineEntry[]>([
           <q-separator color="primary" class="q-mb-md" />
           <p class="summary q-mb-none">
             Hi, I'm <strong class="name text-secondary">Grant Knaver</strong> — a full-stack
-            JavaScript developer with <span class="years text-warning">7+ years</span> of
-            professional experience, currently based in Eugene, Oregon. I specialize in modern
-            frameworks like Angular and Vue, with a strong command of state management libraries
-            (NgRx, Pinia), RESTful APIs, responsive UI, and building apps that solve real-world
-            problems.
+            JavaScript developer with <span class="text-warning">7+ years</span> of professional
+            experience, currently based in Eugene, Oregon. I specialize in modern frameworks like
+            Angular and Vue, with a strong command of state management libraries (NgRx, Pinia),
+            RESTful APIs, responsive UI, and building apps that solve real-world problems.
           </p>
           <p class="summary text-primary q-pt-lg">
             I've built high-performance web apps and streamlining complex systems. I’ve worked in
@@ -275,12 +305,10 @@ $winter-mobile-background: map-get($winter-theme, primary);
         line-height: 1.4rem;
 
         .name {
-          color: var(--q-seondary);
           font-size: 1.2rem;
         }
 
         .years {
-          color: var(--q-warning);
           font-size: 1.2rem;
         }
 

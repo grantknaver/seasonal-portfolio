@@ -12,7 +12,9 @@ import SkillsSection from '../components/SkillsSection.vue';
 import ContactSection from '../components/ContactSection.vue';
 import ProjectSection from '../components/ProjectSection.vue';
 import WeatherBackground from '../components/WeatherBackground.vue';
+import { type Slide } from 'src/shared/models/slide';
 import { QCarousel } from 'quasar';
+import { themeMap } from '../shared/utils/themeMap';
 
 const mainStore = useMainStore();
 const { activeTheme, activeTopic } = storeToRefs(mainStore);
@@ -28,12 +30,19 @@ const updateWidths = () => {
 };
 const mobileMenu = ref(false);
 
-export interface Slide {
-  id: string;
-  src: string;
-  theme: Theme;
-}
+watch(
+  activeTheme,
+  (t) => {
+    const theme = themeMap[t]; // { primary, secondary, accent, dark }
+    const root = document.documentElement;
 
+    root.style.setProperty('--q-primary', theme.primary);
+    root.style.setProperty('--q-secondary', theme.secondary);
+    root.style.setProperty('--q-accent', theme.accent);
+    root.style.setProperty('--q-dark', theme.dark);
+  },
+  { immediate: true },
+);
 const slide = ref<Theme>(Theme.Fall);
 const slides = ref<Slide[]>([
   {

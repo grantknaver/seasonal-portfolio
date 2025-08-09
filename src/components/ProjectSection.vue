@@ -2,10 +2,12 @@
 import { ref } from 'vue';
 import { v4 as uuidv4 } from 'uuid';
 import { type ProjectDetails } from '../shared/models/projectDetails';
-import { themeMap } from 'src/shared/constants/theme';
+import { themeMap } from '../shared/constants/theme';
 import { useMainStore } from '../stores/main';
 import { storeToRefs } from 'pinia';
 import { Project } from '../shared/constants/projects';
+import GeneralTooltip from '../shared/components/GeneralTooltip.vue';
+import { setSeasonClasses } from '../shared/utils/setSeasonColors';
 
 const mainStore = useMainStore();
 const { activeTheme } = storeToRefs(mainStore);
@@ -47,16 +49,29 @@ const projects = ref<ProjectDetails[]>([
     <!-- Mobile -->
     <div class="mobile-view full-width">
       <q-card class="full-width">
-        <q-card-section class="section-container q-pa-lg">
+        <q-card-section
+          class="section-container q-pa-lg"
+          :class="
+            setSeasonClasses(
+              {
+                Fall: 'bg-accent text-primary',
+                Winter: 'bg-accent',
+                Spring: 'bg-green',
+                Summer: 'bg-dark',
+              },
+              activeTheme,
+            )
+          "
+        >
           <h1 class="q-mt-none text-primary">Projects</h1>
           <q-separator color="primary" class="q-mb-md" />
           <p>
             This collection highlights a range of my work — from low-level reactive programming
             demos to full-stack applications. It includes an RxJS catalog built to visualize complex
-            stream logic, a <span class="">MEAN-stack</span> asteroid tracker showcasing real-time
-            data integration, and two evolving products: <span>DrainData</span>, a mobile-first
-            healthcare tool for post-op fluid tracking, and <span>StorytAIm</span>, a creative AI
-            platform for authors to bring their stories to life with voice narration.
+            stream logic, a MEAN-stack asteroid tracker showcasing real-time data integration, and
+            two evolving products: DrainData, a mobile-first healthcare tool for post-op fluid
+            tracking, and StorytAIm, a creative AI platform for authors to bring their stories to
+            life with voice narration.
           </p>
         </q-card-section>
 
@@ -64,34 +79,27 @@ const projects = ref<ProjectDetails[]>([
           class="section-container q-mt-md q-pa-sm"
           :style="{ backgroundColor: themeMap[activeTheme]['--q-primary'] }"
         >
-          <div class="project-container">
-            <a
+          <div class="project-container row justify-center q-pt-lg q-pb-lg">
+            <div
               v-for="project in projects"
               :key="project.id"
               :href="project.url!"
-              class="relative-position q-ma-md"
+              class="project-tile finished-projects"
             >
-              <img
-                :src="project.src"
-                :alt="project.alt"
-                class="project-image"
-                tooltip="kdfk"
-                ref="projectImgRefs"
-              />
-            </a>
+              <GeneralTooltip :text="project.name"></GeneralTooltip>
+              <a class="q-ma-none relative-position q-mb-md">
+                <img :src="project.src" :alt="project.alt" tooltip="kdfk" ref="projectImgRefs" />
+              </a>
+            </div>
 
-            <div class="storytaim relative-position full-width q-ma-md">
+            <div class="project-tile relative-position">
               <div class="under-construction">
                 <img src="../assets/under-construction.png" alt="under-construction" />
-                <span class="under-construction-text text-primary text-center text-bold">
+                <span class="under-construction-text text-secondary text-center text-bold">
                   Under Construction
                 </span>
               </div>
-              <img
-                class="storytaim-logo full-width"
-                :src="storytaimProject.src"
-                :alt="storytaimProject.alt"
-              />
+              <img class="storytaim-logo" :src="storytaimProject.src" :alt="storytaimProject.alt" />
             </div>
           </div>
         </q-card-section>
@@ -151,27 +159,21 @@ const projects = ref<ProjectDetails[]>([
 <style scoped lang="scss">
 @import '../css/main.scss';
 
-img {
-  width: 100%;
-  height: auto;
-  display: block;
-}
+// .project-overlay {
+//   position: absolute;
+//   bottom: 0;
+//   left: 0;
+//   width: 100%;
+//   color: var(--q-accent);
+//   text-align: center;
+//   padding: 0.5rem;
+//   opacity: 0;
+//   transition: opacity 1s ease;
+// }
 
-.project-overlay {
-  position: absolute;
-  bottom: 0;
-  left: 0;
-  width: 100%;
-  color: var(--q-accent);
-  text-align: center;
-  padding: 0.5rem;
-  opacity: 0;
-  transition: opacity 1s ease;
-}
-
-.project-container:hover .project-overlay {
-  opacity: 1;
-}
+// .project-container:hover .project-overlay {
+//   opacity: 1;
+// }
 
 .mobile-view {
   @media (min-width: $breakpoint-md) {
@@ -191,6 +193,68 @@ img {
 
     .section-container {
       background-color: var(--q-secondary);
+      .project-container {
+        .project-tile {
+          width: 100%;
+          max-width: 80%;
+
+          img {
+            width: 100%;
+            height: auto;
+            transition: transform 0.3s ease;
+          }
+        }
+
+        .finished-projects {
+          transition: transform 0.3s ease;
+        }
+
+        .finished-projects:hover {
+          transform: scale(1.05); // 5% larger on hover
+        }
+
+        .project-tile:last-child {
+          display: flex;
+          justify-content: start;
+          align-items: center;
+          position: relative;
+
+          &::after {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background-color: var(--q-primary);
+            opacity: 0.5;
+            z-index: 1;
+          }
+
+          .under-construction {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            position: absolute;
+            z-index: 2;
+            height: auto;
+
+            top: 60%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 100%;
+
+            img {
+              max-width: 50%;
+            }
+
+            .under-construction-text {
+              font-size: 1.5rem;
+              text-shadow: 2px 2px black;
+              @media (min-width: $breakpoint-sm) {
+                font-size: 2rem;
+              }
+            }
+          }
+        }
+      }
     }
 
     .section-container:nth-child(1) {
@@ -201,71 +265,6 @@ img {
 
     .section-container:nth-child(2) {
       border-radius: 10px;
-    }
-
-    .project-tile {
-      @media (max-width: $breakpoint-md) {
-        width: 80%;
-      }
-
-      a {
-        transition: transform 0.3s ease;
-        max-width: 350px;
-
-        img {
-          width: 100%;
-          height: auto;
-          display: block;
-        }
-
-        &:hover {
-          transform: scale(1.1);
-        }
-      }
-
-      .storytaim {
-        position: relative;
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        max-width: 350px;
-
-        &::after {
-          content: '';
-          position: absolute;
-          inset: 0;
-          background-color: rgba(0, 0, 0, 0.2); // Your faded overlay
-          z-index: 1;
-          pointer-events: none;
-          border-radius: 10px;
-        }
-
-        .under-construction {
-          display: flex;
-          flex-direction: column;
-          align-items: center;
-          position: absolute;
-          z-index: 2;
-          height: auto;
-          max-width: 350px;
-          top: 60%;
-          left: 50%;
-          transform: translate(-50%, -50%);
-          width: 100%;
-
-          img {
-            max-width: 200px;
-          }
-
-          .under-construction-text {
-            font-size: 1.2rem;
-          }
-        }
-
-        .storytaim-logo {
-          max-width: 350px;
-        }
-      }
     }
   }
 }
