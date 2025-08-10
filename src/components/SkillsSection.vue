@@ -8,6 +8,7 @@ import { useMainStore } from 'src/stores/main';
 import { storeToRefs } from 'pinia';
 import { themeMap } from 'src/shared/utils/themeMap';
 import type { Theme } from 'src/shared/constants/theme';
+import { setSeasonClasses } from 'src/shared/utils/setSeasonColors';
 
 const mainStore = useMainStore();
 const { activeTheme } = storeToRefs(mainStore);
@@ -274,7 +275,19 @@ onMounted(async () => {
         <q-card-section class="section-container q-pa-lg bg-accent">
           <h1 class="q-mt-none text-primary">Skills</h1>
           <q-separator color="primary" class="full-width q-mb-md" />
-          <p class="text-primary">
+          <p
+            :class="
+              setSeasonClasses(
+                {
+                  Fall: 'text-primary',
+                  Winter: 'text-primary',
+                  Spring: 'text-dark',
+                  Summer: 'text-dark',
+                },
+                activeTheme,
+              )
+            "
+          >
             I'm a full-stack JavaScript developer focused on front-end architecture and UX. I began
             with the MEAN stack, later shifting to the Vue ecosystem to build responsive,
             component-driven UIs. My backend work centers on MongoDB, recently expanding into
@@ -297,7 +310,20 @@ onMounted(async () => {
         </q-card-section>
 
         <q-card-section class="section-container bg-accent q-mt-md q-pa-lg">
-          <p class="text-primary text-center q-ma-none">
+          <p
+            class="text-center q-ma-none"
+            :class="
+              setSeasonClasses(
+                {
+                  Fall: 'text-primary',
+                  Winter: 'text-primary',
+                  Spring: 'text-dark',
+                  Summer: 'text-dark',
+                },
+                activeTheme,
+              )
+            "
+          >
             With a background in fine arts and sales, I bring a strong creative lens and
             user-focused mindset to my work. I enjoy prototyping in Figma, am proficient with Adobe
             Creative Suite, and apply SEO best practices to help build and scale user-centric
@@ -321,7 +347,22 @@ onMounted(async () => {
         class="card full-width col flex column items-center justify-center q-pa-sm bg-transparent"
       >
         <q-card-section class="section-container q-pa-lg">
-          <h1 class="q-mt-none text-primary text-center">Skills</h1>
+          <h1
+            class="q-mt-none text-center"
+            :class="
+              setSeasonClasses(
+                {
+                  Fall: 'text-secondary',
+                  Winter: 'text-secondary',
+                  Spring: 'text-secondary',
+                  Summer: 'text-accent',
+                },
+                activeTheme,
+              )
+            "
+          >
+            Skills
+          </h1>
           <q-separator color="primary" class="full-width q-mb-md" />
           <p class="text-primary text-center">
             I'm a full-stack JavaScript developer focused on front-end architecture and UX. I began
@@ -333,7 +374,7 @@ onMounted(async () => {
         </q-card-section>
 
         <q-card-section class="section-container flex column col">
-          <p class="text-accent">
+          <p class="text-dark">
             The graph below illustrates my current toolset. The size of each sphere represents my
             level of expertise in that area.
           </p>
@@ -357,7 +398,22 @@ onMounted(async () => {
         </q-card-section>
         <q-card-section class="section-container q-pa-lg">
           <q-separator color="primary" class="full-width q-mb-lg" />
-          <h2 class="q-mt-none text-secondary">Coming Soon</h2>
+          <h2
+            class="q-mt-none"
+            :class="
+              setSeasonClasses(
+                {
+                  Fall: 'text-secondary',
+                  Winter: 'text-secondary',
+                  Spring: 'text-secondary',
+                  Summer: 'text-accent',
+                },
+                activeTheme,
+              )
+            "
+          >
+            Coming Soon
+          </h2>
 
           <p class="text-primary">
             I’m currently deepening my DynamoDB expertise, leveling up my Figma design skills, and

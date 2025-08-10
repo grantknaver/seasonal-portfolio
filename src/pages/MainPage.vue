@@ -83,7 +83,7 @@ const selectTopic = (name: TopicName) => {
     <img class="q-pt-sm logo" style="max-width: 200px" src="../assets/logo.png" alt="logo" />
     <div class="sub-container column col items-center q-pl-md q-pr-md">
       <section class="mobile-view column items-center full-width">
-        <div inline-actions class="flex full-width text-white bg-accent q-mt-lg q-mb-sm q-pa-md">
+        <div inline-actions class="flex full-width text-primary bg-accent q-mt-lg q-mb-sm q-pa-md">
           <span>
             <p class="q-ma-none text-primary bounce-text">Grant Knaver</p>
             <p class="q-ma-none text-dark">Fullstack Developer</p>

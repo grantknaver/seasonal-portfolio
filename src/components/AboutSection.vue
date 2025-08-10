@@ -70,7 +70,7 @@ const workHistoryTimeline = ref<TimelineEntry[]>([
               {
                 Fall: 'bg-accent',
                 Winter: 'bg-accent',
-                Spring: 'bg-green',
+                Spring: 'bg-accent',
                 Summer: 'bg-dark',
               },
               activeTheme,
@@ -105,14 +105,14 @@ const workHistoryTimeline = ref<TimelineEntry[]>([
             <ul class="q-pl-none q-pt-sm q-pb-md">
               <a href="https://www.draindata.org/" target="_blank" class="drainData project column">
                 <li
-                  class="column items-center q-pa-lg text-center full-width"
+                  class="column items-center q-pa-lg text-center full-width bg-primary"
                   :class="
                     setSeasonClasses(
                       {
-                        Fall: 'bg-primary text-accent',
-                        Winter: 'bg-primary text-accent',
-                        Spring: 'bg-primary text-dark',
-                        Summer: 'bg-primary text-red',
+                        Fall: 'text-accent',
+                        Winter: 'text-accent',
+                        Spring: 'text-dark',
+                        Summer: 'text-dark',
                       },
                       activeTheme,
                     )
