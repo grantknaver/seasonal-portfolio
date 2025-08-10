@@ -186,7 +186,7 @@ const workHistoryTimeline = ref<TimelineEntry[]>([
                 {
                   Fall: 'text-secondary',
                   Winter: 'text-secondary',
-                  Spring: '',
+                  Spring: 'text-secondary',
                   Summer: 'text-accent',
                 },
                 activeTheme,
@@ -196,27 +196,28 @@ const workHistoryTimeline = ref<TimelineEntry[]>([
             About Me
           </h1>
           <q-separator color="primary" class="q-mb-md" />
+          <p class="summary text-primary q-mb-none">
+            Hi, I'm
+            <strong class="name text-secondary">Grant Knaver</strong>
+            — a full-stack JavaScript developer with seven and half years of professional
+            experience, currently based in Eugene, Oregon. I specialize in modern frameworks like
+            Angular and Vue, with a strong command of state management libraries (NgRx, Pinia),
+            RESTful APIs, responsive UI, and building apps that solve real-world problems.
+          </p>
           <p
-            class="summary q-mb-none"
+            class="summary q-pt-lg"
             :class="
               setSeasonClasses(
                 {
                   Fall: 'text-primary',
                   Winter: 'text-primary',
-                  Spring: 'text-red',
-                  Summer: 'text-secondary',
+                  Spring: 'text-primary',
+                  Summer: 'text-accent',
                 },
                 activeTheme,
               )
             "
           >
-            Hi, I'm <strong class="name text-primary">Grant Knaver</strong> — a full-stack
-            JavaScript developer with seven and half years of professional experience, currently
-            based in Eugene, Oregon. I specialize in modern frameworks like Angular and Vue, with a
-            strong command of state management libraries (NgRx, Pinia), RESTful APIs, responsive UI,
-            and building apps that solve real-world problems.
-          </p>
-          <p class="summary text-primary q-pt-lg">
             I've built high-performance web apps and streamlining complex systems. I’ve worked in
             environments ranging from government labs to startups, with recent experience converting
             legacy systems, integrating Epic OAuth for medical software, and building scalable
@@ -238,7 +239,7 @@ const workHistoryTimeline = ref<TimelineEntry[]>([
                       {
                         Fall: 'text-accent bg-primary',
                         Winter: 'text-accent bg-primary',
-                        Spring: '',
+                        Spring: 'text-dark',
                         Summer: 'text-dark',
                       },
                       activeTheme,
