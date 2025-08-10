@@ -55,9 +55,9 @@ const projects = ref<ProjectDetails[]>([
             setSeasonClasses(
               {
                 Fall: 'bg-accent text-primary',
-                Winter: 'bg-accent',
-                Spring: 'bg-green',
-                Summer: 'bg-dark',
+                Winter: 'bg-accent text-primary',
+                Spring: 'bg-accent text-primary',
+                Summer: 'bg-dark text-primary',
               },
               activeTheme,
             )
@@ -140,13 +140,15 @@ const projects = ref<ProjectDetails[]>([
                   >Under Construction</span
                 >
               </div>
+
               <img :src="project.src" :alt="project.alt" />
+
               <div
                 v-if="project.alt != 'StorytAIm'"
                 class="project-overlay text-primary"
                 :style="{ backgroundColor: themeMap[activeTheme]['--q-dark'] }"
               >
-                {{ project.alt }}
+                {{ project.name }}
               </div>
             </a>
           </div>
@@ -197,6 +199,7 @@ const projects = ref<ProjectDetails[]>([
         .project-tile {
           width: 100%;
           max-width: 80%;
+          cursor: pointer;
 
           @media (min-width: $breakpoint-sm) {
             max-width: 500px;
