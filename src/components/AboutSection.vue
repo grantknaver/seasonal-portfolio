@@ -68,9 +68,9 @@ const workHistoryTimeline = ref<TimelineEntry[]>([
           :class="
             setSeasonClasses(
               {
-                Fall: 'bg-accent text-primary',
+                Fall: 'bg-accent',
                 Winter: 'bg-accent',
-                Spring: 'bg-green text-primary',
+                Spring: 'bg-green',
                 Summer: 'bg-dark',
               },
               activeTheme,
@@ -80,11 +80,12 @@ const workHistoryTimeline = ref<TimelineEntry[]>([
           <h1 class="q-mt-none">About Me</h1>
           <q-separator color="primary" class="q-mb-md" />
           <p>
-            Hi, I'm <strong class="name">Grant Knaver</strong> — a full-stack JavaScript developer
-            with 7+ years of professional experience, currently based in Eugene, Oregon. I
-            specialize in modern frameworks like Angular and Vue, with a strong command of state
-            management libraries (NgRx, Pinia), RESTful APIs, responsive UI, and building apps that
-            solve real-world problems.
+            Hi, I'm
+            <strong class="name">Grant Knaver</strong>
+            — a full-stack JavaScript developer with seven and half years of professional
+            experience, currently based in Eugene, Oregon. I specialize in modern frameworks like
+            Angular and Vue, with a strong command of state management libraries (NgRx, Pinia),
+            RESTful APIs, responsive UI, and building apps that solve real-world problems.
           </p>
           <p class="text-primary">
             I've built high-performance web apps and streamlining complex systems. I’ve worked in

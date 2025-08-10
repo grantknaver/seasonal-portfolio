@@ -86,15 +86,7 @@ const selectTopic = (name: TopicName) => {
         <div inline-actions class="flex full-width text-white bg-accent q-mt-lg q-mb-sm q-pa-md">
           <span>
             <p class="q-ma-none text-primary bounce-text">Grant Knaver</p>
-            <p
-              class="q-ma-none"
-              :class="{
-                'text-warning': activeTheme !== Theme.Summer && activeTheme !== Theme.Fall,
-                'text-primary': activeTheme === Theme.Summer || activeTheme === Theme.Fall,
-              }"
-            >
-              Fullstack Developer
-            </p>
+            <p class="q-ma-none text-dark">Fullstack Developer</p>
           </span>
           <q-space></q-space>
           <q-btn size="lg" color="dark">Resume</q-btn>
