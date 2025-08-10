@@ -92,7 +92,7 @@ const projects = ref<ProjectDetails[]>([
               </a>
             </div>
 
-            <div class="project-tile relative-position">
+            <div class="project-tile relative-position q-mt-md">
               <div class="under-construction">
                 <img src="../assets/under-construction.png" alt="under-construction" />
                 <span class="under-construction-text text-secondary text-center text-bold">
@@ -198,6 +198,10 @@ const projects = ref<ProjectDetails[]>([
           width: 100%;
           max-width: 80%;
 
+          @media (min-width: $breakpoint-sm) {
+            max-width: 500px;
+          }
+
           img {
             width: 100%;
             height: auto;
@@ -223,9 +227,11 @@ const projects = ref<ProjectDetails[]>([
             content: '';
             position: absolute;
             inset: 0;
-            background-color: var(--q-primary);
+            background-color: var(--q-dark);
             opacity: 0.5;
             z-index: 1;
+
+            border-radius: 10px;
           }
 
           .under-construction {

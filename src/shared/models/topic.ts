@@ -1,4 +1,3 @@
-import { type Theme } from '../constants/theme';
 import { type TopicName } from '../constants/topicName';
 
 export interface Topic {
@@ -6,6 +5,5 @@ export interface Topic {
   name: TopicName;
   icon?: string;
   label?: string;
-  theme?: Theme;
   seasonIcon?: string;
 }

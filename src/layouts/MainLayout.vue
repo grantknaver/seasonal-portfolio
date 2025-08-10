@@ -14,7 +14,6 @@ import ProjectSection from '../components/ProjectSection.vue';
 import WeatherBackground from '../components/WeatherBackground.vue';
 import { type Slide } from 'src/shared/models/slide';
 import { QCarousel } from 'quasar';
-import { themeMap } from '../shared/utils/themeMap';
 
 const mainStore = useMainStore();
 const { activeTheme, activeTopic } = storeToRefs(mainStore);
@@ -29,20 +28,6 @@ const updateWidths = () => {
   windowWidth.value = window.innerWidth;
 };
 const mobileMenu = ref(false);
-
-watch(
-  activeTheme,
-  (t) => {
-    const theme = themeMap[t]; // { primary, secondary, accent, dark }
-    const root = document.documentElement;
-
-    root.style.setProperty('--q-primary', theme.primary);
-    root.style.setProperty('--q-secondary', theme.secondary);
-    root.style.setProperty('--q-accent', theme.accent);
-    root.style.setProperty('--q-dark', theme.dark);
-  },
-  { immediate: true },
-);
 const slide = ref<Theme>(Theme.Fall);
 const slides = ref<Slide[]>([
   {
@@ -73,21 +58,18 @@ const topics = ref<Topic[]>([
     name: TopicName.About,
     icon: 'info',
     label: TopicName.About,
-    theme: Theme.Winter,
   },
   {
     id: uuidv4(),
     name: TopicName.Projects,
     icon: 'folder',
     label: TopicName.Projects,
-    theme: Theme.Spring,
   },
   {
     id: uuidv4(),
     name: TopicName.Skills,
     icon: 'mail',
     label: TopicName.Skills,
-    theme: Theme.Summer,
   },
 ]);
 

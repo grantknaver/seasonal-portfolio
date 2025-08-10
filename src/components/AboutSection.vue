@@ -81,10 +81,10 @@ const workHistoryTimeline = ref<TimelineEntry[]>([
           <q-separator color="primary" class="q-mb-md" />
           <p>
             Hi, I'm <strong class="name">Grant Knaver</strong> — a full-stack JavaScript developer
-            with <span class="years text-warning">7+ years</span> of professional experience,
-            currently based in Eugene, Oregon. I specialize in modern frameworks like Angular and
-            Vue, with a strong command of state management libraries (NgRx, Pinia), RESTful APIs,
-            responsive UI, and building apps that solve real-world problems.
+            with 7+ years of professional experience, currently based in Eugene, Oregon. I
+            specialize in modern frameworks like Angular and Vue, with a strong command of state
+            management libraries (NgRx, Pinia), RESTful APIs, responsive UI, and building apps that
+            solve real-world problems.
           </p>
           <p class="text-primary">
             I've built high-performance web apps and streamlining complex systems. I’ve worked in
@@ -178,15 +178,43 @@ const workHistoryTimeline = ref<TimelineEntry[]>([
 
     <div class="desktop-view full-width">
       <q-card class="full-width q-pa-sm">
-        <q-card-section class="section-container text-primary q-pa-lg">
-          <h1 class="q-mt-none q-mb-xl text-primary text-center">About Me</h1>
+        <q-card-section class="section-container q-pa-lg">
+          <h1
+            class="q-mt-none q-mb-xl text-center"
+            :class="
+              setSeasonClasses(
+                {
+                  Fall: 'text-secondary',
+                  Winter: 'text-secondary',
+                  Spring: '',
+                  Summer: 'text-accent',
+                },
+                activeTheme,
+              )
+            "
+          >
+            About Me
+          </h1>
           <q-separator color="primary" class="q-mb-md" />
-          <p class="summary q-mb-none">
-            Hi, I'm <strong class="name text-secondary">Grant Knaver</strong> — a full-stack
-            JavaScript developer with <span class="text-warning">7+ years</span> of professional
-            experience, currently based in Eugene, Oregon. I specialize in modern frameworks like
-            Angular and Vue, with a strong command of state management libraries (NgRx, Pinia),
-            RESTful APIs, responsive UI, and building apps that solve real-world problems.
+          <p
+            class="summary q-mb-none"
+            :class="
+              setSeasonClasses(
+                {
+                  Fall: 'text-primary',
+                  Winter: 'text-primary',
+                  Spring: 'text-red',
+                  Summer: 'text-secondary',
+                },
+                activeTheme,
+              )
+            "
+          >
+            Hi, I'm <strong class="name text-primary">Grant Knaver</strong> — a full-stack
+            JavaScript developer with seven and half years of professional experience, currently
+            based in Eugene, Oregon. I specialize in modern frameworks like Angular and Vue, with a
+            strong command of state management libraries (NgRx, Pinia), RESTful APIs, responsive UI,
+            and building apps that solve real-world problems.
           </p>
           <p class="summary text-primary q-pt-lg">
             I've built high-performance web apps and streamlining complex systems. I’ve worked in
@@ -204,7 +232,18 @@ const workHistoryTimeline = ref<TimelineEntry[]>([
             <ul class="column full-width q-pl-none justify-center">
               <a href="https://www.draindata.org/" class="project column">
                 <li
-                  class="drainData col column items-center justify-center text-accent bg-primary q-pa-md"
+                  class="drainData col column items-center justify-center bg-primary q-pa-md"
+                  :class="
+                    setSeasonClasses(
+                      {
+                        Fall: 'text-accent bg-primary',
+                        Winter: 'text-accent bg-primary',
+                        Spring: '',
+                        Summer: 'text-dark',
+                      },
+                      activeTheme,
+                    )
+                  "
                 >
                   <img
                     class="logo q-pt-lg q-pb-md"

@@ -11,6 +11,7 @@ import SkillsSection from '../components/SkillsSection.vue';
 import ProjectSection from 'src/components/ProjectSection.vue';
 import ContactSection from '../components/ContactSection.vue';
 import { scrollToElement } from '../shared/utils/scrollToElement';
+import { setSeasonClasses } from '../shared/utils/setSeasonColors';
 
 const currentBg = ref('');
 const backgroundMap: Record<Theme, string> = {
@@ -60,15 +61,12 @@ onMounted(() => {
 watch(activeTopic, (newTopic: TopicName | null) => {
   if (!newTopic) return;
 
-  // open the panel
   expandedPanel.value = newTopic;
 });
 
 const handleAfterShow = async (id: TopicName) => {
-  await nextTick(); // wait for Vue to flush DOM changes after expansion
-  scrollToElement(id); // now measure & scroll
-  // optionally:
-  // mainStore.SET_MOBILE_SCROLL_TARGET(null);
+  await nextTick();
+  scrollToElement(id);
 };
 
 const selectTopic = (name: TopicName) => {
@@ -87,7 +85,7 @@ const selectTopic = (name: TopicName) => {
       <section class="mobile-view column items-center full-width">
         <div inline-actions class="flex full-width text-white bg-accent q-mt-lg q-mb-sm q-pa-md">
           <span>
-            <p class="q-ma-none text-primary bounce-text">Grant Knaver {{ expandedPanel }}</p>
+            <p class="q-ma-none text-primary bounce-text">Grant Knaver</p>
             <p
               class="q-ma-none"
               :class="{
@@ -124,7 +122,6 @@ const selectTopic = (name: TopicName) => {
               :model-value="expandedPanel === topic.name"
               @update:model-value="
                 (val) => {
-                  console.log('val', val);
                   expandedPanel = val
                     ? topic.name
                     : expandedPanel === topic.name
@@ -176,12 +173,59 @@ const selectTopic = (name: TopicName) => {
                 {{ topic.label }}
               </q-tooltip>
             </a>
-            <a v-else class="text-primary text-body2" label="Resume" flat>Resume</a>
+            <a
+              v-else
+              :class="
+                setSeasonClasses(
+                  {
+                    Fall: 'text-primary fall-text-shadow',
+                    Winter: 'text-primary winter-text-shadow',
+                    Spring: 'text-warning spring-text-shadow',
+                    Summer: 'text-warning summer-text-shadow',
+                  },
+                  activeTheme,
+                )
+              "
+              label="Resume"
+              flat
+              >Resume</a
+            >
           </div>
         </div>
-        <hr class="q-mt-lg" />
-        <p class="q-ma-none text-primary">Grant Knaver</p>
-        <p class="q-ma-none text-warning">Fullstack Developer</p>
+        <q-separator class="q-mt-lg q-mb-md" />
+
+        <p
+          class="name q-ma-none"
+          :class="
+            setSeasonClasses(
+              {
+                Fall: 'text-primary fall-text-shadow',
+                Winter: 'text-primary winter-text-shadow',
+                Spring: 'text-primary spring-text-shadow',
+                Summer: 'text-primary summer-text-shadow',
+              },
+              activeTheme,
+            )
+          "
+        >
+          Grant Knaver
+        </p>
+        <p
+          class="full-stack q-ma-none text-bold text-warning"
+          :class="
+            setSeasonClasses(
+              {
+                Fall: 'fall-text-shadow',
+                Winter: 'winter-text-shadow',
+                Spring: 'spring-text-shadow',
+                Summer: ' summer-text-shadow',
+              },
+              activeTheme,
+            )
+          "
+        >
+          Fullstack Developer
+        </p>
       </section>
     </div>
     <q-btn
@@ -226,10 +270,6 @@ const selectTopic = (name: TopicName) => {
       padding: initial;
     }
 
-    p {
-      text-shadow: 2px 2px 2px var(--q-dark);
-    }
-
     p:nth-of-type(1) {
       font-weight: bold;
       font-size: 1.5rem;
@@ -239,8 +279,6 @@ const selectTopic = (name: TopicName) => {
 
     p:nth-of-type(2) {
       font-size: 1rem;
-      color: var(--q-secondary);
-      text-shadow: 2px 2px 2px var(--q-dark);
     }
 
     .mobile-view {
@@ -283,6 +321,14 @@ const selectTopic = (name: TopicName) => {
         width: 100px;
       }
 
+      .name {
+        font-size: 1.6rem;
+      }
+
+      .full-stack {
+        font-size: 1.2rem;
+      }
+
       .simon-circle {
         position: relative;
         border-radius: 10px;
@@ -323,14 +369,11 @@ const selectTopic = (name: TopicName) => {
         }
 
         &.Resume {
-          background-color: transparent;
-          border: none;
           top: 0;
           left: 0;
-
-          a {
-            text-shadow: 2px 2px var(--q-dark);
-          }
+          background-color: transparent;
+          border: none;
+          font-size: 1.6rem;
         }
 
         &.About {
@@ -381,7 +424,6 @@ const selectTopic = (name: TopicName) => {
 
       a {
         color: var(--q-primary);
-        font-size: 1.8rem;
         cursor: pointer;
       }
     }
@@ -398,5 +440,37 @@ const selectTopic = (name: TopicName) => {
       display: initial;
     }
   }
+}
+
+.fall-text-shadow {
+  text-shadow:
+    -1px -1px 0 var(--q-dark),
+    1px -1px 0 var(--q-dark),
+    -1px 1px 0 var(--q-dark),
+    1px 1px 0 var(--q-dark);
+}
+
+.winter-text-shadow {
+  text-shadow:
+    -1px -1px 0 var(--q-dark),
+    1px -1px 0 var(--q-dark),
+    -1px 1px 0 var(--q-dark),
+    1px 1px 0 var(--q-dark);
+}
+
+.spring-text-shadow {
+  text-shadow:
+    -1px -1px 0 black,
+    1px -1px 0 black,
+    -1px 1px 0 black,
+    1px 1px 0 black;
+}
+
+.summer-text-shadow {
+  text-shadow:
+    -1px -1px 0 black,
+    1px -1px 0 black,
+    -1px 1px 0 black,
+    1px 1px 0 black;
 }
 </style>
