@@ -17,18 +17,22 @@ import { QCarousel } from 'quasar';
 
 const mainStore = useMainStore();
 const { activeTheme, activeTopic } = storeToRefs(mainStore);
+
 const windowWidth = ref(window.innerWidth);
 const desktopDrawerWidth = ref(window.innerWidth * 0.5);
 const showTopicBreakpoint = +`${getCustomCssVar('breakpoint-md')}`.slice(0, -2);
 const showTopicPanel = computed(
   () => !!activeTopic.value && windowWidth.value > showTopicBreakpoint,
 );
+
 const updateWidths = () => {
   desktopDrawerWidth.value = window.innerWidth * 0.5;
   windowWidth.value = window.innerWidth;
 };
+
 const mobileMenu = ref(false);
 const slide = ref<Theme>(Theme.Fall);
+
 const slides = ref<Slide[]>([
   {
     id: uuidv4(),
@@ -53,24 +57,9 @@ const slides = ref<Slide[]>([
 ]);
 
 const topics = ref<Topic[]>([
-  {
-    id: uuidv4(),
-    name: TopicName.About,
-    icon: 'info',
-    label: TopicName.About,
-  },
-  {
-    id: uuidv4(),
-    name: TopicName.Projects,
-    icon: 'folder',
-    label: TopicName.Projects,
-  },
-  {
-    id: uuidv4(),
-    name: TopicName.Skills,
-    icon: 'mail',
-    label: TopicName.Skills,
-  },
+  { id: uuidv4(), name: TopicName.About, icon: 'info', label: TopicName.About },
+  { id: uuidv4(), name: TopicName.Projects, icon: 'folder', label: TopicName.Projects },
+  { id: uuidv4(), name: TopicName.Skills, icon: 'mail', label: TopicName.Skills },
 ]);
 
 onMounted(() => {
@@ -104,7 +93,8 @@ watch(slide, (newVal) => {
         <q-carousel-slide v-for="s in slides" :key="s.id" :name="s.theme" :img-src="s.src" />
       </q-carousel>
     </div>
-    <!-- HEADER -->
+
+    <!-- HEADER (mobile) -->
     <q-header class="main-header text-black">
       <q-toolbar class="bg-dark q-pa-lg">
         <q-toolbar-title>
@@ -115,6 +105,7 @@ watch(slide, (newVal) => {
             alt="glkFreelance logo"
           />
         </q-toolbar-title>
+
         <q-btn
           color="primary"
           class="menu-button"
@@ -124,8 +115,10 @@ watch(slide, (newVal) => {
           icon="menu"
           @click="mobileMenu = !mobileMenu"
         />
+
+        <!-- MOBILE DRAWER (overlay, always above footer) -->
         <q-drawer
-          class="bg-primary"
+          class="bg-primary drawer-mobile"
           v-model="mobileMenu"
           side="right"
           overlay
@@ -148,6 +141,7 @@ watch(slide, (newVal) => {
             >
               <q-item-section>{{ topic.label }}</q-item-section>
             </q-item>
+
             <q-item
               class="menu-item text-dark"
               clickable
@@ -161,7 +155,9 @@ watch(slide, (newVal) => {
             >
               <q-item-section>{{ TopicName.Contact }}</q-item-section>
             </q-item>
+
             <hr />
+
             <q-item key="resume" clickable @click="mobileMenu = false">
               <q-item-section class="text-bold text-secondary">Download Resume</q-item-section>
             </q-item>
@@ -178,25 +174,27 @@ watch(slide, (newVal) => {
       <router-view />
     </q-page-container>
 
-    <!-- RIGHT DRAWER (Desktop Panel) -->
+    <!-- RIGHT DRAWER (Desktop Panel) - non-overlay/push -->
     <q-drawer
       :model-value="showTopicPanel"
       side="right"
       behavior="desktop"
       :width="desktopDrawerWidth"
-      class="desktop-drawer column col"
+      class="desktop-drawer"
+      content-class="column no-wrap"
     >
-      <q-scroll-area v-if="activeTopic !== TopicName.Contact" class="scroll-area q-pa-md">
+      <q-scroll-area v-if="activeTopic !== TopicName.Contact" class="fit q-pa-md">
         <AboutSection v-if="activeTopic === TopicName.About" />
-        <SkillsSection v-if="activeTopic === TopicName.Skills" />
-        <ProjectSection v-if="activeTopic === TopicName.Projects" />
+        <SkillsSection v-else-if="activeTopic === TopicName.Skills" />
+        <ProjectSection v-else-if="activeTopic === TopicName.Projects" />
       </q-scroll-area>
-      <div v-else class="flex column col justify-center items-center">
-        <ContactSection v-if="activeTopic === TopicName.Contact" />
+
+      <div v-else class="fit flex column justify-center items-center q-pa-md">
+        <ContactSection />
       </div>
     </q-drawer>
 
-    <!-- FOOTER -->
+    <!-- FOOTER (always below drawers in stacking) -->
     <q-footer class="bg-dark text-white">
       <q-toolbar class="justify-between">
         <q-toolbar-title class="text-subtitle2 text-weight-light">
@@ -276,6 +274,7 @@ body,
   }
 }
 
+/* Quasar renders <aside> for drawers */
 aside {
   @media (min-width: $breakpoint-sm) {
     height: 100%;
@@ -283,22 +282,30 @@ aside {
   }
 }
 
+/* Desktop drawer (push mode) */
 .desktop-drawer {
   height: 100%;
   background-color: rgba(black, 0.5);
   box-shadow: none !important;
   border-left: solid 4px var(--q-primary);
+  z-index: 2000; /* ensure above footer if any stacking context appears */
 
+  /* Make internal scroll area own full height to prevent content overflow */
+  .q-scrollarea,
   .scroll-area {
-    height: calc(100% - 72px);
-
-    @media (min-width: $breakpoint-md) {
-      height: calc(100% - 50px);
-    }
+    height: 100%;
   }
 }
 
+/* Mobile drawer should always overlay above footer */
+.drawer-mobile {
+  z-index: 2000;
+}
+
+/* Footer must never sit on top of drawers */
 .q-footer {
+  position: relative;
+  z-index: 1000; /* lower than drawers, higher than backgrounds */
   border-top: 1px solid var(--q-primary);
 
   @media (min-width: $breakpoint-md) {

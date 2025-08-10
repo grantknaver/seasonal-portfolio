@@ -20,6 +20,7 @@ const backgroundMap: Record<Theme, string> = {
   [Theme.Spring]: new URL('../assets/beautiful-forest-spring-season.jpg', import.meta.url).href,
   [Theme.Summer]: new URL('../assets/beautiful-shot-forest.jpg', import.meta.url).href,
 };
+const simonRef = ref();
 const mainStore = useMainStore();
 const topics: Topic[] = [
   { id: uuidv4(), name: TopicName.Resume, icon: 'description', label: '' },
@@ -56,6 +57,7 @@ watch(mobileScrollTarget, (newTopic) => {
 
 onMounted(() => {
   currentBg.value = backgroundMap[Theme.Fall];
+  // window.addEventListener('resize', updateWidths);
 });
 
 watch(activeTopic, (newTopic: TopicName | null) => {
@@ -149,7 +151,7 @@ const selectTopic = (name: TopicName) => {
         </div>
       </section>
       <section class="desktop-view flex col column justify-center items-center full-width">
-        <div class="simon-circle q-mt-xl">
+        <div ref="simonRef" class="simon">
           <div
             v-for="topic in topics"
             :key="topic.id"
@@ -185,39 +187,40 @@ const selectTopic = (name: TopicName) => {
           </div>
         </div>
         <q-separator class="q-mt-lg q-mb-md" />
-
-        <p
-          class="name q-ma-none"
-          :class="
-            setSeasonClasses(
-              {
-                Fall: 'text-primary fall-text-shadow',
-                Winter: 'text-primary winter-text-shadow',
-                Spring: 'text-primary spring-text-shadow',
-                Summer: 'text-primary summer-text-shadow',
-              },
-              activeTheme,
-            )
-          "
-        >
-          Grant Knaver
-        </p>
-        <p
-          class="full-stack q-ma-none text-bold text-warning"
-          :class="
-            setSeasonClasses(
-              {
-                Fall: 'fall-text-shadow',
-                Winter: 'winter-text-shadow',
-                Spring: 'spring-text-shadow',
-                Summer: ' summer-text-shadow',
-              },
-              activeTheme,
-            )
-          "
-        >
-          Fullstack Developer
-        </p>
+        <span>
+          <p
+            class="name q-ma-none"
+            :class="
+              setSeasonClasses(
+                {
+                  Fall: 'text-primary fall-text-shadow',
+                  Winter: 'text-primary winter-text-shadow',
+                  Spring: 'text-primary spring-text-shadow',
+                  Summer: 'text-primary summer-text-shadow',
+                },
+                activeTheme,
+              )
+            "
+          >
+            Grant Knaver
+          </p>
+          <p
+            class="full-stack q-ma-none text-bold text-warning"
+            :class="
+              setSeasonClasses(
+                {
+                  Fall: 'fall-text-shadow',
+                  Winter: 'winter-text-shadow',
+                  Spring: 'spring-text-shadow',
+                  Summer: ' summer-text-shadow',
+                },
+                activeTheme,
+              )
+            "
+          >
+            Fullstack Developer
+          </p>
+        </span>
       </section>
     </div>
     <q-btn
@@ -235,6 +238,11 @@ const selectTopic = (name: TopicName) => {
 
 <style scoped lang="scss">
 @import '../css/main.scss';
+
+.q-page-container {
+  margin: 0 !important;
+  padding: 0 !important;
+}
 
 .page-container {
   background-color: rgba($color: white, $alpha: 0.7);
@@ -321,7 +329,7 @@ const selectTopic = (name: TopicName) => {
         font-size: 1.2rem;
       }
 
-      .simon-circle {
+      .simon {
         position: relative;
         border-radius: 10px;
         overflow: visible;
