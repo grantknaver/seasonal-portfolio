@@ -6,7 +6,6 @@ import { themeMap } from '../shared/constants/theme';
 import { useMainStore } from '../stores/main';
 import { storeToRefs } from 'pinia';
 import { Project } from '../shared/constants/projects';
-import GeneralTooltip from '../shared/components/GeneralTooltip.vue';
 import { setSeasonClasses } from '../shared/utils/setSeasonColors';
 
 const mainStore = useMainStore();
@@ -79,12 +78,12 @@ const projects = ref<ProjectDetails[]>([
           class="section-container q-mt-md q-pa-sm"
           :style="{ backgroundColor: themeMap[activeTheme]['--q-primary'] }"
         >
-          <div class="project-container row justify-center q-pt-lg q-pb-lg">
+          <div class="project-container column items-center q-pt-lg q-pb-lg">
             <div
               v-for="project in projects"
               :key="project.id"
               :href="project.url!"
-              class="project-tile finished-projects"
+              class="project-tile finished-projects cursor-pointer"
             >
               <GeneralTooltip :text="project.name"></GeneralTooltip>
               <a class="q-ma-none relative-position q-mb-md">
@@ -110,7 +109,7 @@ const projects = ref<ProjectDetails[]>([
     <div class="desktop-view full-width">
       <q-card class="full-width q-pa-sm bg-transparent">
         <q-card-section class="section-container text-primary q-pa-lg">
-          <h1 class="q-mt-none q-mb-xl text-primary text-center">Projects</h1>
+          <h1 class="q-mt-none q-mb-xl text-accent text-center">Projects</h1>
           <q-separator color="primary" class="q-mb-md" />
           <p class="text-center q-mb-none">
             This collection highlights a range of my work — from low-level reactive programming
@@ -126,31 +125,28 @@ const projects = ref<ProjectDetails[]>([
           class="section-container q-pa-sm"
           :style="{ backgroundColor: themeMap[activeTheme]['--q-primary'] }"
         >
-          <div class="project-container full-width q-pa-lg">
-            <a
+          <div class="project-container row justify-around items-center q-pt-lg q-pb-lg">
+            <div
               v-for="project in projects"
               :key="project.id"
               :href="project.url!"
-              class="project-tile"
-              :class="{ storytaim: project.alt === 'StorytAIm' }"
+              class="project-tile finished-projects cursor-pointer"
             >
-              <div v-if="project.alt === 'StorytAIm'" class="under-construction">
+              <GeneralTooltip :text="project.name"></GeneralTooltip>
+              <a class="q-ma-none relative-position q-mb-md">
+                <img :src="project.src" :alt="project.alt" tooltip="kdfk" ref="projectImgRefs" />
+              </a>
+            </div>
+
+            <div class="project-tile relative-position q-mt-md">
+              <div class="under-construction">
                 <img src="../assets/under-construction.png" alt="under-construction" />
-                <span class="under-construction-text text-primary text-center"
-                  >Under Construction</span
-                >
+                <span class="under-construction-text text-secondary text-center text-bold">
+                  Under Construction
+                </span>
               </div>
-
-              <img :src="project.src" :alt="project.alt" />
-
-              <div
-                v-if="project.alt != 'StorytAIm'"
-                class="project-overlay text-primary"
-                :style="{ backgroundColor: themeMap[activeTheme]['--q-dark'] }"
-              >
-                {{ project.name }}
-              </div>
-            </a>
+              <img class="storytaim-logo" :src="storytaimProject.src" :alt="storytaimProject.alt" />
+            </div>
           </div>
         </q-card-section>
       </q-card>
@@ -160,22 +156,6 @@ const projects = ref<ProjectDetails[]>([
 
 <style scoped lang="scss">
 @import '../css/main.scss';
-
-// .project-overlay {
-//   position: absolute;
-//   bottom: 0;
-//   left: 0;
-//   width: 100%;
-//   color: var(--q-accent);
-//   text-align: center;
-//   padding: 0.5rem;
-//   opacity: 0;
-//   transition: opacity 1s ease;
-// }
-
-// .project-container:hover .project-overlay {
-//   opacity: 1;
-// }
 
 .mobile-view {
   @media (min-width: $breakpoint-md) {
@@ -199,10 +179,9 @@ const projects = ref<ProjectDetails[]>([
         .project-tile {
           width: 100%;
           max-width: 80%;
-          cursor: pointer;
 
           @media (min-width: $breakpoint-sm) {
-            max-width: 500px;
+            max-width: 300px;
           }
 
           img {
@@ -210,6 +189,10 @@ const projects = ref<ProjectDetails[]>([
             height: auto;
             transition: transform 0.3s ease;
           }
+        }
+
+        .project-tile:last-child {
+          display: none;
         }
 
         .finished-projects {
@@ -302,64 +285,78 @@ const projects = ref<ProjectDetails[]>([
     }
 
     .project-container {
-      display: flex;
-      flex-wrap: wrap;
-      justify-content: center;
-      gap: 1.5rem;
-
-      @media (max-width: $breakpoint-md) {
-        flex-direction: column;
-        align-items: center;
-
-        a {
-          width: 80%;
-        }
+      @media (min-width: $breakpoint-xl) {
+        justify-content: center;
       }
 
-      a {
-        display: inline-block;
-        transition: transform 0.3s ease;
-        max-width: 200px;
-
+      .project-tile {
         img {
           width: 100%;
           height: auto;
-          display: block;
+          transition: transform 0.3s ease;
         }
 
-        &:hover {
-          transform: scale(1.05);
+        @media (min-width: $breakpoint-sm) {
+          max-width: 200px;
         }
+
+        @media (min-width: $breakpoint-md) {
+          max-width: 250px;
+        }
+
+        // @media (min-width: $breakpoint-lg) {
+        //   max-width: 300px;
+        // }
       }
 
-      .storytaim {
+      .finished-projects {
+        transition: transform 0.3s ease;
+      }
+
+      .finished-projects:hover {
+        transform: scale(1.05); // 5% larger on hover
+      }
+
+      .project-tile:last-child {
+        display: flex;
+        justify-content: start;
+        align-items: center;
         position: relative;
 
         &::after {
           content: '';
           position: absolute;
           inset: 0;
-          background-color: rgba(0, 0, 0, 0.6); // Your faded overlay
+          background-color: var(--q-dark);
+          opacity: 0.5;
           z-index: 1;
-          pointer-events: none;
+
           border-radius: 10px;
         }
 
         .under-construction {
           display: flex;
           flex-direction: column;
+          align-items: center;
           position: absolute;
           z-index: 2;
           height: auto;
-          max-width: 150px;
-          top: 50%;
+
+          top: 60%;
           left: 50%;
           transform: translate(-50%, -50%);
           width: 100%;
 
+          img {
+            max-width: 50%;
+          }
+
           .under-construction-text {
-            text-shadow: 2px 2px 5px var(--q-dark);
-            font-size: 1rem;
+            font-size: 1.2rem;
+            text-shadow: 2px 2px black;
+            @media (min-width: $breakpoint-sm) {
+              font-size: 1.5rem;
+            }
           }
         }
       }
