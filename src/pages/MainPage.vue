@@ -207,7 +207,7 @@ const selectTopic = (name: TopicName) => {
             Grant Knaver
           </p>
           <p
-            class="full-stack q-ma-none text-bold text-warning"
+            class="full-stack q-ma-none text-bold text-warning text-center"
             :class="
               setSeasonClasses(
                 {
