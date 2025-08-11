@@ -159,7 +159,13 @@ watch(slide, (newVal) => {
             <hr />
 
             <q-item key="resume" clickable @click="mobileMenu = false">
-              <q-item-section class="text-bold text-secondary">Download Resume</q-item-section>
+              <q-item-section class="text-bold text-secondary"
+                ><a
+                  class="resume"
+                  href="https://firebasestorage.googleapis.com/v0/b/portfolio-4-seasons.firebasestorage.app/o/Resume.pdf?alt=media&token=2dbf1bfa-6d3f-44e4-a9b9-d6c6a53ea178"
+                  >Download Resume</a
+                ></q-item-section
+              >
             </q-item>
           </q-list>
         </q-drawer>
@@ -325,5 +331,10 @@ aside {
 .activeTopic {
   color: var(--q-accent);
   font-weight: bold;
+}
+
+.resume {
+  text-decoration: none;
+  color: var(--q-accent);
 }
 </style>

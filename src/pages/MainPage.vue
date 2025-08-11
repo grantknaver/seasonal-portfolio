@@ -181,7 +181,9 @@ const selectTopic = (name: TopicName) => {
                 )
               "
               label="Resume"
+              class="resume"
               flat
+              href="https://firebasestorage.googleapis.com/v0/b/portfolio-4-seasons.firebasestorage.app/o/Resume.pdf?alt=media&token=2dbf1bfa-6d3f-44e4-a9b9-d6c6a53ea178"
               >Resume</a
             >
           </div>
@@ -440,6 +442,10 @@ const selectTopic = (name: TopicName) => {
       display: initial;
     }
   }
+}
+
+.resume {
+  text-decoration: none;
 }
 
 .fall-text-shadow {
