@@ -205,24 +205,26 @@ watch(slide, (newVal) => {
         </q-toolbar-title>
 
         <div class="q-gutter-sm">
-          <q-btn
-            flat
-            round
-            icon="fab fa-github"
-            :href="'https://github.com/your-username'"
-            target="_blank"
-            :class="activeTheme !== Theme.Spring ? 'text-accent' : 'text-secondary'"
-            aria-label="GitHub"
-          />
-          <q-btn
-            flat
-            round
-            icon="fab fa-linkedin"
-            :href="'https://linkedin.com/in/your-linkedin-id'"
-            target="_blank"
-            :class="[activeTheme !== Theme.Spring ? 'text-accent' : 'text-secondary']"
-            aria-label="LinkedIn"
-          />
+          <a href="https://github.com/grantknaver">
+            <q-btn
+              flat
+              round
+              icon="fab fa-github"
+              :href="'https://github.com/your-username'"
+              target="_blank"
+              :class="activeTheme !== Theme.Spring ? 'text-accent' : 'text-secondary'"
+              aria-label="GitHub"
+          /></a>
+
+          <a href="https://www.linkedin.com/in/grant-knaver/">
+            <q-btn
+              flat
+              round
+              icon="fab fa-linkedin"
+              target="_blank"
+              :class="[activeTheme !== Theme.Spring ? 'text-accent' : 'text-secondary']"
+              aria-label="LinkedIn"
+          /></a>
         </div>
       </q-toolbar>
     </q-footer>
