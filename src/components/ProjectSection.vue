@@ -82,16 +82,25 @@ const projects = ref<ProjectDetails[]>([
             <div
               v-for="project in projects"
               :key="project.id"
-              :href="project.url!"
               class="project-tile finished-projects cursor-pointer"
             >
-              <GeneralTooltip :text="project.name"></GeneralTooltip>
-              <a class="q-ma-none relative-position q-mb-md">
-                <img :src="project.src" :alt="project.alt" tooltip="kdfk" ref="projectImgRefs" />
+              <q-tooltip class="bg-dark" anchor="center middle" self="center middle">
+                {{ project.name }}
+              </q-tooltip>
+              <a class="q-ma-none relative-position q-mb-md" :href="project.url!">
+                <img :src="project.src" :alt="project.alt" ref="projectImgRefs" />
               </a>
             </div>
 
             <div class="project-tile relative-position q-mt-md">
+              <q-tooltip
+                class="bg-negative"
+                anchor="top middle"
+                self="center middle"
+                :offset="[0, -60]"
+              >
+                StorytAIm
+              </q-tooltip>
               <div class="under-construction">
                 <img src="../assets/under-construction.png" alt="under-construction" />
                 <span class="under-construction-text text-secondary text-center text-bold">
@@ -129,16 +138,25 @@ const projects = ref<ProjectDetails[]>([
             <div
               v-for="project in projects"
               :key="project.id"
-              :href="project.url!"
               class="project-tile finished-projects cursor-pointer"
             >
-              <GeneralTooltip :text="project.name"></GeneralTooltip>
-              <a class="q-ma-none relative-position q-mb-md">
+              <a class="q-ma-none relative-position q-mb-md" :href="project.url!">
+                <q-tooltip class="bg-dark" anchor="center middle" self="center middle">
+                  {{ project.name }}
+                </q-tooltip>
                 <img :src="project.src" :alt="project.alt" tooltip="kdfk" ref="projectImgRefs" />
               </a>
             </div>
 
             <div class="project-tile relative-position q-mt-md">
+              <q-tooltip
+                class="bg-negative"
+                anchor="top middle"
+                self="center middle"
+                :offset="[0, -50]"
+              >
+                StorytAIm
+              </q-tooltip>
               <div class="under-construction">
                 <img src="../assets/under-construction.png" alt="under-construction" />
                 <span class="under-construction-text text-secondary text-center text-bold">
@@ -183,7 +201,6 @@ const projects = ref<ProjectDetails[]>([
           @media (min-width: $breakpoint-sm) {
             max-width: 300px;
           }
-
           img {
             width: 100%;
             height: auto;
