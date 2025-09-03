@@ -61,13 +61,26 @@ export const useMainStore = defineStore('main', () => {
       bgColor: 'dark',
     },
   ]);
-  const SET_MOBILE_SCROLL_TARGET = (topicName: TopicName | null) => {
+
+  const SEND_ASSITANT_MESSAGE = (text: string): void => {
+    const newMessage = {
+      id: uuidv4(),
+      name: 'Me',
+      avatar: 'https://cdn.quasar.dev/img/avatar4.jpg',
+      text: [text],
+      sent: true,
+      stamp: '5 minutes ago',
+      bgColor: 'primary',
+    };
+    chatLog.value = [...chatLog.value, newMessage];
+  };
+  const SET_MOBILE_SCROLL_TARGET = (topicName: TopicName | null): void => {
     mobileScrollTarget.value = topicName;
   };
-  const SET_ACTIVE_TOPIC = (topicName: TopicName | null) => {
+  const SET_ACTIVE_TOPIC = (topicName: TopicName | null): void => {
     activeTopic.value = topicName;
   };
-  const SET_ACTIVE_THEME = (theme: Theme) => {
+  const SET_ACTIVE_THEME = (theme: Theme): void => {
     const aiAssistLogos = {
       [Theme.Fall]: new URL('/src/assets/ai-chat_fall.png', import.meta.url).href,
       [Theme.Winter]: new URL('/src/assets/ai-chat_winter.png', import.meta.url).href,
@@ -80,7 +93,7 @@ export const useMainStore = defineStore('main', () => {
     activeAiAssistLogo.value = aiAssistLogos[theme];
   };
 
-  const SET_CONTACT_SECTION_REF = (element: HTMLElement | null) => {
+  const SET_CONTACT_SECTION_REF = (element: HTMLElement | null): void => {
     contactSectionRef.value = element;
   };
 
@@ -95,5 +108,6 @@ export const useMainStore = defineStore('main', () => {
     SET_ACTIVE_THEME,
     SET_CONTACT_SECTION_REF,
     SET_MOBILE_SCROLL_TARGET,
+    SEND_ASSITANT_MESSAGE,
   };
 });

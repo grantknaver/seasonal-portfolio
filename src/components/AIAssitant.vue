@@ -1,45 +1,64 @@
 <script lang="ts" setup>
-import { ref, onMounted } from 'vue';
+import { ref, nextTick, watch } from 'vue';
 import { useMainStore } from '../stores/main';
 import { storeToRefs } from 'pinia';
 import { TopicName } from 'src/shared/constants/topicName';
-import { QChatMessage } from 'quasar';
-import { type ChatMessage } from 'src/shared/models/chatMessage';
 import { Theme } from 'src/shared/constants/theme';
+import { QScrollArea } from 'quasar';
 
 const mainStore = useMainStore();
 const { activeAiAssistLogo, activeTopic, chatLog, activeTheme } = storeToRefs(mainStore);
-const isChatting = ref<boolean>(false);
-const text = ref<string>('');
-const chatHistory = ref<ChatMessage[]>([]);
 
-onMounted(() => (chatHistory.value = chatLog.value));
+const isChatting = ref(true);
+const text = ref('');
+
+const chatScroll = ref<QScrollArea>();
+
+const submit = async () => {
+  if (!text.value.trim()) return;
+  mainStore.SEND_ASSITANT_MESSAGE(text.value);
+  text.value = '';
+  await nextTick();
+  chatScroll.value?.setScrollPosition('vertical', 99999, 300);
+};
+
+watch(chatLog, async () => {
+  await nextTick();
+  chatScroll.value?.setScrollPosition('vertical', 99999, 300);
+});
 </script>
 
 <template>
   <div class="container">
     <div v-if="isChatting" class="assistant-chat full-width q-pa-lg">
-      <div class="message-feed">
+      <q-scroll-area ref="chatScroll" class="chat-feed">
         <q-chat-message
-          v-for="message in chatHistory"
+          v-for="message in chatLog"
           :key="message.id"
           :name="message.name"
-          :avatar="
-            message.sent ? '/src/assets/silhouette-avatar.svg' : '/src/assets/robot-avatar.svg'
-          "
+          :avatar="message.sent ? '/silhouette-avatar.svg' : '/robot-avatar.svg'"
           :text="message.text"
           :sent="message.sent"
           :stamp="message.stamp"
-          :textColor="message.sent && activeTheme === Theme.Summer ? 'black' : 'primary'"
+          :text-color="message.sent && activeTheme === Theme.Summer ? 'black' : 'primary'"
           :bg-color="message.sent ? 'accent' : 'dark'"
         />
-      </div>
+      </q-scroll-area>
 
       <hr />
-      <q-input color="white" bg-color="secondary" filled v-model="text" label="What is up?">
-        <template v-slot:prepend>
-          <q-icon name="chat" />
-        </template>
+      <q-input
+        color="dark"
+        :dark="false"
+        bg-color="white"
+        filled
+        v-model="text"
+        label="What is up?"
+        :borderless="false"
+        @keyup.enter="submit"
+        outlined
+        class="custom-input"
+      >
+        <template #prepend><q-icon name="chat" /></template>
       </q-input>
     </div>
 
@@ -50,16 +69,15 @@ onMounted(() => (chatHistory.value = chatLog.value));
       size="lg"
       :color="activeTopic === TopicName.Contact ? 'dark' : 'accent'"
     >
-      <q-tooltip anchor="center middle" self="top left"> Chat </q-tooltip>
-      <q-avatar>
-        <img :src="activeAiAssistLogo" />
-      </q-avatar>
+      <q-tooltip anchor="center middle" self="top left">Chat</q-tooltip>
+      <q-avatar><img :src="activeAiAssistLogo" /></q-avatar>
     </q-btn>
   </div>
 </template>
 
 <style scoped lang="scss">
 @import '../css/main.scss';
+
 .container {
   display: flex;
   flex-direction: column;
@@ -78,11 +96,12 @@ onMounted(() => (chatHistory.value = chatLog.value));
       right: 8px;
     }
 
-    .message-feed {
+    .chat-feed {
+      height: 300px;
       max-height: 300px;
-      overflow: auto;
       background-color: white;
       border-radius: 5px;
+      border: 1px solid var(--q-secondary);
     }
   }
 
@@ -90,5 +109,10 @@ onMounted(() => (chatHistory.value = chatLog.value));
     align-self: self-end;
     margin-top: 1rem;
   }
+}
+
+.custom-input {
+  border: 1px solid var(--q-secondary);
+  border-radius: 5px;
 }
 </style>
