@@ -1,6 +1,5 @@
 <script setup lang="ts">
-import { ref, onMounted, nextTick, watch } from 'vue';
-import { Theme } from '../shared/constants/theme';
+import { ref, nextTick, watch } from 'vue';
 import { useMainStore } from '../stores/main';
 import { type Topic } from '../shared/models/topic';
 import { v4 as uuidv4 } from 'uuid';
@@ -12,14 +11,8 @@ import ProjectSection from 'src/components/ProjectSection.vue';
 import ContactSection from '../components/ContactSection.vue';
 import { scrollToElement } from '../shared/utils/scrollToElement';
 import { setSeasonClasses } from '../shared/utils/setSeasonColors';
+import AIAssitant from '../components/AIAssitant.vue';
 
-const currentBg = ref('');
-const backgroundMap: Record<Theme, string> = {
-  [Theme.Fall]: new URL('../assets/autumn-forestry.jpg', import.meta.url).href,
-  [Theme.Winter]: new URL('../assets/snowy-winter-landscape.jpg', import.meta.url).href,
-  [Theme.Spring]: new URL('../assets/beautiful-forest-spring-season.jpg', import.meta.url).href,
-  [Theme.Summer]: new URL('../assets/beautiful-shot-forest.jpg', import.meta.url).href,
-};
 const simonRef = ref();
 const mainStore = useMainStore();
 const topics: Topic[] = [
@@ -47,22 +40,15 @@ const topics: Topic[] = [
   },
 ];
 const { activeTheme, activeTopic, mobileScrollTarget } = storeToRefs(mainStore);
-const expandedPanel = ref<TopicName | null>(null); // mobile accordion state
+const expandedPanel = ref<TopicName | null>(null);
 
 watch(mobileScrollTarget, (newTopic) => {
   if (!newTopic) return;
-  expandedPanel.value = newTopic; // opens the matching expansion
-  // drawer can close itself in MainLayout when you set the target
-});
-
-onMounted(() => {
-  currentBg.value = backgroundMap[Theme.Fall];
-  // window.addEventListener('resize', updateWidths);
+  expandedPanel.value = newTopic;
 });
 
 watch(activeTopic, (newTopic: TopicName | null) => {
   if (!newTopic) return;
-
   expandedPanel.value = newTopic;
 });
 
@@ -225,7 +211,9 @@ const selectTopic = (name: TopicName) => {
         </span>
       </section>
     </div>
-    <q-btn
+
+    <AIAssitant />
+    <!-- <q-btn
       @click.stop="selectTopic(TopicName.Contact)"
       round
       class="contact-btn"
@@ -234,7 +222,7 @@ const selectTopic = (name: TopicName) => {
       icon="mail"
     >
       <q-tooltip anchor="center middle" self="top left"> Contact </q-tooltip>
-    </q-btn>
+    </q-btn> -->
   </q-page>
 </template>
 

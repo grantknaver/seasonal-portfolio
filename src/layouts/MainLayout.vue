@@ -69,14 +69,11 @@ onMounted(() => {
 onBeforeUnmount(() => window.removeEventListener('resize', updateWidths));
 
 watch(slide, (newVal) => {
-  setTimeout(() => {
-    mainStore.SET_ACTIVE_THEME(newVal);
-  }, 2000);
+  mainStore.SET_ACTIVE_THEME(newVal);
 });
 </script>
 
 <template>
-  <!-- Main Layout -->
   <q-layout view="Hhh Lpr lff">
     <div class="carousel-background">
       <q-carousel

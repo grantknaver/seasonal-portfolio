@@ -14,6 +14,11 @@ $breakpoints: (
   'breakpoint-xl': $breakpoint-xl,
 );
 
+$ai-chat-fall: 0px;
+$ai-chat-winter: 600px;
+$ai-chat-spring: 1024px;
+$ai-chat-summer: 1440px;
+
 :root {
   @include export-css-vars($breakpoints);
 }
