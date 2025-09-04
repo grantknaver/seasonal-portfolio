@@ -11,16 +11,21 @@ const { activeAiAssistLogo, activeTopic, chatLog, activeTheme } = storeToRefs(ma
 
 const isChatting = ref(true);
 const text = ref('');
-
 const chatScroll = ref<QScrollArea>();
+const hasPassedRecaptcha = ref(false);
+const right = ref(false);
 
-const submit = async () => {
+const submitMessage = async () => {
   if (!text.value.trim()) return;
   mainStore.SEND_ASSITANT_MESSAGE(text.value);
   text.value = '';
   await nextTick();
   chatScroll.value?.setScrollPosition('vertical', 99999, 300);
 };
+
+// const submitRecaptcha = () => {
+//   console.log('submitRecaptcha');
+// };
 
 watch(chatLog, async () => {
   await nextTick();
@@ -30,48 +35,76 @@ watch(chatLog, async () => {
 
 <template>
   <div class="container">
-    <div v-if="isChatting" class="assistant-chat full-width q-pa-lg">
-      <q-scroll-area ref="chatScroll" class="chat-feed">
-        <q-chat-message
-          v-for="message in chatLog"
-          :key="message.id"
-          :name="message.name"
-          :avatar="message.sent ? '/silhouette-avatar.svg' : '/robot-avatar.svg'"
-          :text="message.text"
-          :sent="message.sent"
-          :stamp="message.stamp"
-          :text-color="message.sent && activeTheme === Theme.Summer ? 'black' : 'primary'"
-          :bg-color="message.sent ? 'accent' : 'dark'"
-        />
-      </q-scroll-area>
-
-      <hr />
-      <q-input
-        color="dark"
-        :dark="false"
-        bg-color="white"
-        filled
-        v-model="text"
-        label="What is up?"
-        :borderless="false"
-        @keyup.enter="submit"
-        outlined
-        class="custom-input"
-      >
-        <template #prepend><q-icon name="chat" /></template>
-      </q-input>
-    </div>
-
-    <q-btn
-      @click="isChatting = !isChatting"
-      class="chat-button"
-      round
-      size="lg"
-      :color="activeTopic === TopicName.Contact ? 'dark' : 'accent'"
+    <!-- <q-btn
+      v-if="!hasPassedRecaptcha"
+      @click="submitRecaptcha()"
+      class="g-recaptcha"
+      color="primary"
+      text-color="dark"
+      data-sitekey="6Lcpeb0rAAAAAMJTycfari4SgoePh5mrzvZIYTiP"
+      data-callback="onSubmit"
+      data-action="submit"
+      >Captcha</q-btn
+    > -->
+    <div
+      class="recaptcha-container flex row full-width justify-between q-pa-xs"
+      v-if="!hasPassedRecaptcha"
     >
-      <q-tooltip anchor="center middle" self="top left">Chat</q-tooltip>
-      <q-avatar><img :src="activeAiAssistLogo" /></q-avatar>
-    </q-btn>
+      <q-checkbox
+        color="dark"
+        v-model="right"
+        label="I'm not a robot"
+        class="g-recaptcha"
+        data-sitekey="6Lcpeb0rAAAAAMJTycfari4SgoePh5mrzvZIYTiP"
+        data-callback="onSubmit"
+        data-action="submit"
+      />
+      <q-img src="../assets/recaptcha.png" />
+    </div>
+    <div v-else>
+      <div v-if="isChatting" class="assistant-chat full-width q-pa-lg">
+        <q-scroll-area ref="chatScroll" class="chat-feed q-pa-md">
+          <q-chat-message
+            v-for="message in chatLog"
+            :key="message.id"
+            :name="message.name"
+            :avatar="message.sent ? '/silhouette-avatar.svg' : '/robot-avatar.svg'"
+            :text="message.text"
+            :sent="message.sent"
+            :stamp="message.stamp"
+            :text-color="message.sent && activeTheme === Theme.Summer ? 'black' : 'primary'"
+            :bg-color="message.sent ? 'accent' : 'dark'"
+          />
+        </q-scroll-area>
+
+        <hr />
+        <q-input
+          color="dark"
+          :dark="false"
+          bg-color="white"
+          filled
+          v-model="text"
+          label="What is up?"
+          :borderless="false"
+          @keyup.enter="submitMessage"
+          outlined
+          class="custom-input"
+        >
+          <template #prepend><q-icon name="chat" /></template>
+        </q-input>
+      </div>
+
+      <q-btn
+        @click="isChatting = !isChatting"
+        class="chat-button"
+        round
+        size="lg"
+        :color="activeTopic === TopicName.Contact ? 'dark' : 'accent'"
+      >
+        <q-tooltip anchor="center middle" self="top left">Chat</q-tooltip>
+        <q-avatar><img :src="activeAiAssistLogo" /></q-avatar>
+      </q-btn>
+    </div>
   </div>
 </template>
 
@@ -84,6 +117,18 @@ watch(chatLog, async () => {
   align-items: center;
   width: 90%;
   max-width: 400px;
+
+  .recaptcha-container {
+    background-color: white;
+    max-width: 250px;
+    .g-recaptcha {
+      z-index: 100;
+    }
+
+    .q-img {
+      max-width: 75px;
+    }
+  }
 
   .assistant-chat {
     z-index: 100;
