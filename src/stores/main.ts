@@ -4,7 +4,7 @@ import { v4 as uuidv4 } from 'uuid';
 import { Theme } from '../shared/constants/theme';
 import { syncThemeGlobals } from '../shared/utils/theme';
 import { type TopicName } from 'src/shared/constants/topicName';
-import { type ChatMessage } from 'src/shared/models/chatMessage';
+import { type ChatMessage } from 'src/shared/types/chatMessage';
 
 export const useMainStore = defineStore('main', () => {
   const activeTopic = ref<TopicName | null>(null);

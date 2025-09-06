@@ -1,7 +1,7 @@
 <script lang="ts" setup>
 import { ref, onMounted, reactive, nextTick, computed, watch } from 'vue';
 import type { CSSProperties } from 'vue';
-import type { SkillNode } from '../shared/models/skillNode';
+import type { SkillNode } from '../shared/types/skillNode';
 import * as d3 from 'd3';
 import chroma from 'chroma-js';
 import { useMainStore } from 'src/stores/main';

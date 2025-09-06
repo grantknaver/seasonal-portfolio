@@ -1,7 +1,7 @@
 <script lang="ts" setup>
 import { ref } from 'vue';
 import { v4 as uuidv4 } from 'uuid';
-import { type ProjectDetails } from '../shared/models/projectDetails';
+import { type ProjectDetails } from '../shared/types/projectDetails';
 import { themeMap } from '../shared/constants/theme';
 import { useMainStore } from '../stores/main';
 import { storeToRefs } from 'pinia';

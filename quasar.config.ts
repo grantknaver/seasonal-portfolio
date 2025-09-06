@@ -42,7 +42,16 @@ export default defineConfig((/* ctx */) => {
       typescript: {
         strict: true,
         vueShim: true,
-        // extendTsConfig (tsConfig) {}
+        extendTsConfig(tsconfig) {
+          tsconfig.compilerOptions ??= {};
+
+          // Make sure Quasar includes your global types
+          tsconfig.include ??= [];
+          tsconfig.include.push('src/**/*.d.ts');
+
+          // Optional: still skip library type errors
+          tsconfig.compilerOptions.skipLibCheck = true;
+        },
       },
 
       vueRouterMode: 'hash', // available values: 'hash', 'history'

@@ -5,14 +5,14 @@ import { storeToRefs } from 'pinia';
 import { Theme } from '../shared/constants/theme';
 import { getCustomCssVar } from '../shared/utils/getCustomCssVar';
 import { TopicName } from '../shared/constants/topicName';
-import { type Topic } from '../shared/models/topic';
+import { type Topic } from '../shared/types/topic';
 import { v4 as uuidv4 } from 'uuid';
 import AboutSection from '../components/AboutSection.vue';
 import SkillsSection from '../components/SkillsSection.vue';
 import ContactSection from '../components/ContactSection.vue';
 import ProjectSection from '../components/ProjectSection.vue';
 import WeatherBackground from '../components/WeatherBackground.vue';
-import { type Slide } from 'src/shared/models/slide';
+import { type Slide } from 'src/shared/types/slide';
 import { QCarousel } from 'quasar';
 
 const mainStore = useMainStore();
