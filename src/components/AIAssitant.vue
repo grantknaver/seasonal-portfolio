@@ -15,7 +15,8 @@ const chatScroll = ref<QScrollArea>();
 
 const submitMessage = async () => {
   if (!text.value.trim()) return;
-  mainStore.SEND_ASSITANT_MESSAGE(text.value);
+  console.log('submitMessage');
+  await mainStore.SEND_ASSITANT_MESSAGE(text.value);
   text.value = '';
   await nextTick();
   chatScroll.value?.setScrollPosition('vertical', 99999, 300);
@@ -43,7 +44,6 @@ watch(chatLog, async () => {
           :bg-color="message.sent ? 'accent' : 'dark'"
         />
       </q-scroll-area>
-
       <hr />
       <q-input
         color="dark"
@@ -83,6 +83,7 @@ watch(chatLog, async () => {
   align-items: center;
   width: 90%;
   max-width: 400px;
+  max-height: 100%;
 
   .assistant-chat {
     z-index: 100;
@@ -90,6 +91,7 @@ watch(chatLog, async () => {
     border: 4px solid var(--q-accent);
     border-radius: 1rem;
     box-shadow: 5px 5px 10px black;
+    max-height: 100%;
 
     @media (min-width: $breakpoint-md) {
       right: 8px;

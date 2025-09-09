@@ -11,7 +11,7 @@ import ProjectSection from 'src/components/ProjectSection.vue';
 import ContactSection from '../components/ContactSection.vue';
 import { scrollToElement } from '../shared/utils/scrollToElement';
 import { setSeasonClasses } from '../shared/utils/setSeasonColors';
-// import AIAssitant from '../components/AIAssitant.vue';
+import AIAssitant from '../components/AIAssitant.vue';
 import RecaptchaWidget from '../components/RecaptchaWidget.vue';
 
 const simonRef = ref();
@@ -42,7 +42,6 @@ const topics: Topic[] = [
 ];
 const { activeTheme, activeTopic, mobileScrollTarget } = storeToRefs(mainStore);
 const expandedPanel = ref<TopicName | null>(null);
-const isHuman = ref<boolean>(false);
 
 watch(mobileScrollTarget, (newTopic) => {
   if (!newTopic) return;
@@ -70,10 +69,10 @@ const selectTopic = (name: TopicName) => {
 
 <template>
   <q-page class="page-container scroll column col">
-    <div v-if="!isHuman" class="recaptcha-container bg-primary">
+    <div class="recaptcha-container bg-primary">
       <RecaptchaWidget></RecaptchaWidget>
     </div>
-    <div v-else>
+    <div>
       <img class="q-pt-sm logo" style="max-width: 200px" src="../assets/logo.png" alt="logo" />
       <div class="sub-container column col items-center q-pl-md q-pr-md">
         <section class="mobile-view column items-center full-width">
@@ -221,8 +220,7 @@ const selectTopic = (name: TopicName) => {
         </section>
       </div>
     </div>
-
-    <!-- <AIAssitant /> -->
+    <AIAssitant />
   </q-page>
 </template>
 

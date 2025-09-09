@@ -5,7 +5,6 @@ import { Theme } from '../shared/constants/theme';
 import { syncThemeGlobals } from '../shared/utils/theme';
 import { type TopicName } from '../shared/constants/topicName';
 import { type ChatMessage } from '../shared/types/chatMessage';
-import { type GoogleVerify } from '../shared/types/googleVerify';
 
 export const useMainStore = defineStore('main', () => {
   const activeTopic = ref<TopicName | null>(null);
@@ -64,17 +63,38 @@ export const useMainStore = defineStore('main', () => {
   ]);
   const isVerified = ref<boolean>(false);
 
-  const SEND_ASSITANT_MESSAGE = (text: string): void => {
-    const newMessage = {
-      id: uuidv4(),
-      name: 'Me',
-      avatar: 'https://cdn.quasar.dev/img/avatar4.jpg',
-      text: [text],
-      sent: true,
-      stamp: '5 minutes ago',
-      bgColor: 'primary',
-    };
-    chatLog.value = [...chatLog.value, newMessage];
+  const SEND_ASSITANT_MESSAGE = async (message: string) => {
+    const ngrok_url = `/openAi/submit-message`;
+    // const url = `${import.meta.env.VITE_BASE_URL}/openAi/submit-message`;
+    const res = await fetch(ngrok_url, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'X-Forwarded-For': 'true',
+      },
+      credentials: 'include',
+      body: JSON.stringify({ message }),
+    });
+    const data = await res.json();
+    console.log('SEND_ASSITANT_MESSAGE', data);
+    if (!res.ok) {
+      const codes = Array.isArray(data['error-codes']) ? data['error-codes'].join(', ') : '';
+      throw new Error(`Server error ${res.status}${codes ? ` (${codes})` : ''}`);
+    }
+    if (data.success !== true) {
+      const codes = Array.isArray(data['error-codes']) ? data['error-codes'].join(', ') : 'unknown';
+      throw new Error(`OpenAI messagign failed: ${codes}`);
+    }
+    // const newMessage = {
+    //   id: uuidv4(),
+    //   name: 'Me',
+    //   avatar: 'https://cdn.quasar.dev/img/avatar4.jpg',
+    //   text: [message],
+    //   sent: true,
+    //   stamp: '5 minutes ago',
+    //   bgColor: 'primary',
+    // };
+    // chatLog.value = [...chatLog.value, newMessage];
   };
   const SET_MOBILE_SCROLL_TARGET = (topicName: TopicName | null): void => {
     mobileScrollTarget.value = topicName;
@@ -97,16 +117,19 @@ export const useMainStore = defineStore('main', () => {
   const SET_CONTACT_SECTION_REF = (element: HTMLElement | null): void => {
     contactSectionRef.value = element;
   };
-
   const VERIFY_RECAPTCHA = async (token: string): Promise<void> => {
-    const res = await fetch(`${import.meta.env.VITE_BASE_URL}/auth/verify-recaptcha`, {
+    const ngrok_url = `https://00a0e42a75de.ngrok-free.app/auth/verify-recaptcha`;
+    // const url = `${import.meta.env.VITE_BASE_URL}/auth/verify-recaptcha`;
+    const res = await fetch(ngrok_url, {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
+      headers: {
+        'Content-Type': 'application/json',
+        'X-Forwarded-For': 'true',
+      },
       credentials: 'include',
       body: JSON.stringify({ token }),
     });
-
-    const data = (await res.json().catch(() => ({}))) as Partial<GoogleVerify>;
+    const data = await res.json();
     if (!res.ok) {
       const codes = Array.isArray(data['error-codes']) ? data['error-codes'].join(', ') : '';
       throw new Error(`Server error ${res.status}${codes ? ` (${codes})` : ''}`);
