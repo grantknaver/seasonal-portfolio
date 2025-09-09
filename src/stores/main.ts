@@ -3,8 +3,9 @@ import { defineStore } from 'pinia';
 import { v4 as uuidv4 } from 'uuid';
 import { Theme } from '../shared/constants/theme';
 import { syncThemeGlobals } from '../shared/utils/theme';
-import { type TopicName } from 'src/shared/constants/topicName';
-import { type ChatMessage } from 'src/shared/types/chatMessage';
+import { type TopicName } from '../shared/constants/topicName';
+import { type ChatMessage } from '../shared/types/chatMessage';
+import { type GoogleVerify } from '../shared/types/googleVerify';
 
 export const useMainStore = defineStore('main', () => {
   const activeTopic = ref<TopicName | null>(null);
@@ -61,6 +62,7 @@ export const useMainStore = defineStore('main', () => {
       bgColor: 'dark',
     },
   ]);
+  const isVerified = ref<boolean>(false);
 
   const SEND_ASSITANT_MESSAGE = (text: string): void => {
     const newMessage = {
@@ -92,9 +94,29 @@ export const useMainStore = defineStore('main', () => {
     syncThemeGlobals(theme);
     activeAiAssistLogo.value = aiAssistLogos[theme];
   };
-
   const SET_CONTACT_SECTION_REF = (element: HTMLElement | null): void => {
     contactSectionRef.value = element;
+  };
+
+  const VERIFY_RECAPTCHA = async (token: string): Promise<void> => {
+    const res = await fetch(`${import.meta.env.VITE_BASE_URL}/auth/verify-recaptcha`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      credentials: 'include',
+      body: JSON.stringify({ token }),
+    });
+
+    const data = (await res.json().catch(() => ({}))) as Partial<GoogleVerify>;
+    if (!res.ok) {
+      const codes = Array.isArray(data['error-codes']) ? data['error-codes'].join(', ') : '';
+      throw new Error(`Server error ${res.status}${codes ? ` (${codes})` : ''}`);
+    }
+
+    if (data.success !== true) {
+      const codes = Array.isArray(data['error-codes']) ? data['error-codes'].join(', ') : 'unknown';
+      throw new Error(`reCAPTCHA failed: ${codes}`);
+    }
+    isVerified.value = data.success;
   };
 
   return {
@@ -109,5 +131,6 @@ export const useMainStore = defineStore('main', () => {
     SET_CONTACT_SECTION_REF,
     SET_MOBILE_SCROLL_TARGET,
     SEND_ASSITANT_MESSAGE,
+    VERIFY_RECAPTCHA,
   };
 });

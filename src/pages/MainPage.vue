@@ -70,7 +70,7 @@ const selectTopic = (name: TopicName) => {
 
 <template>
   <q-page class="page-container scroll column col">
-    <div v-if="!isHuman" class="test bg-primary">
+    <div v-if="!isHuman" class="recaptcha-container bg-primary">
       <RecaptchaWidget></RecaptchaWidget>
     </div>
     <div v-else>
@@ -468,7 +468,7 @@ const selectTopic = (name: TopicName) => {
     1px 1px 0 black;
 }
 
-.test {
+.recaptcha-container {
   height: 100% !important;
   width: 100% !important;
   display: flex;
