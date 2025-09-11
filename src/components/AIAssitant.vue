@@ -19,12 +19,13 @@ watch(chatLog, async () => {
   chatScroll.value?.setScrollPosition('vertical', 99999, 300);
 });
 
-const submitMessage = async () => {
+const submitMessage = async (e: Event) => {
+  console.log('e', e);
   if (!text.value.trim()) return;
   await mainStore.SEND_ASSITANT_MESSAGE(text.value);
   text.value = '';
-  await nextTick();
-  chatScroll.value?.setScrollPosition('vertical', 99999, 300);
+
+  // chatScroll.value?.setScrollPosition('vertical', 99999, 300);
 };
 </script>
 

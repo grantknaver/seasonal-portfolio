@@ -1,38 +1,3 @@
-// import { type TopicName } from '../constants/topicName';
-
-// export const scrollToElement = (elementId: TopicName): void => {
-//   setTimeout(() => {
-//     const target = document.getElementById(elementId);
-//     const header = document.querySelector('.q-header');
-//     const headerHeight = header?.clientHeight ?? 0;
-//     const scrollableContainers = [
-//       document.scrollingElement,
-//       document.querySelector('.q-page-container'),
-//       document.querySelector('.q-page'),
-//       window,
-//     ];
-
-//     if (target) {
-//       const offsetTop = target.offsetTop + window.pageYOffset;
-//       for (const container of scrollableContainers) {
-//         if (container && 'scrollTo' in container) {
-//           try {
-//             container.scrollTo({
-//               top: offsetTop - headerHeight,
-//               behavior: 'smooth',
-//             });
-//           } catch (err) {
-//             console.warn('Failed scroll attempt', err);
-//           }
-//         }
-//       }
-//       document.body.classList.remove('q-body--prevent-scroll');
-//     } else {
-//       console.warn(`Element with id "${elementId}" not found.`);
-//     }
-//   }, 2000);
-// };
-
 import { scroll } from 'quasar';
 import { type TopicName } from '../constants/topicName';
 

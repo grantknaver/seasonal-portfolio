@@ -1,10 +1,11 @@
 import { ref } from 'vue';
 import { defineStore } from 'pinia';
-import { v4 as uuidv4 } from 'uuid';
+// import { v4 as uuidv4 } from 'uuid';
 import { Theme } from '../shared/constants/theme';
 import { syncThemeGlobals } from '../shared/utils/theme';
 import { type TopicName } from '../shared/constants/topicName';
 import { type ChatMessage } from '../shared/types/chatMessage';
+// import { useChatTime } from 'src/shared/composables/useChatTime';
 
 export const useMainStore = defineStore('main', () => {
   const activeTopic = ref<TopicName | null>(null);
@@ -16,60 +17,24 @@ export const useMainStore = defineStore('main', () => {
   const mobileScrollTarget = ref<TopicName | null>(null);
   const isHuman = ref<boolean>(false);
   const chatLog = ref<ChatMessage[]>([
-    {
-      id: uuidv4(),
-      name: 'Me',
-      avatar: 'https://cdn.quasar.dev/img/avatar4.jpg',
-      text: ['Hey Jane, how are you?'],
-      sent: true,
-      stamp: '7 minutes ago',
-      bgColor: 'primary',
-    },
-    {
-      id: uuidv4(),
-      name: 'Bot',
-      avatar: 'https://cdn.quasar.dev/img/avatar3.jpg',
-      text: ['Doing fine, how are you?'],
-      sent: false,
-      stamp: '6 minutes ago',
-      bgColor: 'grey-4',
-    },
-    {
-      id: uuidv4(),
-      name: 'Me',
-      avatar: 'https://cdn.quasar.dev/img/avatar4.jpg',
-      text: ['I’m good, just working on the new project.', 'Got time to review it later?'],
-      sent: true,
-      stamp: '5 minutes ago',
-      bgColor: 'primary',
-    },
-    {
-      id: uuidv4(),
-      name: 'Bot',
-      avatar: 'https://cdn.quasar.dev/img/avatar3.jpg',
-      text: ['Sure, send it over!'],
-      sent: false,
-      stamp: '4 minutes ago',
-      bgColor: 'grey-4',
-    },
-    {
-      id: uuidv4(),
-      name: 'Bot',
-      avatar: '/images/ai-bot.svg', // <- put a real placeholder robot avatar in /public/images
-      text: ['Hello 👋, I’m your AI assistant.'],
-      sent: false,
-      stamp: 'Just now',
-      bgColor: 'dark',
-    },
+    // {
+    //   id: uuidv4(),
+    //   name: 'Bot',
+    //   avatar: 'https://cdn.quasar.dev/img/avatar3.jpg',
+    //   text: ['Doing fine, how are you?'],
+    //   sent: false,
+    //   stamp: '6 minutes ago',
+    //   bgColor: 'grey-4',
+    // },
   ]);
 
   const SEND_ASSITANT_MESSAGE = async (message: string) => {
-    const url = `${import.meta.env.VITE_BASE_URL}/openAi/submit-message`;
+    const url = `${import.meta.env.VITE_BASE_URL}/ai/openAi/submit-message`;
+    console.log('URL', url);
     const res = await fetch(url, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
-        'X-Forwarded-For': 'true',
       },
       credentials: 'include',
       body: JSON.stringify({ message }),
@@ -83,13 +48,15 @@ export const useMainStore = defineStore('main', () => {
       const codes = Array.isArray(data['error-codes']) ? data['error-codes'].join(', ') : 'unknown';
       throw new Error(`OpenAI messagign failed: ${codes}`);
     }
+    // const d = new Date();
+    // const date = d.toISOString();
     // const newMessage = {
     //   id: uuidv4(),
     //   name: 'Me',
     //   avatar: 'https://cdn.quasar.dev/img/avatar4.jpg',
     //   text: [message],
     //   sent: true,
-    //   stamp: '5 minutes ago',
+    //   stamp: useChatTime(date).label.value,
     //   bgColor: 'primary',
     // };
     // chatLog.value = [...chatLog.value, newMessage];
@@ -135,7 +102,6 @@ export const useMainStore = defineStore('main', () => {
       throw new Error(`reCAPTCHA failed: ${codes}`);
     }
   };
-
   const VERIFY_HUMANITY = async () => {
     try {
       const res = await fetch(`${import.meta.env.VITE_BASE_URL}/api/auth/verify-status`, {
@@ -143,7 +109,6 @@ export const useMainStore = defineStore('main', () => {
       });
       const { isHuman: isHumanRef } = await res.json();
       isHuman.value = isHumanRef;
-      console.log('verify humanity');
     } catch (e) {
       const msg = e instanceof Error ? e.message : String(e);
       throw new Error(`Server error ${msg}`);
