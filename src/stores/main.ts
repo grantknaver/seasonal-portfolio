@@ -14,6 +14,7 @@ export const useMainStore = defineStore('main', () => {
   );
   const contactSectionRef = ref<HTMLElement | null>(null);
   const mobileScrollTarget = ref<TopicName | null>(null);
+  const isHuman = ref<boolean>(false);
   const chatLog = ref<ChatMessage[]>([
     {
       id: uuidv4(),
@@ -61,12 +62,10 @@ export const useMainStore = defineStore('main', () => {
       bgColor: 'dark',
     },
   ]);
-  const isVerified = ref<boolean>(false);
 
   const SEND_ASSITANT_MESSAGE = async (message: string) => {
-    const ngrok_url = `/openAi/submit-message`;
-    // const url = `${import.meta.env.VITE_BASE_URL}/openAi/submit-message`;
-    const res = await fetch(ngrok_url, {
+    const url = `${import.meta.env.VITE_BASE_URL}/openAi/submit-message`;
+    const res = await fetch(url, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -76,7 +75,6 @@ export const useMainStore = defineStore('main', () => {
       body: JSON.stringify({ message }),
     });
     const data = await res.json();
-    console.log('SEND_ASSITANT_MESSAGE', data);
     if (!res.ok) {
       const codes = Array.isArray(data['error-codes']) ? data['error-codes'].join(', ') : '';
       throw new Error(`Server error ${res.status}${codes ? ` (${codes})` : ''}`);
@@ -118,13 +116,10 @@ export const useMainStore = defineStore('main', () => {
     contactSectionRef.value = element;
   };
   const VERIFY_RECAPTCHA = async (token: string): Promise<void> => {
-    const ngrok_url = `https://00a0e42a75de.ngrok-free.app/auth/verify-recaptcha`;
-    // const url = `${import.meta.env.VITE_BASE_URL}/auth/verify-recaptcha`;
-    const res = await fetch(ngrok_url, {
+    const res = await fetch(`${import.meta.env.VITE_BASE_URL}/api/auth/verify-recaptcha`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
-        'X-Forwarded-For': 'true',
       },
       credentials: 'include',
       body: JSON.stringify({ token }),
@@ -139,7 +134,20 @@ export const useMainStore = defineStore('main', () => {
       const codes = Array.isArray(data['error-codes']) ? data['error-codes'].join(', ') : 'unknown';
       throw new Error(`reCAPTCHA failed: ${codes}`);
     }
-    isVerified.value = data.success;
+  };
+
+  const VERIFY_HUMANITY = async () => {
+    try {
+      const res = await fetch(`${import.meta.env.VITE_BASE_URL}/api/auth/verify-status`, {
+        credentials: 'include',
+      });
+      const { isHuman: isHumanRef } = await res.json();
+      isHuman.value = isHumanRef;
+      console.log('verify humanity');
+    } catch (e) {
+      const msg = e instanceof Error ? e.message : String(e);
+      throw new Error(`Server error ${msg}`);
+    }
   };
 
   return {
@@ -149,11 +157,13 @@ export const useMainStore = defineStore('main', () => {
     mobileScrollTarget,
     activeAiAssistLogo,
     chatLog,
+    isHuman,
     SET_ACTIVE_TOPIC,
     SET_ACTIVE_THEME,
     SET_CONTACT_SECTION_REF,
     SET_MOBILE_SCROLL_TARGET,
     SEND_ASSITANT_MESSAGE,
     VERIFY_RECAPTCHA,
+    VERIFY_HUMANITY,
   };
 });

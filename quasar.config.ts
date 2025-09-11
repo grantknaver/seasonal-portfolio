@@ -3,7 +3,7 @@
 
 import { defineConfig } from '#q-app/wrappers';
 
-export default defineConfig((/* ctx */) => {
+export default defineConfig(() => {
   return {
     // https://v2.quasar.dev/quasar-cli-vite/prefetch-feature
     // preFetch: true,
@@ -31,7 +31,6 @@ export default defineConfig((/* ctx */) => {
       'roboto-font', // optional, you are not bound to it
       'material-icons', // optional, you are not bound to it
     ],
-
     // Full list of options: https://v2.quasar.dev/quasar-cli-vite/quasar-config-file#build
     build: {
       target: {
@@ -87,11 +86,26 @@ export default defineConfig((/* ctx */) => {
         ],
       ],
     },
-
     // Full list of options: https://v2.quasar.dev/quasar-cli-vite/quasar-config-file#devserver
     devServer: {
-      // https: true,
-      open: true, // opens browser window automatically
+      host: '0.0.0.0',
+      port: 9000,
+      open: true,
+      proxy: {
+        '/api': {
+          target: 'http://localhost:3000', // your backend
+          changeOrigin: true,
+          secure: false, // backend is http
+          // Make /api/foo -> /foo on the backend:
+          rewrite: (path) => path.replace(/^\/api/, ''),
+        },
+      },
+    },
+    // (optional, only needed if you still open the site through ngrok)
+    vite: {
+      server: {
+        allowedHosts: ['198c227ec8bb.ngrok-free.app'],
+      },
     },
     // https://v2.quasar.dev/quasar-cli-vite/quasar-config-file#framework
     framework: {

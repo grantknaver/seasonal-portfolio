@@ -14,10 +14,10 @@ onMounted(() => {
       callback: (token: string) => {
         mainStore
           .VERIFY_RECAPTCHA(token)
-          .catch((err) => {
-            // e.g. $q.notify({ type: 'negative', message: String(err) });
-            console.error(err);
+          .then(async () => {
+            await mainStore.VERIFY_HUMANITY();
           })
+          .catch((err) => console.error(err))
           .finally(() => {
             if (widgetId.value !== null) grecaptcha.reset(widgetId.value);
           });

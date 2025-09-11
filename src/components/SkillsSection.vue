@@ -262,7 +262,6 @@ const redrawElement = async () => {
 onMounted(async () => {
   if (!initialized.value) {
     initialized.value = true;
-    console.log('Running redrawElement only once');
     await redrawElement();
   }
 });

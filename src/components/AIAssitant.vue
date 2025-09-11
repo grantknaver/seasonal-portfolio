@@ -2,36 +2,43 @@
 import { ref, nextTick, watch } from 'vue';
 import { useMainStore } from '../stores/main';
 import { storeToRefs } from 'pinia';
-import { TopicName } from 'src/shared/constants/topicName';
-import { Theme } from 'src/shared/constants/theme';
+import { TopicName } from '../shared/constants/topicName';
 import type { QScrollArea } from 'quasar';
+import { Theme } from '../shared/constants/theme';
+import RecaptchaWidget from '../components/RecaptchaWidget.vue';
 
 const mainStore = useMainStore();
-const { activeAiAssistLogo, activeTopic, chatLog, activeTheme } = storeToRefs(mainStore);
+const { activeAiAssistLogo, activeTopic, chatLog, activeTheme, isHuman } = storeToRefs(mainStore);
 
 const isChatting = ref(true);
 const text = ref('');
 const chatScroll = ref<QScrollArea>();
 
+watch(chatLog, async () => {
+  await nextTick();
+  chatScroll.value?.setScrollPosition('vertical', 99999, 300);
+});
+
 const submitMessage = async () => {
   if (!text.value.trim()) return;
-  console.log('submitMessage');
   await mainStore.SEND_ASSITANT_MESSAGE(text.value);
   text.value = '';
   await nextTick();
   chatScroll.value?.setScrollPosition('vertical', 99999, 300);
 };
-
-watch(chatLog, async () => {
-  await nextTick();
-  chatScroll.value?.setScrollPosition('vertical', 99999, 300);
-});
 </script>
 
 <template>
   <div class="container">
     <div v-if="isChatting" class="assistant-chat full-width q-pa-lg">
-      <q-scroll-area ref="chatScroll" class="chat-feed q-pa-md">
+      <q-scroll-area
+        ref="chatScroll"
+        class="chat-feed q-pa-md"
+        :visible="false"
+        :style="{
+          opacity: isHuman ? 1 : 0.4,
+        }"
+      >
         <q-chat-message
           v-for="message in chatLog"
           :key="message.id"
@@ -46,6 +53,7 @@ watch(chatLog, async () => {
       </q-scroll-area>
       <hr />
       <q-input
+        v-if="isHuman"
         color="dark"
         :dark="false"
         bg-color="white"
@@ -59,8 +67,10 @@ watch(chatLog, async () => {
       >
         <template #prepend><q-icon name="chat" /></template>
       </q-input>
+      <div v-else class="recaptcha-container q-mt-sm">
+        <RecaptchaWidget></RecaptchaWidget>
+      </div>
     </div>
-
     <q-btn
       @click="isChatting = !isChatting"
       class="chat-button"

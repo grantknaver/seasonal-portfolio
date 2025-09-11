@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref, nextTick, watch } from 'vue';
+import { ref, nextTick, watch, onMounted } from 'vue';
 import { useMainStore } from '../stores/main';
 import { type Topic } from '../shared/types/topic';
 import { v4 as uuidv4 } from 'uuid';
@@ -12,7 +12,7 @@ import ContactSection from '../components/ContactSection.vue';
 import { scrollToElement } from '../shared/utils/scrollToElement';
 import { setSeasonClasses } from '../shared/utils/setSeasonColors';
 import AIAssitant from '../components/AIAssitant.vue';
-import RecaptchaWidget from '../components/RecaptchaWidget.vue';
+// import RecaptchaWidget from '../components/RecaptchaWidget.vue';
 
 const simonRef = ref();
 const mainStore = useMainStore();
@@ -43,6 +43,10 @@ const topics: Topic[] = [
 const { activeTheme, activeTopic, mobileScrollTarget } = storeToRefs(mainStore);
 const expandedPanel = ref<TopicName | null>(null);
 
+onMounted(async () => {
+  await mainStore.VERIFY_HUMANITY();
+});
+
 watch(mobileScrollTarget, (newTopic) => {
   if (!newTopic) return;
   expandedPanel.value = newTopic;
@@ -69,9 +73,6 @@ const selectTopic = (name: TopicName) => {
 
 <template>
   <q-page class="page-container scroll column col">
-    <div class="recaptcha-container bg-primary">
-      <RecaptchaWidget></RecaptchaWidget>
-    </div>
     <div>
       <img class="q-pt-sm logo" style="max-width: 200px" src="../assets/logo.png" alt="logo" />
       <div class="sub-container column col items-center q-pl-md q-pr-md">
@@ -464,13 +465,5 @@ const selectTopic = (name: TopicName) => {
     1px -1px 0 black,
     -1px 1px 0 black,
     1px 1px 0 black;
-}
-
-.recaptcha-container {
-  height: 100% !important;
-  width: 100% !important;
-  display: flex;
-  justify-content: center;
-  align-items: center;
 }
 </style>
