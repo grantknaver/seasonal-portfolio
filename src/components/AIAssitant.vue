@@ -13,19 +13,30 @@ const { activeAiAssistLogo, activeTopic, chatLog, activeTheme, isHuman } = store
 const isChatting = ref(true);
 const text = ref('');
 const chatScroll = ref<QScrollArea>();
+const sending = ref<boolean>(false);
 
 watch(chatLog, async () => {
   await nextTick();
   chatScroll.value?.setScrollPosition('vertical', 99999, 300);
 });
 
-const submitMessage = async (e: Event) => {
-  console.log('e', e);
-  if (!text.value.trim()) return;
-  await mainStore.SEND_ASSITANT_MESSAGE(text.value);
-  text.value = '';
-
-  // chatScroll.value?.setScrollPosition('vertical', 99999, 300);
+const submitMessage = async () => {
+  const msg = text.value.trim();
+  if (!msg || sending.value) return;
+  alert('submitMessage');
+  sending.value = true;
+  try {
+    await mainStore.SEND_ASSITANT_MESSAGE(msg); // may reject → we catch it
+    text.value = '';
+  } catch (e) {
+    // const m = e instanceof Error ? e.message : String(e);
+    console.error('SEND_ASSITANT_MESSAGE error:', e);
+    // $q.notify({ type: 'negative', message: m });
+  } finally {
+    sending.value = false;
+    // scroll after DOM updates (we also watch chatLog below as a backup)
+    chatScroll.value?.setScrollPosition('vertical', 99999, 300);
+  }
 };
 </script>
 
@@ -62,9 +73,10 @@ const submitMessage = async (e: Event) => {
         v-model="text"
         label="What is up?"
         :borderless="false"
-        @keyup.enter="submitMessage"
+        @keyup.enter.prevent="submitMessage"
         outlined
         class="custom-input"
+        :disable="true"
       >
         <template #prepend><q-icon name="chat" /></template>
       </q-input>

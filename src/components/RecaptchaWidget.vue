@@ -1,11 +1,12 @@
 <script setup lang="ts">
-import { onMounted, ref } from 'vue';
+import { ref, watch } from 'vue';
 import { useMainStore } from 'src/stores/main';
 
 const mainStore = useMainStore();
 const widgetId = ref<number | null>(null);
+const recaptchaEl = ref<HTMLElement | null>(null);
 
-onMounted(() => {
+const init = () => {
   grecaptcha.ready(() => {
     widgetId.value = grecaptcha.render('recaptcha', {
       sitekey: '6Lfgtr8rAAAAAMLTtsoeUz0tkVGKcGLog0JWasz6',
@@ -24,9 +25,21 @@ onMounted(() => {
       },
     });
   });
-});
+};
+watch(
+  recaptchaEl,
+  (v) => {
+    if (v) {
+      init();
+    }
+  },
+  {
+    flush: 'post',
+    immediate: true,
+  },
+);
 </script>
 
 <template>
-  <div id="recaptcha"></div>
+  <div id="recaptcha" ref="recaptchaEl"></div>
 </template>

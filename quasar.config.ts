@@ -92,12 +92,16 @@ export default defineConfig(() => {
       port: 9000,
       open: true,
       proxy: {
-        '/api': {
-          target: 'http://localhost:3000', // your backend
+        '/api/auth/verify-recaptcha': {
+          target: 'http://localhost:3000',
           changeOrigin: true,
-          secure: false, // backend is http
-          // Make /api/foo -> /foo on the backend:
-          rewrite: (path) => path.replace(/^\/api/, ''),
+          secure: false,
+          // no rewrite: backend expects /api/auth/verify-recaptcha
+        },
+        '/api/auth/verify-status': {
+          target: 'http://localhost:3000',
+          changeOrigin: true,
+          secure: false,
         },
       },
     },
