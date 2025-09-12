@@ -51,7 +51,7 @@ const slides = ref<Slide[]>([
   },
   {
     id: uuidv4(),
-    src: new URL('../assets/beautiful-shot-forest.jpg', import.meta.url).href,
+    src: new URL('../assets/beach.jpg', import.meta.url).href,
     theme: Theme.Summer,
   },
 ]);

@@ -30,15 +30,31 @@ const artifactRefs = ref<(Element | ComponentPublicInstance | null)[]>([]);
 
 const fallEmojis = ['🍂', '🍁'];
 const winterEmoji = '❄';
+const springEmoji = '🌸';
+const summerEmoji = '🌸';
 
 function createArtifacts() {
   artifacts.value = [];
   for (let i = 0; i < NUM_ARTIFACTS; i++) {
     const size = 8 + Math.random() * 22;
-    const emoji =
-      activeTheme.value === Theme.Fall
-        ? (fallEmojis[Math.floor(Math.random() * fallEmojis.length)] ?? '🍁')
-        : winterEmoji;
+    let emoji = null;
+    switch (activeTheme.value) {
+      case Theme.Fall:
+        emoji = fallEmojis[Math.floor(Math.random() * fallEmojis.length)] ?? '🍁';
+        break;
+      case Theme.Winter:
+        emoji = winterEmoji;
+        break;
+      case Theme.Spring:
+        emoji = springEmoji;
+        break;
+      case Theme.Summer:
+        emoji = summerEmoji;
+        break;
+    }
+    // activeTheme.value === Theme.Fall
+    //   ? (fallEmojis[Math.floor(Math.random() * fallEmojis.length)] ?? '🍁')
+    //   : winterEmoji;
 
     artifacts.value.push({
       id: `${i}-${Math.random()}`,
