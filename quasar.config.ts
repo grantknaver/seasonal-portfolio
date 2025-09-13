@@ -113,7 +113,17 @@ export default defineConfig(() => {
     },
     // https://v2.quasar.dev/quasar-cli-vite/quasar-config-file#framework
     framework: {
-      config: {},
+      config: {
+        notify: {
+          progress: true,
+          icon: 'error',
+          position: 'center',
+          // color: 'negative',
+          // type: 'negative',
+          // multiLine: true,
+          // avatar: 'https://cdn.quasar.dev/img/boy-avatar.png',
+        },
+      },
 
       // iconSet: 'material-icons', // Quasar icon set
       // lang: 'en-US', // Quasar language pack
@@ -126,7 +136,7 @@ export default defineConfig(() => {
       // directives: [],
       iconSet: 'fontawesome-v6', // 👈 Put inside framework
       // Quasar plugins
-      plugins: [],
+      plugins: ['Notify'],
     },
 
     // animations: 'all', // --- includes all animations

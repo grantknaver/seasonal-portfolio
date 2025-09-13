@@ -1,11 +1,13 @@
 import { ref } from 'vue';
 import { defineStore } from 'pinia';
-// import { v4 as uuidv4 } from 'uuid';
+import { v4 as uuidv4 } from 'uuid';
 import { Theme } from '../shared/constants/theme';
 import { syncThemeGlobals } from '../shared/utils/theme';
 import { type TopicName } from '../shared/constants/topicName';
 import { type ChatMessage } from '../shared/types/chatMessage';
-// import { useChatTime } from 'src/shared/composables/useChatTime';
+import type { CustomError } from 'src/shared/types/customError';
+import { useCustomError } from 'src/shared/composables/useCustomError';
+import { useQuasar } from 'quasar';
 
 export const useMainStore = defineStore('main', () => {
   const activeTopic = ref<TopicName | null>(null);
@@ -13,54 +15,12 @@ export const useMainStore = defineStore('main', () => {
   const activeAiAssistLogo = ref<string>(
     new URL('/src/assets/ai-chat_fall.png', import.meta.url).href,
   );
+  const $q = useQuasar();
   const contactSectionRef = ref<HTMLElement | null>(null);
   const mobileScrollTarget = ref<TopicName | null>(null);
   const isHuman = ref<boolean>(false);
-  const chatLog = ref<ChatMessage[]>([
-    // {
-    //   id: uuidv4(),
-    //   name: 'Bot',
-    //   avatar: 'https://cdn.quasar.dev/img/avatar3.jpg',
-    //   text: ['Doing fine, how are you?'],
-    //   sent: false,
-    //   stamp: '6 minutes ago',
-    //   bgColor: 'grey-4',
-    // },
-  ]);
+  const chatLog = ref<ChatMessage[]>([]);
 
-  const SEND_ASSITANT_MESSAGE = async (message: string) => {
-    const url = `${import.meta.env.VITE_BASE_URL}/ai/openAi/submit-message`;
-    console.log('URL', url);
-    const res = await fetch(url, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      credentials: 'include',
-      body: JSON.stringify({ message }),
-    });
-    const data = await res.json();
-    if (!res.ok) {
-      const codes = Array.isArray(data['error-codes']) ? data['error-codes'].join(', ') : '';
-      throw new Error(`Server error ${res.status}${codes ? ` (${codes})` : ''}`);
-    }
-    if (data.success !== true) {
-      const codes = Array.isArray(data['error-codes']) ? data['error-codes'].join(', ') : 'unknown';
-      throw new Error(`OpenAI messagign failed: ${codes}`);
-    }
-    // const d = new Date();
-    // const date = d.toISOString();
-    // const newMessage = {
-    //   id: uuidv4(),
-    //   name: 'Me',
-    //   avatar: 'https://cdn.quasar.dev/img/avatar4.jpg',
-    //   text: [message],
-    //   sent: true,
-    //   stamp: useChatTime(date).label.value,
-    //   bgColor: 'primary',
-    // };
-    // chatLog.value = [...chatLog.value, newMessage];
-  };
   const SET_MOBILE_SCROLL_TARGET = (topicName: TopicName | null): void => {
     mobileScrollTarget.value = topicName;
   };
@@ -82,36 +42,97 @@ export const useMainStore = defineStore('main', () => {
   const SET_CONTACT_SECTION_REF = (element: HTMLElement | null): void => {
     contactSectionRef.value = element;
   };
-  const VERIFY_RECAPTCHA = async (token: string): Promise<void> => {
-    const res = await fetch(`${import.meta.env.VITE_BASE_URL}/api/auth/verify-recaptcha`, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      credentials: 'include',
-      body: JSON.stringify({ token }),
-    });
-    const data = await res.json();
-    if (!res.ok) {
-      const codes = Array.isArray(data['error-codes']) ? data['error-codes'].join(', ') : '';
-      throw new Error(`Server error ${res.status}${codes ? ` (${codes})` : ''}`);
+  const SEND_ASSITANT_MESSAGE = async (message: string) => {
+    const url = `${import.meta.env.VITE_BASE_URL}/api/openAi/submit-message`;
+    const controller = new AbortController();
+    const t = setTimeout(() => controller.abort(), 6000);
+    try {
+      const res = await fetch(url, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        credentials: 'include',
+        body: JSON.stringify({ message }),
+        signal: controller.signal,
+      });
+      const data = await res.json();
+      const error = data as CustomError;
+      if (!res.ok) {
+        if (data.status !== 429) {
+          useCustomError(error);
+        }
+      }
+      const d = new Date();
+      const stamp = d.toISOString();
+      const newMessage = {
+        id: uuidv4(),
+        name: 'Me',
+        avatar: 'https://cdn.quasar.dev/img/avatar4.jpg',
+        text: [message],
+        sent: true,
+        stamp,
+        label: 'label',
+        bgColor: 'primary',
+      };
+      chatLog.value = [...chatLog.value, newMessage];
+    } catch (error) {
+      console.error('[SEND_ASSITANT_MESSAGE]', error);
+      $q.notify({ type: 'negative', message: `500 - Server error 0` });
+      return;
+    } finally {
+      clearTimeout(t);
     }
+  };
+  const VERIFY_RECAPTCHA = async (token: string): Promise<void> => {
+    const controller = new AbortController();
+    const t = setTimeout(() => controller.abort(), 6000);
+    try {
+      const res = await fetch(`${import.meta.env.VITE_BASE_URL}/api/auth/verify-recaptcha`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        credentials: 'include',
+        body: JSON.stringify({ token }),
+        signal: controller.signal,
+      });
+      const data = await res.json();
+      const error = data as CustomError;
+      if (!res.ok) {
+        useCustomError(error);
+      }
 
-    if (data.success !== true) {
-      const codes = Array.isArray(data['error-codes']) ? data['error-codes'].join(', ') : 'unknown';
-      throw new Error(`reCAPTCHA failed: ${codes}`);
+      if (data.success !== true) {
+        useCustomError(error);
+      }
+    } catch (error) {
+      console.error('[VERIFY_RECAPTCHA]', error);
+      $q.notify({ type: 'negative', message: `500 - Server error 1` });
+      return;
+    } finally {
+      clearTimeout(t);
     }
   };
   const VERIFY_HUMANITY = async () => {
+    const url = new URL(`${import.meta.env.VITE_BASE_URL}/api/auth/verify-status`).toString();
+    const controller = new AbortController();
+    const t = setTimeout(() => controller.abort(), 6000);
+
     try {
-      const res = await fetch(`${import.meta.env.VITE_BASE_URL}/api/auth/verify-status`, {
+      const res = await fetch(url, {
         credentials: 'include',
+        headers: { Accept: 'application/json' },
+        signal: controller.signal,
       });
-      const { isHuman: isHumanRef } = await res.json();
-      isHuman.value = isHumanRef;
-    } catch (e) {
-      const msg = e instanceof Error ? e.message : String(e);
-      throw new Error(`Server error ${msg}`);
+      const data = await res.json();
+      isHuman.value = data.isHuman;
+    } catch (error) {
+      console.error('[VERIFY_HUMANITY]', error);
+      $q.notify({ type: 'negative', message: `500 - Server Error 2` });
+      return;
+    } finally {
+      clearTimeout(t);
     }
   };
 

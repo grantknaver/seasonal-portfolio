@@ -67,7 +67,7 @@ function formatChatTimestamp(date: Date, now: Date, locale: string, timeZone?: s
   const hour = 60 * minute;
 
   if (ms < 30 * 1000) return 'just now';
-  if (ms < hour) return `${Math.floor(ms / minute)}m`;
+  if (ms < hour) return `${Math.floor(ms / minute) + 1}m`;
 
   if (isSameLocalDay(date, now, timeZone)) return timeHM(date, locale, timeZone);
   if (isYesterdayLocal(date, now, timeZone)) return `Yesterday ${timeHM(date, locale, timeZone)}`;

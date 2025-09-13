@@ -2,9 +2,18 @@
 import { ref, watch } from 'vue';
 import { useMainStore } from 'src/stores/main';
 
+declare const grecaptcha: ReCaptchaV2.ReCaptcha; // let TS chill
+
 const mainStore = useMainStore();
 const widgetId = ref<number | null>(null);
 const recaptchaEl = ref<HTMLElement | null>(null);
+
+const waitForGrecaptcha = () =>
+  new Promise<void>((resolve) => {
+    const tick = () =>
+      typeof window !== 'undefined' && window.grecaptcha ? resolve() : setTimeout(tick, 100);
+    tick();
+  });
 
 const init = () => {
   grecaptcha.ready(() => {
@@ -26,17 +35,16 @@ const init = () => {
     });
   });
 };
+
 watch(
   recaptchaEl,
-  (v) => {
+  async (v) => {
     if (v) {
+      await waitForGrecaptcha(); // ✅ just this line
       init();
     }
   },
-  {
-    flush: 'post',
-    immediate: true,
-  },
+  { flush: 'post', immediate: true },
 );
 </script>
 

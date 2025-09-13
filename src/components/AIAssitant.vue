@@ -6,6 +6,7 @@ import { TopicName } from '../shared/constants/topicName';
 import type { QScrollArea } from 'quasar';
 import { Theme } from '../shared/constants/theme';
 import RecaptchaWidget from '../components/RecaptchaWidget.vue';
+import { useChatTime } from 'src/shared/composables/useChatTime';
 
 const mainStore = useMainStore();
 const { activeAiAssistLogo, activeTopic, chatLog, activeTheme, isHuman } = storeToRefs(mainStore);
@@ -23,21 +24,21 @@ watch(chatLog, async () => {
 const submitMessage = async () => {
   const msg = text.value.trim();
   if (!msg || sending.value) return;
-  alert('submitMessage');
   sending.value = true;
   try {
     await mainStore.SEND_ASSITANT_MESSAGE(msg); // may reject → we catch it
     text.value = '';
   } catch (e) {
-    // const m = e instanceof Error ? e.message : String(e);
     console.error('SEND_ASSITANT_MESSAGE error:', e);
-    // $q.notify({ type: 'negative', message: m });
+    text.value = '';
   } finally {
     sending.value = false;
-    // scroll after DOM updates (we also watch chatLog below as a backup)
     chatScroll.value?.setScrollPosition('vertical', 99999, 300);
   }
 };
+
+const updateStamp = (stamp: string | undefined): string =>
+  stamp ? useChatTime(stamp).label.value : '';
 </script>
 
 <template>
@@ -58,7 +59,7 @@ const submitMessage = async () => {
           :avatar="message.sent ? '/silhouette-avatar.svg' : '/robot-avatar.svg'"
           :text="message.text"
           :sent="message.sent"
-          :stamp="message.stamp"
+          :stamp="message.stamp ? updateStamp(message.stamp) : ''"
           :text-color="message.sent && activeTheme === Theme.Summer ? 'black' : 'primary'"
           :bg-color="message.sent ? 'accent' : 'dark'"
         />
@@ -76,7 +77,7 @@ const submitMessage = async () => {
         @keyup.enter.prevent="submitMessage"
         outlined
         class="custom-input"
-        :disable="true"
+        :disable="sending"
       >
         <template #prepend><q-icon name="chat" /></template>
       </q-input>
