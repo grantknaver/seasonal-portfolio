@@ -8,6 +8,8 @@ import { type ChatMessage } from '../shared/types/chatMessage';
 import type { CustomError } from 'src/shared/types/customError';
 import { useCustomError } from 'src/shared/composables/useCustomError';
 import { useQuasar } from 'quasar';
+import type OAMessageElement from '../shared/types/oaMessageElement';
+import { OARole } from 'src/shared/types/oaRole';
 
 export const useMainStore = defineStore('main', () => {
   const activeTopic = ref<TopicName | null>(null);
@@ -19,7 +21,28 @@ export const useMainStore = defineStore('main', () => {
   const contactSectionRef = ref<HTMLElement | null>(null);
   const mobileScrollTarget = ref<TopicName | null>(null);
   const isHuman = ref<boolean>(false);
-  const chatLog = ref<ChatMessage[]>([]);
+  const oaLog = ref<OAMessageElement[]>([
+    {
+      role: OARole.Developer,
+      content: [
+        {
+          type: 'text',
+          text: 'Introduce yourself with a season-inspired name (e.g., Snowflake, Autumn, Solstice). Speak briefly and clearly. Whenever possible, weave in light seasonal references (weather, nature, time of year) into your answers. If you are uncertain, ask a clarifying question instead of guessing.',
+        },
+      ],
+    },
+  ]);
+  const chatLog = ref<ChatMessage[]>([
+    // {
+    //   id: uuidv4(),
+    //   name: 'Bot',
+    //   avatar: 'https://cdn.quasar.dev/img/avatar3.jpg',
+    //   text: ['Doing fine, how are you?'],
+    //   sent: false,
+    //   stamp: '6 minutes ago',
+    //   bgColor: 'grey-4',
+    // },
+  ]);
 
   const SET_MOBILE_SCROLL_TARGET = (topicName: TopicName | null): void => {
     mobileScrollTarget.value = topicName;
@@ -42,7 +65,7 @@ export const useMainStore = defineStore('main', () => {
   const SET_CONTACT_SECTION_REF = (element: HTMLElement | null): void => {
     contactSectionRef.value = element;
   };
-  const SEND_ASSITANT_MESSAGE = async (message: string) => {
+  const SEND_ASSITANT_MESSAGE = async (messageElements: OAMessageElement[]) => {
     const url = `${import.meta.env.VITE_BASE_URL}/api/openAi/submit-message`;
     const controller = new AbortController();
     const t = setTimeout(() => controller.abort(), 6000);
@@ -53,7 +76,7 @@ export const useMainStore = defineStore('main', () => {
           'Content-Type': 'application/json',
         },
         credentials: 'include',
-        body: JSON.stringify({ message }),
+        body: JSON.stringify([]),
         signal: controller.signal,
       });
       const data = await res.json();
@@ -63,13 +86,23 @@ export const useMainStore = defineStore('main', () => {
           useCustomError(error);
         }
       }
+      // {
+      //   id: uuidv4(),
+      //   name: 'Bot',
+      //   avatar: 'https://cdn.quasar.dev/img/avatar3.jpg',
+      //   text: ['Doing fine, how are you?'],
+      //   sent: false,
+      //   stamp: '6 minutes ago',
+      //   bgColor: 'grey-4',
+      // },
       const d = new Date();
       const stamp = d.toISOString();
+
       const newMessage = {
         id: uuidv4(),
         name: 'Me',
         avatar: 'https://cdn.quasar.dev/img/avatar4.jpg',
-        text: [message],
+        text: [messageDetails.content[0]?.text],
         sent: true,
         stamp,
         label: 'label',

@@ -6,11 +6,12 @@ import { TopicName } from '../shared/constants/topicName';
 import type { QScrollArea } from 'quasar';
 import { Theme } from '../shared/constants/theme';
 import RecaptchaWidget from '../components/RecaptchaWidget.vue';
-import { useChatTime } from 'src/shared/composables/useChatTime';
+import { useChatTime } from '../shared/composables/useChatTime';
+import type OAMessageElement from '../shared/types/oaMessageElement';
+import { OARole } from '../shared/types/oaRole';
 
 const mainStore = useMainStore();
 const { activeAiAssistLogo, activeTopic, chatLog, activeTheme, isHuman } = storeToRefs(mainStore);
-
 const isChatting = ref(true);
 const text = ref('');
 const chatScroll = ref<QScrollArea>();
@@ -26,7 +27,16 @@ const submitMessage = async () => {
   if (!msg || sending.value) return;
   sending.value = true;
   try {
-    await mainStore.SEND_ASSITANT_MESSAGE(msg); // may reject → we catch it
+    const messageDetails: OAMessageElement = {
+      role: OARole.User,
+      content: [
+        {
+          type: 'text',
+          text: msg,
+        },
+      ],
+    };
+    await mainStore.SEND_ASSITANT_MESSAGE(messageDetails); // may reject → we catch it
     text.value = '';
   } catch (e) {
     console.error('SEND_ASSITANT_MESSAGE error:', e);
