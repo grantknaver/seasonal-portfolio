@@ -11,7 +11,6 @@ import ProjectSection from 'src/components/ProjectSection.vue';
 import ContactSection from '../components/ContactSection.vue';
 import { scrollToElement } from '../shared/utils/scrollToElement';
 import { setSeasonClasses } from '../shared/utils/setSeasonColors';
-import AIAssitant from '../components/AIAssitant.vue';
 
 const simonRef = ref();
 const mainStore = useMainStore();
@@ -73,7 +72,18 @@ const selectTopic = (name: TopicName) => {
 <template>
   <q-page class="page-container scroll column col">
     <div>
-      <img class="q-pt-sm logo" style="max-width: 200px" src="../assets/logo.png" alt="logo" />
+      <div class="logo">
+        <img
+          class="q-pt-sm"
+          style="max-width: 65px"
+          src="../assets/glkfreelance-logo.png"
+          alt="logo"
+        />
+        <span class="logo-text"
+          ><span class="text-secondary">glk</span><span class="text-primary">Freelance</span></span
+        >
+      </div>
+
       <div class="sub-container column col items-center q-pl-md q-pr-md">
         <section class="mobile-view column items-center full-width">
           <div
@@ -220,7 +230,6 @@ const selectTopic = (name: TopicName) => {
         </section>
       </div>
     </div>
-    <AIAssitant />
   </q-page>
 </template>
 
@@ -248,7 +257,13 @@ const selectTopic = (name: TopicName) => {
 
     @media (min-width: $breakpoint-md) {
       display: flex !important;
+      align-items: center;
       z-index: 10;
+
+      .logo-text {
+        padding-left: 0.5rem;
+        font-size: 1.5rem;
+      }
     }
   }
 

@@ -92,15 +92,27 @@ watch(slide, (newVal) => {
     </div>
 
     <!-- HEADER (mobile) -->
-    <q-header class="main-header text-black">
+    <q-header class="text-black">
       <q-toolbar class="bg-dark q-pa-lg">
         <q-toolbar-title>
-          <img
+          <!-- <img
             class="q-pt-sm"
             style="max-width: 200px"
-            src="../assets/logo.png"
+            src="../assets/glkfreelance-logo.png"
             alt="glkFreelance logo"
-          />
+          /> -->
+          <div class="logo row items-center">
+            <img
+              class="q-pt-sm"
+              style="max-width: 65px"
+              src="../assets/glkfreelance-logo.png"
+              alt="logo"
+            />
+            <span class="logo-text"
+              ><span class="text-secondary">glk</span
+              ><span class="text-primary">Freelance</span></span
+            >
+          </div>
         </q-toolbar-title>
 
         <q-btn
@@ -276,6 +288,11 @@ body,
 
   @media (min-width: $breakpoint-md) {
     display: none;
+  }
+
+  .logo-text {
+    padding-left: 0.5rem;
+    font-size: 1.5rem;
   }
 }
 
