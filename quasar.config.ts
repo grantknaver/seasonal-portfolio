@@ -232,7 +232,7 @@ export default defineConfig(() => {
       builder: {
         // https://www.electron.build/configuration/configuration
 
-        appId: 'minimalistic-portfolio',
+        appId: '4-seasons-portfolio',
       },
     },
 
