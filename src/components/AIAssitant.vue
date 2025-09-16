@@ -21,16 +21,19 @@ const flushLogs = debounce(async () => {
   chatScroll.value?.setScrollPosition('vertical', 99999, 300);
 }, 2000);
 
-const addToLog = (): void | undefined => {
-  const t = text.value.trim();
-  if (!t) return;
-  const logItem: OALog = {
-    role: OARole.User,
-    content: [{ type: 'input_text', text: t }],
-  };
-  mainStore.SET_OALOG([logItem]);
-  text.value = '';
-  flushLogs();
+const addToLog = async (): Promise<void | undefined> => {
+  await mainStore.VERIFY_HUMANITY();
+  if (isHuman.value) {
+    const t = text.value.trim();
+    if (!t) return;
+    const logItem: OALog = {
+      role: OARole.User,
+      content: [{ type: 'input_text', text: t }],
+    };
+    mainStore.SET_OALOG([logItem]);
+    text.value = '';
+    flushLogs();
+  }
 };
 
 watch(isChatting, async (newChattingStatus) => {

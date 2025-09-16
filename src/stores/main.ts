@@ -5,12 +5,14 @@ import { Theme } from '../shared/constants/theme';
 import { syncThemeGlobals } from '../shared/utils/theme';
 import { type TopicName } from '../shared/constants/topicName';
 import { type ChatMessage } from '../shared/types/chatMessage';
-import type { CustomError } from 'src/shared/types/customError';
-import { useCustomError } from 'src/shared/composables/useCustomError';
 import { useQuasar } from 'quasar';
 import type OALog from '../shared/types/oaLog';
 import { OARole } from '../shared/types/oaRole';
 import { default as useChatTime } from '../shared/composables/useChatTime';
+import { fetchRetry } from '../shared/utils/fetchRetry';
+import { safeJson } from '../shared/composables/safeJson';
+import { HttpError } from '../shared/errors/HttpError';
+import { useErrorNotifier } from '../shared/composables/useErrorNotifier';
 
 export const useMainStore = defineStore('main', () => {
   const activeTopic = ref<TopicName | null>(null);
@@ -36,6 +38,7 @@ export const useMainStore = defineStore('main', () => {
   const chatLog = ref<ChatMessage[]>([]);
   const lastAssistantIndex = ref<number>(-1);
   const isLoading = ref<boolean>(false);
+  const { notifyHttp, notifyGeneric } = useErrorNotifier();
 
   const SET_MOBILE_SCROLL_TARGET = (topicName: TopicName | null): void => {
     mobileScrollTarget.value = topicName;
@@ -58,23 +61,18 @@ export const useMainStore = defineStore('main', () => {
   const SET_CONTACT_SECTION_REF = (element: HTMLElement | null): void => {
     contactSectionRef.value = element;
   };
-
   const SET_OALOG = (logItems: OALog[]) => {
     oaLogs.value = [...oaLogs.value, ...logItems];
   };
-
   const SEND_OALOGS = async () => {
     isLoading.value = true;
     const url = `${import.meta.env.VITE_BASE_URL}/api/openAi/submit-logs`;
-    // const controller = new AbortController();
-    // const t = setTimeout(() => {
-    //   $q.notify({ type: 'negative', message: 'Request took too long' });
-    //   controller.abort();
-    // }, 6000);
+    const TIMEOUT_MS = 6000;
+
     const constructChatMessage = (log: OALog): ChatMessage => {
       const d = new Date();
       const stamp = d.toISOString();
-      const message: ChatMessage = {
+      return {
         id: uuidv4(),
         name: log.role === OARole.Assistant ? 'Bot' : 'Me',
         avatar:
@@ -86,57 +84,51 @@ export const useMainStore = defineStore('main', () => {
         stamp: useChatTime(stamp).format('h:mm A'),
         bgColor: log.role === OARole.Assistant ? 'grey-4' : 'primary',
       };
-      return message;
     };
 
+    const controller = new AbortController();
+    const t = setTimeout(() => controller.abort(), TIMEOUT_MS);
+
     try {
-      const res = await fetch(url, {
+      const res = await fetchRetry(url, {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
+        headers: { 'Content-Type': 'application/json' },
         credentials: 'include',
         body: JSON.stringify([...oaLogs.value]),
-        // signal: controller.signal,
+        signal: controller.signal,
       });
+      const data = await safeJson(res);
 
-      const data = await res.json();
-      const error = data as CustomError;
       if (!res.ok) {
-        if (data.status !== 429) {
-          useCustomError(error);
-        }
+        throw new HttpError(res.status, data);
       }
 
       const { text: assistantDialog } = data;
       const logItem: OALog = {
         role: OARole.Assistant,
-        content: [
-          {
-            type: 'output_text',
-            text: assistantDialog.trim(),
-          },
-        ],
+        content: [{ type: 'output_text', text: (assistantDialog ?? '').trim() }],
       };
-      isLoading.value = false;
+
       oaLogs.value = [...oaLogs.value, logItem];
       chatLog.value = oaLogs.value
         .filter((log) => log.role !== OARole.System)
         .map((log) => constructChatMessage(log));
     } catch (err) {
-      console.error('[SEND_OALOGS] error:', err);
-      $q.notify({ type: 'negative', message: `500 - Server error` });
-      return;
+      if (err instanceof HttpError) {
+        notifyHttp(err);
+      } else {
+        notifyGeneric(err);
+      }
+    } finally {
+      clearTimeout(t);
+      isLoading.value = false;
     }
-    // finally {
-    //   clearTimeout(t);
-    // }
   };
   const VERIFY_RECAPTCHA = async (token: string): Promise<void> => {
     const controller = new AbortController();
     const t = setTimeout(() => controller.abort(), 6000);
     try {
-      const res = await fetch(`${import.meta.env.VITE_BASE_URL}/api/auth/verify-recaptcha`, {
+      const res = await fetchRetry(`${import.meta.env.VITE_BASE_URL}/api/auth/verify-recaptcha`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -145,19 +137,17 @@ export const useMainStore = defineStore('main', () => {
         body: JSON.stringify({ token }),
         signal: controller.signal,
       });
-      const data = await res.json();
-      const error = data as CustomError;
-      if (!res.ok) {
-        useCustomError(error);
-      }
+      const data = await safeJson(res);
 
-      if (data.success !== true) {
-        useCustomError(error);
+      if (!res.ok || data.success !== true) {
+        throw new HttpError(res.status, data);
       }
     } catch (err) {
-      console.error('[VERIFY_RECAPTCHA] err:', err);
-      $q.notify({ type: 'negative', message: `500 - Server error` });
-      return;
+      if (err instanceof HttpError) {
+        notifyHttp(err);
+      } else {
+        notifyGeneric(err);
+      }
     } finally {
       clearTimeout(t);
     }
