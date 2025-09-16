@@ -12,7 +12,6 @@ import ContactSection from '../components/ContactSection.vue';
 import { scrollToElement } from '../shared/utils/scrollToElement';
 import { setSeasonClasses } from '../shared/utils/setSeasonColors';
 import AIAssitant from '../components/AIAssitant.vue';
-// import RecaptchaWidget from '../components/RecaptchaWidget.vue';
 
 const simonRef = ref();
 const mainStore = useMainStore();

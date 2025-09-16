@@ -1,11 +1,11 @@
 import { type OARole } from './oaRole';
 
-export default interface OAMessageElement {
+export default interface OALog {
   role: OARole;
   content: InputContent[];
 }
 
 interface InputContent {
-  type: 'text';
+  type: 'input_text' | 'output_text';
   text: string;
 }
