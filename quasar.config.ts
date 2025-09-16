@@ -3,7 +3,7 @@
 
 import { defineConfig } from '#q-app/wrappers';
 
-export default defineConfig((/* ctx */) => {
+export default defineConfig(() => {
   return {
     // https://v2.quasar.dev/quasar-cli-vite/prefetch-feature
     // preFetch: true,
@@ -31,7 +31,6 @@ export default defineConfig((/* ctx */) => {
       'roboto-font', // optional, you are not bound to it
       'material-icons', // optional, you are not bound to it
     ],
-
     // Full list of options: https://v2.quasar.dev/quasar-cli-vite/quasar-config-file#build
     build: {
       target: {
@@ -42,7 +41,16 @@ export default defineConfig((/* ctx */) => {
       typescript: {
         strict: true,
         vueShim: true,
-        // extendTsConfig (tsConfig) {}
+        extendTsConfig(tsconfig) {
+          tsconfig.compilerOptions ??= {};
+
+          // Make sure Quasar includes your global types
+          tsconfig.include ??= [];
+          tsconfig.include.push('src/**/*.d.ts');
+
+          // Optional: still skip library type errors
+          tsconfig.compilerOptions.skipLibCheck = true;
+        },
       },
 
       vueRouterMode: 'hash', // available values: 'hash', 'history'
@@ -78,15 +86,44 @@ export default defineConfig((/* ctx */) => {
         ],
       ],
     },
-
     // Full list of options: https://v2.quasar.dev/quasar-cli-vite/quasar-config-file#devserver
     devServer: {
-      // https: true,
-      open: true, // opens browser window automatically
+      host: '0.0.0.0',
+      port: 9000,
+      open: true,
+      proxy: {
+        '/api/auth/verify-recaptcha': {
+          target: 'http://localhost:3000',
+          changeOrigin: true,
+          secure: false,
+          // no rewrite: backend expects /api/auth/verify-recaptcha
+        },
+        '/api/auth/verify-status': {
+          target: 'http://localhost:3000',
+          changeOrigin: true,
+          secure: false,
+        },
+      },
+    },
+    // (optional, only needed if you still open the site through ngrok)
+    vite: {
+      server: {
+        allowedHosts: ['198c227ec8bb.ngrok-free.app'],
+      },
     },
     // https://v2.quasar.dev/quasar-cli-vite/quasar-config-file#framework
     framework: {
-      config: {},
+      config: {
+        notify: {
+          progress: true,
+          icon: 'error',
+          position: 'center',
+          // color: 'negative',
+          // type: 'negative',
+          // multiLine: true,
+          // avatar: 'https://cdn.quasar.dev/img/boy-avatar.png',
+        },
+      },
 
       // iconSet: 'material-icons', // Quasar icon set
       // lang: 'en-US', // Quasar language pack
@@ -99,7 +136,7 @@ export default defineConfig((/* ctx */) => {
       // directives: [],
       iconSet: 'fontawesome-v6', // 👈 Put inside framework
       // Quasar plugins
-      plugins: [],
+      plugins: ['Notify'],
     },
 
     // animations: 'all', // --- includes all animations
@@ -195,7 +232,7 @@ export default defineConfig((/* ctx */) => {
       builder: {
         // https://www.electron.build/configuration/configuration
 
-        appId: 'minimalistic-portfolio',
+        appId: '4-seasons-portfolio',
       },
     },
 

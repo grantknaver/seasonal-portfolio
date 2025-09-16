@@ -1,8 +1,7 @@
 <script setup lang="ts">
-import { ref, onMounted, nextTick, watch } from 'vue';
-import { Theme } from '../shared/constants/theme';
+import { ref, nextTick, watch, onMounted } from 'vue';
 import { useMainStore } from '../stores/main';
-import { type Topic } from '../shared/models/topic';
+import { type Topic } from '../shared/types/topic';
 import { v4 as uuidv4 } from 'uuid';
 import { storeToRefs } from 'pinia';
 import { TopicName } from 'src/shared/constants/topicName';
@@ -13,13 +12,6 @@ import ContactSection from '../components/ContactSection.vue';
 import { scrollToElement } from '../shared/utils/scrollToElement';
 import { setSeasonClasses } from '../shared/utils/setSeasonColors';
 
-const currentBg = ref('');
-const backgroundMap: Record<Theme, string> = {
-  [Theme.Fall]: new URL('../assets/autumn-forestry.jpg', import.meta.url).href,
-  [Theme.Winter]: new URL('../assets/snowy-winter-landscape.jpg', import.meta.url).href,
-  [Theme.Spring]: new URL('../assets/beautiful-forest-spring-season.jpg', import.meta.url).href,
-  [Theme.Summer]: new URL('../assets/beautiful-shot-forest.jpg', import.meta.url).href,
-};
 const simonRef = ref();
 const mainStore = useMainStore();
 const topics: Topic[] = [
@@ -47,22 +39,19 @@ const topics: Topic[] = [
   },
 ];
 const { activeTheme, activeTopic, mobileScrollTarget } = storeToRefs(mainStore);
-const expandedPanel = ref<TopicName | null>(null); // mobile accordion state
+const expandedPanel = ref<TopicName | null>(null);
+
+onMounted(async () => {
+  await mainStore.VERIFY_HUMANITY();
+});
 
 watch(mobileScrollTarget, (newTopic) => {
   if (!newTopic) return;
-  expandedPanel.value = newTopic; // opens the matching expansion
-  // drawer can close itself in MainLayout when you set the target
-});
-
-onMounted(() => {
-  currentBg.value = backgroundMap[Theme.Fall];
-  // window.addEventListener('resize', updateWidths);
+  expandedPanel.value = newTopic;
 });
 
 watch(activeTopic, (newTopic: TopicName | null) => {
   if (!newTopic) return;
-
   expandedPanel.value = newTopic;
 });
 
@@ -82,159 +71,165 @@ const selectTopic = (name: TopicName) => {
 
 <template>
   <q-page class="page-container scroll column col">
-    <img class="q-pt-sm logo" style="max-width: 200px" src="../assets/logo.png" alt="logo" />
-    <div class="sub-container column col items-center q-pl-md q-pr-md">
-      <section class="mobile-view column items-center full-width">
-        <div inline-actions class="flex full-width text-primary bg-accent q-mt-lg q-mb-sm q-pa-md">
-          <span>
-            <p class="q-ma-none text-primary bounce-text">Grant Knaver</p>
-            <p class="q-ma-none text-dark">Fullstack Developer</p>
-          </span>
-          <q-space></q-space>
-          <q-btn size="lg" color="dark">Resume</q-btn>
-        </div>
-        <blockquote
-          class="full-width q-pa-md text-center"
-          cite="http://www.worldwildlife.org/who/index.html"
+    <div>
+      <div class="logo">
+        <img
+          class="q-pt-sm"
+          style="max-width: 65px"
+          src="../assets/glkfreelance-logo.png"
+          alt="logo"
+        />
+        <span class="logo-text"
+          ><span class="text-secondary">glk</span><span class="text-primary">Freelance</span></span
         >
-          "Successful software is built not just with code, but with trust. The best developers
-          listen first — not to respond, but to understand. Because building the right thing is just
-          as important as building it right."
-        </blockquote>
+      </div>
 
-        <q-list padding class="full-width q-pa-none">
-          <q-item
-            v-for="topic in topics.slice(1)"
-            :key="topic.id"
-            :name="topic.name"
-            v-model="expandedPanel"
-            class="full-width bg-transparent q-pa-none q-mb-sm"
-          >
-            <q-expansion-item
-              :icon="topic.seasonIcon"
-              :label="topic.label"
-              :model-value="expandedPanel === topic.name"
-              @update:model-value="
-                (val) => {
-                  expandedPanel = val
-                    ? topic.name
-                    : expandedPanel === topic.name
-                      ? null
-                      : expandedPanel;
-                }
-              "
-              :header-class="['text-dark', 'bg-secondary']"
-              class="expansion-item full-width"
-              @after-show="() => handleAfterShow(topic.name)"
-            >
-              <template v-if="topic.name === TopicName.About">
-                <div :id="topic.name" class="full-width">
-                  <AboutSection />
-                </div>
-              </template>
-              <template v-if="topic.name === TopicName.Skills">
-                <div :id="topic.name" class="anchor full-width">
-                  <SkillsSection />
-                </div>
-              </template>
-              <template v-if="topic.name === TopicName.Projects">
-                <div :id="topic.name" class="anchor full-width">
-                  <ProjectSection />
-                </div>
-              </template>
-            </q-expansion-item>
-          </q-item>
-        </q-list>
-        <q-separator color="secondary" class="full-width q-mt-xs q-mb-lg"></q-separator>
-        <div class="full-width" :id="TopicName.Contact">
-          <ContactSection />
-        </div>
-      </section>
-      <section class="desktop-view flex col column justify-center items-center full-width">
-        <div ref="simonRef" class="simon">
+      <div class="sub-container column col items-center q-pl-md q-pr-md">
+        <section class="mobile-view column items-center full-width">
           <div
-            v-for="topic in topics"
-            :key="topic.id"
-            class="simon-quadrant"
-            :class="[topic.name, { 'active-topic': topic.name === activeTopic }]"
-            tabindex="0"
-            style="padding: 1rem"
-            @click.stop="selectTopic(topic.name)"
+            inline-actions
+            class="flex full-width text-primary bg-accent q-mt-lg q-mb-sm q-pa-md"
           >
-            <a v-if="topic.name !== TopicName.Resume" class="simon-link">
-              <q-icon :name="topic.icon" size="32px" />
-              <q-tooltip anchor="center middle" self="top left">
-                {{ topic.label }}
-              </q-tooltip>
-            </a>
-            <a
-              v-else
+            <span>
+              <p class="q-ma-none text-primary bounce-text">Grant Knaver</p>
+              <p class="q-ma-none text-dark">Fullstack Developer</p>
+            </span>
+            <q-space></q-space>
+            <q-btn size="lg" color="dark">Resume</q-btn>
+          </div>
+          <blockquote
+            class="full-width q-pa-md text-center"
+            cite="http://www.worldwildlife.org/who/index.html"
+          >
+            "Successful software is built not just with code, but with trust. The best developers
+            listen first — not to respond, but to understand. Because building the right thing is
+            just as important as building it right."
+          </blockquote>
+
+          <q-list padding class="full-width q-pa-none">
+            <q-item
+              v-for="topic in topics.slice(1)"
+              :key="topic.id"
+              :name="topic.name"
+              v-model="expandedPanel"
+              class="full-width bg-transparent q-pa-none q-mb-sm"
+            >
+              <q-expansion-item
+                :icon="topic.seasonIcon"
+                :label="topic.label"
+                :model-value="expandedPanel === topic.name"
+                @update:model-value="
+                  (val) => {
+                    expandedPanel = val
+                      ? topic.name
+                      : expandedPanel === topic.name
+                        ? null
+                        : expandedPanel;
+                  }
+                "
+                :header-class="['text-dark', 'bg-secondary']"
+                class="expansion-item full-width"
+                @after-show="() => handleAfterShow(topic.name)"
+              >
+                <template v-if="topic.name === TopicName.About">
+                  <div :id="topic.name" class="full-width">
+                    <AboutSection />
+                  </div>
+                </template>
+                <template v-if="topic.name === TopicName.Skills">
+                  <div :id="topic.name" class="anchor full-width">
+                    <SkillsSection />
+                  </div>
+                </template>
+                <template v-if="topic.name === TopicName.Projects">
+                  <div :id="topic.name" class="anchor full-width">
+                    <ProjectSection />
+                  </div>
+                </template>
+              </q-expansion-item>
+            </q-item>
+          </q-list>
+          <q-separator color="secondary" class="full-width q-mt-xs q-mb-lg"></q-separator>
+          <div class="full-width" :id="TopicName.Contact">
+            <ContactSection />
+          </div>
+        </section>
+        <section class="desktop-view flex col column justify-center items-center full-width">
+          <div ref="simonRef" class="simon">
+            <div
+              v-for="topic in topics"
+              :key="topic.id"
+              class="simon-quadrant"
+              :class="[topic.name, { 'active-topic': topic.name === activeTopic }]"
+              tabindex="0"
+              style="padding: 1rem"
+              @click.stop="selectTopic(topic.name)"
+            >
+              <a v-if="topic.name !== TopicName.Resume" class="simon-link">
+                <q-icon :name="topic.icon" size="32px" />
+                <q-tooltip anchor="center middle" self="top left">
+                  {{ topic.label }}
+                </q-tooltip>
+              </a>
+              <a
+                v-else
+                :class="
+                  setSeasonClasses(
+                    {
+                      Fall: 'text-primary fall-text-shadow',
+                      Winter: 'text-primary winter-text-shadow',
+                      Spring: 'text-warning spring-text-shadow',
+                      Summer: 'text-warning summer-text-shadow',
+                    },
+                    activeTheme,
+                  )
+                "
+                label="Resume"
+                class="resume"
+                flat
+                href="https://firebasestorage.googleapis.com/v0/b/portfolio-4-seasons.firebasestorage.app/o/Resume.pdf?alt=media&token=2dbf1bfa-6d3f-44e4-a9b9-d6c6a53ea178"
+                >Resume</a
+              >
+            </div>
+          </div>
+          <q-separator class="q-mt-lg q-mb-md" />
+          <span>
+            <p
+              class="name q-ma-none"
               :class="
                 setSeasonClasses(
                   {
                     Fall: 'text-primary fall-text-shadow',
                     Winter: 'text-primary winter-text-shadow',
-                    Spring: 'text-warning spring-text-shadow',
-                    Summer: 'text-warning summer-text-shadow',
+                    Spring: 'text-primary spring-text-shadow',
+                    Summer: 'text-primary summer-text-shadow',
                   },
                   activeTheme,
                 )
               "
-              label="Resume"
-              class="resume"
-              flat
-              href="https://firebasestorage.googleapis.com/v0/b/portfolio-4-seasons.firebasestorage.app/o/Resume.pdf?alt=media&token=2dbf1bfa-6d3f-44e4-a9b9-d6c6a53ea178"
-              >Resume</a
             >
-          </div>
-        </div>
-        <q-separator class="q-mt-lg q-mb-md" />
-        <span>
-          <p
-            class="name q-ma-none"
-            :class="
-              setSeasonClasses(
-                {
-                  Fall: 'text-primary fall-text-shadow',
-                  Winter: 'text-primary winter-text-shadow',
-                  Spring: 'text-primary spring-text-shadow',
-                  Summer: 'text-primary summer-text-shadow',
-                },
-                activeTheme,
-              )
-            "
-          >
-            Grant Knaver
-          </p>
-          <p
-            class="full-stack q-ma-none text-bold text-warning text-center"
-            :class="
-              setSeasonClasses(
-                {
-                  Fall: 'fall-text-shadow',
-                  Winter: 'winter-text-shadow',
-                  Spring: 'spring-text-shadow',
-                  Summer: ' summer-text-shadow',
-                },
-                activeTheme,
-              )
-            "
-          >
-            Fullstack Developer
-          </p>
-        </span>
-      </section>
+              Grant Knaver
+            </p>
+            <p
+              class="full-stack q-ma-none text-bold text-warning text-center"
+              :class="
+                setSeasonClasses(
+                  {
+                    Fall: 'fall-text-shadow',
+                    Winter: 'winter-text-shadow',
+                    Spring: 'spring-text-shadow',
+                    Summer: ' summer-text-shadow',
+                  },
+                  activeTheme,
+                )
+              "
+            >
+              Fullstack Developer
+            </p>
+          </span>
+        </section>
+      </div>
     </div>
-    <q-btn
-      @click.stop="selectTopic(TopicName.Contact)"
-      round
-      class="contact-btn"
-      :color="activeTopic === TopicName.Contact ? 'dark' : 'accent'"
-      size="lg"
-      icon="mail"
-    >
-      <q-tooltip anchor="center middle" self="top left"> Contact </q-tooltip>
-    </q-btn>
   </q-page>
 </template>
 
@@ -262,7 +257,13 @@ const selectTopic = (name: TopicName) => {
 
     @media (min-width: $breakpoint-md) {
       display: flex !important;
+      align-items: center;
       z-index: 10;
+
+      .logo-text {
+        padding-left: 0.5rem;
+        font-size: 1.5rem;
+      }
     }
   }
 

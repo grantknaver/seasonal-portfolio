@@ -2,7 +2,7 @@
 import { ref } from 'vue';
 import { v4 as uuidv4 } from 'uuid';
 
-import { type TimelineEntry } from '../shared/models/timelineEntry';
+import { type TimelineEntry } from '../shared/types/timelineEntry';
 import { setSeasonClasses } from 'src/shared/utils/setSeasonColors';
 import { useMainStore } from '../stores/main';
 import { storeToRefs } from 'pinia';

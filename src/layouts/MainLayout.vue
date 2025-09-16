@@ -5,14 +5,14 @@ import { storeToRefs } from 'pinia';
 import { Theme } from '../shared/constants/theme';
 import { getCustomCssVar } from '../shared/utils/getCustomCssVar';
 import { TopicName } from '../shared/constants/topicName';
-import { type Topic } from '../shared/models/topic';
+import { type Topic } from '../shared/types/topic';
 import { v4 as uuidv4 } from 'uuid';
 import AboutSection from '../components/AboutSection.vue';
 import SkillsSection from '../components/SkillsSection.vue';
 import ContactSection from '../components/ContactSection.vue';
 import ProjectSection from '../components/ProjectSection.vue';
 import WeatherBackground from '../components/WeatherBackground.vue';
-import { type Slide } from 'src/shared/models/slide';
+import { type Slide } from 'src/shared/types/slide';
 import { QCarousel } from 'quasar';
 
 const mainStore = useMainStore();
@@ -69,14 +69,11 @@ onMounted(() => {
 onBeforeUnmount(() => window.removeEventListener('resize', updateWidths));
 
 watch(slide, (newVal) => {
-  setTimeout(() => {
-    mainStore.SET_ACTIVE_THEME(newVal);
-  }, 2000);
+  mainStore.SET_ACTIVE_THEME(newVal);
 });
 </script>
 
 <template>
-  <!-- Main Layout -->
   <q-layout view="Hhh Lpr lff">
     <div class="carousel-background">
       <q-carousel
@@ -95,15 +92,27 @@ watch(slide, (newVal) => {
     </div>
 
     <!-- HEADER (mobile) -->
-    <q-header class="main-header text-black">
+    <q-header class="text-black">
       <q-toolbar class="bg-dark q-pa-lg">
         <q-toolbar-title>
-          <img
+          <!-- <img
             class="q-pt-sm"
             style="max-width: 200px"
-            src="../assets/logo.png"
+            src="../assets/glkfreelance-logo.png"
             alt="glkFreelance logo"
-          />
+          /> -->
+          <div class="logo row items-center">
+            <img
+              class="q-pt-sm"
+              style="max-width: 65px"
+              src="../assets/glkfreelance-logo.png"
+              alt="logo"
+            />
+            <span class="logo-text"
+              ><span class="text-secondary">glk</span
+              ><span class="text-primary">Freelance</span></span
+            >
+          </div>
         </q-toolbar-title>
 
         <q-btn
@@ -279,6 +288,11 @@ body,
 
   @media (min-width: $breakpoint-md) {
     display: none;
+  }
+
+  .logo-text {
+    padding-left: 0.5rem;
+    font-size: 1.5rem;
   }
 }
 
