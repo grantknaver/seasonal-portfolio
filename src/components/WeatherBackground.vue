@@ -10,19 +10,13 @@ import {
 import { gsap } from 'gsap';
 import { useMainStore } from '../stores/main';
 import { storeToRefs } from 'pinia';
-import { Theme } from 'src/shared/constants/theme';
 import { debounce } from 'quasar';
+import { getCustomCssVar } from '../shared/utils/getCustomCssVar';
+import { type Artifact } from '../shared/types/artifact';
+import { Theme } from '../shared/constants/theme';
 
 const mainStore = useMainStore();
 const { activeTheme } = storeToRefs(mainStore);
-import { getCustomCssVar } from '../shared/utils/getCustomCssVar';
-
-interface Artifact {
-  id: string;
-  left: number;
-  size: number;
-  emoji: string;
-}
 
 const NUM_ARTIFACTS = 50;
 const artifacts = ref<Artifact[]>([]);
@@ -52,9 +46,6 @@ function createArtifacts() {
         emoji = summerEmoji;
         break;
     }
-    // activeTheme.value === Theme.Fall
-    //   ? (fallEmojis[Math.floor(Math.random() * fallEmojis.length)] ?? '🍁')
-    //   : winterEmoji;
 
     artifacts.value.push({
       id: `${i}-${Math.random()}`,
@@ -108,8 +99,7 @@ const animateArtifacts = () => {
       const artifact = artifacts.value[index];
       if (!artifact) continue;
 
-      const isFall = activeTheme.value === Theme.Fall;
-      const startX = Math.random() * window.innerWidth;
+      const startX = gsap.utils.random(0, 1) * window.innerWidth;
       const startY = -window.innerHeight - Math.random() * 400;
       const duration = 6 + (30 - assignFallDuration(artifact.size)) * 0.2;
       const delay = Math.random() * 6;
@@ -142,6 +132,17 @@ const animateArtifacts = () => {
           repeat: -1,
           ease: 'sine.inOut',
         });
+      }
+
+      switch (activeTheme.value) {
+        case Theme.Fall:
+          break;
+        case Theme.Winter:
+          break;
+        case Theme.Spring:
+          break;
+        case Theme.Summer:
+          break;
       }
     }
   }

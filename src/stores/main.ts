@@ -10,7 +10,7 @@ import type OALog from '../shared/types/oaLog';
 import { OARole } from '../shared/types/oaRole';
 import { default as useChatTime } from '../shared/composables/useChatTime';
 import { fetchRetry } from '../shared/utils/fetchRetry';
-import { safeJson } from '../shared/composables/safeJson';
+import { safeJson } from '../shared/composables/useSafeJson';
 import { HttpError } from '../shared/errors/HttpError';
 import { useErrorNotifier } from '../shared/composables/useErrorNotifier';
 
