@@ -17,21 +17,82 @@ import { Theme } from '../shared/constants/theme';
 
 const mainStore = useMainStore();
 const { activeTheme } = storeToRefs(mainStore);
-
-const NUM_ARTIFACTS = 50;
 const artifacts = ref<Artifact[]>([]);
 const artifactRefs = ref<(Element | ComponentPublicInstance | null)[]>([]);
-
 const fallEmojis = ['🍂', '🍁'];
 const winterEmoji = '❄';
 const springEmoji = '🌸';
-const summerEmoji = '🌸';
+const summerEmoji = '🏐';
+// ---------------------------------------------
+// Artifact creation
+// ---------------------------------------------
+
+// Helper
+const randRange = (min: number, max: number) => min + Math.random() * (max - min);
+
+// ---- Wind helpers
+const now = () => performance.now() / 1000; // seconds
+const n1 = (t: number, f = 0.07) => Math.sin(t * 2 * Math.PI * f);
+const n2 = (t: number, f = 0.11) => Math.sin((t + 13.37) * 2 * Math.PI * f);
+const n3 = (t: number, f = 0.041) => Math.sin((t + 7.5) * 2 * Math.PI * f);
+
+// gust envelope (0..1)
+function gust(t: number) {
+  const g = Math.max(0, Math.sin(t * 2 * Math.PI * 0.02));
+  return g * g;
+}
+
+// wind components (px/sec, deg/sec)
+function windX(t: number) {
+  const base = vw() * 0.1;
+  const wobble = (n1(t) * 0.6 + n2(t) * 0.3 + n3(t) * 0.1) * vw() * 0.03;
+  const gustAmp = gust(t) * vw() * 0.1;
+  return (n1(t, 0.03) >= 0 ? 1 : -1) * base + wobble + gustAmp;
+}
+function windY(t: number) {
+  return (n1(t, 0.09) * 0.5 + n2(t, 0.05) * 0.5) * 22;
+}
+function windSpin(t: number) {
+  return (n1(t, 0.06) * 0.7 + n2(t, 0.04) * 0.3) * 90 + gust(t) * 120;
+}
+
+// ---- Natural (Poisson) start schedule, with gust bumps
+
+// Per-season visual size (font-size) ranges, in px
+const SIZE_RANGE: Record<Theme, { min: number; max: number }> = {
+  [Theme.Fall]: { min: 12, max: 32 }, // leaves a bit larger on average
+  [Theme.Winter]: { min: 8, max: 22 }, // snowflakes smaller
+  [Theme.Spring]: { min: 10, max: 26 }, // petals medium/small
+  [Theme.Summer]: { min: 18, max: 36 }, // volleyball bigger
+};
+
+const ARTIFACT_QUANITY: Record<Theme, number> = {
+  [Theme.Fall]: 50, // leaves a bit larger on average
+  [Theme.Winter]: 50, // snowflakes smaller
+  [Theme.Spring]: 50, // petals medium/small
+  [Theme.Summer]: 1, // volleyball bigger
+};
+
+// Optional: per-season transform scale clamp (affects GSAP `scale`, not font-size)
+// This lets you tune physics feel per season independent of font-size.
+const SCALE_CLAMP: Record<Theme, { min: number; max: number; base: number }> = {
+  [Theme.Fall]: { min: 0.6, max: 1.1, base: 24 },
+  [Theme.Winter]: { min: 0.5, max: 0.9, base: 24 },
+  [Theme.Spring]: { min: 0.5, max: 1.0, base: 24 },
+  [Theme.Summer]: { min: 0.9, max: 1.1, base: 28 }, // feel a bit heavier
+};
 
 function createArtifacts() {
   artifacts.value = [];
-  for (let i = 0; i < NUM_ARTIFACTS; i++) {
-    const size = 8 + Math.random() * 22;
-    let emoji = null;
+  const range = SIZE_RANGE[activeTheme.value];
+  const min = range.min;
+  const max = range.max;
+  const artifactQuanity = ARTIFACT_QUANITY[activeTheme.value];
+
+  for (let i = 0; i < artifactQuanity; i++) {
+    const size = randRange(min, max); // 👈 per-artifact, per-season size
+
+    let emoji: string | null = null;
     switch (activeTheme.value) {
       case Theme.Fall:
         emoji = fallEmojis[Math.floor(Math.random() * fallEmojis.length)] ?? '🍁';
@@ -50,12 +111,15 @@ function createArtifacts() {
     artifacts.value.push({
       id: `${i}-${Math.random()}`,
       left: Math.random() * 100,
-      size,
+      size, // 👈 stored; template uses this for font-size
       emoji,
     });
   }
 }
 
+// ---------------------------------------------
+// Utilities
+// ---------------------------------------------
 const getAbsoluteOffsetTop = (el: HTMLElement): number => {
   let top = el.offsetTop;
   let parent = el.offsetParent as HTMLElement | null;
@@ -70,107 +134,323 @@ const assignFallDuration = (artifactSize: number) => {
   let duration = 6 + (30 - artifactSize) * 0.2;
   const smallBreakpoint = +getCustomCssVar('breakpoint-sm').slice(0, -2);
   const isMobile = smallBreakpoint < 600;
-
   if (isMobile && activeTheme.value === Theme.Fall) {
     duration = 6 + (30 - artifactSize) * 0.15;
   }
   return duration;
 };
 
+// ---------------------------------------------
+// GSAP study helpers (typed & numbers-only)
+// ---------------------------------------------
+type NumStr = number | string;
+
+interface KeyframeStep {
+  x?: NumStr;
+  y?: NumStr;
+  rotation?: NumStr;
+  scale?: number;
+  opacity?: number;
+  duration?: number;
+  ease?: string;
+}
+
+type Keyframes = KeyframeStep[] | Record<string, KeyframeStep>;
+
+type Motion = {
+  keyframes?: Keyframes; // array OR percentage map
+  ease?: string;
+  yoyo?: boolean;
+};
+
+type Spawn = { x: number; y: number; scale: number; rot: number; opacity?: number };
+
+type SeasonCfg = {
+  spawn: (el: HTMLElement, artifactSize: number) => Spawn;
+  targetY: (footerTop: number) => number | null; // null => y handled inside keyframes
+  motion: (el: HTMLElement, artifactSize: number) => Motion;
+  duration: (artifactSize: number) => number;
+  rotPerCycle: (artifactSize: number) => number;
+  endOpacity?: number;
+};
+
+// viewport helpers
+const vw = () => Math.max(document.documentElement.clientWidth, window.innerWidth || 0);
+const vh = () => Math.max(document.documentElement.clientHeight, window.innerHeight || 0);
+
+// gsap.utils.random(min, max, snapIncrement?, returnFunction?)
+const rand = (min: number, max: number): number => gsap.utils.random(min, max, 0, false); // float
+const randInt = (min: number, max: number): number => gsap.utils.random(min, max, 1, false); // integer
+
+const clamp = gsap.utils.clamp;
+const fallDurationFromSize = (size: number) => clamp(4, 18)(assignFallDuration(size));
+
+// ---------------------------------------------
+// Seasonal behavior definitions
+// ---------------------------------------------
+const SEASONS: Record<Theme, SeasonCfg> = {
+  [Theme.Fall]: {
+    spawn: (el, size) => {
+      const { min, max, base } = SCALE_CLAMP[Theme.Fall];
+      const scaleClamp = gsap.utils.clamp(min, max);
+      // spawn from top/left/right
+      const side = gsap.utils.random(['top', 'left', 'right'], true);
+      if (side() === 'top') {
+        return {
+          x: rand(el.offsetWidth / 2, vw() - el.offsetWidth / 2),
+          y: -rand(60, 180),
+          scale: scaleClamp(size / base),
+          rot: randInt(0, 360),
+          opacity: 0.85,
+        };
+      } else if (side() === 'left') {
+        return {
+          x: -rand(40, 140),
+          y: rand(-40, vh() * 0.6),
+          scale: scaleClamp(size / base),
+          rot: randInt(0, 360),
+          opacity: 0.85,
+        };
+      } else {
+        return {
+          x: vw() + rand(40, 140),
+          y: rand(-40, vh() * 0.6),
+          scale: scaleClamp(size / base),
+          rot: randInt(0, 360),
+          opacity: 0.85,
+        };
+      }
+    },
+    targetY: (footerTop) => Math.min(footerTop, vh() + 140),
+    motion: (_el, size) => {
+      const t0 = now();
+      const steps = 6 + randInt(0, 2); // 6 to 9 segments
+      const kfs: KeyframeStep[] = [];
+      const idealSecs = clamp(6, 18)(10 + (24 - size) * 0.25);
+      for (let i = 1; i <= steps; i++) {
+        const u = i / steps;
+        const ti = t0 + u * idealSecs;
+        const vx = windX(ti);
+        const vy = windY(ti);
+        const segT = idealSecs / steps;
+        const dx = vx * segT * gsap.utils.random(0.8, 1.25);
+        const dy = Math.max(28, 60 + vy * segT); // ensure net downward
+        const drot = windSpin(ti) * segT * gsap.utils.random(0.6, 1.2);
+        kfs.push({ x: `+=${dx}`, y: `+=${dy}`, rotation: `+=${drot}`, ease: 'none' });
+      }
+      if (Math.random() < 0.35) {
+        kfs.push(
+          {
+            x: `+=${rand(-20, 20)}`,
+            y: `-=${rand(6, 14)}`,
+            rotation: `+=${rand(-30, 30)}`,
+            ease: 'none',
+          },
+          {
+            x: `+=${rand(-20, 20)}`,
+            y: `+=${rand(12, 24)}`,
+            rotation: `+=${rand(-20, 20)}`,
+            ease: 'none',
+          },
+        );
+      }
+      return { keyframes: kfs, ease: 'none' };
+    },
+    duration: (size) => clamp(6, 18)(10 + (24 - size) * 0.25),
+    rotPerCycle: () => 0, // rotation handled in keyframes
+    endOpacity: 0.95,
+  },
+
+  [Theme.Winter]: {
+    spawn: (_el, size) => {
+      const { min, max, base } = SCALE_CLAMP[Theme.Winter];
+      const scaleClamp = gsap.utils.clamp(min, max);
+      return {
+        x: rand(0, vw()),
+        y: -rand(40, 200),
+        scale: scaleClamp(size / base),
+        rot: 0,
+        opacity: 0.65,
+      };
+    },
+    targetY: (footerTop) => footerTop,
+    motion: () => {
+      const drift = rand(0.12, 0.22) * vw();
+      return {
+        keyframes: [
+          { x: `+=${drift}`, ease: 'sine.inOut' },
+          { x: `-=${drift}`, ease: 'sine.inOut' },
+        ],
+        ease: 'sine.inOut',
+      };
+    },
+    duration: (size) => clamp(8, 18)(fallDurationFromSize(size) + 4),
+    rotPerCycle: () => 0,
+    endOpacity: 1,
+  },
+
+  [Theme.Spring]: {
+    // Petals blown RIGHT → LEFT with slight rise & flutter
+    spawn: (_el, size) => {
+      const { min, max, base } = SCALE_CLAMP[Theme.Spring];
+      const scaleClamp = gsap.utils.clamp(min, max);
+      return {
+        x: vw() + randInt(40, 200), // offscreen right
+        y: rand(vh() * 0.5, vh() * 0.9), // lower half
+        scale: scaleClamp(size / base),
+        rot: rand(-30, 30),
+      };
+    },
+    targetY: () => null,
+    motion: () => {
+      const travel = vw() + rand(120, 220);
+      const lift = rand(40, 120);
+      const wobble = rand(12, 24);
+      return {
+        keyframes: [
+          { x: `-=${travel * 0.25}`, y: `-=${lift * 0.4}`, rotation: '+=60', ease: 'sine.inOut' },
+          { x: `-=${travel * 0.25}`, y: `+=${wobble}`, rotation: '-=40', ease: 'sine.inOut' },
+          { x: `-=${travel * 0.25}`, y: `-=${wobble}`, rotation: '+=40', ease: 'sine.inOut' },
+          { x: `-=${travel * 0.25}`, y: `-=${lift * 0.6}`, rotation: '+=20', ease: 'sine.inOut' },
+        ],
+        ease: 'none',
+      };
+    },
+    duration: (size) => clamp(8, 16)(10 + (30 - assignFallDuration(size)) * 0.2),
+    rotPerCycle: () => 0,
+  },
+
+  [Theme.Summer]: {
+    spawn: (_el, size) => {
+      const { min, max, base } = SCALE_CLAMP[Theme.Summer];
+      const scaleClamp = gsap.utils.clamp(min, max);
+      const margin = 48;
+      return {
+        x: margin,
+        y: Math.max(0, vh() - 180),
+        scale: scaleClamp(size / base),
+        rot: 0,
+      };
+    },
+    targetY: () => null, // timeline fully drives y
+    motion: (el) => {
+      const left = 48;
+      const right = vw() - 48;
+      const baseY = Math.max(0, vh() - 180);
+      const apexY = Math.max(0, baseY - rand(140, 220));
+
+      const tl = gsap.timeline({ repeat: -1, yoyo: true });
+
+      // tl.fromTo(
+      //   el,
+      //   { x: (left + right) / 2, y: apexY, duration: 1.2, ease: 'none' },
+      //   {
+      //     x: right,
+      //     y: baseY,
+      //     duration: 1.2,
+      //     ease: 'sine.in',
+      //   },
+      // );
+
+      tl.to(el, { x: (left + right) / 2, y: apexY, duration: 1.2, ease: 'none' }).to(el, {
+        x: right,
+        y: baseY,
+        duration: 1.2,
+        ease: 'sine.in',
+      });
+
+      return { keyframes: [], ease: 'none' }; // not used here
+    },
+    duration: () => 2.4,
+    rotPerCycle: () => 0,
+  },
+};
+
+// ---------------------------------------------
+// Animation runner
+// ---------------------------------------------
 const animateArtifacts = () => {
-  gsap.killTweensOf('*');
-
+  gsap.killTweensOf('*'); // consider scoping w/ gsap.context (see notes below)
   const footerEl = document.querySelector('footer.q-footer');
-  if (footerEl instanceof HTMLElement) {
-    const verticalDrop = getAbsoluteOffsetTop(footerEl);
+  if (!(footerEl instanceof HTMLElement)) return;
 
-    for (let index = 0; index < artifactRefs.value.length; index++) {
-      const el = artifactRefs.value[index];
-      let domEl: HTMLElement | null = null;
+  // const reduced = window.matchMedia?.('(prefers-reduced-motion: reduce)')?.matches;
+  const footerTop = getAbsoluteOffsetTop(footerEl);
+  const cfg = SEASONS[activeTheme.value];
+  const masterTimeline = gsap.timeline();
 
-      if (el instanceof HTMLElement) {
-        domEl = el;
-      } else if (el && '$el' in el && el.$el instanceof HTMLElement) {
-        domEl = el.$el;
-      }
+  for (let index = 0; index < artifactRefs.value.length; index++) {
+    const el = artifactRefs.value[index];
+    let domEl: HTMLElement | null = null;
+    if (el instanceof HTMLElement) domEl = el;
+    else if (el && '$el' in el && el.$el instanceof HTMLElement) domEl = el.$el;
+    if (!domEl) continue;
 
-      if (!domEl) continue;
+    const artifact = artifacts.value[index];
+    if (!artifact) continue;
 
-      const artifact = artifacts.value[index];
-      if (!artifact) continue;
+    const spawn = cfg.spawn(domEl, artifact.size);
+    const duration = cfg.duration(artifact.size);
+    const motion = cfg.motion(domEl, artifact.size);
+    const targetY = cfg.targetY(footerTop);
 
-      const startX = gsap.utils.random(0, 1) * window.innerWidth;
-      const startY = -window.innerHeight - Math.random() * 400;
-      const duration = 6 + (30 - assignFallDuration(artifact.size)) * 0.2;
-      const delay = Math.random() * 6;
-      const rotation = Math.random() * 360;
+    // if (reduced) {
+    //   // Accessibility: render static final pose, no looping
+    //   gsap.set(domEl, {
+    //     x: s.x,
+    //     y: ty !== null ? ty : s.y,
+    //     scale: s.scale,
+    //     rotation: s.rot,
+    //     opacity: cfg.endOpacity ?? s.opacity ?? 1,
+    //   });
+    //   continue;
+    // }
 
-      gsap.set(domEl, {
-        x: startX,
-        y: startY,
-        rotation,
-        scale: artifact.size / 24,
-      });
-
-      gsap.to(domEl, {
-        y: verticalDrop,
-        rotation: `+=${isFall ? 360 : 90}`,
+    // Single, owning tween per element:
+    masterTimeline.fromTo(
+      domEl,
+      {
+        x: spawn.x,
+        y: spawn.y,
+        scale: spawn.scale,
+        rotation: spawn.rot,
+        opacity: spawn.opacity ?? 1,
+      },
+      {
+        ...(targetY !== null ? { y: targetY } : {}), // optional y target
+        rotation: `+=${cfg.rotPerCycle(artifact.size)}`, // per-cycle spin
         duration,
-        delay,
+        delay: -gsap.utils.random(0, duration), // de-sync starts
         repeat: -1,
-        ease: isFall ? 'sine.inOut' : 'none',
-      });
-
-      if (isFall) {
-        const horizontalDrift = 200 + Math.random() * 200;
-        gsap.to(domEl, {
-          x: `+=${Math.random() > 0.5 ? horizontalDrift : -horizontalDrift}`,
-          y: verticalDrop,
-          rotation: `+=360`,
-          duration,
-          delay,
-          repeat: -1,
-          ease: 'sine.inOut',
-        });
-      }
-
-      switch (activeTheme.value) {
-        case Theme.Fall:
-          break;
-        case Theme.Winter:
-          break;
-        case Theme.Spring:
-          break;
-        case Theme.Summer:
-          break;
-      }
-    }
+        ease: motion.ease ?? 'none',
+        ...(motion.keyframes ? { keyframes: motion.keyframes } : {}),
+        ...(motion.yoyo ? { yoyo: true } : {}),
+        ...(cfg.endOpacity ? { opacity: cfg.endOpacity } : {}),
+      },
+      -1,
+    );
   }
 };
 
+// ---------------------------------------------
+// Resize & lifecycle
+// ---------------------------------------------
 const handleResize = debounce(async () => {
   gsap.killTweensOf('*');
-
   artifacts.value = [];
   artifactRefs.value = [];
-
   await nextTick();
-
-  if (activeTheme.value === Theme.Winter || activeTheme.value === Theme.Fall) {
-    createArtifacts();
-    await nextTick();
-    artifactRefs.value = artifactRefs.value.slice(0, artifacts.value.length);
-    animateArtifacts();
-  }
+  createArtifacts(); // run for all themes
+  await nextTick();
+  artifactRefs.value = artifactRefs.value.slice(0, artifacts.value.length);
+  animateArtifacts();
 }, 1);
 
 onMounted(async () => {
-  if (activeTheme.value === Theme.Winter || activeTheme.value === Theme.Fall) {
-    createArtifacts();
-    await nextTick();
-    artifactRefs.value = artifactRefs.value.slice(0, artifacts.value.length);
-    animateArtifacts();
-  }
+  createArtifacts();
+  await nextTick();
+  artifactRefs.value = artifactRefs.value.slice(0, artifacts.value.length);
+  animateArtifacts();
   window.addEventListener('resize', handleResize);
 });
 
@@ -179,18 +459,41 @@ onBeforeUnmount(() => {
 });
 
 watch(activeTheme, async () => {
-  gsap.killTweensOf('*');
-
+  // 2) Clear + rebuild new artifacts.
   artifacts.value = [];
   artifactRefs.value = [];
-
   await nextTick();
-  if (activeTheme.value === Theme.Winter || activeTheme.value === Theme.Fall) {
-    createArtifacts();
-    await nextTick();
+  createArtifacts(); // build for the NEW season
+  await nextTick();
 
-    artifactRefs.value = artifactRefs.value.slice(0, artifacts.value.length);
-    animateArtifacts();
+  artifactRefs.value = artifactRefs.value.slice(0, artifacts.value.length);
+
+  // set new nodes to an invisible, slightly soft state
+  const newNodes: HTMLElement[] = [];
+  for (const el of artifactRefs.value) {
+    const node =
+      el instanceof HTMLElement ? el : el && '$el' in el ? (el.$el as HTMLElement) : null;
+    if (node) {
+      node.style.opacity = '0';
+      node.style.filter = 'blur(2px)';
+      node.style.transform += ' scale(1.02)'; // tiny scale up before anim starts
+      newNodes.push(node);
+    }
+  }
+
+  // 3) Start motion NOW so they’re already moving as they appear.
+  animateArtifacts();
+
+  // 4) Fade new season IN smoothly and sharpen it.
+  if (newNodes.length) {
+    gsap.to(newNodes, {
+      opacity: 0.9, // matches your CSS default
+      filter: 'blur(0px)',
+      scale: 1,
+      duration: 1,
+      stagger: { each: 0.006, from: 'random' },
+      ease: 'power2.out',
+    });
   }
 });
 </script>
@@ -205,6 +508,7 @@ watch(activeTheme, async () => {
       :ref="(el) => (artifactRefs[index] = el)"
     >
       <span>{{ artifact.emoji }}</span>
+      <p>{{ activeTheme }}</p>
     </div>
   </div>
 </template>
