@@ -17,12 +17,14 @@ import { Theme } from '../shared/constants/theme';
 
 const mainStore = useMainStore();
 const { activeTheme } = storeToRefs(mainStore);
+const containerRef = ref<HTMLElement>();
 const artifacts = ref<Artifact[]>([]);
 const artifactRefs = ref<(Element | ComponentPublicInstance | null)[]>([]);
 const fallEmojis = ['🍂', '🍁'];
 const winterEmoji = '❄';
 const springEmoji = '🌸';
 const summerEmoji = '🏐';
+const FALL_START_DELAY = 0.5; // seconds
 // ---------------------------------------------
 // Artifact creation
 // ---------------------------------------------
@@ -130,8 +132,8 @@ const getAbsoluteOffsetTop = (el: HTMLElement): number => {
   return top;
 };
 
-const assignFallDuration = (artifactSize: number) => {
-  let duration = 6 + (30 - artifactSize) * 0.2;
+const assignFallDuration = (artifactSize: number, fallFactor: number) => {
+  let duration = 6 + (30 - artifactSize) * fallFactor;
   const smallBreakpoint = +getCustomCssVar('breakpoint-sm').slice(0, -2);
   const isMobile = smallBreakpoint < 600;
   if (isMobile && activeTheme.value === Theme.Fall) {
@@ -153,6 +155,7 @@ interface KeyframeStep {
   opacity?: number;
   duration?: number;
   ease?: string;
+  delay?: number;
 }
 
 type Keyframes = KeyframeStep[] | Record<string, KeyframeStep>;
@@ -169,7 +172,7 @@ type SeasonCfg = {
   spawn: (el: HTMLElement, artifactSize: number) => Spawn;
   targetY: (footerTop: number) => number | null; // null => y handled inside keyframes
   motion: (el: HTMLElement, artifactSize: number) => Motion;
-  duration: (artifactSize: number) => number;
+  duration: (artifactSize: number, fallFactor: number) => number;
   rotPerCycle: (artifactSize: number) => number;
   endOpacity?: number;
 };
@@ -183,19 +186,89 @@ const rand = (min: number, max: number): number => gsap.utils.random(min, max, 0
 const randInt = (min: number, max: number): number => gsap.utils.random(min, max, 1, false); // integer
 
 const clamp = gsap.utils.clamp;
-const fallDurationFromSize = (size: number) => clamp(4, 18)(assignFallDuration(size));
+const fallDurationFromSize = (size: number, fallFactor: number) =>
+  clamp(4, 18)(assignFallDuration(size, fallFactor));
 
 // ---------------------------------------------
 // Seasonal behavior definitions
 // ---------------------------------------------
 const SEASONS: Record<Theme, SeasonCfg> = {
   [Theme.Fall]: {
+    // spawn from the TOP only, random x
+    spawn: (el, size) => {
+      const { min, max, base } = SCALE_CLAMP[Theme.Fall];
+      const scaleClamp = gsap.utils.clamp(min, max);
+      return {
+        x: rand(el.offsetWidth / 2, vw() - el.offsetWidth / 2),
+        y: -rand(100, 150),
+        scale: scaleClamp(size / base),
+        rot: randInt(0, 360),
+        opacity: 1,
+        duration: fallDurationFromSize(size, 0.02),
+      };
+    },
+    targetY: (footerTop) => Math.min(footerTop, vh() + 140),
+    motion: () => {
+      const t0 = now();
+      const steps = 6 + randInt(0, 2); // 6–8 steps
+      const kfs: KeyframeStep[] = [];
+      const idealSecs = clamp(6, 18)(10); // keep consistent; you already clamp via duration()
+      const wiggle = Math.min(vw() * gsap.utils.random(0.01, 0.03), 28);
+      const tiltAmp = gsap.utils.random(8, 15); // degrees peak
+      const tiltHz = gsap.utils.random(0.18, 0.3);
+      let prevAngle = 0;
+
+      for (let i = 1; i <= steps; i++) {
+        const u = i / steps;
+        const ti = t0 + u * idealSecs;
+        const angle = Math.sin(ti * 2 * Math.PI * tiltHz) * tiltAmp;
+        const drot = angle - prevAngle; // incremental tilt change
+        prevAngle = angle;
+        const dx = gsap.utils.random(-wiggle, wiggle);
+        kfs.push({ x: `+=${dx}`, rotation: `+=${drot}`, ease: 'none' });
+      }
+      return { keyframes: kfs, ease: 'none' };
+    },
+    // **
+    duration: (size, fallFactor) => fallDurationFromSize(size, fallFactor),
+    rotPerCycle: () => randInt(0, 360),
+  },
+
+  [Theme.Winter]: {
+    spawn: (_el, size) => {
+      const { min, max, base } = SCALE_CLAMP[Theme.Winter];
+      const scaleClamp = gsap.utils.clamp(min, max);
+      return {
+        x: rand(0, vw()),
+        y: -rand(40, 200),
+        scale: scaleClamp(size / base),
+        rot: 0,
+        opacity: 0.65,
+      };
+    },
+    targetY: (footerTop) => footerTop,
+    motion: () => {
+      const drift = rand(0.12, 0.22) * vw();
+      return {
+        keyframes: [
+          { x: `+=${drift}`, ease: 'sine.inOut' },
+          { x: `-=${drift}`, ease: 'sine.inOut' },
+        ],
+        ease: 'sine.inOut',
+      };
+    },
+    // **
+    duration: (size) => fallDurationFromSize(size, 0.02),
+    rotPerCycle: () => 0,
+    endOpacity: 1,
+  },
+  [Theme.Spring]: {
     spawn: (el, size) => {
       const { min, max, base } = SCALE_CLAMP[Theme.Fall];
       const scaleClamp = gsap.utils.clamp(min, max);
       // spawn from top/left/right
-      const side = gsap.utils.random(['top', 'left', 'right'], true);
-      if (side() === 'top') {
+      const side = gsap.utils.random(['top', 'left', 'right'], true)();
+      if (side === 'top') {
         return {
           x: rand(el.offsetWidth / 2, vw() - el.offsetWidth / 2),
           y: -rand(60, 180),
@@ -203,7 +276,7 @@ const SEASONS: Record<Theme, SeasonCfg> = {
           rot: randInt(0, 360),
           opacity: 0.85,
         };
-      } else if (side() === 'left') {
+      } else if (side === 'left') {
         return {
           x: -rand(40, 140),
           y: rand(-40, vh() * 0.6),
@@ -258,68 +331,7 @@ const SEASONS: Record<Theme, SeasonCfg> = {
     },
     duration: (size) => clamp(6, 18)(10 + (24 - size) * 0.25),
     rotPerCycle: () => 0, // rotation handled in keyframes
-    endOpacity: 0.95,
   },
-
-  [Theme.Winter]: {
-    spawn: (_el, size) => {
-      const { min, max, base } = SCALE_CLAMP[Theme.Winter];
-      const scaleClamp = gsap.utils.clamp(min, max);
-      return {
-        x: rand(0, vw()),
-        y: -rand(40, 200),
-        scale: scaleClamp(size / base),
-        rot: 0,
-        opacity: 0.65,
-      };
-    },
-    targetY: (footerTop) => footerTop,
-    motion: () => {
-      const drift = rand(0.12, 0.22) * vw();
-      return {
-        keyframes: [
-          { x: `+=${drift}`, ease: 'sine.inOut' },
-          { x: `-=${drift}`, ease: 'sine.inOut' },
-        ],
-        ease: 'sine.inOut',
-      };
-    },
-    duration: (size) => clamp(8, 18)(fallDurationFromSize(size) + 4),
-    rotPerCycle: () => 0,
-    endOpacity: 1,
-  },
-
-  [Theme.Spring]: {
-    // Petals blown RIGHT → LEFT with slight rise & flutter
-    spawn: (_el, size) => {
-      const { min, max, base } = SCALE_CLAMP[Theme.Spring];
-      const scaleClamp = gsap.utils.clamp(min, max);
-      return {
-        x: vw() + randInt(40, 200), // offscreen right
-        y: rand(vh() * 0.5, vh() * 0.9), // lower half
-        scale: scaleClamp(size / base),
-        rot: rand(-30, 30),
-      };
-    },
-    targetY: () => null,
-    motion: () => {
-      const travel = vw() + rand(120, 220);
-      const lift = rand(40, 120);
-      const wobble = rand(12, 24);
-      return {
-        keyframes: [
-          { x: `-=${travel * 0.25}`, y: `-=${lift * 0.4}`, rotation: '+=60', ease: 'sine.inOut' },
-          { x: `-=${travel * 0.25}`, y: `+=${wobble}`, rotation: '-=40', ease: 'sine.inOut' },
-          { x: `-=${travel * 0.25}`, y: `-=${wobble}`, rotation: '+=40', ease: 'sine.inOut' },
-          { x: `-=${travel * 0.25}`, y: `-=${lift * 0.6}`, rotation: '+=20', ease: 'sine.inOut' },
-        ],
-        ease: 'none',
-      };
-    },
-    duration: (size) => clamp(8, 16)(10 + (30 - assignFallDuration(size)) * 0.2),
-    rotPerCycle: () => 0,
-  },
-
   [Theme.Summer]: {
     spawn: (_el, size) => {
       const { min, max, base } = SCALE_CLAMP[Theme.Summer];
@@ -369,45 +381,41 @@ const SEASONS: Record<Theme, SeasonCfg> = {
 // ---------------------------------------------
 // Animation runner
 // ---------------------------------------------
-const animateArtifacts = () => {
-  gsap.killTweensOf('*'); // consider scoping w/ gsap.context (see notes below)
+
+const animateArtifacts = (delay: number) => {
+  const container = containerRef.value;
+  if (!container) return;
+
+  // Kill only our layer
+  gsap.killTweensOf(container);
+  gsap.killTweensOf(container.querySelectorAll('*'));
+
+  // Hide layer until start
+  gsap.set(container, { autoAlpha: 0 });
   const footerEl = document.querySelector('footer.q-footer');
   if (!(footerEl instanceof HTMLElement)) return;
 
-  // const reduced = window.matchMedia?.('(prefers-reduced-motion: reduce)')?.matches;
   const footerTop = getAbsoluteOffsetTop(footerEl);
   const cfg = SEASONS[activeTheme.value];
-  const masterTimeline = gsap.timeline();
 
-  for (let index = 0; index < artifactRefs.value.length; index++) {
-    const el = artifactRefs.value[index];
-    let domEl: HTMLElement | null = null;
-    if (el instanceof HTMLElement) domEl = el;
-    else if (el && '$el' in el && el.$el instanceof HTMLElement) domEl = el.$el;
+  for (let i = 0; i < artifactRefs.value.length; i++) {
+    const el = artifactRefs.value[i];
+    const domEl =
+      el instanceof HTMLElement
+        ? el
+        : el && '$el' in el && el.$el instanceof HTMLElement
+          ? el.$el
+          : null;
     if (!domEl) continue;
 
-    const artifact = artifacts.value[index];
+    const artifact = artifacts.value[i];
     if (!artifact) continue;
-
     const spawn = cfg.spawn(domEl, artifact.size);
-    const duration = cfg.duration(artifact.size);
+    const baseDur = cfg.duration(artifact.size, 1);
     const motion = cfg.motion(domEl, artifact.size);
     const targetY = cfg.targetY(footerTop);
 
-    // if (reduced) {
-    //   // Accessibility: render static final pose, no looping
-    //   gsap.set(domEl, {
-    //     x: s.x,
-    //     y: ty !== null ? ty : s.y,
-    //     scale: s.scale,
-    //     rotation: s.rot,
-    //     opacity: cfg.endOpacity ?? s.opacity ?? 1,
-    //   });
-    //   continue;
-    // }
-
-    // Single, owning tween per element:
-    masterTimeline.fromTo(
+    gsap.fromTo(
       domEl,
       {
         x: spawn.x,
@@ -417,19 +425,19 @@ const animateArtifacts = () => {
         opacity: spawn.opacity ?? 1,
       },
       {
-        ...(targetY !== null ? { y: targetY } : {}), // optional y target
-        rotation: `+=${cfg.rotPerCycle(artifact.size)}`, // per-cycle spin
-        duration,
-        delay: -gsap.utils.random(0, duration), // de-sync starts
-        repeat: -1,
+        ...(targetY !== null ? { y: targetY } : {}),
         ease: motion.ease ?? 'none',
         ...(motion.keyframes ? { keyframes: motion.keyframes } : {}),
-        ...(motion.yoyo ? { yoyo: true } : {}),
         ...(cfg.endOpacity ? { opacity: cfg.endOpacity } : {}),
+        // the anti-wave trio:
+        duration: baseDur,
+        delay: rand(0.1, 5),
       },
-      -1,
     );
   }
+
+  // Reveal layer exactly when motion starts
+  gsap.to(container, { autoAlpha: 1, delay, duration: 0.3, ease: 'power2.out' });
 };
 
 // ---------------------------------------------
@@ -443,14 +451,15 @@ const handleResize = debounce(async () => {
   createArtifacts(); // run for all themes
   await nextTick();
   artifactRefs.value = artifactRefs.value.slice(0, artifacts.value.length);
-  animateArtifacts();
+  animateArtifacts(FALL_START_DELAY);
 }, 1);
 
 onMounted(async () => {
   createArtifacts();
   await nextTick();
   artifactRefs.value = artifactRefs.value.slice(0, artifacts.value.length);
-  animateArtifacts();
+  animateArtifacts(FALL_START_DELAY);
+
   window.addEventListener('resize', handleResize);
 });
 
@@ -482,7 +491,7 @@ watch(activeTheme, async () => {
   }
 
   // 3) Start motion NOW so they’re already moving as they appear.
-  animateArtifacts();
+  animateArtifacts(0);
 
   // 4) Fade new season IN smoothly and sharpen it.
   if (newNodes.length) {
@@ -499,7 +508,7 @@ watch(activeTheme, async () => {
 </script>
 
 <template>
-  <div class="weather-artifact-container">
+  <div class="weather-artifact-container" ref="containerRef">
     <div
       v-for="(artifact, index) in artifacts"
       :key="artifact.id"
