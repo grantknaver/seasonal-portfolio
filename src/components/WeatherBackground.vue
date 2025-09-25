@@ -54,16 +54,30 @@ function gust(t: number) {
 
 // wind components (px/sec, deg/sec)
 function windX(t: number) {
-  const base = vw() * 0.1;
+  const baseAmp = vw() * 0.06;
+  // smooth "square-ish" left/right periods (no step)
+  const base = Math.tanh(4 * n1(t, 0.03)) * baseAmp;
+
   const wobble = (n1(t) * 0.6 + n2(t) * 0.3 + n3(t) * 0.1) * vw() * 0.03;
-  const gustAmp = gust(t) * vw() * 0.1;
-  return (n1(t, 0.03) >= 0 ? 1 : -1) * base + wobble + gustAmp;
+  const gustAmp = gust(t) * vw() * 0.08;
+  return base + wobble + gustAmp;
 }
+
 function windY(t: number) {
   return (n1(t, 0.09) * 0.5 + n2(t, 0.05) * 0.5) * 22;
 }
 function windSpin(t: number) {
-  return (n1(t, 0.06) * 0.7 + n2(t, 0.04) * 0.3) * 90 + gust(t) * 120;
+  const swirl = (n1(t, 0.06) * 0.7 + n2(t, 0.04) * 0.3) * 90; // deg/sec
+  const gRaw = Math.max(0, Math.sin(t * 2 * Math.PI * 0.02));
+  const envelope = 0.35 + 0.65 * (gRaw * gRaw); // floor at 0.35 (35% power)
+  return swirl * envelope; // deg/sec, never zero
+}
+
+function makeSpinEnvelope() {
+  const freq = rand(0.02, 0.05); // Hz
+  const phase = rand(0, Math.PI * 2);
+  const sharp = rand(3, 6); // higher = shorter, punchier bursts
+  return (t: number) => Math.pow(0.5 + 0.5 * Math.sin(2 * Math.PI * freq * t + phase), sharp);
 }
 
 // Types
@@ -129,6 +143,8 @@ type SeasonCfg = {
   endOpacity?: number;
 };
 
+const FALL_SPIN_PROB = 0.6; // 60% of leaves can rotate this cycle
+
 // ---------------------------------------------
 // Seasonal behavior definitions
 // ---------------------------------------------
@@ -147,27 +163,82 @@ const SEASONS: Record<Theme, SeasonCfg> = {
       };
     },
     targetY: (footerTop) => Math.min(footerTop, vh() + 140),
-    motion: () => {
-      const t0 = now();
-      const steps = 6 + randInt(0, 2); // 6–8 steps
-      const kfs: KeyframeStep[] = [];
-      const idealSecs = clamp(6, 18)(10); // keep consistent; you already clamp via duration()
-      // const wiggle = Math.min(vw() * rand(0.01, 0.03), 28);
-      const tiltAmp = rand(12, 15); // degrees peak
-      const tiltHz = rand(0.18, 0.3);
-      let prevAngle = 0;
+    // motion: () => {
+    //   const t0 = now();
+    //   const steps = 6 + randInt(0, 2); // 6–8 steps
+    //   const kfs: KeyframeStep[] = [];
+    //   const idealSecs = clamp(6, 18)(10); // keep consistent; you already clamp via duration()
+    //   // const wiggle = Math.min(vw() * rand(0.01, 0.03), 28);
+    //   const tiltAmp = rand(12, 15); // degrees peak
+    //   const tiltHz = rand(0.18, 0.3);
+    //   let prevAngle = 0;
 
-      for (let i = 1; i <= steps; i++) {
-        const u = i / steps;
-        const ti = t0 + u * idealSecs;
-        const angle = Math.sin(ti * 2 * Math.PI * tiltHz) * tiltAmp;
-        const drot = angle - prevAngle;
-        prevAngle = angle;
-        // const dx = rand(-wiggle, wiggle);
-        kfs.push({ x: `+=50`, rotation: `+=${drot}`, ease: 'none' });
+    //   for (let i = 1; i <= steps; i++) {
+    //     const u = i / steps;
+    //     const ti = t0 + u * idealSecs;
+    //     const angle = Math.sin(ti * 2 * Math.PI * tiltHz) * tiltAmp;
+    //     const drot = angle - prevAngle;
+    //     prevAngle = angle;
+    //     // const dx = rand(-wiggle, wiggle);
+    //     kfs.push({ x: `+=50`, rotation: `+=${drot}`, ease: 'none' });
+    //   }
+    //   return { keyframes: kfs, ease: 'none' };
+    // },
+    motion: (_el, size) => {
+      const t0 = now() + rand(0, 1) * 1000; // desync per leaf
+      const steps = 12; // keep modest for perf
+      const T = clamp(6, 18)(10 + (36 - size) * 0.1);
+      const segT = T / steps;
+
+      // --- lateral drift (smoothed)
+      const smoothX = 0.9;
+      const windScaleX = 0.22;
+      const bias = rand(-vw() * 0.01, vw() * 0.01);
+
+      // --- rotation (decide ONCE per leaf)
+      const doSpin = Math.random() < FALL_SPIN_PROB;
+      // base tumble so spin is always visible when enabled
+      const baseOmega = doSpin
+        ? (Math.random() < 0.5 ? -1 : 1) * rand(18, 35) // deg/sec
+        : 0;
+
+      const spinEnv = makeSpinEnvelope(); // smooth bursts 0..1
+      const spinScale = 0.6; // ↑ from 0.28
+      const smoothW = 0.75; // ↓ from 0.88 (less damping)
+
+      let vx = 0; // px/s
+      let omega = baseOmega; // deg/s
+
+      const kfs: KeyframeStep[] = [];
+      for (let i = 0; i < steps; i++) {
+        const ti = t0 + (i / steps) * T;
+
+        // lateral
+        const vxTarget = bias + windX(ti) * windScaleX;
+        vx = smoothX * vx + (1 - smoothX) * vxTarget;
+        const dx = vx * segT;
+
+        const frame: KeyframeStep = { x: `+=${dx}`, ease: 'none' };
+
+        // rotation (only when doSpin)
+        if (doSpin) {
+          const omegaTarget = baseOmega + windSpin(ti) * spinScale * spinEnv(ti);
+          omega = smoothW * omega + (1 - smoothW) * omegaTarget;
+          const drot = omega * segT; // deg for this segment
+
+          // avoid micro changes that aren’t visible but cost work
+          if (Math.abs(drot) > 0.75) frame.rotation = `+=${drot}`;
+        }
+
+        kfs.push(frame);
       }
+
+      // optional: debug once per leaf
+      // (_el as HTMLElement).dataset.spins = doSpin ? '1' : '0';
+
       return { keyframes: kfs, ease: 'none' };
     },
+
     duration: rand(6, 10),
     rotPerCycle: () => randInt(0, 360),
   },
