@@ -11,26 +11,32 @@ import { gsap } from 'gsap';
 import { useMainStore } from '../stores/main';
 import { storeToRefs } from 'pinia';
 import { debounce } from 'quasar';
-import { getCustomCssVar } from '../shared/utils/getCustomCssVar';
+// import { getCustomCssVar } from '../shared/utils/getCustomCssVar';
 import { type Artifact } from '../shared/types/artifact';
 import { Theme } from '../shared/constants/theme';
 
 const mainStore = useMainStore();
 const { activeTheme } = storeToRefs(mainStore);
-const containerRef = ref<HTMLElement>();
 const artifacts = ref<Artifact[]>([]);
 const artifactRefs = ref<(Element | ComponentPublicInstance | null)[]>([]);
 const fallEmojis = ['🍂', '🍁'];
 const winterEmoji = '❄';
 const springEmoji = '🌸';
 const summerEmoji = '🏐';
-const FALL_START_DELAY = 0.5; // seconds
-// ---------------------------------------------
-// Artifact creation
-// ---------------------------------------------
 
 // Helper
 const randRange = (min: number, max: number) => min + Math.random() * (max - min);
+
+// viewport helpers
+const vw = () => Math.max(document.documentElement.clientWidth, window.innerWidth || 0);
+const vh = () => Math.max(document.documentElement.clientHeight, window.innerHeight || 0);
+
+// gsap.utils.random(min, max, snapIncrement?, returnFunction?)
+const rand = (min: number, max: number): number => gsap.utils.random(min, max, 0, false); // float
+const randInt = (min: number, max: number): number => gsap.utils.random(min, max, 1, false); // integer
+const clamp = gsap.utils.clamp;
+// const fallDurationFromSize = (size: number, fallFactor: number) =>
+//   clamp(4, 18)(assignFallDuration(size, fallFactor));
 
 // ---- Wind helpers
 const now = () => performance.now() / 1000; // seconds
@@ -58,11 +64,11 @@ function windSpin(t: number) {
   return (n1(t, 0.06) * 0.7 + n2(t, 0.04) * 0.3) * 90 + gust(t) * 120;
 }
 
-// ---- Natural (Poisson) start schedule, with gust bumps
+// Types
 
 // Per-season visual size (font-size) ranges, in px
 const SIZE_RANGE: Record<Theme, { min: number; max: number }> = {
-  [Theme.Fall]: { min: 12, max: 32 }, // leaves a bit larger on average
+  [Theme.Fall]: { min: 20, max: 36 }, // leaves a bit larger on average
   [Theme.Winter]: { min: 8, max: 22 }, // snowflakes smaller
   [Theme.Spring]: { min: 10, max: 26 }, // petals medium/small
   [Theme.Summer]: { min: 18, max: 36 }, // volleyball bigger
@@ -78,46 +84,11 @@ const ARTIFACT_QUANITY: Record<Theme, number> = {
 // Optional: per-season transform scale clamp (affects GSAP `scale`, not font-size)
 // This lets you tune physics feel per season independent of font-size.
 const SCALE_CLAMP: Record<Theme, { min: number; max: number; base: number }> = {
-  [Theme.Fall]: { min: 0.6, max: 1.1, base: 24 },
+  [Theme.Fall]: { min: 0.9, max: 1.5, base: 24 },
   [Theme.Winter]: { min: 0.5, max: 0.9, base: 24 },
   [Theme.Spring]: { min: 0.5, max: 1.0, base: 24 },
   [Theme.Summer]: { min: 0.9, max: 1.1, base: 28 }, // feel a bit heavier
 };
-
-function createArtifacts() {
-  artifacts.value = [];
-  const range = SIZE_RANGE[activeTheme.value];
-  const min = range.min;
-  const max = range.max;
-  const artifactQuanity = ARTIFACT_QUANITY[activeTheme.value];
-
-  for (let i = 0; i < artifactQuanity; i++) {
-    const size = randRange(min, max); // 👈 per-artifact, per-season size
-
-    let emoji: string | null = null;
-    switch (activeTheme.value) {
-      case Theme.Fall:
-        emoji = fallEmojis[Math.floor(Math.random() * fallEmojis.length)] ?? '🍁';
-        break;
-      case Theme.Winter:
-        emoji = winterEmoji;
-        break;
-      case Theme.Spring:
-        emoji = springEmoji;
-        break;
-      case Theme.Summer:
-        emoji = summerEmoji;
-        break;
-    }
-
-    artifacts.value.push({
-      id: `${i}-${Math.random()}`,
-      left: Math.random() * 100,
-      size, // 👈 stored; template uses this for font-size
-      emoji,
-    });
-  }
-}
 
 // ---------------------------------------------
 // Utilities
@@ -132,15 +103,15 @@ const getAbsoluteOffsetTop = (el: HTMLElement): number => {
   return top;
 };
 
-const assignFallDuration = (artifactSize: number, fallFactor: number) => {
-  let duration = 6 + (30 - artifactSize) * fallFactor;
-  const smallBreakpoint = +getCustomCssVar('breakpoint-sm').slice(0, -2);
-  const isMobile = smallBreakpoint < 600;
-  if (isMobile && activeTheme.value === Theme.Fall) {
-    duration = 6 + (30 - artifactSize) * 0.15;
-  }
-  return duration;
-};
+// const assignFallDuration = (artifactSize: number, fallFactor: number) => {
+//   let duration = 6 + (30 - artifactSize) * fallFactor;
+//   const smallBreakpoint = +getCustomCssVar('breakpoint-sm').slice(0, -2);
+//   const isMobile = smallBreakpoint < 600;
+//   if (isMobile && activeTheme.value === Theme.Fall) {
+//     duration = 6 + (30 - artifactSize) * 0.15;
+//   }
+//   return duration;
+// };
 
 // ---------------------------------------------
 // GSAP study helpers (typed & numbers-only)
@@ -171,23 +142,11 @@ type Spawn = { x: number; y: number; scale: number; rot: number; opacity?: numbe
 type SeasonCfg = {
   spawn: (el: HTMLElement, artifactSize: number) => Spawn;
   targetY: (footerTop: number) => number | null; // null => y handled inside keyframes
-  motion: (el: HTMLElement, artifactSize: number) => Motion;
-  duration: (artifactSize: number, fallFactor: number) => number;
+  motion: (el: HTMLElement, artifactSize: number, phase: number) => Motion;
+  duration: number;
   rotPerCycle: (artifactSize: number) => number;
   endOpacity?: number;
 };
-
-// viewport helpers
-const vw = () => Math.max(document.documentElement.clientWidth, window.innerWidth || 0);
-const vh = () => Math.max(document.documentElement.clientHeight, window.innerHeight || 0);
-
-// gsap.utils.random(min, max, snapIncrement?, returnFunction?)
-const rand = (min: number, max: number): number => gsap.utils.random(min, max, 0, false); // float
-const randInt = (min: number, max: number): number => gsap.utils.random(min, max, 1, false); // integer
-
-const clamp = gsap.utils.clamp;
-const fallDurationFromSize = (size: number, fallFactor: number) =>
-  clamp(4, 18)(assignFallDuration(size, fallFactor));
 
 // ---------------------------------------------
 // Seasonal behavior definitions
@@ -204,7 +163,6 @@ const SEASONS: Record<Theme, SeasonCfg> = {
         scale: scaleClamp(size / base),
         rot: randInt(0, 360),
         opacity: 1,
-        duration: fallDurationFromSize(size, 0.02),
       };
     },
     targetY: (footerTop) => Math.min(footerTop, vh() + 140),
@@ -229,8 +187,7 @@ const SEASONS: Record<Theme, SeasonCfg> = {
       }
       return { keyframes: kfs, ease: 'none' };
     },
-    // **
-    duration: (size, fallFactor) => fallDurationFromSize(size, fallFactor),
+    duration: rand(6, 10),
     rotPerCycle: () => randInt(0, 360),
   },
 
@@ -258,7 +215,7 @@ const SEASONS: Record<Theme, SeasonCfg> = {
       };
     },
     // **
-    duration: (size) => fallDurationFromSize(size, 0.02),
+    duration: rand(10, 13),
     rotPerCycle: () => 0,
     endOpacity: 1,
   },
@@ -329,7 +286,7 @@ const SEASONS: Record<Theme, SeasonCfg> = {
       }
       return { keyframes: kfs, ease: 'none' };
     },
-    duration: (size) => clamp(6, 18)(10 + (24 - size) * 0.25),
+    duration: rand(10, 13),
     rotPerCycle: () => 0, // rotation handled in keyframes
   },
   [Theme.Summer]: {
@@ -373,53 +330,105 @@ const SEASONS: Record<Theme, SeasonCfg> = {
 
       return { keyframes: [], ease: 'none' }; // not used here
     },
-    duration: () => 2.4,
+    duration: rand(5, 10),
     rotPerCycle: () => 0,
   },
 };
 
 // ---------------------------------------------
+// Artifact creation
+// ---------------------------------------------
+
+function createArtifacts() {
+  artifacts.value = [];
+  const range = SIZE_RANGE[activeTheme.value];
+  const min = range.min;
+  const max = range.max;
+  const artifactQuanity = ARTIFACT_QUANITY[activeTheme.value];
+
+  for (let i = 0; i < artifactQuanity; i++) {
+    const size = randRange(min, max);
+
+    let emoji: string | null = null;
+    switch (activeTheme.value) {
+      case Theme.Fall:
+        emoji = fallEmojis[Math.floor(Math.random() * fallEmojis.length)] ?? '🍁';
+        break;
+      case Theme.Winter:
+        emoji = winterEmoji;
+        break;
+      case Theme.Spring:
+        emoji = springEmoji;
+        break;
+      case Theme.Summer:
+        emoji = summerEmoji;
+        break;
+    }
+
+    artifacts.value.push({
+      id: `${i}-${Math.random()}`,
+      left: Math.random() * 100,
+      size,
+      emoji,
+    });
+  }
+}
+
+// ---------------------------------------------
 // Animation runner
 // ---------------------------------------------
 
-const animateArtifacts = (delay: number) => {
-  const container = containerRef.value;
-  if (!container) return;
+const DRIZZLE_DELAY = 1.5; // global gate
+const DRIZZLE_RATE = 0.5; // seconds between new leaves starting
+const DRIZZLE_JITTER = 0.2; // small random +/- jitter per leaf
 
-  // Kill only our layer
-  gsap.killTweensOf(container);
-  gsap.killTweensOf(container.querySelectorAll('*'));
+const animateArtifacts = () => {
+  const nodes = artifactRefs.value
+    .map((el) =>
+      el instanceof HTMLElement ? el : el && '$el' in el ? (el.$el as HTMLElement) : null,
+    )
+    .filter(Boolean) as HTMLElement[];
 
-  // Hide layer until start
-  gsap.set(container, { autoAlpha: 0 });
-  const footerEl = document.querySelector('footer.q-footer');
-  if (!(footerEl instanceof HTMLElement)) return;
+  const distX = gsap.utils.distribute({ base: 24, amount: vw() - 48, ease: 'none', from: 0 });
+  const distY = gsap.utils.distribute({ base: -160, amount: 40, ease: 'none', from: 0 }); // -160..-120
 
-  const footerTop = getAbsoluteOffsetTop(footerEl);
-  const cfg = SEASONS[activeTheme.value];
+  const xVals = nodes.map((el, i) => distX(i, el, nodes));
+  const yVals = nodes.map((el, i) => distY(i, el, nodes));
 
-  for (let i = 0; i < artifactRefs.value.length; i++) {
-    const el = artifactRefs.value[i];
-    const domEl =
-      el instanceof HTMLElement
-        ? el
-        : el && '$el' in el && el.$el instanceof HTMLElement
-          ? el.$el
-          : null;
-    if (!domEl) continue;
+  gsap.utils.shuffle(xVals);
+  gsap.utils.shuffle(yVals);
 
+  for (let i = 0; i < nodes.length; i++) {
+    const domEl = nodes[i] as HTMLElement;
     const artifact = artifacts.value[i];
     if (!artifact) continue;
+
+    const cfg = SEASONS[activeTheme.value];
     const spawn = cfg.spawn(domEl, artifact.size);
-    const baseDur = cfg.duration(artifact.size, 1);
-    const motion = cfg.motion(domEl, artifact.size);
+
+    const spawnX = (xVals[i] ?? rand(24, vw() - 24)) + rand(-12, 12);
+    const spawnY = (yVals[i] ?? rand(-160, -120)) + rand(-8, 8);
+
+    const duration = cfg.duration;
+    const phase = rand(100, 1000);
+    const motion = cfg.motion(domEl, artifact.size, phase);
+    const footerEl = document.querySelector('footer.q-footer') as HTMLElement;
+    const footerTop = footerEl ? getAbsoluteOffsetTop(footerEl) : vh();
     const targetY = cfg.targetY(footerTop);
+
+    const delay =
+      DRIZZLE_DELAY + i * DRIZZLE_RATE + gsap.utils.random(-DRIZZLE_JITTER, DRIZZLE_JITTER);
+
+    gsap.set(domEl, {
+      x: 0,
+      y: -50,
+    });
 
     gsap.fromTo(
       domEl,
       {
-        x: spawn.x,
-        y: spawn.y,
+        x: spawnX,
+        y: spawnY,
         scale: spawn.scale,
         rotation: spawn.rot,
         opacity: spawn.opacity ?? 1,
@@ -429,20 +438,20 @@ const animateArtifacts = (delay: number) => {
         ease: motion.ease ?? 'none',
         ...(motion.keyframes ? { keyframes: motion.keyframes } : {}),
         ...(cfg.endOpacity ? { opacity: cfg.endOpacity } : {}),
-        // the anti-wave trio:
-        duration: baseDur,
-        delay: rand(0.1, 5),
+        duration,
+        delay,
+        repeat: -1,
+        repeatRefresh: true,
+        repeatDelay: rand(1.0, 3.0),
+        immediateRender: false, // ✅ prevents “from” state from flashing before delay with top
       },
     );
   }
 
-  // Reveal layer exactly when motion starts
-  gsap.to(container, { autoAlpha: 1, delay, duration: 0.3, ease: 'power2.out' });
+  // universal layer reveal delay still works the same:
+  // gsap.to(container, { autoAlpha: 1, delay, duration: 0.3, ease: 'power2.out' });
 };
 
-// ---------------------------------------------
-// Resize & lifecycle
-// ---------------------------------------------
 const handleResize = debounce(async () => {
   gsap.killTweensOf('*');
   artifacts.value = [];
@@ -451,15 +460,14 @@ const handleResize = debounce(async () => {
   createArtifacts(); // run for all themes
   await nextTick();
   artifactRefs.value = artifactRefs.value.slice(0, artifacts.value.length);
-  animateArtifacts(FALL_START_DELAY);
+  animateArtifacts();
 }, 1);
 
 onMounted(async () => {
   createArtifacts();
   await nextTick();
   artifactRefs.value = artifactRefs.value.slice(0, artifacts.value.length);
-  animateArtifacts(FALL_START_DELAY);
-
+  animateArtifacts();
   window.addEventListener('resize', handleResize);
 });
 
@@ -491,7 +499,7 @@ watch(activeTheme, async () => {
   }
 
   // 3) Start motion NOW so they’re already moving as they appear.
-  animateArtifacts(0);
+  animateArtifacts();
 
   // 4) Fade new season IN smoothly and sharpen it.
   if (newNodes.length) {
@@ -516,8 +524,7 @@ watch(activeTheme, async () => {
       :style="{ fontSize: artifact.size + 'px' }"
       :ref="(el) => (artifactRefs[index] = el)"
     >
-      <span>{{ artifact.emoji }}</span>
-      <p>{{ activeTheme }}</p>
+      <span class="artifact">{{ artifact.emoji }}</span>
     </div>
   </div>
 </template>
