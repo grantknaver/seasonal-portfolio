@@ -14,6 +14,8 @@ import { debounce } from 'quasar';
 // import { getCustomCssVar } from '../shared/utils/getCustomCssVar';
 import { type Artifact } from '../shared/types/artifact';
 import { Theme } from '../shared/constants/theme';
+import { type Motion } from '../shared/types/motion';
+import { type KeyframeStep } from 'src/shared/types/keyframeStep';
 
 const mainStore = useMainStore();
 const { activeTheme } = storeToRefs(mainStore);
@@ -80,7 +82,6 @@ const ARTIFACT_QUANITY: Record<Theme, number> = {
   [Theme.Spring]: 50, // petals medium/small
   [Theme.Summer]: 1, // volleyball bigger
 };
-
 // Optional: per-season transform scale clamp (affects GSAP `scale`, not font-size)
 // This lets you tune physics feel per season independent of font-size.
 const SCALE_CLAMP: Record<Theme, { min: number; max: number; base: number }> = {
@@ -116,26 +117,6 @@ const getAbsoluteOffsetTop = (el: HTMLElement): number => {
 // ---------------------------------------------
 // GSAP study helpers (typed & numbers-only)
 // ---------------------------------------------
-type NumStr = number | string;
-
-interface KeyframeStep {
-  x?: NumStr;
-  y?: NumStr;
-  rotation?: NumStr;
-  scale?: number;
-  opacity?: number;
-  duration?: number;
-  ease?: string;
-  delay?: number;
-}
-
-type Keyframes = KeyframeStep[] | Record<string, KeyframeStep>;
-
-type Motion = {
-  keyframes?: Keyframes; // array OR percentage map
-  ease?: string;
-  yoyo?: boolean;
-};
 
 type Spawn = { x: number; y: number; scale: number; rot: number; opacity?: number };
 
@@ -171,19 +152,19 @@ const SEASONS: Record<Theme, SeasonCfg> = {
       const steps = 6 + randInt(0, 2); // 6–8 steps
       const kfs: KeyframeStep[] = [];
       const idealSecs = clamp(6, 18)(10); // keep consistent; you already clamp via duration()
-      const wiggle = Math.min(vw() * gsap.utils.random(0.01, 0.03), 28);
-      const tiltAmp = gsap.utils.random(8, 15); // degrees peak
-      const tiltHz = gsap.utils.random(0.18, 0.3);
+      // const wiggle = Math.min(vw() * rand(0.01, 0.03), 28);
+      const tiltAmp = rand(12, 15); // degrees peak
+      const tiltHz = rand(0.18, 0.3);
       let prevAngle = 0;
 
       for (let i = 1; i <= steps; i++) {
         const u = i / steps;
         const ti = t0 + u * idealSecs;
         const angle = Math.sin(ti * 2 * Math.PI * tiltHz) * tiltAmp;
-        const drot = angle - prevAngle; // incremental tilt change
+        const drot = angle - prevAngle;
         prevAngle = angle;
-        const dx = gsap.utils.random(-wiggle, wiggle);
-        kfs.push({ x: `+=${dx}`, rotation: `+=${drot}`, ease: 'none' });
+        // const dx = rand(-wiggle, wiggle);
+        kfs.push({ x: `+=50`, rotation: `+=${drot}`, ease: 'none' });
       }
       return { keyframes: kfs, ease: 'none' };
     },
@@ -254,7 +235,7 @@ const SEASONS: Record<Theme, SeasonCfg> = {
     targetY: (footerTop) => Math.min(footerTop, vh() + 140),
     motion: (_el, size) => {
       const t0 = now();
-      const steps = 6 + randInt(0, 2); // 6 to 9 segments
+      const steps = 6 + randInt(0, 2);
       const kfs: KeyframeStep[] = [];
       const idealSecs = clamp(6, 18)(10 + (24 - size) * 0.25);
       for (let i = 1; i <= steps; i++) {
@@ -264,7 +245,7 @@ const SEASONS: Record<Theme, SeasonCfg> = {
         const vy = windY(ti);
         const segT = idealSecs / steps;
         const dx = vx * segT * gsap.utils.random(0.8, 1.25);
-        const dy = Math.max(28, 60 + vy * segT); // ensure net downward
+        const dy = Math.max(28, 60 + vy * segT);
         const drot = windSpin(ti) * segT * gsap.utils.random(0.6, 1.2);
         kfs.push({ x: `+=${dx}`, y: `+=${dy}`, rotation: `+=${drot}`, ease: 'none' });
       }
@@ -447,9 +428,6 @@ const animateArtifacts = () => {
       },
     );
   }
-
-  // universal layer reveal delay still works the same:
-  // gsap.to(container, { autoAlpha: 1, delay, duration: 0.3, ease: 'power2.out' });
 };
 
 const handleResize = debounce(async () => {
@@ -457,7 +435,7 @@ const handleResize = debounce(async () => {
   artifacts.value = [];
   artifactRefs.value = [];
   await nextTick();
-  createArtifacts(); // run for all themes
+  createArtifacts();
   await nextTick();
   artifactRefs.value = artifactRefs.value.slice(0, artifacts.value.length);
   animateArtifacts();
@@ -476,16 +454,14 @@ onBeforeUnmount(() => {
 });
 
 watch(activeTheme, async () => {
-  // 2) Clear + rebuild new artifacts.
   artifacts.value = [];
   artifactRefs.value = [];
   await nextTick();
-  createArtifacts(); // build for the NEW season
+  createArtifacts();
   await nextTick();
 
   artifactRefs.value = artifactRefs.value.slice(0, artifacts.value.length);
 
-  // set new nodes to an invisible, slightly soft state
   const newNodes: HTMLElement[] = [];
   for (const el of artifactRefs.value) {
     const node =
@@ -493,7 +469,7 @@ watch(activeTheme, async () => {
     if (node) {
       node.style.opacity = '0';
       node.style.filter = 'blur(2px)';
-      node.style.transform += ' scale(1.02)'; // tiny scale up before anim starts
+      node.style.transform += ' scale(1.02)';
       newNodes.push(node);
     }
   }
