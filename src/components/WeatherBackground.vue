@@ -17,106 +17,79 @@ import { Theme } from '../shared/constants/theme';
 import { type Motion } from '../shared/types/motion';
 import { type KeyframeStep } from '../shared/types/keyframeStep';
 import { type Spawn } from '../shared/types/spawn';
+import { rand } from '../shared/utils/rand';
+import { vw } from '../shared/utils/viewWidth';
+import { vh } from '../shared/utils/viewHeight';
+import { randRange } from '../shared/utils/randRange';
+import { clamp } from '../shared/utils/clamp';
+import { randInt } from '../shared/utils/randInt';
+import windDynamics from '../shared/utils/windDynamics';
 
+// -----------------------------------------------------
+// Store / reactive state
+// -----------------------------------------------------
 const mainStore = useMainStore();
 const { activeTheme } = storeToRefs(mainStore);
+
 const artifacts = ref<Artifact[]>([]);
 const artifactRefs = ref<(Element | ComponentPublicInstance | null)[]>([]);
-const fallEmojis = ['🍂', '🍁'];
-const winterEmoji = '❄';
-const springEmoji = '🌸';
-const summerEmoji = '🏐';
 
-// Per-season visual size (font-size) ranges, in px
-const SIZE_RANGE: Record<Theme, { min: number; max: number }> = {
+// -----------------------------------------------------
+// Theme glyphs (visuals)
+// -----------------------------------------------------
+const FALL_EMOJIS = ['🍂', '🍁'];
+const WINTER_EMOJI = '❄';
+const SPRING_EMOJI = '🌸';
+const SUMMER_EMOJI = '🏐';
+
+// -----------------------------------------------------
+// Size ranges (font-size, in px) by season
+// Controls visual size (CSS font-size), not GSAP scale
+// -----------------------------------------------------
+const FONT_SIZE_RANGE_PX: Record<Theme, { min: number; max: number }> = {
   [Theme.Fall]: { min: 20, max: 36 }, // leaves a bit larger on average
   [Theme.Winter]: { min: 8, max: 22 }, // snowflakes smaller
   [Theme.Spring]: { min: 10, max: 26 }, // petals medium/small
   [Theme.Summer]: { min: 18, max: 36 }, // volleyball bigger
 };
 
-const ARTIFACT_QUANITY: Record<Theme, number> = {
-  [Theme.Fall]: 50, // leaves a bit larger on average
-  [Theme.Winter]: 100, // snowflakes smaller
-  [Theme.Spring]: 50, // petals medium/small
-  [Theme.Summer]: 1, // volleyball bigger
+// -----------------------------------------------------
+// Artifact counts by season
+// -----------------------------------------------------
+const ARTIFACT_QUANTITY: Record<Theme, number> = {
+  [Theme.Fall]: 50,
+  [Theme.Winter]: 100,
+  [Theme.Spring]: 50,
+  [Theme.Summer]: 1,
 };
-// Optional: per-season transform scale clamp (affects GSAP `scale`, not font-size)
-// This lets you tune physics feel per season independent of font-size.
+
+// -----------------------------------------------------
+// Per-season GSAP scale clamps (affects transform scale)
+// Lets physics feel differ from font-size
+// -----------------------------------------------------
 const SCALE_CLAMP: Record<Theme, { min: number; max: number; base: number }> = {
   [Theme.Fall]: { min: 0.9, max: 1.5, base: 24 },
-  [Theme.Winter]: { min: 0.5, max: 1, base: 24 },
+  [Theme.Winter]: { min: 0.5, max: 1.0, base: 24 },
   [Theme.Spring]: { min: 0.5, max: 1.0, base: 24 },
   [Theme.Summer]: { min: 0.9, max: 1.1, base: 28 }, // feel a bit heavier
 };
 
-const FALL_DRIZZLE_DELAY = 1.5; // global gate
+// -----------------------------------------------------
+// Seasonal timing & spin tuning
+// -----------------------------------------------------
+const FALL_DRIZZLE_DELAY = 1.5; // global gate before Fall starts
 const FALL_DRIZZLE_RATE = 0.5; // seconds between new leaves starting
-const FALL_DRIZZLE_JITTER = 0.2; // small random +/- jitter per leaf
+const FALL_DRIZZLE_JITTER = 0.2; // per-leaf random +/- jitter
 
-const WINTER_DRIZZLE_DELAY = 1.5; // global gate
-const WINTER_DRIZZLE_RATE = 0.1; // seconds between new leaves starting
-const WINTER_DRIZZLE_JITTER = 0.2; // small random +/- jitter per leaf
+const WINTER_DRIZZLE_DELAY = 1.5; // global gate before Winter starts
+const WINTER_DRIZZLE_RATE = 0.1; // seconds between new flakes starting
+const WINTER_DRIZZLE_JITTER = 0.2; // per-flake random +/- jitter
 
 const FALL_SPIN_PROB = 0.6; // 60% of leaves can rotate this cycle
 
-// Helper
-const randRange = (min: number, max: number) => min + Math.random() * (max - min);
-
-// viewport helpers
-const vw = () => Math.max(document.documentElement.clientWidth, window.innerWidth || 0);
-const vh = () => Math.max(document.documentElement.clientHeight, window.innerHeight || 0);
-
-// gsap.utils.random(min, max, snapIncrement?, returnFunction?)
-const rand = (min: number, max: number): number => gsap.utils.random(min, max, 0, false); // float
-const randInt = (min: number, max: number): number => gsap.utils.random(min, max, 1, false); // integer
-const clamp = gsap.utils.clamp;
-// const fallDurationFromSize = (size: number, fallFactor: number) =>
-//   clamp(4, 18)(assignFallDuration(size, fallFactor));
-
-// ---- Wind helpers
-const now = () => performance.now() / 1000; // seconds
-const n1 = (t: number, f = 0.07) => Math.sin(t * 2 * Math.PI * f);
-const n2 = (t: number, f = 0.11) => Math.sin((t + 13.37) * 2 * Math.PI * f);
-const n3 = (t: number, f = 0.041) => Math.sin((t + 7.5) * 2 * Math.PI * f);
-
-// gust envelope (0..1)
-function gust(t: number) {
-  const g = Math.max(0, Math.sin(t * 2 * Math.PI * 0.02));
-  return g * g;
-}
-
-// wind components (px/sec, deg/sec)
-function windX(t: number) {
-  const baseAmp = vw() * 0.06;
-  // smooth "square-ish" left/right periods (no step)
-  const base = Math.tanh(4 * n1(t, 0.03)) * baseAmp;
-
-  const wobble = (n1(t) * 0.6 + n2(t) * 0.3 + n3(t) * 0.1) * vw() * 0.03;
-  const gustAmp = gust(t) * vw() * 0.08;
-  return base + wobble + gustAmp;
-}
-
-function windY(t: number) {
-  return (n1(t, 0.09) * 0.5 + n2(t, 0.05) * 0.5) * 22;
-}
-function windSpin(t: number) {
-  const swirl = (n1(t, 0.06) * 0.7 + n2(t, 0.04) * 0.3) * 90; // deg/sec
-  const gRaw = Math.max(0, Math.sin(t * 2 * Math.PI * 0.02));
-  const envelope = 0.35 + 0.65 * (gRaw * gRaw); // floor at 0.35 (35% power)
-  return swirl * envelope; // deg/sec, never zero
-}
-
-function makeSpinEnvelope() {
-  const freq = rand(0.02, 0.05); // Hz
-  const phase = rand(0, Math.PI * 2);
-  const sharp = rand(3, 6); // higher = shorter, punchier bursts
-  return (t: number) => Math.pow(0.5 + 0.5 * Math.sin(2 * Math.PI * freq * t + phase), sharp);
-}
-
-// ---------------------------------------------
-// Utilities
-// ---------------------------------------------
+// -----------------------------------------------------
+// DOM / layout utilities
+// -----------------------------------------------------
 const getAbsoluteOffsetTop = (el: HTMLElement): number => {
   let top = el.offsetTop;
   let parent = el.offsetParent as HTMLElement | null;
@@ -127,369 +100,546 @@ const getAbsoluteOffsetTop = (el: HTMLElement): number => {
   return top;
 };
 
-const assignFallDuration = (artifactSize: number) => {
-  let duration = 8 + (30 - artifactSize) * 0.25;
-  const smallBreakpoint = +getCustomCssVar('breakpoint-sm').slice(0, -2);
-  const isMobile = smallBreakpoint < 600;
+// Fall duration scales w/ size (adjusted for small/mobile view)
+const assignFallDuration = (artifactSizePx: number) => {
+  let durationSec = 8 + (30 - artifactSizePx) * 0.25;
+  const smallBreakpointPx = +getCustomCssVar('breakpoint-sm').slice(0, -2);
+  const isMobile = smallBreakpointPx < 600;
+
   if (isMobile && activeTheme.value === Theme.Fall) {
-    duration = 6 + (30 - artifactSize) * 0.15;
+    durationSec = 6 + (30 - artifactSizePx) * 0.15;
   }
-  return duration;
+
+  return durationSec;
 };
 
-// ---------------------------------------------
+// -----------------------------------------------------
 // Seasonal behavior definitions
-// ---------------------------------------------
+// -----------------------------------------------------
 
-// Types
-
+// Types for the per-season configuration object
 type SeasonCfg = {
-  spawn: (el: HTMLElement, artifactSize: number) => Spawn;
-  targetY: (footerTop: number) => number | null; // null => y handled inside keyframes
-  motion: (el: HTMLElement, artifactSize: number) => Motion;
-  duration: (size: number) => number;
+  // Where/How the element first appears
+  spawn: (element: HTMLElement, artifactSizePx: number) => Spawn;
+
+  // Target Y position for "falling" animations (null => y is driven in keyframes)
+  targetY: (footerTopPx: number) => number | null;
+
+  // Keyframed motion pattern for the season
+  motion: (element: HTMLElement, artifactSizePx: number) => Motion;
+
+  // Total animation duration for one cycle
+  duration: (artifactSizePx: number) => number;
+
+  // Start delay (used for drizzle/flurry staggering); return null to skip
   delay: (nodeIndex: number) => number | null;
+
+  // Initial rotation angle
   rot: () => number;
 };
 
+// Season configs (renamed consistently and commented for context)
 const SEASONS: Record<Theme, SeasonCfg> = {
   [Theme.Fall]: {
-    // spawn from the TOP only, random x
-    spawn: (el, size) => {
-      const { min, max, base } = SCALE_CLAMP[Theme.Fall];
-      const scaleClamp = gsap.utils.clamp(min, max);
+    /**
+     * Spawn from the TOP only at a random x across the viewport.
+     * Scale is clamped using Fall's scale clamp.
+     */
+    spawn: (element, artifactSize) => {
+      const { min: minScale, max: maxScale, base: baseScale } = SCALE_CLAMP[Theme.Fall];
+      const clampScale = clamp(minScale, maxScale);
+
       return {
-        x: rand(el.offsetWidth / 2, vw() - el.offsetWidth / 2),
+        x: rand(element.offsetWidth / 2, vw() - element.offsetWidth / 2),
+        // Slight vertical jitter so rows don't look grid-aligned
         y: rand(-160, -120) + rand(-8, 8),
-        scale: scaleClamp(size / base),
+        scale: clampScale(artifactSize / baseScale),
         rot: randInt(0, 360),
         opacity: 1,
       };
     },
-    targetY: (footerTop) => Math.min(footerTop, vh() + 140),
-    motion: (_el, size) => {
-      const t0 = now() + rand(0, 1) * 1000; // desync per leaf
-      const steps = 12; // keep modest for perf
-      const T = clamp(6, 18)(10 + (36 - size) * 0.1);
-      const segT = T / steps;
+    /** Limit fall distance to just above the footer (or a padded bottom-of-viewport). */
+    targetY: (footerTopPx) => Math.min(footerTopPx, vh() + 140),
+    /**
+     * Gentle drift with optional spinning “tumbles”.
+     * Uses smoothed wind for lateral drift and a spin envelope for bursts of rotation.
+     */
+    motion: (_element, artifactSize) => {
+      const startTime = windDynamics.now() + rand(0, 1) * 1000; // de-sync each leaf a bit
+      const totalSteps = 12; // modest for perf
+      const idealDurationSeconds = clamp(6, 18)(10 + (36 - artifactSize) * 0.1);
+      const segmentDuration = idealDurationSeconds / totalSteps;
 
       // --- lateral drift (smoothed)
-      const smoothX = 0.9;
-      const windScaleX = 0.5;
-      const bias = rand(-vw() * 0.01, vw() * 0.01);
+      const lateralSmoothing = 0.9;
+      const windInfluenceX = 0.5;
+      const lateralBias = rand(-vw() * 0.01, vw() * 0.01); // small per-leaf bias
 
       // --- rotation (decide ONCE per leaf)
-      const doSpin = Math.random() < FALL_SPIN_PROB;
+      const enableSpin = Math.random() < FALL_SPIN_PROB;
       // base tumble so spin is always visible when enabled
-      const baseOmega = doSpin
-        ? (Math.random() < 0.5 ? -1 : 1) * rand(18, 35) // deg/sec
+      const baseAngularVelDegPerSec = enableSpin
+        ? (Math.random() < 0.5 ? -1 : 1) * rand(18, 35)
         : 0;
 
-      const spinEnv = makeSpinEnvelope(); // smooth bursts 0..1
-      const spinScale = 0.6; // ↑ from 0.28
-      const smoothW = 0.75; // ↓ from 0.88 (less damping)
+      const spinEnvelopeFn = windDynamics.makeSpinEnvelope(); // smooth bursts 0..1 over time
+      const windSpinScale = 0.6; // how strongly wind affects spin
+      const angularSmoothing = 0.75; // lower = less damping
 
-      let vx = 0; // px/s
-      let omega = baseOmega; // deg/s
+      let velX = 0; // px/s (smoothed)
+      let angularVelDegPerSec = baseAngularVelDegPerSec; // deg/s (smoothed)
 
-      const kfs: KeyframeStep[] = [];
-      for (let i = 0; i < steps; i++) {
-        const ti = t0 + (i / steps) * T;
+      const keyframes: KeyframeStep[] = [];
+      for (let step = 0; step < totalSteps; step++) {
+        const t = startTime + (step / totalSteps) * idealDurationSeconds;
 
-        // lateral
-        const vxTarget = bias + windX(ti) * windScaleX;
-        vx = smoothX * vx + (1 - smoothX) * vxTarget;
-        const dx = vx * segT;
+        // Lateral drift: ease toward wind + bias
+        const targetVelX = lateralBias + windDynamics.windX(t) * windInfluenceX;
+        velX = lateralSmoothing * velX + (1 - lateralSmoothing) * targetVelX;
+        const dx = velX * segmentDuration;
 
         const frame: KeyframeStep = { x: `+=${dx}`, ease: 'none' };
 
-        // rotation (only when doSpin)
-        if (doSpin) {
-          const omegaTarget = baseOmega + windSpin(ti) * spinScale * spinEnv(ti);
-          omega = smoothW * omega + (1 - smoothW) * omegaTarget;
-          const drot = omega * segT; // deg for this segment
+        // Optional spinning: wind-boosted, smoothed envelopes
+        if (enableSpin) {
+          const targetOmega =
+            baseAngularVelDegPerSec + windDynamics.windSpin(t) * windSpinScale * spinEnvelopeFn(t);
+          angularVelDegPerSec =
+            angularSmoothing * angularVelDegPerSec + (1 - angularSmoothing) * targetOmega;
 
-          // avoid micro changes that aren’t visible but cost work
-          if (Math.abs(drot) > 0.75) frame.rotation = `+=${drot}`;
+          const dRot = angularVelDegPerSec * segmentDuration; // deg this segment
+
+          // Skip tiny rotations that cost work but aren’t visible
+          if (Math.abs(dRot) > 0.75) frame.rotation = `+=${dRot}`;
         }
 
-        kfs.push(frame);
+        keyframes.push(frame);
       }
 
-      return { keyframes: kfs, ease: 'none' };
+      return { keyframes, ease: 'none' };
     },
-    duration: (size) => assignFallDuration(size),
-    delay: (nodeNumber: number) =>
+    /** Longer for larger sprites (feels heavier). */
+    duration: (artifactSize) => assignFallDuration(artifactSize),
+    /**
+     * Stagger: slow drizzle effect with per-node jitter.
+     * Keeps the scene feeling organic rather than bursty.
+     */
+    delay: (nodeIndex: number) =>
       FALL_DRIZZLE_DELAY +
-      nodeNumber * FALL_DRIZZLE_RATE +
+      nodeIndex * FALL_DRIZZLE_RATE +
       rand(-FALL_DRIZZLE_JITTER, FALL_DRIZZLE_JITTER),
+    /** Start without initial rotation; tumble happens in motion() if enabled. */
     rot: () => 0,
   },
-
   [Theme.Winter]: {
-    spawn: (_el, size) => {
-      const { min, max, base } = SCALE_CLAMP[Theme.Fall];
-      const scaleClamp = gsap.utils.clamp(min, max);
+    /**
+     * Spawn from the TOP at a random x like Fall,
+     * but with no initial rotation (flakes start upright).
+     */
+    spawn: (element, artifactSize) => {
+      const { min: minScale, max: maxScale, base: baseScale } = SCALE_CLAMP[Theme.Fall];
+      const clampScale = clamp(minScale, maxScale);
+
       return {
-        x: rand(_el.offsetWidth / 2, vw() - _el.offsetWidth / 2),
+        x: rand(element.offsetWidth / 2, vw() - element.offsetWidth / 2),
         y: rand(-160, -120) + rand(-8, 8),
-        scale: scaleClamp(size / base),
+        scale: clampScale(artifactSize / baseScale),
         rot: 0,
       };
     },
-    targetY: (footerTop) => Math.min(footerTop, vh() + 140),
-    motion: (_el, size) => {
-      const t0 = now() + rand(0, 1) * 1000; // desync per leaf
-      const steps = 14; // keep modest for perf
-      const T = clamp(6, 18)(10 + (36 - size) * 0.1);
-      const segT = T / steps;
 
-      const smoothX = 0.9;
-      const windScaleX = 0.22;
-      // const bias = rand(-vw() * 0.01, vw() * 0.01);
+    /** Same vertical target behavior as Fall. */
+    targetY: (footerTopPx) => Math.min(footerTopPx, vh() + 140),
 
-      let vx = 0; // px/s
+    /**
+     * Snow-like drift: slow, smoothed lateral wander driven by wind.
+     * No spin here; Winter’s look is calmer and simpler.
+     */
+    motion: (_element, artifactSize) => {
+      const startTime = windDynamics.now() + rand(0, 1) * 1000; // de-sync each flake
+      const totalSteps = 14; // slightly more steps for a smoother drift
+      const idealDurationSeconds = clamp(6, 18)(10 + (36 - artifactSize) * 0.1);
+      const segmentDuration = idealDurationSeconds / totalSteps;
 
-      const kfs: KeyframeStep[] = [];
-      for (let i = 0; i < steps; i++) {
-        const ti = t0 + (i / steps) * T;
+      const lateralSmoothing = 0.9;
+      const windInfluenceX = 0.22;
 
-        // lateral
-        const vxTarget = windX(ti) * windScaleX;
-        vx = smoothX * vx + (1 - smoothX) * vxTarget;
-        const dx = vx * segT;
+      let velX = 0;
 
-        const frame: KeyframeStep = {
+      const keyframes: KeyframeStep[] = [];
+      for (let step = 0; step < totalSteps; step++) {
+        const t = startTime + (step / totalSteps) * idealDurationSeconds;
+
+        // Lateral drift only, smoothed toward wind target
+        const targetVelX = windDynamics.windX(t) * windInfluenceX;
+        velX = lateralSmoothing * velX + (1 - lateralSmoothing) * targetVelX;
+        const dx = velX * segmentDuration;
+
+        keyframes.push({
           x: `+=${dx}`,
           ease: 'none',
-        };
-
-        kfs.push(frame);
+        });
       }
 
-      return { keyframes: kfs, ease: 'none' };
+      return { keyframes, ease: 'none' };
     },
-    delay: (nodeNumber: number) =>
+
+    /**
+     * Stagger: winter “flurry” cadence.
+     * Rate/jitter tuned independently from Fall to change the vibe.
+     */
+    delay: (nodeIndex: number) =>
       WINTER_DRIZZLE_DELAY +
-      nodeNumber * WINTER_DRIZZLE_RATE +
+      nodeIndex * WINTER_DRIZZLE_RATE +
       gsap.utils.random(-WINTER_DRIZZLE_JITTER, WINTER_DRIZZLE_JITTER),
+
+    /** Flakes don’t linger as long. */
     duration: () => rand(4, 8),
+
+    /** Occasional random spin to break uniformity. */
     rot: () => (rand(0, 1) > 0.08 ? randRange(0, 360) : 0),
   },
   [Theme.Spring]: {
-    spawn: (el, size) => {
-      const { min, max, base } = SCALE_CLAMP[Theme.Fall];
-      const scaleClamp = gsap.utils.clamp(min, max);
-      // spawn from top/left/right
-      const side = gsap.utils.random(['top', 'left', 'right'], true)();
-      if (side === 'top') {
+    /**
+     * Spawn from top/left/right edges.
+     * Scale is clamped using Fall’s scale band (for consistency across themes).
+     */
+    spawn: (element, artifactSize) => {
+      const { min: minScale, max: maxScale, base: baseScale } = SCALE_CLAMP[Theme.Fall];
+      const clampScale = clamp(minScale, maxScale);
+
+      // Choose side: top / left / right
+      const spawnSide = gsap.utils.random(['top', 'left', 'right'], true)();
+      if (spawnSide === 'top') {
         return {
-          x: rand(el.offsetWidth / 2, vw() - el.offsetWidth / 2),
+          x: rand(element.offsetWidth / 2, vw() - element.offsetWidth / 2),
           y: -rand(100, 150),
-          scale: scaleClamp(size / base),
+          scale: clampScale(artifactSize / baseScale),
           rot: randInt(0, 360),
         };
-      } else if (side === 'left') {
+      } else if (spawnSide === 'left') {
         return {
           x: -rand(40, 140),
           y: rand(-40, vh() * 0.6),
-          scale: scaleClamp(size / base),
+          scale: clampScale(artifactSize / baseScale),
           rot: randInt(0, 360),
         };
       } else {
         return {
           x: vw() + rand(40, 140),
           y: rand(-40, vh() * 0.6),
-          scale: scaleClamp(size / base),
-          rot: randInt(0, 360),
+          scale: clampScale(artifactSize / baseScale),
+          rot: 0,
         };
       }
     },
-    targetY: (footerTop) => Math.min(footerTop, vh() + 140),
-    motion: (_el, size) => {
-      const t0 = now();
-      const steps = 6 + randInt(0, 2);
-      const kfs: KeyframeStep[] = [];
-      const idealSecs = clamp(6, 18)(10 + (24 - size) * 0.25);
-      for (let i = 1; i <= steps; i++) {
-        const u = i / steps;
-        const ti = t0 + u * idealSecs;
-        const vx = windX(ti);
-        const vy = windY(ti);
-        const segT = idealSecs / steps;
-        const dx = vx * segT * gsap.utils.random(0.8, 1.25);
-        const dy = Math.max(28, 60 + vy * segT);
-        const drot = windSpin(ti) * segT * gsap.utils.random(0.6, 1.2);
-        kfs.push({ x: `+=${dx}`, y: `+=${dy}`, rotation: `+=${drot}`, ease: 'none' });
+
+    /** Stop above footer or bottom-padding, whichever is higher. */
+    targetY: (footerTopPx) => Math.min(footerTopPx, vh() + 140),
+
+    /**
+     * Breezy arc across the screen: forward progress toward an exit point,
+     * wind added along/against the path, and a sinusoidal side sway.
+     */
+    motion: (_, artifactSize) => {
+      const totalSteps = 14;
+      const idealDurationSeconds = clamp(6, 18)(10 + (24 - artifactSize) * 0.25);
+      const segmentDuration = idealDurationSeconds / totalSteps;
+
+      const keyframes: KeyframeStep[] = [];
+      const startTime = windDynamics.now();
+
+      // GSAP keyframe value factory helper
+      const asNumberOrString = (fn: (i: number, target: HTMLElement) => number) =>
+        fn as unknown as number | string;
+
+      const swayWaves = 1 + randInt(0, 1);
+      const sinePhase = rand(0, Math.PI * 2);
+      const EXIT_PADDING = 140;
+
+      let exitX: number | null = null;
+      let exitY: number | null = null;
+      let velX = 0;
+      let velY = 0;
+
+      const dotProduct = (ax: number, ay: number, bx: number, by: number) => ax * bx + ay * by;
+
+      for (let step = 1; step <= totalSteps; step++) {
+        const progress = step / totalSteps;
+        const t = startTime + progress * idealDurationSeconds;
+
+        keyframes.push({
+          x: asNumberOrString((_i, target) => {
+            const currentX = Number(gsap.getProperty(target, 'x')) || 0;
+            const currentY = Number(gsap.getProperty(target, 'y')) || 0;
+
+            if (exitX == null) {
+              // Decide horizontal exit: if we spawned from the left (x<0) → exit right, else → left
+              exitX = currentX < 0 ? vw() + EXIT_PADDING : -EXIT_PADDING;
+              exitY = vh() + EXIT_PADDING;
+            }
+
+            // Vector toward exit
+            const dx = exitX - currentX;
+            const dy = exitY! - currentY;
+            const dist = Math.max(1, Math.hypot(dx, dy));
+            const unitToExitX = dx / dist;
+            const unitToExitY = dy / dist;
+
+            // Perpendicular for lateral sway
+            const perpX = -unitToExitY;
+            const perpY = unitToExitX;
+
+            // Base forward speed slowly increases with progress
+            const baseForward =
+              0.85 * vw() * (0.02 + 0.016 * Math.pow(progress, 1.3)) * segmentDuration;
+
+            // Wind contributions
+            const windVX = windDynamics.windX(t) * 0.1 * segmentDuration;
+            const windVY = windDynamics.windY(t) * 0.06 * segmentDuration;
+
+            // Wind projected along forward direction, clamped so it doesn’t dominate
+            const windAlong = Math.max(
+              -baseForward * 0.4,
+              Math.min(baseForward * 0.4, windVX * unitToExitX + windVY * unitToExitY),
+            );
+
+            // Side-to-side sine sway
+            const oscillationMagnitude =
+              baseForward * 0.4 * Math.sin(sinePhase + progress * swayWaves * Math.PI * 2);
+
+            // Proposed velocity
+            let targetVelX = unitToExitX * (baseForward + windAlong) + perpX * oscillationMagnitude;
+            let targetVelY = unitToExitY * (baseForward + windAlong) + perpY * oscillationMagnitude;
+
+            // Ensure minimum forward progress so elements don’t stall or backtrack
+            const minForwardSpeed = vw() * 0.006;
+            const forwardComponent = dotProduct(targetVelX, targetVelY, unitToExitX, unitToExitY);
+            if (forwardComponent < minForwardSpeed) {
+              const add = minForwardSpeed - forwardComponent;
+              targetVelX += unitToExitX * add;
+              targetVelY += unitToExitY * add;
+            }
+
+            // Blend toward the “needed” velocity so we actually reach the exit in time
+            const stepsRemaining = totalSteps - step + 1;
+            const remainingDist = Math.hypot(exitX - currentX, exitY! - currentY);
+            const neededSpeed = remainingDist / stepsRemaining;
+            const blendTowardNeeded = Math.max(0.35, Math.min(0.75, Math.pow(progress, 1.8)));
+            const neededVelX = unitToExitX * neededSpeed;
+            const neededVelY = unitToExitY * neededSpeed;
+            targetVelX = targetVelX * (1 - blendTowardNeeded) + neededVelX * blendTowardNeeded;
+            targetVelY = targetVelY * (1 - blendTowardNeeded) + neededVelY * blendTowardNeeded;
+
+            // Smooth velocity to avoid jitter
+            const smoothing = 0.25;
+            let newVelX = velX * smoothing + targetVelX * (1 - smoothing);
+            let newVelY = velY * smoothing + targetVelY * (1 - smoothing);
+
+            // Re-assert min forward motion after smoothing
+            const newForwardComponent = dotProduct(newVelX, newVelY, unitToExitX, unitToExitY);
+            if (newForwardComponent < minForwardSpeed) {
+              const scaleUp = (minForwardSpeed + 1e-6) / Math.max(1e-6, newForwardComponent);
+              newVelX *= scaleUp;
+              newVelY *= scaleUp;
+            }
+
+            velX = newVelX;
+            velY = newVelY;
+
+            return currentX + velX;
+          }),
+
+          y: asNumberOrString((_i, target) => {
+            const currentY = Number(gsap.getProperty(target, 'y')) || 0;
+            return currentY + velY;
+          }),
+
+          // Add a bit of wind-driven spin so Spring feels lively
+          rotation: `+=${windDynamics.windSpin(t) * segmentDuration * rand(3, 20)}`,
+          ease: 'none',
+        } as KeyframeStep);
       }
-      if (Math.random() < 0.35) {
-        kfs.push(
-          {
-            x: `+=${rand(-20, 20)}`,
-            y: `-=${rand(6, 14)}`,
-            rotation: `+=${rand(-30, 30)}`,
-            ease: 'none',
-          },
-          {
-            x: `+=${rand(-20, 20)}`,
-            y: `+=${rand(12, 24)}`,
-            rotation: `+=${rand(-20, 20)}`,
-            ease: 'none',
-          },
-        );
-      }
-      return { keyframes: kfs, ease: 'none' };
+
+      return { keyframes, ease: 'none' };
     },
     duration: () => rand(10, 13),
     delay: () => 1,
-    rot: () => 0,
+    rot: () => (rand(0, 1) > 0.06 ? randRange(0, 360) : 0),
   },
   [Theme.Summer]: {
-    spawn: (_el, size) => {
-      const { min, max, base } = SCALE_CLAMP[Theme.Summer];
-      const scaleClamp = gsap.utils.clamp(min, max);
-      const margin = 48;
+    /**
+     * Spawn near bottom-left with a margin.
+     * Summer is typically UI-driven (timeline controls y), not wind-driven.
+     */
+    spawn: (_, artifactSize) => {
+      const { min: minScale, max: maxScale, base: baseScale } = SCALE_CLAMP[Theme.Summer];
+      const clampScale = clamp(minScale, maxScale);
+      const marginPx = 48;
+
       return {
-        x: margin,
+        x: marginPx,
         y: Math.max(0, vh() - 180),
-        scale: scaleClamp(size / base),
+        scale: clampScale(artifactSize / baseScale),
         rot: 0,
       };
     },
+
+    /** Summer animation is timeline-driven; no natural “fall” target. */
     targetY: () => null, // timeline fully drives y
-    motion: () => {
-      return { keyframes: [], ease: 'none' }; // not used here
-    },
+
+    /** Not used; Summer’s movement comes from external timeline tweens. */
+    motion: () => ({ keyframes: [], ease: 'none' }),
+
+    /** Shorter presence; feels snappier / sunnier. */
     duration: () => rand(5, 10),
+
+    /** Tiny delay to avoid everything appearing on the same frame. */
     delay: () => 1,
+
+    /** No initial rotation. */
     rot: () => 0,
   },
 };
 
-// ---------------------------------------------
+// -----------------------------------------------------
 // Artifact creation
-// ---------------------------------------------
-
+// -----------------------------------------------------
 function createArtifacts() {
   artifacts.value = [];
-  const range = SIZE_RANGE[activeTheme.value];
-  const min = range.min;
-  const max = range.max;
-  const artifactQuanity = ARTIFACT_QUANITY[activeTheme.value];
 
-  for (let i = 0; i < artifactQuanity; i++) {
-    const size = randRange(min, max);
+  const { min, max } = FONT_SIZE_RANGE_PX[activeTheme.value];
+  const artifactCount = ARTIFACT_QUANTITY[activeTheme.value];
 
+  for (let i = 0; i < artifactCount; i++) {
+    const sizePx = randRange(min, max);
+
+    // pick an emoji for this artifact based on theme
     let emoji: string | null = null;
     switch (activeTheme.value) {
       case Theme.Fall:
-        emoji = fallEmojis[Math.floor(Math.random() * fallEmojis.length)] ?? '🍁';
+        emoji = FALL_EMOJIS[Math.floor(Math.random() * FALL_EMOJIS.length)] ?? '🍁';
         break;
       case Theme.Winter:
-        emoji = winterEmoji;
+        emoji = WINTER_EMOJI;
         break;
       case Theme.Spring:
-        emoji = springEmoji;
+        emoji = SPRING_EMOJI;
         break;
       case Theme.Summer:
-        emoji = summerEmoji;
+        emoji = SUMMER_EMOJI;
         break;
     }
 
     artifacts.value.push({
       id: `${i}-${Math.random()}`,
-      left: Math.random() * 100,
-      size,
+      left: Math.random() * 100, // initial CSS left% (not used for GSAP x)
+      size: sizePx,
       emoji,
     });
   }
 }
 
-// ---------------------------------------------
+// -----------------------------------------------------
 // Animation runner
-// ---------------------------------------------
-
+// -----------------------------------------------------
 const animateArtifacts = () => {
+  // Normalize refs: accept raw HTMLElements and Vue component instances
   const nodes = artifactRefs.value
     .map((el) =>
       el instanceof HTMLElement ? el : el && '$el' in el ? (el.$el as HTMLElement) : null,
     )
     .filter(Boolean) as HTMLElement[];
 
-  const distX = gsap.utils.distribute({ base: 24, amount: vw() - 48, ease: 'none', from: 0 });
-  const distY = gsap.utils.distribute({ base: -160, amount: 40, ease: 'none', from: 0 }); // -160..-120
+  // Distribute initial x/y values across the batch to avoid overlap
+  const spreadX = gsap.utils.distribute({ base: 24, amount: vw() - 48, ease: 'none', from: 0 });
+  const spreadY = gsap.utils.distribute({ base: -160, amount: 40, ease: 'none', from: 0 }); // -160..-120
 
-  const xVals = nodes.map((el, i) => distX(i, el, nodes));
-  const yVals = nodes.map((el, i) => distY(i, el, nodes));
-
-  gsap.utils.shuffle(xVals);
-  gsap.utils.shuffle(yVals);
+  const xSeed = nodes.map((el, i) => spreadX(i, el, nodes));
+  const ySeed = nodes.map((el, i) => spreadY(i, el, nodes));
+  gsap.utils.shuffle(xSeed);
+  gsap.utils.shuffle(ySeed);
 
   for (let i = 0; i < nodes.length; i++) {
-    const domEl = nodes[i] as HTMLElement;
+    const nodeEl = nodes[i] as HTMLElement;
     const artifact = artifacts.value[i];
     if (!artifact) continue;
 
-    const cfg = SEASONS[activeTheme.value];
-    const spawn = cfg.spawn(domEl, artifact.size);
+    const seasonCfg = SEASONS[activeTheme.value];
 
+    // initial spawn state (position, scale, rotation)
+    const spawnState = seasonCfg.spawn(nodeEl, artifact.size);
+
+    // determine vertical target (footer or padded bottom)
     const footerEl = document.querySelector('footer.q-footer') as HTMLElement;
-    const footerTop = footerEl ? getAbsoluteOffsetTop(footerEl) : vh();
-    const targetY = cfg.targetY(footerTop);
+    const footerTopPx = footerEl ? getAbsoluteOffsetTop(footerEl) : vh();
+    const targetYPx = seasonCfg.targetY(footerTopPx);
 
-    const motion = cfg.motion(domEl, artifact.size);
+    // motion keyframes/ease for this season
+    const motionCfg = seasonCfg.motion(nodeEl, artifact.size);
 
-    const delay = cfg.delay(i) as number;
+    // drizzle / flurry stagger delay
+    const startDelaySec = seasonCfg.delay(i) as number;
 
-    const duration = cfg.duration(artifact.size);
+    // one cycle duration
+    const runDurationSec = seasonCfg.duration(artifact.size);
 
-    const rotate = cfg.rot;
-
-    gsap.set(domEl, {
-      x: 0,
-      y: -50,
-    });
+    // reset node (prevents “from” flash in some cases)
+    gsap.set(nodeEl, { x: 0, y: -50 });
 
     gsap.fromTo(
-      domEl,
+      nodeEl,
       {
-        x: spawn.x,
-        y: spawn.y,
-        scale: spawn.scale,
-        rotation: spawn.rot,
+        x: spawnState.x,
+        y: spawnState.y,
+        scale: spawnState.scale,
+        rotation: spawnState.rot,
       },
       {
-        ...(targetY !== null ? { y: targetY } : {}),
-        ease: motion.ease ?? 'none',
-        ...(motion.keyframes ? { keyframes: motion.keyframes } : {}),
-        duration,
-        delay,
+        ...(targetYPx !== null ? { y: targetYPx } : {}),
+        ease: motionCfg.ease ?? 'none',
+        ...(motionCfg.keyframes ? { keyframes: motionCfg.keyframes } : {}),
+        duration: runDurationSec,
+        delay: startDelaySec,
         repeat: -1,
-        repeatRefresh: true,
+        repeatRefresh: true, // recompute functions each repeat
         repeatDelay: rand(1.0, 3.0),
         immediateRender: false, // ✅ prevents “from” state from flashing before delay with top
-        rotate,
       },
     );
   }
 };
 
+// -----------------------------------------------------
+// Resize handling
+// -----------------------------------------------------
 const handleResize = debounce(async () => {
   gsap.killTweensOf('*');
+
+  // reset lists to force fresh refs & animation
   artifacts.value = [];
   artifactRefs.value = [];
   await nextTick();
+
   createArtifacts();
   await nextTick();
+
+  // keep refs array in sync with artifacts
   artifactRefs.value = artifactRefs.value.slice(0, artifacts.value.length);
+
   animateArtifacts();
 }, 1);
 
+// -----------------------------------------------------
+// Lifecycle
+// -----------------------------------------------------
 onMounted(async () => {
   createArtifacts();
   await nextTick();
+
   artifactRefs.value = artifactRefs.value.slice(0, artifacts.value.length);
   animateArtifacts();
+
   window.addEventListener('resize', handleResize);
 });
 
@@ -497,15 +647,19 @@ onBeforeUnmount(() => {
   gsap.killTweensOf('*');
 });
 
+// Theme switch: cross-fade + blur soften-in, while motion starts immediately
 watch(activeTheme, async () => {
+  // reset lists so new season builds clean
   artifacts.value = [];
   artifactRefs.value = [];
   await nextTick();
+
   createArtifacts();
   await nextTick();
 
   artifactRefs.value = artifactRefs.value.slice(0, artifacts.value.length);
 
+  // Prep nodes for a soft fade/blur-in
   const newNodes: HTMLElement[] = [];
   for (const el of artifactRefs.value) {
     const node =
@@ -518,13 +672,13 @@ watch(activeTheme, async () => {
     }
   }
 
-  // 3) Start motion NOW so they’re already moving as they appear.
+  // Start motion now so they’re moving as they appear
   animateArtifacts();
 
-  // 4) Fade new season IN smoothly and sharpen it.
+  // Fade/blur-in the new season
   if (newNodes.length) {
     gsap.to(newNodes, {
-      opacity: 0.9, // matches your CSS default
+      opacity: 0.9, // matches CSS default
       filter: 'blur(0px)',
       scale: 1,
       duration: 1,

@@ -31,29 +31,29 @@ const updateWidths = () => {
 };
 
 const mobileMenu = ref(false);
-const slide = ref<Theme>(Theme.Fall);
+const slide = ref<Theme>(Theme.Spring);
 
 const slides = ref<Slide[]>([
-  {
-    id: uuidv4(),
-    src: new URL('../assets/autumn-forestry.jpg', import.meta.url).href,
-    theme: Theme.Fall,
-  },
-  {
-    id: uuidv4(),
-    src: new URL('../assets/snowy-winter-landscape.jpg', import.meta.url).href,
-    theme: Theme.Winter,
-  },
+  // {
+  //   id: uuidv4(),
+  //   src: new URL('../assets/autumn-forestry.jpg', import.meta.url).href,
+  //   theme: Theme.Fall,
+  // },
+  // {
+  //   id: uuidv4(),
+  //   src: new URL('../assets/snowy-winter-landscape.jpg', import.meta.url).href,
+  //   theme: Theme.Winter,
+  // },
   {
     id: uuidv4(),
     src: new URL('../assets/beautiful-forest-spring-season.jpg', import.meta.url).href,
     theme: Theme.Spring,
   },
-  {
-    id: uuidv4(),
-    src: new URL('../assets/beach.jpg', import.meta.url).href,
-    theme: Theme.Summer,
-  },
+  // {
+  //   id: uuidv4(),
+  //   src: new URL('../assets/beach.jpg', import.meta.url).href,
+  //   theme: Theme.Summer,
+  // },
 ]);
 
 const topics = ref<Topic[]>([
