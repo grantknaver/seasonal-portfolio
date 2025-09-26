@@ -33,6 +33,7 @@ const { activeTheme } = storeToRefs(mainStore);
 
 const artifacts = ref<Artifact[]>([]);
 const artifactRefs = ref<(Element | ComponentPublicInstance | null)[]>([]);
+const spawnSide = ref('');
 
 // -----------------------------------------------------
 // Theme glyphs (visuals)
@@ -49,7 +50,7 @@ const SUMMER_EMOJI = '🏐';
 const FONT_SIZE_RANGE_PX: Record<Theme, { min: number; max: number }> = {
   [Theme.Fall]: { min: 20, max: 36 }, // leaves a bit larger on average
   [Theme.Winter]: { min: 8, max: 22 }, // snowflakes smaller
-  [Theme.Spring]: { min: 10, max: 26 }, // petals medium/small
+  [Theme.Spring]: { min: 15, max: 30 }, // petals medium/small
   [Theme.Summer]: { min: 18, max: 36 }, // volleyball bigger
 };
 
@@ -70,7 +71,7 @@ const ARTIFACT_QUANTITY: Record<Theme, number> = {
 const SCALE_CLAMP: Record<Theme, { min: number; max: number; base: number }> = {
   [Theme.Fall]: { min: 0.9, max: 1.5, base: 24 },
   [Theme.Winter]: { min: 0.5, max: 1.0, base: 24 },
-  [Theme.Spring]: { min: 0.5, max: 1.0, base: 24 },
+  [Theme.Spring]: { min: 0.6, max: 1.25, base: 24 },
   [Theme.Summer]: { min: 0.9, max: 1.1, base: 28 }, // feel a bit heavier
 };
 
@@ -85,11 +86,16 @@ const WINTER_DRIZZLE_DELAY = 1.5; // global gate before Winter starts
 const WINTER_DRIZZLE_RATE = 0.1; // seconds between new flakes starting
 const WINTER_DRIZZLE_JITTER = 0.2; // per-flake random +/- jitter
 
+// const SPRING_DRIZZLE_DELAY = 0.45;
+// const SPRING_DRIZZLE_RATE = 0.14;
+// const SPRING_DRIZZLE_JITTER = 0.12;
+
 const FALL_SPIN_PROB = 0.6; // 60% of leaves can rotate this cycle
 
 // -----------------------------------------------------
 // DOM / layout utilities
 // -----------------------------------------------------
+
 const getAbsoluteOffsetTop = (el: HTMLElement): number => {
   let top = el.offsetTop;
   let parent = el.offsetParent as HTMLElement | null;
@@ -301,184 +307,112 @@ const SEASONS: Record<Theme, SeasonCfg> = {
   },
   [Theme.Spring]: {
     /**
-     * Spawn from top/left/right edges.
-     * Scale is clamped using Fall’s scale band (for consistency across themes).
+     * Spawn from the TOP only at a random x across the viewport.
+     * Scale is clamped using Fall's scale clamp.
      */
     spawn: (element, artifactSize) => {
       const { min: minScale, max: maxScale, base: baseScale } = SCALE_CLAMP[Theme.Fall];
       const clampScale = clamp(minScale, maxScale);
 
-      // Choose side: top / left / right
-      const spawnSide = gsap.utils.random(['top', 'left', 'right'], true)();
-      if (spawnSide === 'top') {
-        return {
-          x: rand(element.offsetWidth / 2, vw() - element.offsetWidth / 2),
-          y: -rand(100, 150),
-          scale: clampScale(artifactSize / baseScale),
-          rot: randInt(0, 360),
-        };
-      } else if (spawnSide === 'left') {
-        return {
-          x: -rand(40, 140),
-          y: rand(-40, vh() * 0.6),
-          scale: clampScale(artifactSize / baseScale),
-          rot: randInt(0, 360),
-        };
-      } else {
-        return {
-          x: vw() + rand(40, 140),
-          y: rand(-40, vh() * 0.6),
-          scale: clampScale(artifactSize / baseScale),
-          rot: 0,
-        };
-      }
+      return {
+        x: rand(element.offsetWidth / 2, vw() - element.offsetWidth / 2),
+        // Slight vertical jitter so rows don't look grid-aligned
+        y: rand(-160, -120) + rand(-8, 8),
+        scale: clampScale(artifactSize / baseScale),
+        rot: randInt(0, 360),
+        opacity: 1,
+      };
     },
-
-    /** Stop above footer or bottom-padding, whichever is higher. */
+    /** Limit fall distance to just above the footer (or a padded bottom-of-viewport). */
     targetY: (footerTopPx) => Math.min(footerTopPx, vh() + 140),
-
     /**
-     * Breezy arc across the screen: forward progress toward an exit point,
-     * wind added along/against the path, and a sinusoidal side sway.
+     * Gentle drift with optional spinning “tumbles”.
+     * Uses smoothed wind for lateral drift and a spin envelope for bursts of rotation.
      */
-    motion: (_, artifactSize) => {
-      const totalSteps = 14;
-      const idealDurationSeconds = clamp(6, 18)(10 + (24 - artifactSize) * 0.25);
+    motion: (_element, artifactSize) => {
+      const startTime = windDynamics.now() + rand(0, 1) * 1000;
+      const totalSteps = 12;
+      const idealDurationSeconds = clamp(6, 18)(10 + (36 - artifactSize) * 0.1);
       const segmentDuration = idealDurationSeconds / totalSteps;
 
-      const keyframes: KeyframeStep[] = [];
-      const startTime = windDynamics.now();
+      // smoother lateral response (gusts still visible)
+      const lateralSmoothing = 0.9;
+      const windInfluenceX = 0.58;
+      const lateralBias = rand(-vw() * 0.012, vw() * 0.012);
 
-      // GSAP keyframe value factory helper
-      const asNumberOrString = (fn: (i: number, target: HTMLElement) => number) =>
-        fn as unknown as number | string;
+      // spin (unchanged vibe)
+      const baseAngularVelDegPerSec = (Math.random() < 0.5 ? -1 : 1) * rand(18, 35);
+      const spinEnvelopeFn = windDynamics.makeSpinEnvelope();
+      const windSpinScale = 8;
+      const angularSmoothing = 0.75;
 
-      const swayWaves = 1 + randInt(0, 1);
-      const sinePhase = rand(0, Math.PI * 2);
-      const EXIT_PADDING = 140;
+      // --- smooth gust setup ---
+      const gustPhase = rand(0, Math.PI * 2);
+      const gustHz = rand(0.12, 0.28); // 3.5–8.3s period → human-visible
+      const gustPower = rand(2.4, 3.4); // lower power = softer peaks
+      const gustFloor = rand(0.08, 0.2); // baseline wind
+      let gustSmoothed = gustFloor; // EMA state (starts at floor)
+      const gustTau = rand(0.6, 1.0); // EMA time-constant (s)
+      const gustAlpha = 1 - Math.exp(-segmentDuration / gustTau); // per-step EMA coeff
 
-      let exitX: number | null = null;
-      let exitY: number | null = null;
       let velX = 0;
-      let velY = 0;
+      let angularVelDegPerSec = baseAngularVelDegPerSec;
 
-      const dotProduct = (ax: number, ay: number, bx: number, by: number) => ax * bx + ay * by;
+      const keyframes: KeyframeStep[] = [];
+      for (let step = 0; step < totalSteps; step++) {
+        const t = startTime + (step / totalSteps) * idealDurationSeconds;
 
-      for (let step = 1; step <= totalSteps; step++) {
-        const progress = step / totalSteps;
-        const t = startTime + progress * idealDurationSeconds;
+        // raised-cosine envelope → perfectly smooth 0..1
+        const raw = 0.5 + 0.5 * Math.sin(2 * Math.PI * gustHz * t + gustPhase);
+        const shaped = Math.pow(raw, gustPower);
+        const gustInstant = gustFloor + (1 - gustFloor) * shaped;
 
-        keyframes.push({
-          x: asNumberOrString((_i, target) => {
-            const currentX = Number(gsap.getProperty(target, 'x')) || 0;
-            const currentY = Number(gsap.getProperty(target, 'y')) || 0;
+        // EMA low-pass to ensure super-smooth gust ramps
+        gustSmoothed = gustSmoothed + gustAlpha * (gustInstant - gustSmoothed);
 
-            if (exitX == null) {
-              // Decide horizontal exit: if we spawned from the left (x<0) → exit right, else → left
-              exitX = currentX < 0 ? vw() + EXIT_PADDING : -EXIT_PADDING;
-              exitY = vh() + EXIT_PADDING;
-            }
+        // wind with smoothed gust
+        const windVX = windDynamics.windX(t, {
+          gustFn: () => gustSmoothed, // <-- smooth gust for this step
+          gustScaleFactor: rand(0.12, 0.22),
+          wobbleFactor: rand(0.018, 0.03), // keep micro-jitter subtle
+          steadyFreqHz: rand(0.025, 0.04),
+          wobbleWeights: { n1: rand(0.5, 0.7), n2: rand(0.2, 0.35), n3: rand(0.05, 0.2) },
+        });
 
-            // Vector toward exit
-            const dx = exitX - currentX;
-            const dy = exitY! - currentY;
-            const dist = Math.max(1, Math.hypot(dx, dy));
-            const unitToExitX = dx / dist;
-            const unitToExitY = dy / dist;
+        // lateral drift toward wind + bias
+        const targetVelX = lateralBias + windVX * windInfluenceX;
+        velX = lateralSmoothing * velX + (1 - lateralSmoothing) * targetVelX;
+        const dx = velX * segmentDuration;
 
-            // Perpendicular for lateral sway
-            const perpX = -unitToExitY;
-            const perpY = unitToExitX;
+        const frame: KeyframeStep = { x: `+=${dx}`, ease: 'none' };
 
-            // Base forward speed slowly increases with progress
-            const baseForward =
-              0.85 * vw() * (0.02 + 0.012 * Math.pow(progress, 1.1)) * segmentDuration;
+        // wind-boosted, smoothed spin
+        const targetOmega =
+          baseAngularVelDegPerSec + windDynamics.windSpin(t) * windSpinScale * spinEnvelopeFn(t);
+        angularVelDegPerSec =
+          angularSmoothing * angularVelDegPerSec + (1 - angularSmoothing) * targetOmega;
 
-            // Wind contributions
-            const windVX = windDynamics.windX(t) * 0.1 * segmentDuration;
-            const windVY = windDynamics.windY(t) * 0.06 * segmentDuration;
+        const dRot = angularVelDegPerSec * segmentDuration;
+        if (Math.abs(dRot) > 0.75) frame.rotation = `+=${dRot}`;
 
-            // Wind projected along forward direction, clamped so it doesn’t dominate
-            const windAlong = Math.max(
-              -baseForward * 0.3,
-              Math.min(baseForward * 0.3, windVX * unitToExitX + windVY * unitToExitY),
-            );
-
-            // Side-to-side sine sway
-            const oscillationMagnitude =
-              baseForward * 0.4 * Math.sin(sinePhase + progress * swayWaves * Math.PI * 2);
-
-            // Proposed velocity
-            let targetVelX = unitToExitX * (baseForward + windAlong) + perpX * oscillationMagnitude;
-            let targetVelY = unitToExitY * (baseForward + windAlong) + perpY * oscillationMagnitude;
-            const minForwardSpeed = vw() * 0.006;
-            // Ensure minimum forward progress so elements don’t stall or backtrack
-
-            // Blend toward the “needed” velocity so we actually reach the exit in time
-            const stepsRemaining = totalSteps - step + 1;
-            const remainingDist = Math.hypot(exitX - currentX, exitY! - currentY);
-
-            // const neededSpeedCap = baseForward * 1.5; // keep this
-            // const neededSpeed = Math.min(
-            //   remainingDist / Math.max(stepsRemaining, 6),
-            //   neededSpeedCap,
-            //   vw() * 0.01,
-            // );
-            const neededSpeed = remainingDist / stepsRemaining;
-            const blendTowardNeeded = Math.max(0.35, Math.min(0.55, Math.pow(progress, 1.6)));
-            const neededVelX = unitToExitX * neededSpeed;
-            const neededVelY = unitToExitY * neededSpeed;
-            targetVelX = targetVelX * (1 - blendTowardNeeded) + neededVelX * blendTowardNeeded;
-            targetVelY = targetVelY * (1 - blendTowardNeeded) + neededVelY * blendTowardNeeded;
-
-            // Smooth velocity to avoid jitter
-            const smoothing = 0.25;
-            let newVelX = velX * smoothing + targetVelX * (1 - smoothing);
-            let newVelY = velY * smoothing + targetVelY * (1 - smoothing);
-
-            // Re-assert min forward motion after smoothing
-            const newForwardComponent = dotProduct(newVelX, newVelY, unitToExitX, unitToExitY);
-            if (newForwardComponent < minForwardSpeed) {
-              const MAX_MINFWD_BOOST = vw() * 0.004; // tune 0.003–0.005
-              const correction = Math.min(minForwardSpeed - newForwardComponent, MAX_MINFWD_BOOST);
-              newVelX += unitToExitX * correction;
-              newVelY += unitToExitY * correction;
-            }
-
-            // adaptive per-step forward cap so we never block progress
-            const neededThisStep = remainingDist / stepsRemaining; // same vars you computed above
-            const defaultCap = vw() * 0.014; // base ceiling
-            const maxFwdPerStep = Math.max(defaultCap, neededThisStep * 1.06); // ~6% headroom
-
-            const fwd2 = dotProduct(newVelX, newVelY, unitToExitX, unitToExitY);
-            if (fwd2 > maxFwdPerStep) {
-              const s = (maxFwdPerStep + 1e-6) / Math.max(1e-6, fwd2);
-              newVelX *= s;
-              newVelY *= s;
-            }
-
-            velX = newVelX;
-            velY = newVelY;
-
-            return currentX + velX;
-          }),
-
-          y: asNumberOrString((_i, target) => {
-            const currentY = Number(gsap.getProperty(target, 'y')) || 0;
-            return currentY + velY;
-          }),
-
-          // Add a bit of wind-driven spin so Spring feels lively
-          rotation: `+=${windDynamics.windSpin(t) * segmentDuration * rand(3, 20)}`,
-          ease: 'none',
-        } as KeyframeStep);
+        keyframes.push(frame);
       }
 
       return { keyframes, ease: 'none' };
     },
-    duration: () => rand(10, 13),
-    delay: () => 1,
-    rot: () => (rand(0, 1) > 0.06 ? randRange(0, 360) : 0),
+
+    /** Longer for larger sprites (feels heavier). */
+    duration: (artifactSize) => assignFallDuration(artifactSize),
+    /**
+     * Stagger: slow drizzle effect with per-node jitter.
+     * Keeps the scene feeling organic rather than bursty.
+     */
+    delay: (nodeIndex: number) =>
+      FALL_DRIZZLE_DELAY +
+      nodeIndex * FALL_DRIZZLE_RATE +
+      rand(-FALL_DRIZZLE_JITTER, FALL_DRIZZLE_JITTER),
+    /** Start without initial rotation; tumble happens in motion() if enabled. */
+    rot: () => 0,
   },
   [Theme.Summer]: {
     /**
@@ -647,6 +581,7 @@ const handleResize = debounce(async () => {
 // Lifecycle
 // -----------------------------------------------------
 onMounted(async () => {
+  spawnSide.value = gsap.utils.random(['top', 'left', 'right'], true)();
   createArtifacts();
   await nextTick();
 
