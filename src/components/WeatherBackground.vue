@@ -161,7 +161,6 @@ const SEASONS: Record<Theme, SeasonCfg> = {
         y: rand(-160, -120) + rand(-8, 8),
         scale: clampScale(artifactSize / baseScale),
         rot: randInt(0, 360),
-        opacity: 1,
       };
     },
     /** Limit fall distance to just above the footer (or a padded bottom-of-viewport). */
@@ -320,7 +319,6 @@ const SEASONS: Record<Theme, SeasonCfg> = {
         y: rand(-160, -120) + rand(-8, 8),
         scale: clampScale(artifactSize / baseScale),
         rot: randInt(0, 360),
-        opacity: 1,
       };
     },
     /** Limit fall distance to just above the footer (or a padded bottom-of-viewport). */
@@ -415,37 +413,53 @@ const SEASONS: Record<Theme, SeasonCfg> = {
     rot: () => 0,
   },
   [Theme.Summer]: {
-    /**
-     * Spawn near bottom-left with a margin.
-     * Summer is typically UI-driven (timeline controls y), not wind-driven.
-     */
-    spawn: (_, artifactSize) => {
-      const { min: minScale, max: maxScale, base: baseScale } = SCALE_CLAMP[Theme.Summer];
-      const clampScale = clamp(minScale, maxScale);
-      const marginPx = 48;
-
+    // One volleyball; start just off the left edge at a mid-screen height.
+    spawn: () => {
+      const PADDING = Math.max(32, vw() * 0.05); // keep slightly offscreen
+      const midY = vh() * 0.35; // flight height
       return {
-        x: marginPx,
-        y: Math.max(0, vh() - 180),
-        scale: clampScale(artifactSize / baseScale),
-        rot: 0,
+        x: -PADDING, // always start left
+        y: midY,
+        scale: 1, // no transform-based scaling
+        rot: randRange(0, 360),
       };
     },
 
-    /** Summer animation is timeline-driven; no natural “fall” target. */
-    targetY: () => null, // timeline fully drives y
+    // Summer drives y itself (arc), so no fixed target
+    targetY: () => null,
 
-    /** Not used; Summer’s movement comes from external timeline tweens. */
-    motion: () => ({ keyframes: [], ease: 'none' }),
+    // Arc from left → right; we'll use yoyo on the tween to go back and forth.
+    motion: () => {
+      const steps = 48; // smooth arc
+      const PADDING = Math.max(32, vw() * 0.05);
+      const left = -PADDING;
+      const right = vw() + PADDING; // fully traverse offscreen
+      const midY = vh() * 0.35;
+      const amp = Math.min(160, vh() * 0.25); // arc height
 
-    /** Shorter presence; feels snappier / sunnier. */
-    duration: () => rand(1, 4),
+      const asVal = (fn: (i: number, t: HTMLElement) => number) => fn as unknown as number | string;
+      const rotStep = 360 / steps;
 
-    /** Tiny delay to avoid everything appearing on the same frame. */
-    delay: () => 1,
+      const keyframes: KeyframeStep[] = [];
+      for (let i = 0; i <= steps; i++) {
+        const p = i / steps; // 0..1 across width
+        const xAbs = left + p * (right - left); // absolute x
+        const yAbs = midY - amp * Math.sin(Math.PI * p); // up-and-down arc
+        keyframes.push({
+          x: asVal(() => xAbs),
+          y: asVal(() => yAbs),
+          ease: 'none',
+          rotation: `+=${rotStep}`,
+        });
+      }
 
-    /** No initial rotation. */
-    rot: () => 0,
+      return { keyframes, ease: 'none' };
+    },
+
+    // Speed scales a bit with viewport width so it doesn’t crawl on ultrawide screens
+    duration: () => Math.max(3.5, Math.min(2.0, vw() / 260 + 1.0)),
+    delay: () => 1, // no start delay
+    rot: () => randRange(0, 360), // no spin
   },
 };
 
@@ -459,7 +473,11 @@ function createArtifacts() {
   const artifactCount = ARTIFACT_QUANTITY[activeTheme.value];
 
   for (let i = 0; i < artifactCount; i++) {
-    const sizePx = randRange(min, max);
+    const sizePx =
+      activeTheme.value === Theme.Summer
+        ? // ~10% of vw, also consider vh, clamped to sane bounds
+          Math.round(clamp(40, 120)(Math.min(vw() * 0.1, vh() * 0.16)))
+        : randRange(min, max);
 
     // pick an emoji for this artifact based on theme
     let emoji: string | null = null;
@@ -532,7 +550,28 @@ const animateArtifacts = () => {
     const runDurationSec = seasonCfg.duration(artifact.size);
 
     // reset node (prevents “from” flash in some cases)
-    gsap.set(nodeEl, { x: 0, y: -50 });
+    gsap.set(nodeEl, { x: activeTheme.value === Theme.Summer ? -150 : 0, y: -50 });
+
+    // gsap.fromTo(
+    //   nodeEl,
+    //   {
+    //     x: spawnState.x,
+    //     y: spawnState.y,
+    //     scale: spawnState.scale,
+    //     rotation: spawnState.rot,
+    //   },
+    //   {
+    //     ...(targetYPx !== null ? { y: targetYPx } : {}),
+    //     ease: motionCfg.ease ?? 'none',
+    //     ...(motionCfg.keyframes ? { keyframes: motionCfg.keyframes } : {}),
+    //     duration: runDurationSec,
+    //     delay: startDelaySec,
+    //     repeat: -1,
+    //     repeatRefresh: true, // recompute functions each repeat
+    //     repeatDelay: rand(1.0, 3.0),
+    //     immediateRender: false, // ✅ prevents “from” state from flashing before delay with top
+    //   },
+    // );
 
     gsap.fromTo(
       nodeEl,
@@ -549,9 +588,11 @@ const animateArtifacts = () => {
         duration: runDurationSec,
         delay: startDelaySec,
         repeat: -1,
-        repeatRefresh: true, // recompute functions each repeat
-        repeatDelay: rand(1.0, 3.0),
-        immediateRender: false, // ✅ prevents “from” state from flashing before delay with top
+        // Summer: back-and-forth; others: keep current behavior
+        yoyo: activeTheme.value === Theme.Summer,
+        repeatDelay: activeTheme.value === Theme.Summer ? 0 : rand(1.0, 3.0),
+        repeatRefresh: true,
+        immediateRender: false,
       },
     );
   }
@@ -665,8 +706,7 @@ watch(activeTheme, async () => {
 
 .weather-artifact {
   position: absolute;
-  color: white;
-  opacity: 0.9;
+  opacity: 1;
   user-select: none;
   will-change: transform;
 }
