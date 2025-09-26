@@ -392,7 +392,7 @@ const SEASONS: Record<Theme, SeasonCfg> = {
 
             // Base forward speed slowly increases with progress
             const baseForward =
-              0.85 * vw() * (0.02 + 0.016 * Math.pow(progress, 1.3)) * segmentDuration;
+              0.85 * vw() * (0.02 + 0.012 * Math.pow(progress, 1.1)) * segmentDuration;
 
             // Wind contributions
             const windVX = windDynamics.windX(t) * 0.1 * segmentDuration;
@@ -400,8 +400,8 @@ const SEASONS: Record<Theme, SeasonCfg> = {
 
             // Wind projected along forward direction, clamped so it doesn’t dominate
             const windAlong = Math.max(
-              -baseForward * 0.4,
-              Math.min(baseForward * 0.4, windVX * unitToExitX + windVY * unitToExitY),
+              -baseForward * 0.3,
+              Math.min(baseForward * 0.3, windVX * unitToExitX + windVY * unitToExitY),
             );
 
             // Side-to-side sine sway
@@ -411,21 +411,21 @@ const SEASONS: Record<Theme, SeasonCfg> = {
             // Proposed velocity
             let targetVelX = unitToExitX * (baseForward + windAlong) + perpX * oscillationMagnitude;
             let targetVelY = unitToExitY * (baseForward + windAlong) + perpY * oscillationMagnitude;
-
-            // Ensure minimum forward progress so elements don’t stall or backtrack
             const minForwardSpeed = vw() * 0.006;
-            const forwardComponent = dotProduct(targetVelX, targetVelY, unitToExitX, unitToExitY);
-            if (forwardComponent < minForwardSpeed) {
-              const add = minForwardSpeed - forwardComponent;
-              targetVelX += unitToExitX * add;
-              targetVelY += unitToExitY * add;
-            }
+            // Ensure minimum forward progress so elements don’t stall or backtrack
 
             // Blend toward the “needed” velocity so we actually reach the exit in time
             const stepsRemaining = totalSteps - step + 1;
             const remainingDist = Math.hypot(exitX - currentX, exitY! - currentY);
+
+            // const neededSpeedCap = baseForward * 1.5; // keep this
+            // const neededSpeed = Math.min(
+            //   remainingDist / Math.max(stepsRemaining, 6),
+            //   neededSpeedCap,
+            //   vw() * 0.01,
+            // );
             const neededSpeed = remainingDist / stepsRemaining;
-            const blendTowardNeeded = Math.max(0.35, Math.min(0.75, Math.pow(progress, 1.8)));
+            const blendTowardNeeded = Math.max(0.35, Math.min(0.55, Math.pow(progress, 1.6)));
             const neededVelX = unitToExitX * neededSpeed;
             const neededVelY = unitToExitY * neededSpeed;
             targetVelX = targetVelX * (1 - blendTowardNeeded) + neededVelX * blendTowardNeeded;
@@ -439,9 +439,22 @@ const SEASONS: Record<Theme, SeasonCfg> = {
             // Re-assert min forward motion after smoothing
             const newForwardComponent = dotProduct(newVelX, newVelY, unitToExitX, unitToExitY);
             if (newForwardComponent < minForwardSpeed) {
-              const scaleUp = (minForwardSpeed + 1e-6) / Math.max(1e-6, newForwardComponent);
-              newVelX *= scaleUp;
-              newVelY *= scaleUp;
+              const MAX_MINFWD_BOOST = vw() * 0.004; // tune 0.003–0.005
+              const correction = Math.min(minForwardSpeed - newForwardComponent, MAX_MINFWD_BOOST);
+              newVelX += unitToExitX * correction;
+              newVelY += unitToExitY * correction;
+            }
+
+            // adaptive per-step forward cap so we never block progress
+            const neededThisStep = remainingDist / stepsRemaining; // same vars you computed above
+            const defaultCap = vw() * 0.014; // base ceiling
+            const maxFwdPerStep = Math.max(defaultCap, neededThisStep * 1.06); // ~6% headroom
+
+            const fwd2 = dotProduct(newVelX, newVelY, unitToExitX, unitToExitY);
+            if (fwd2 > maxFwdPerStep) {
+              const s = (maxFwdPerStep + 1e-6) / Math.max(1e-6, fwd2);
+              newVelX *= s;
+              newVelY *= s;
             }
 
             velX = newVelX;
@@ -492,7 +505,7 @@ const SEASONS: Record<Theme, SeasonCfg> = {
     motion: () => ({ keyframes: [], ease: 'none' }),
 
     /** Shorter presence; feels snappier / sunnier. */
-    duration: () => rand(5, 10),
+    duration: () => rand(1, 4),
 
     /** Tiny delay to avoid everything appearing on the same frame. */
     delay: () => 1,
