@@ -16,7 +16,7 @@ import { useErrorNotifier } from '../shared/composables/useErrorNotifier';
 
 export const useMainStore = defineStore('main', () => {
   const activeTopic = ref<TopicName | null>(null);
-  const activeTheme = ref<Theme>(Theme.Spring);
+  const activeTheme = ref<Theme>(Theme.Fall);
   const activeAiAssistLogo = ref<string>(
     new URL('/src/assets/ai-chat_fall.png', import.meta.url).href,
   );
@@ -54,7 +54,7 @@ export const useMainStore = defineStore('main', () => {
       [Theme.Summer]: new URL('/src/assets/ai-chat_summer.png', import.meta.url).href,
     };
 
-    activeTheme.value = Theme.Spring;
+    activeTheme.value = theme;
     syncThemeGlobals(theme);
     activeAiAssistLogo.value = aiAssistLogos[theme];
   };
