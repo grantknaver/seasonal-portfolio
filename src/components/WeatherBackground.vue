@@ -413,53 +413,55 @@ const SEASONS: Record<Theme, SeasonCfg> = {
     rot: () => 0,
   },
   [Theme.Summer]: {
-    // One volleyball; start just off the left edge at a mid-screen height.
-    spawn: () => {
-      const PADDING = Math.max(32, vw() * 0.05); // keep slightly offscreen
-      const midY = vh() * 0.35; // flight height
+    // Start fully off the left, accounting for the ball's width
+    spawn: (el) => {
+      const PADDING = Math.max(50, vw() * 0.07);
+      const w = el?.offsetWidth ?? 64;
+      const midY = vh() * 0.35;
+
       return {
-        x: -PADDING, // always start left
+        x: -(PADDING + w), // fully beyond the left edge
         y: midY,
-        scale: 1, // no transform-based scaling
+        scale: 1,
         rot: randRange(0, 360),
       };
     },
 
-    // Summer drives y itself (arc), so no fixed target
     targetY: () => null,
 
-    // Arc from left → right; we'll use yoyo on the tween to go back and forth.
-    motion: () => {
-      const steps = 48; // smooth arc
-      const PADDING = Math.max(32, vw() * 0.05);
-      const left = -PADDING;
-      const right = vw() + PADDING; // fully traverse offscreen
+    // Absolute keyframes from left→right (both fully off-screen), then yoyo back
+    motion: (el) => {
+      const steps = 60;
+      const PADDING = Math.max(50, vw() * 0.07);
+      const w = el?.offsetWidth ?? 64;
+      const left = -(PADDING + w); // fully off left
+      const right = vw() + PADDING + w; // fully off right
       const midY = vh() * 0.35;
-      const amp = Math.min(160, vh() * 0.25); // arc height
+      const amp = Math.min(160, vh() * 0.25);
 
       const asVal = (fn: (i: number, t: HTMLElement) => number) => fn as unknown as number | string;
-      const rotStep = 360 / steps;
 
       const keyframes: KeyframeStep[] = [];
-      for (let i = 0; i <= steps; i++) {
-        const p = i / steps; // 0..1 across width
-        const xAbs = left + p * (right - left); // absolute x
-        const yAbs = midY - amp * Math.sin(Math.PI * p); // up-and-down arc
+      const rotSetp = 360 / steps;
+      // start at i=1 so we don't duplicate the spawn frame on the left edge
+      for (let i = 1; i <= steps; i++) {
+        const p = i / steps; // 0..1
+        const xAbs = left + p * (right - left);
+        const yAbs = midY - amp * Math.sin(Math.PI * p);
         keyframes.push({
           x: asVal(() => xAbs),
           y: asVal(() => yAbs),
           ease: 'none',
-          rotation: `+=${rotStep}`,
+          rotation: `+=${rotSetp}`,
         });
       }
 
       return { keyframes, ease: 'none' };
     },
 
-    // Speed scales a bit with viewport width so it doesn’t crawl on ultrawide screens
-    duration: () => Math.max(3.5, Math.min(2.0, vw() / 260 + 1.0)),
-    delay: () => 1, // no start delay
-    rot: () => randRange(0, 360), // no spin
+    duration: () => Math.max(2, Math.min(1.0, vw() / 520)),
+    delay: () => 1,
+    rot: () => randRange(0, 360),
   },
 };
 
@@ -550,8 +552,11 @@ const animateArtifacts = () => {
     const runDurationSec = seasonCfg.duration(artifact.size);
 
     // reset node (prevents “from” flash in some cases)
-    gsap.set(nodeEl, { x: activeTheme.value === Theme.Summer ? -150 : 0, y: -50 });
-
+    if (activeTheme.value !== Theme.Summer) {
+      gsap.set(nodeEl, { x: 0, y: -50 });
+    } else {
+      gsap.set(nodeEl, { x: -Math.max(150, vw() * 0.06), y: -50 });
+    }
     // gsap.fromTo(
     //   nodeEl,
     //   {
@@ -573,6 +578,8 @@ const animateArtifacts = () => {
     //   },
     // );
 
+    const isSummer = activeTheme.value === Theme.Summer;
+
     gsap.fromTo(
       nodeEl,
       {
@@ -588,10 +595,10 @@ const animateArtifacts = () => {
         duration: runDurationSec,
         delay: startDelaySec,
         repeat: -1,
-        // Summer: back-and-forth; others: keep current behavior
-        yoyo: activeTheme.value === Theme.Summer,
-        repeatDelay: activeTheme.value === Theme.Summer ? 0 : rand(1.0, 3.0),
-        repeatRefresh: true,
+        yoyo: isSummer, // ping-pong for Summer only
+        yoyoEase: false, // keep constant speed at turnarounds
+        repeatDelay: isSummer ? 0 : rand(1.0, 3.0),
+        repeatRefresh: isSummer ? false : true, // <- prevent re-eval bounce on yoyo
         immediateRender: false,
       },
     );
@@ -709,5 +716,6 @@ watch(activeTheme, async () => {
   opacity: 1;
   user-select: none;
   will-change: transform;
+  color: white;
 }
 </style>
