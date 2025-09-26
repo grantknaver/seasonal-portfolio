@@ -160,7 +160,7 @@ const SEASONS: Record<Theme, SeasonCfg> = {
       const scaleClamp = gsap.utils.clamp(min, max);
       return {
         x: rand(el.offsetWidth / 2, vw() - el.offsetWidth / 2),
-        y: -rand(100, 150),
+        y: rand(-160, -120) + rand(-8, 8),
         scale: scaleClamp(size / base),
         rot: randInt(0, 360),
         opacity: 1,
@@ -232,7 +232,7 @@ const SEASONS: Record<Theme, SeasonCfg> = {
       const scaleClamp = gsap.utils.clamp(min, max);
       return {
         x: rand(_el.offsetWidth / 2, vw() - _el.offsetWidth / 2),
-        y: -rand(100, 150),
+        y: rand(-160, -120) + rand(-8, 8),
         scale: scaleClamp(size / base),
         rot: 0,
       };
@@ -285,10 +285,9 @@ const SEASONS: Record<Theme, SeasonCfg> = {
       if (side === 'top') {
         return {
           x: rand(el.offsetWidth / 2, vw() - el.offsetWidth / 2),
-          y: -rand(60, 180),
+          y: -rand(100, 150),
           scale: scaleClamp(size / base),
           rot: randInt(0, 360),
-          opacity: 0.85,
         };
       } else if (side === 'left') {
         return {
@@ -296,7 +295,6 @@ const SEASONS: Record<Theme, SeasonCfg> = {
           y: rand(-40, vh() * 0.6),
           scale: scaleClamp(size / base),
           rot: randInt(0, 360),
-          opacity: 0.85,
         };
       } else {
         return {
@@ -304,7 +302,6 @@ const SEASONS: Record<Theme, SeasonCfg> = {
           y: rand(-40, vh() * 0.6),
           scale: scaleClamp(size / base),
           rot: randInt(0, 360),
-          opacity: 0.85,
         };
       }
     },
@@ -435,8 +432,6 @@ const animateArtifacts = () => {
 
     const cfg = SEASONS[activeTheme.value];
     const spawn = cfg.spawn(domEl, artifact.size);
-    const spawnX = (xVals[i] ?? rand(24, vw() - 24)) + rand(-12, 12);
-    const spawnY = (yVals[i] ?? rand(-160, -120)) + rand(-8, 8);
 
     const footerEl = document.querySelector('footer.q-footer') as HTMLElement;
     const footerTop = footerEl ? getAbsoluteOffsetTop(footerEl) : vh();
@@ -458,11 +453,10 @@ const animateArtifacts = () => {
     gsap.fromTo(
       domEl,
       {
-        x: spawnX,
-        y: spawnY,
+        x: spawn.x,
+        y: spawn.y,
         scale: spawn.scale,
         rotation: spawn.rot,
-        opacity: spawn.opacity ?? 1,
       },
       {
         ...(targetY !== null ? { y: targetY } : {}),
