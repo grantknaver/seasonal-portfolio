@@ -11,7 +11,7 @@ import { gsap } from 'gsap';
 import { useMainStore } from '../stores/main';
 import { storeToRefs } from 'pinia';
 import { debounce } from 'quasar';
-// import { getCustomCssVar } from '../shared/utils/getCustomCssVar';
+import { getCustomCssVar } from '../shared/utils/getCustomCssVar';
 import { type Artifact } from '../shared/types/artifact';
 import { Theme } from '../shared/constants/theme';
 import { type Motion } from '../shared/types/motion';
@@ -127,15 +127,15 @@ const getAbsoluteOffsetTop = (el: HTMLElement): number => {
   return top;
 };
 
-// const assignFallDuration = (artifactSize: number, fallFactor: number) => {
-//   let duration = 6 + (30 - artifactSize) * fallFactor;
-//   const smallBreakpoint = +getCustomCssVar('breakpoint-sm').slice(0, -2);
-//   const isMobile = smallBreakpoint < 600;
-//   if (isMobile && activeTheme.value === Theme.Fall) {
-//     duration = 6 + (30 - artifactSize) * 0.15;
-//   }
-//   return duration;
-// };
+const assignFallDuration = (artifactSize: number) => {
+  let duration = 8 + (30 - artifactSize) * 0.25;
+  const smallBreakpoint = +getCustomCssVar('breakpoint-sm').slice(0, -2);
+  const isMobile = smallBreakpoint < 600;
+  if (isMobile && activeTheme.value === Theme.Fall) {
+    duration = 6 + (30 - artifactSize) * 0.15;
+  }
+  return duration;
+};
 
 // ---------------------------------------------
 // Seasonal behavior definitions
@@ -147,7 +147,7 @@ type SeasonCfg = {
   spawn: (el: HTMLElement, artifactSize: number) => Spawn;
   targetY: (footerTop: number) => number | null; // null => y handled inside keyframes
   motion: (el: HTMLElement, artifactSize: number) => Motion;
-  duration: number;
+  duration: (size: number) => number;
   delay: (nodeIndex: number) => number | null;
   rot: () => number;
 };
@@ -218,7 +218,7 @@ const SEASONS: Record<Theme, SeasonCfg> = {
 
       return { keyframes: kfs, ease: 'none' };
     },
-    duration: rand(8, 12),
+    duration: (size) => assignFallDuration(size),
     delay: (nodeNumber: number) =>
       FALL_DRIZZLE_DELAY +
       nodeNumber * FALL_DRIZZLE_RATE +
@@ -273,7 +273,7 @@ const SEASONS: Record<Theme, SeasonCfg> = {
       WINTER_DRIZZLE_DELAY +
       nodeNumber * WINTER_DRIZZLE_RATE +
       gsap.utils.random(-WINTER_DRIZZLE_JITTER, WINTER_DRIZZLE_JITTER),
-    duration: rand(4, 8),
+    duration: () => rand(4, 8),
     rot: () => (rand(0, 1) > 0.08 ? randRange(0, 360) : 0),
   },
   [Theme.Spring]: {
@@ -343,7 +343,7 @@ const SEASONS: Record<Theme, SeasonCfg> = {
       }
       return { keyframes: kfs, ease: 'none' };
     },
-    duration: rand(10, 13),
+    duration: () => rand(10, 13),
     delay: () => 1,
     rot: () => 0,
   },
@@ -363,7 +363,7 @@ const SEASONS: Record<Theme, SeasonCfg> = {
     motion: () => {
       return { keyframes: [], ease: 'none' }; // not used here
     },
-    duration: rand(5, 10),
+    duration: () => rand(5, 10),
     delay: () => 1,
     rot: () => 0,
   },
@@ -446,7 +446,7 @@ const animateArtifacts = () => {
 
     const delay = cfg.delay(i) as number;
 
-    const duration = cfg.duration;
+    const duration = cfg.duration(artifact.size);
 
     const rotate = cfg.rot;
 
