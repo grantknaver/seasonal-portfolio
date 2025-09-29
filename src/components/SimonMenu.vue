@@ -9,27 +9,29 @@ import { storeToRefs } from 'pinia';
 const mainStore = useMainStore();
 const { activeTopic } = storeToRefs(mainStore);
 const topics: Topic[] = [
-  { id: uuidv4(), name: TopicName.Packages, icon: 'description', label: 'Packages' },
+  {
+    id: uuidv4(),
+    name: TopicName.Packages,
+    icon: 'inventory',
+    label: 'Packages',
+  },
   {
     id: uuidv4(),
     name: TopicName.About,
     icon: 'info',
     label: TopicName.About,
-    seasonIcon: 'ac_unit',
   },
   {
     id: uuidv4(),
-    name: TopicName.Projects,
-    icon: 'folder',
-    label: TopicName.Projects,
-    seasonIcon: 'eco',
+    name: TopicName.Contact,
+    icon: 'mail',
+    label: TopicName.Contact,
   },
   {
     id: uuidv4(),
-    name: TopicName.Skills,
-    icon: 'code',
-    label: TopicName.Skills,
-    seasonIcon: 'wb_sunny',
+    name: TopicName.CaseStudies,
+    icon: 'menu_book',
+    label: 'CaseStudies',
   },
 ];
 
@@ -94,30 +96,35 @@ const simonRef = ref();
       background-color: var(--q-secondary);
     }
 
+    &.CaseStudies {
+      background-color: var(--q-accent);
+    }
+
     &.About {
       background-color: var(--q-accent);
     }
 
-    &.Projects {
-      background-color: var(--q-accent);
-    }
-
-    &.Skills {
+    &.Contact {
       background-color: var(--q-secondary);
     }
   }
 
-  &.About {
+  &.Packages {
+    top: 0;
+    left: 0;
+  }
+
+  &.CaseStudies {
     top: 0;
     right: 0;
   }
 
-  &.Projects {
+  &.About {
     bottom: 0;
     left: 0;
   }
 
-  &.Skills {
+  &.Contact {
     bottom: 0;
     right: 0;
   }

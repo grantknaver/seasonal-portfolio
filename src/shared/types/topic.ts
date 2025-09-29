@@ -5,5 +5,4 @@ export interface Topic {
   name: TopicName;
   icon?: string;
   label?: string;
-  seasonIcon?: string;
 }

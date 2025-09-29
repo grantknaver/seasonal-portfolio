@@ -6,36 +6,33 @@ import { v4 as uuidv4 } from 'uuid';
 import { storeToRefs } from 'pinia';
 import { TopicName } from '../shared/constants/topicName';
 import AboutSection from '../components/AboutSection.vue';
-import SkillsSection from '../components/SkillsSection.vue';
-import ProjectSection from '../components/ProjectSection.vue';
 import ContactSection from '../components/ContactSection.vue';
+import PackageSection from '../components/PackageSection.vue';
 import { scrollToElement } from '../shared/utils/scrollToElement';
 import { setSeasonClasses } from '../shared/utils/setSeasonColors';
 import SimonMenu from '../components/SimonMenu.vue';
+import CaseStudiesSection from 'src/components/CaseStudiesSection.vue';
 
 const mainStore = useMainStore();
 const topics: Topic[] = [
-  { id: uuidv4(), name: TopicName.Resume, icon: 'description', label: '' },
+  { id: uuidv4(), name: TopicName.Packages, icon: 'local_shipping', label: 'Packages' },
   {
     id: uuidv4(),
     name: TopicName.About,
     icon: 'info',
     label: TopicName.About,
-    seasonIcon: 'ac_unit',
   },
   {
     id: uuidv4(),
-    name: TopicName.Projects,
-    icon: 'folder',
-    label: TopicName.Projects,
-    seasonIcon: 'eco',
+    name: TopicName.Contact,
+    icon: 'contact_mail',
+    label: TopicName.Contact,
   },
   {
     id: uuidv4(),
-    name: TopicName.Skills,
-    icon: 'code',
-    label: TopicName.Skills,
-    seasonIcon: 'wb_sunny',
+    name: TopicName.CaseStudies,
+    icon: 'menu_book',
+    label: TopicName.CaseStudies,
   },
 ];
 const { activeTheme, activeTopic, mobileScrollTarget } = storeToRefs(mainStore);
@@ -107,7 +104,7 @@ const handleAfterShow = async (id: TopicName) => {
               class="full-width bg-transparent q-pa-none q-mb-sm"
             >
               <q-expansion-item
-                :icon="topic.seasonIcon"
+                :icon="topic.icon"
                 :label="topic.label"
                 :model-value="expandedPanel === topic.name"
                 @update:model-value="
@@ -128,14 +125,14 @@ const handleAfterShow = async (id: TopicName) => {
                     <AboutSection />
                   </div>
                 </template>
-                <template v-if="topic.name === TopicName.Skills">
+                <template v-if="topic.name === TopicName.CaseStudies">
                   <div :id="topic.name" class="anchor full-width">
-                    <SkillsSection />
+                    <CaseStudiesSection />
                   </div>
                 </template>
-                <template v-if="topic.name === TopicName.Projects">
+                <template v-if="topic.name === TopicName.Packages">
                   <div :id="topic.name" class="anchor full-width">
-                    <ProjectSection />
+                    <PackageSection></PackageSection>
                   </div>
                 </template>
               </q-expansion-item>

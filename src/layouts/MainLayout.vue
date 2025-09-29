@@ -57,9 +57,10 @@ const slides = ref<Slide[]>([
 ]);
 
 const topics = ref<Topic[]>([
+  { id: uuidv4(), name: TopicName.Packages, icon: 'local_shipping', label: TopicName.Packages },
   { id: uuidv4(), name: TopicName.About, icon: 'info', label: TopicName.About },
-  { id: uuidv4(), name: TopicName.Projects, icon: 'folder', label: TopicName.Projects },
-  { id: uuidv4(), name: TopicName.Skills, icon: 'mail', label: TopicName.Skills },
+  { id: uuidv4(), name: TopicName.Contact, icon: 'contact_mail', label: TopicName.Contact },
+  { id: uuidv4(), name: TopicName.CaseStudies, icon: 'menu_book', label: TopicName.CaseStudies },
 ]);
 
 onMounted(() => {
@@ -95,12 +96,6 @@ watch(slide, (newVal) => {
     <q-header class="text-black">
       <q-toolbar class="bg-dark q-pa-lg">
         <q-toolbar-title>
-          <!-- <img
-            class="q-pt-sm"
-            style="max-width: 200px"
-            src="../assets/glkfreelance-logo.png"
-            alt="glkFreelance logo"
-          /> -->
           <div class="logo row items-center">
             <img
               class="q-pt-sm"
@@ -200,8 +195,8 @@ watch(slide, (newVal) => {
     >
       <q-scroll-area v-if="activeTopic !== TopicName.Contact" class="fit q-pa-md">
         <AboutSection v-if="activeTopic === TopicName.About" />
-        <SkillsSection v-else-if="activeTopic === TopicName.Skills" />
-        <ProjectSection v-else-if="activeTopic === TopicName.Projects" />
+        <SkillsSection v-else-if="activeTopic === TopicName.CaseStudies" />
+        <ProjectSection v-else-if="activeTopic === TopicName.Packages" />
       </q-scroll-area>
 
       <div v-else class="fit flex column justify-center items-center q-pa-md">
