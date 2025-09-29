@@ -557,26 +557,6 @@ const animateArtifacts = () => {
     } else {
       gsap.set(nodeEl, { x: -Math.max(150, vw() * 0.06), y: -50 });
     }
-    // gsap.fromTo(
-    //   nodeEl,
-    //   {
-    //     x: spawnState.x,
-    //     y: spawnState.y,
-    //     scale: spawnState.scale,
-    //     rotation: spawnState.rot,
-    //   },
-    //   {
-    //     ...(targetYPx !== null ? { y: targetYPx } : {}),
-    //     ease: motionCfg.ease ?? 'none',
-    //     ...(motionCfg.keyframes ? { keyframes: motionCfg.keyframes } : {}),
-    //     duration: runDurationSec,
-    //     delay: startDelaySec,
-    //     repeat: -1,
-    //     repeatRefresh: true, // recompute functions each repeat
-    //     repeatDelay: rand(1.0, 3.0),
-    //     immediateRender: false, // ✅ prevents “from” state from flashing before delay with top
-    //   },
-    // );
 
     const isSummer = activeTheme.value === Theme.Summer;
 

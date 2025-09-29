@@ -4,15 +4,15 @@ import { useMainStore } from '../stores/main';
 import { type Topic } from '../shared/types/topic';
 import { v4 as uuidv4 } from 'uuid';
 import { storeToRefs } from 'pinia';
-import { TopicName } from 'src/shared/constants/topicName';
+import { TopicName } from '../shared/constants/topicName';
 import AboutSection from '../components/AboutSection.vue';
 import SkillsSection from '../components/SkillsSection.vue';
-import ProjectSection from 'src/components/ProjectSection.vue';
+import ProjectSection from '../components/ProjectSection.vue';
 import ContactSection from '../components/ContactSection.vue';
 import { scrollToElement } from '../shared/utils/scrollToElement';
 import { setSeasonClasses } from '../shared/utils/setSeasonColors';
+import SimonMenu from '../components/SimonMenu.vue';
 
-const simonRef = ref();
 const mainStore = useMainStore();
 const topics: Topic[] = [
   { id: uuidv4(), name: TopicName.Resume, icon: 'description', label: '' },
@@ -59,18 +59,10 @@ const handleAfterShow = async (id: TopicName) => {
   await nextTick();
   scrollToElement(id);
 };
-
-const selectTopic = (name: TopicName) => {
-  if (name === activeTopic.value) {
-    mainStore.SET_ACTIVE_TOPIC(null);
-  } else if (name !== TopicName.Resume) {
-    mainStore.SET_ACTIVE_TOPIC(name);
-  }
-};
 </script>
 
 <template>
-  <q-page class="page-container scroll column col">
+  <q-page class="page-container scroll column col justify-center items-center">
     <div>
       <div class="logo">
         <img
@@ -155,43 +147,7 @@ const selectTopic = (name: TopicName) => {
           </div>
         </section>
         <section class="desktop-view flex col column justify-center items-center full-width">
-          <div ref="simonRef" class="simon">
-            <div
-              v-for="topic in topics"
-              :key="topic.id"
-              class="simon-quadrant"
-              :class="[topic.name, { 'active-topic': topic.name === activeTopic }]"
-              tabindex="0"
-              style="padding: 1rem"
-              @click.stop="selectTopic(topic.name)"
-            >
-              <a v-if="topic.name !== TopicName.Resume" class="simon-link">
-                <q-icon :name="topic.icon" size="32px" />
-                <q-tooltip anchor="center middle" self="top left">
-                  {{ topic.label }}
-                </q-tooltip>
-              </a>
-              <a
-                v-else
-                :class="
-                  setSeasonClasses(
-                    {
-                      Fall: 'text-primary fall-text-shadow',
-                      Winter: 'text-primary winter-text-shadow',
-                      Spring: 'text-warning spring-text-shadow',
-                      Summer: 'text-warning summer-text-shadow',
-                    },
-                    activeTheme,
-                  )
-                "
-                label="Resume"
-                class="resume"
-                flat
-                href="https://firebasestorage.googleapis.com/v0/b/portfolio-4-seasons.firebasestorage.app/o/Resume.pdf?alt=media&token=2dbf1bfa-6d3f-44e4-a9b9-d6c6a53ea178"
-                >Resume</a
-              >
-            </div>
-          </div>
+          <SimonMenu></SimonMenu>
           <q-separator class="q-mt-lg q-mb-md" />
           <span>
             <p
@@ -330,99 +286,6 @@ const selectTopic = (name: TopicName) => {
 
       .full-stack {
         font-size: 1.2rem;
-      }
-
-      .simon {
-        position: relative;
-        border-radius: 10px;
-        overflow: visible;
-        width: 325px;
-        height: 325px;
-      }
-
-      .simon-quadrant {
-        position: absolute;
-        width: 49%;
-        height: 49%;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        transition: transform 0.3s ease;
-        transform-origin: center;
-        border-radius: 10px;
-        border: solid 4px rgba($color: white, $alpha: 0.7);
-        background-color: rgba($color: #521c0d, $alpha: 0.5);
-        z-index: 1;
-
-        &:hover {
-          transform: scale(1.25);
-          z-index: 10;
-
-          &.About {
-            background-color: var(--q-secondary);
-          }
-
-          &.Projects {
-            background-color: var(--q-accent);
-          }
-
-          &.Skills {
-            background-color: var(--q-secondary);
-          }
-        }
-
-        &.Resume {
-          top: 0;
-          left: 0;
-          background-color: transparent;
-          border: none;
-          font-size: 1.6rem;
-        }
-
-        &.About {
-          top: 0;
-          right: 0;
-        }
-
-        &.Projects {
-          bottom: 0;
-          left: 0;
-        }
-
-        &.Skills {
-          bottom: 0;
-          right: 0;
-        }
-
-        &.active-topic {
-          background-color: var(--q-dark);
-          border: solid 5px var(--q-accent);
-          transform: scale(0.9);
-          transition: transform 0.7s ease-in;
-        }
-      }
-
-      .simon-link {
-        color: white;
-        text-decoration: none;
-        font-size: 1rem;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        width: 100%;
-        height: 100%;
-        text-shadow: 0 0 5px black;
-
-        &:focus {
-          outline: none;
-        }
-
-        &:hover {
-          .q-icon {
-            transform: scale(1.25);
-            z-index: 5;
-          }
-        }
       }
 
       a {
