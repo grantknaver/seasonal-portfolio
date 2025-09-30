@@ -1,60 +1,71 @@
 <script lang="ts" setup>
-import { ref } from 'vue';
+// import { ref } from 'vue';
 import { v4 as uuidv4 } from 'uuid';
-
-import { type TimelineEntry } from '../shared/types/timelineEntry';
 import { setSeasonClasses } from 'src/shared/utils/setSeasonColors';
 import { useMainStore } from '../stores/main';
 import { storeToRefs } from 'pinia';
-
+import { type AboutBulletPoints } from 'src/shared/types/aboutBulletPoints';
+import { ref } from 'vue';
 const mainStore = useMainStore();
 const { activeTheme } = storeToRefs(mainStore);
-
-const workHistoryTimeline = ref<TimelineEntry[]>([
+const generalBullets = ref<AboutBulletPoints[]>([
   {
+    src: 'src/assets/gsap-animations.png',
+    label: 'GSAP animations',
     id: uuidv4(),
-    heading: false,
-    icon: 'work',
-    color: 'dark',
-    subtitle: '2024 - 2025',
-    title: 'L&G Devworks',
-    body: 'Currently developing Draindata, a surgical drain tracking app in open beta with active users. Also working on StorytAIm, an AI narration suite now being migrated to the MEAN stack for enhanced scalability.',
+    text: 'I use GSAP to build smooth, modern animations that give your site personality. Motion guides the user’s eye, makes interactions feel natural, and adds that “alive” quality your competitors won’t have.',
   },
   {
+    src: 'src/assets/interactive-data-visualization.png',
+    label: 'Interactive data visualizations',
     id: uuidv4(),
-    heading: false,
-    avatar: new URL('../assets/ornl-icon.png', import.meta.url).href,
-    color: 'dark',
-    subtitle: '2023 - 2024',
-    title: 'ONRL',
-    body: 'Developed a comprehensive tool set for the Veterans Association, enabling multivariate analysis to optimize resource allocation.',
+    text: 'With D3 and Highcharts, I transform raw data into visuals that actually tell a story. Whether it’s a dashboard or a product demo, I design charts that are both insightful and engaging.',
   },
   {
+    src: 'src/assets/ai-integration.png',
+    label: 'AI integrations',
     id: uuidv4(),
-    heading: false,
-    icon: 'business',
-    color: 'dark',
-    subtitle: '2023',
-    title: 'T2',
-    body: 'I upgraded their payment system to streamline the process, reducing the average customer payment time from 3.5 minutes to just over 1 minute.',
+    text: 'From chatbots to voice narration, I integrate AI tools that make your app more intuitive and useful. It’s about creating smarter experiences that save time and keep users engaged.',
+  },
+]);
+const myApproachBullets = ref<AboutBulletPoints[]>([
+  {
+    src: 'src/assets/creative-engineering.png',
+    label: 'Creative engineering',
+    id: uuidv4(),
+    text: 'I combine strong frontend skills (Vue, Angular, GSAP) with a designer’s eye (Figma) to build experiences that look as good as they perform.',
   },
   {
+    src: 'src/assets/future-proof-thinking.png',
+    label: 'Future-proof thinking',
     id: uuidv4(),
-    heading: false,
-    avatar: new URL('../assets/labcorp-icon.jpeg', import.meta.url).href,
-    color: 'dark',
-    subtitle: '2022 - 2023',
-    title: 'Labcorp',
-    body: 'Collaborated with a team to modernize the entire specimen collection workflow, resulting in a reduction of processing time by over 60% on average for specimen reviews.',
+    text: 'I don’t just build for today. I integrate AI tools and best practices that keep your product relevant, scalable, and ahead of the curve.',
   },
-
   {
+    src: 'src/assets/collaborative-mindset.png',
+    label: 'Collaborative mindset',
     id: uuidv4(),
-    heading: false,
-    icon: 'more_horiz',
-    color: 'dark',
-    subtitle: '2017 - 2022',
-    title: 'Review Resume',
+    text: 'I work as a partner, not just a coder. That means clear communication, shared problem solving, and building solutions that fit your vision.',
+  },
+]);
+const whyClientsBullets = ref<AboutBulletPoints[]>([
+  {
+    src: 'src/assets/fast-results.png',
+    label: 'Fast results',
+    id: uuidv4(),
+    text: 'I turn concepts into polished demos quickly, helping you test ideas and capture attention without long wait times.',
+  },
+  {
+    src: 'src/assets/scalable-systems.png',
+    label: 'Scalable systems',
+    id: uuidv4(),
+    text: 'I architect projects with growth in mind, so the work we do today can expand seamlessly as your product or business evolves.',
+  },
+  {
+    src: 'src/assets/memorable-experiences.png',
+    label: 'Memorable experiences',
+    id: uuidv4(),
+    text: 'I focus on the “wow” factor — animations, interactions, and storytelling that make your product stand out and leave a lasting impression.',
   },
 ]);
 </script>
@@ -63,122 +74,6 @@ const workHistoryTimeline = ref<TimelineEntry[]>([
   <section>
     <div class="mobile-view full-width">
       <q-card class="full-width">
-        <q-card-section
-          class="section-container q-pa-lg text-primary"
-          :class="
-            setSeasonClasses(
-              {
-                Fall: 'bg-accent',
-                Winter: 'bg-accent',
-                Spring: 'bg-accent',
-                Summer: 'bg-dark',
-              },
-              activeTheme,
-            )
-          "
-        >
-          <h1 class="q-mt-none">About Me</h1>
-          <q-separator color="primary" class="q-mb-md" />
-          <p>
-            Hi, I'm
-            <strong class="name">Grant Knaver</strong>
-            — a full-stack JavaScript developer with seven and half years of professional
-            experience, currently based in Eugene, Oregon. I specialize in modern frameworks like
-            Angular and Vue, with a strong command of state management libraries (NgRx, Pinia),
-            RESTful APIs, responsive UI, and building apps that solve real-world problems.
-          </p>
-          <p class="text-primary">
-            I've built high-performance web apps and streamlining complex systems. I’ve worked in
-            environments ranging from government labs to startups, with recent experience converting
-            legacy systems, integrating Epic OAuth for medical software, and building scalable
-            monorepos.
-          </p>
-        </q-card-section>
-
-        <q-separator color="primary q-mt-sm q-mb-sm"></q-separator>
-
-        <q-card-section class="section-container bg-transparent text-primary q-pa-sm">
-          <h2 class="q-ma-none q-mt-lg q-mb-md text-center text-primary">
-            Projects Under Development
-          </h2>
-          <div class="projects-container full-width column col justify-center items-center">
-            <ul class="q-pl-none q-pt-sm q-pb-md">
-              <a href="https://www.draindata.org/" target="_blank" class="drainData project column">
-                <li
-                  class="column items-center q-pa-lg text-center full-width bg-primary"
-                  :class="
-                    setSeasonClasses(
-                      {
-                        Fall: 'text-accent',
-                        Winter: 'text-accent',
-                        Spring: 'text-dark',
-                        Summer: 'text-dark',
-                      },
-                      activeTheme,
-                    )
-                  "
-                >
-                  <img
-                    class="logo q-pb-md"
-                    src="../assets/logo-drainData.png"
-                    alt="Draindata logo"
-                  />
-                  A surgery drain tracking tool aimed at improving patient recovery through better
-                  data.
-                </li>
-              </a>
-              <br />
-              <a href="#" class="project column">
-                <li
-                  class="storytaim column full-width items-center justify-between text-primary text-center bg-accent q-pa-md"
-                >
-                  <div class="under-construction">
-                    <img src="../assets/under-construction.png" alt="under-construction" />
-                    <span class="under-construction-text text-primary">Under Construction</span>
-                  </div>
-
-                  <img
-                    class="logo q-pb-md"
-                    src="../assets/logo-storytAIm.png"
-                    alt="StorytAIm logo"
-                  />
-                  <span class="q-pa-md">
-                    An AI-powered narration toolkit designed for authors, complete with voice
-                    emotion control and audio stitching.
-                  </span>
-                </li></a
-              >
-            </ul>
-          </div>
-        </q-card-section>
-
-        <hr class="separator full-width" />
-
-        <q-card-section class="section-container work-history-section q-pa-lg bg-primary">
-          <h2 class="q-ma-none q-mt-lg q-mb-xl text-center text-dark">Recent Work History</h2>
-
-          <q-timeline layout="dense" color="primary">
-            <q-timeline-entry
-              v-for="employer in workHistoryTimeline"
-              :key="employer.id"
-              :heading="employer.heading"
-              :icon="employer.icon"
-              :tag="employer.tag"
-              :color="employer.color"
-              :subtitle="employer.subtitle"
-              :avatar="employer.avatar"
-              class="my-timeline-entry"
-            >
-              <template v-slot:title> {{ employer.title }} </template>
-              {{ employer.body }}
-            </q-timeline-entry>
-          </q-timeline>
-        </q-card-section>
-      </q-card>
-    </div>
-
-    <div class="desktop-view full-width">
-      <q-card class="full-width q-pa-sm">
         <q-card-section class="section-container q-pa-lg">
           <h1
             class="q-mt-none q-mb-xl text-center"
@@ -197,16 +92,13 @@ const workHistoryTimeline = ref<TimelineEntry[]>([
             About Me
           </h1>
           <q-separator color="primary" class="q-mb-md" />
-          <p class="summary text-primary q-mb-none">
-            Hi, I'm
-            <strong class="name text-secondary">Grant Knaver</strong>
-            — a full-stack JavaScript developer with seven and half years of professional
-            experience, currently based in Eugene, Oregon. I specialize in modern frameworks like
-            Angular and Vue, with a strong command of state management libraries (NgRx, Pinia),
-            RESTful APIs, responsive UI, and building apps that solve real-world problems.
+          <p class="text-primary q-mb-none">
+            I’m Grant, a frontend engineer and creative problem-solver. For the past 7+ years, I’ve
+            worked at the intersection of design, code, and storytelling — helping companies and
+            creators bring their ideas to life on the web.
           </p>
           <p
-            class="summary q-pt-lg"
+            class="q-pt-lg"
             :class="
               setSeasonClasses(
                 {
@@ -219,94 +111,332 @@ const workHistoryTimeline = ref<TimelineEntry[]>([
               )
             "
           >
-            I've built high-performance web apps and streamlining complex systems. I’ve worked in
-            environments ranging from government labs to startups, with recent experience converting
-            legacy systems, integrating Epic OAuth for medical software, and building scalable
-            monorepos.
+            What sets me apart isn’t just the code I write, but the experiences I design:
+          </p>
+          <br />
+          <q-list bordered class="bg-primary">
+            <div
+              v-for="bullet in generalBullets"
+              :key="bullet.id"
+              :name="bullet.id"
+              expand-separator
+              :label="bullet.label"
+            >
+              <q-expansion-item group="aboutMe" header-class="bg-dark">
+                <template v-slot:header>
+                  <q-item-section avatar>
+                    <q-avatar>
+                      <img :src="bullet.src" />
+                    </q-avatar>
+                  </q-item-section>
+
+                  <q-item-section> {{ bullet.label }} </q-item-section>
+                </template>
+
+                <q-card>
+                  <q-card-section>
+                    Lorem ipsum dolor sit amet, consectetur adipisicing elit. Quidem, eius
+                    reprehenderit eos corrupti commodi magni quaerat ex numquam, dolorum officiis
+                    modi facere maiores architecto suscipit iste eveniet doloribus ullam aliquid.
+                  </q-card-section>
+                </q-card>
+              </q-expansion-item>
+              <q-separator />
+            </div>
+          </q-list>
+
+          <p>
+            I’ve built tools for industries as diverse as healthcare, publishing, and SaaS — and
+            I’ve learned that whether you’re a startup founder or a creative team, you need more
+            than just a functioning app. You need an experience that stands out.
           </p>
         </q-card-section>
-
-        <q-card-section class="section-container bg-transparent text-primary q-pa-sm">
-          <h2 class="q-ma-none q-mt-lg q-mb-xl text-center text-secondary">
-            Projects Under Development
+        <q-card-section class="section-container q-pa-lg">
+          <h2
+            class="q-mt-none q-mb-xl text-center"
+            :class="
+              setSeasonClasses(
+                {
+                  Fall: 'text-secondary',
+                  Winter: 'text-secondary',
+                  Spring: 'text-secondary',
+                  Summer: 'text-accent',
+                },
+                activeTheme,
+              )
+            "
+          >
+            🌱 My Approach
           </h2>
-          <div class="projects-container full-width q-pb-xl">
-            <ul class="column full-width q-pl-none justify-center">
-              <a href="https://www.draindata.org/" class="project column">
-                <li
-                  class="drainData col column items-center justify-center bg-primary q-pa-md"
-                  :class="
-                    setSeasonClasses(
-                      {
-                        Fall: 'text-accent bg-primary',
-                        Winter: 'text-accent bg-primary',
-                        Spring: 'text-dark',
-                        Summer: 'text-dark',
-                      },
-                      activeTheme,
-                    )
-                  "
-                >
-                  <img
-                    class="logo q-pt-lg q-pb-md"
-                    src="../assets/logo-drainData.png"
-                    alt="Draindata logo"
-                  />
-                  <span class="text-center"
-                    >A surgery drain tracking tool aimed at improving patient recovery through
-                    better data.</span
-                  >
-                </li>
-              </a>
-              <br />
-              <span class="project column">
-                <li
-                  class="storytaim column full-width items-center justify-between text-primary text-center bg-accent q-pa-md"
-                >
-                  <div class="under-construction">
-                    <img src="../assets/under-construction.png" alt="under-construction" />
-                    <span class="under-construction-text text-primary">Under Construction</span>
-                  </div>
-
-                  <img
-                    class="logo q-pb-md"
-                    src="../assets/logo-storytAIm.png"
-                    alt="StorytAIm logo"
-                  />
-                  <span class="q-pa-md">
-                    An AI-powered narration toolkit designed for authors, complete with voice
-                    emotion control and audio stitching.
-                  </span>
-                </li></span
-              >
-            </ul>
-          </div>
-        </q-card-section>
-
-        <hr class="separator full-width" />
-
-        <q-card-section
-          class="section-container work-history-section column items-center q-pl-xl q-pt-xl q-pr-xl q-pb-none"
-        >
-          <h2 class="q-ma-none q-mt-none q-mb-xl text-center text-secondary">Work History</h2>
+          <q-separator color="primary" class="q-mb-md" />
+          <p class="text-primary q-mb-none">
+            Before I dive into code, I focus on understanding the vision behind the project. Every
+            product has a story, and my role is to translate that story into an interface that feels
+            intuitive, engaging, and alive.
+          </p>
+          <br />
           <q-separator></q-separator>
-          <div class="full-width">
-            <q-timeline dark>
-              <q-timeline-entry
-                v-for="employer in workHistoryTimeline"
-                :key="employer.id"
-                :heading="employer.heading"
-                :icon="employer.icon"
-                :tag="employer.tag"
-                color="dark"
-                :subtitle="employer.subtitle"
-                :avatar="employer.avatar"
+          <q-list bordered class="bg-primary">
+            <div v-for="bullet in myApproachBullets" :key="bullet.id" :name="bullet.id">
+              <q-expansion-item expand-separator :label="bullet.label" group="myApproach">
+                <template v-slot:header>
+                  <q-item-section avatar>
+                    <q-avatar>
+                      <img :src="bullet.src" />
+                    </q-avatar>
+                  </q-item-section>
+
+                  <q-item-section> {{ bullet.label }} </q-item-section>
+                </template>
+
+                <q-card>
+                  <q-card-section>
+                    {{ bullet.text }}
+                  </q-card-section>
+                </q-card>
+              </q-expansion-item>
+              <q-separator></q-separator>
+            </div>
+          </q-list>
+        </q-card-section>
+        <q-card-section class="section-container q-pa-lg">
+          <h2
+            class="q-mt-none q-mb-xl text-center"
+            :class="
+              setSeasonClasses(
+                {
+                  Fall: 'text-secondary',
+                  Winter: 'text-secondary',
+                  Spring: 'text-secondary',
+                  Summer: 'text-accent',
+                },
+                activeTheme,
+              )
+            "
+          >
+            ✨ Why Clients Work With Me
+          </h2>
+          <q-separator color="primary" class="q-mb-md" />
+          <p class="text-primary q-mb-none">
+            I know you’re not just looking for code — you’re looking for results. My clients come to
+            me when they want their projects to stand out, attract attention, and deliver value
+            quickly.
+          </p>
+          <br />
+          <q-separator></q-separator>
+          <q-list bordered class="bg-primary">
+            <q-expansion-item
+              v-for="bullet in whyClientsBullets"
+              :key="bullet.id"
+              :name="bullet.id"
+              expand-separator
+              :label="bullet.label"
+              group="whyClientsWorkWithMe"
+            >
+              <template v-slot:header>
+                <q-item-section avatar>
+                  <q-avatar>
+                    <img :src="bullet.src" />
+                  </q-avatar>
+                </q-item-section>
+
+                <q-item-section> {{ bullet.label }} </q-item-section>
+              </template>
+
+              <q-card>
+                <q-card-section>
+                  {{ bullet.text }}
+                </q-card-section>
+              </q-card>
+            </q-expansion-item>
+          </q-list>
+        </q-card-section>
+      </q-card>
+    </div>
+
+    <div class="desktop-view full-width">
+      <q-card class="full-width q-pa-sm">
+        <q-card-section class="section-container q-pa-lg">
+          <h1
+            class="q-mt-none q-mb-xl text-center bg-dark"
+            :class="
+              setSeasonClasses(
+                {
+                  Fall: 'text-secondary',
+                  Winter: 'text-secondary',
+                  Spring: 'text-primary',
+                  Summer: 'text-primary',
+                },
+                activeTheme,
+              )
+            "
+          >
+            About Me
+          </h1>
+          <q-separator color="primary" class="q-mb-md" />
+          <p class="text-primary q-mb-none">
+            I’m Grant, a frontend engineer and creative problem-solver. For the past 7+ years, I’ve
+            worked at the intersection of design, code, and storytelling — helping companies and
+            creators bring their ideas to life on the web.
+          </p>
+          <p
+            class="q-pt-lg q-mb-none"
+            :class="
+              setSeasonClasses(
+                {
+                  Fall: 'text-primary',
+                  Winter: 'text-primary',
+                  Spring: 'text-primary',
+                  Summer: 'text-accent',
+                },
+                activeTheme,
+              )
+            "
+          >
+            What sets me apart isn’t just the code I write, but the experiences I design:
+          </p>
+          <br />
+          <q-separator></q-separator>
+          <q-list bordered class="bg-primary">
+            <div
+              v-for="bullet in generalBullets"
+              :key="bullet.id"
+              :name="bullet.id"
+              expand-separator
+              :label="bullet.label"
+            >
+              <q-expansion-item group="aboutMe" header-class="bg-dark text-primary">
+                <template v-slot:header>
+                  <q-item-section avatar>
+                    <q-avatar>
+                      <img :src="bullet.src" />
+                    </q-avatar>
+                  </q-item-section>
+
+                  <q-item-section> {{ bullet.label }}</q-item-section>
+                </template>
+
+                <q-card>
+                  <q-card-section>
+                    <p class="text-dark">{{ bullet.text }}</p>
+                  </q-card-section>
+                </q-card>
+              </q-expansion-item>
+              <q-separator />
+            </div>
+          </q-list>
+          <br />
+          <p class="q-mb-none text-primary">
+            I’ve built tools for industries as diverse as healthcare, publishing, and SaaS — and
+            I’ve learned that whether you’re a startup founder or a creative team, you need more
+            than just a functioning app. You need an experience that stands out.
+          </p>
+        </q-card-section>
+        <q-card-section class="section-container q-pa-lg">
+          <h2
+            class="q-mt-none q-mb-xl text-center"
+            :class="
+              setSeasonClasses(
+                {
+                  Fall: 'text-secondary',
+                  Winter: 'text-secondary',
+                  Spring: 'text-secondary',
+                  Summer: 'text-accent',
+                },
+                activeTheme,
+              )
+            "
+          >
+            My Approach
+          </h2>
+          <q-separator color="primary" class="q-mb-md" />
+          <p class="text-primary q-mb-none">
+            Before I dive into code, I focus on understanding the vision behind the project. Every
+            product has a story, and my role is to translate that story into an interface that feels
+            intuitive, engaging, and alive.
+          </p>
+          <br />
+          <q-separator></q-separator>
+          <q-list bordered class="bg-primary">
+            <div v-for="bullet in myApproachBullets" :key="bullet.id" :name="bullet.id">
+              <q-expansion-item
+                expand-separator
+                :label="bullet.label"
+                group="myApproach"
+                header-class="bg-dark text-primary"
               >
-                <template v-slot:title> <span></span>{{ employer.title }} </template>
-                {{ employer.body }}
-              </q-timeline-entry>
-            </q-timeline>
-          </div>
+                <template v-slot:header>
+                  <q-item-section avatar>
+                    <q-avatar>
+                      <img :src="bullet.src" />
+                    </q-avatar>
+                  </q-item-section>
+
+                  <q-item-section> {{ bullet.label }} </q-item-section>
+                </template>
+
+                <q-card>
+                  <q-card-section>
+                    <p class="text-dark">{{ bullet.text }}</p>
+                  </q-card-section>
+                </q-card>
+              </q-expansion-item>
+              <q-separator></q-separator>
+            </div>
+          </q-list>
+        </q-card-section>
+        <q-card-section class="section-container q-pa-lg">
+          <h2
+            class="q-mt-none q-mb-xl text-center"
+            :class="
+              setSeasonClasses(
+                {
+                  Fall: 'text-secondary',
+                  Winter: 'text-secondary',
+                  Spring: 'text-secondary',
+                  Summer: 'text-accent',
+                },
+                activeTheme,
+              )
+            "
+          >
+            Why Clients Work With Me
+          </h2>
+          <q-separator color="primary" class="q-mb-md" />
+          <p class="text-primary q-mb-none">
+            I know you’re not just looking for code — you’re looking for results. My clients come to
+            me when they want their projects to stand out, attract attention, and deliver value
+            quickly.
+          </p>
+          <br />
+          <q-separator></q-separator>
+          <q-list bordered class="bg-primary">
+            <div v-for="bullet in whyClientsBullets" :key="bullet.id" :name="bullet.id">
+              <q-expansion-item
+                expand-separator
+                :label="bullet.label"
+                group="whyClientsWorkForMe"
+                header-class="bg-dark text-primary"
+              >
+                <template v-slot:header>
+                  <q-item-section avatar>
+                    <q-avatar>
+                      <img :src="bullet.src" />
+                    </q-avatar>
+                  </q-item-section>
+
+                  <q-item-section> {{ bullet.label }} </q-item-section>
+                </template>
+
+                <q-card>
+                  <q-card-section>
+                    <p class="text-dark">{{ bullet.text }}</p>
+                  </q-card-section>
+                </q-card>
+              </q-expansion-item>
+              <q-separator></q-separator>
+            </div>
+          </q-list>
         </q-card-section>
       </q-card>
     </div>
@@ -328,18 +458,18 @@ $winter-mobile-background: map-get($winter-theme, primary);
     border-top-left-radius: 0;
     border-top-right-radius: 0;
 
-    h1 {
-      font-size: 3rem;
-      margin-bottom: 2rem;
-    }
-
-    h2 {
-      font-size: 2rem;
-    }
-
     .section-container {
       background-color: var(--q-accent);
       border-radius: 10px;
+
+      h1 {
+        font-size: 3rem;
+        margin-bottom: 2rem;
+      }
+
+      h2 {
+        font-size: 2rem;
+      }
 
       p {
         font-size: 1rem;
@@ -356,75 +486,6 @@ $winter-mobile-background: map-get($winter-theme, primary);
         .most-recently {
           text-shadow: 2px 2px 2px var(--q-dark);
           font-size: 1.3rem;
-        }
-      }
-
-      .history-context {
-        font-size: 1.2rem;
-        line-height: 1.5rem;
-      }
-
-      .projects-container {
-        border-radius: 20px;
-
-        ul {
-          max-width: 600px;
-          list-style-type: none;
-
-          .project {
-            font-size: 1rem;
-            line-height: 1.3rem;
-            text-decoration: none;
-            border-radius: 10px;
-
-            li {
-              border-radius: 10px;
-              .logo {
-                max-width: 100px;
-              }
-            }
-          }
-
-          .drainData:hover {
-            transform: scale(1.02);
-            box-shadow: 5px 10px 20px var(--q-dark);
-            cursor: pointer;
-          }
-
-          .storytaim {
-            position: relative;
-
-            &::after {
-              content: '';
-              position: absolute;
-              inset: 0;
-              background-color: rgba(0, 0, 0, 0.6); // Your faded overlay
-              z-index: 1;
-              pointer-events: none;
-              border-radius: 10px;
-            }
-
-            .under-construction {
-              display: flex;
-              flex-direction: column;
-              position: absolute;
-              z-index: 2;
-              height: auto;
-              max-width: 125px;
-              top: 50%;
-              left: 50%;
-              transform: translate(-50%, -50%);
-
-              .under-construction-text {
-                text-shadow: 2px 2px 5px var(--q-dark);
-                font-size: 1.2rem;
-              }
-            }
-          }
-
-          .storytaim:hover {
-            cursor: auto;
-          }
         }
       }
     }
@@ -449,111 +510,41 @@ $winter-mobile-background: map-get($winter-theme, primary);
   .q-card {
     background-color: transparent;
 
-    h1 {
-      font-size: 3rem;
-    }
-
-    h2 {
-      font-size: 2.2rem;
-    }
-
-    .summary {
-      font-size: 1.2rem;
-      margin-bottom: 0;
-
-      .name {
-        font-size: 1.5rem;
+    .section-container {
+      h1 {
+        font-size: 3rem;
+        border: solid 2px var(--q-primary);
       }
-    }
 
-    .projects-container {
-      border-radius: 20px;
-
-      ul {
-        list-style-type: none;
-
-        @media (min-width: 1280px) {
-          flex-direction: row;
-          justify-content: space-around;
-        }
-        .project {
-          font-size: 1rem;
-          line-height: 1.3rem;
-          text-decoration: none;
-          border-radius: 10px;
-
-          @media (min-width: 1280px) {
-            width: 45%;
-          }
-
-          li {
-            border-radius: 10px;
-            .logo {
-              max-width: 100px;
-            }
-          }
-        }
-
-        .drainData:hover {
-          transform: scale(1.02);
-          box-shadow: 5px 10px 20px var(--q-dark);
-          cursor: pointer;
-        }
-
-        .storytaim {
-          position: relative;
-
-          &::after {
-            content: '';
-            position: absolute;
-            inset: 0;
-            background-color: rgba(0, 0, 0, 0.6); // Your faded overlay
-            z-index: 1;
-            pointer-events: none;
-            border-radius: 10px;
-          }
-
-          .under-construction {
-            display: flex;
-            flex-direction: column;
-            position: absolute;
-            z-index: 2;
-            height: auto;
-            max-width: 150px;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-
-            .under-construction-text {
-              text-shadow: 2px 2px 5px var(--q-dark);
-              font-size: 1.2rem;
-            }
-          }
-        }
-      }
-    }
-
-    .work-history-section {
-      font-size: 1rem;
       h2 {
-        margin-bottom: 2rem;
+        font-size: 3rem;
       }
 
-      p:nth-child(1) {
-        font-size: 1.5rem;
+      h2:nth-child(2) {
+        font-size: 2.5rem;
       }
 
-      .carousel-container {
-        max-width: 750px;
+      .bulletContent {
+        opacity: 0;
+      }
+
+      .showContent {
+        opacity: 1;
+        transition: 1s;
       }
     }
   }
 }
+
 .winter-mobile-background {
   background-color: rgba($winter-mobile-background, $alpha: 0.8);
 
   @media (min-width: $breakpoint-md) {
     background-color: initial;
   }
+}
+
+.test {
+  display: none;
 }
 </style>
