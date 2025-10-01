@@ -149,9 +149,22 @@ const packages = ref<PackageDetails[]>([
                 :separator="true"
                 class="q-mb-none no-border rounded-borders"
               >
-                <q-item class="packageName text-accent">{{ p.name }}</q-item>
+                <q-item class="text-accent package-name">{{ p.name }}</q-item>
                 <q-item>
-                  <q-item-section class="tagline text-dark">
+                  <q-item-section
+                    class="tagline"
+                    :class="
+                      setSeasonClasses(
+                        {
+                          Fall: 'text-green-6',
+                          Winter: 'earth-orange',
+                          Spring: 'text-red-9',
+                          Summer: 'dusty-plum',
+                        },
+                        activeTheme,
+                      )
+                    "
+                  >
                     {{ p.tagline }}
                   </q-item-section>
                 </q-item>
@@ -164,9 +177,9 @@ const packages = ref<PackageDetails[]>([
                   </q-item-section>
                 </q-item>
                 <q-item>
-                  <q-item-section class="text-black">
+                  <q-item-section class="q-pt-md text-black">
                     <span>Cost for Package:</span>
-                    <span class="cost">{{ p.cost }}</span>
+                    <span class="cost text-green-6">{{ p.cost }}</span>
                   </q-item-section>
                 </q-item>
               </q-list>
@@ -263,8 +276,9 @@ const packages = ref<PackageDetails[]>([
       .package-tile {
         border-radius: 10px;
 
-        .packageName {
+        .package-name {
           font-size: 2rem;
+          text-shadow: 1px 1px 2px black;
         }
 
         .q-list {
@@ -277,7 +291,8 @@ const packages = ref<PackageDetails[]>([
           }
 
           .cost {
-            font-size: 1.5rem;
+            font-size: 1.25rem;
+            color: #8bc34a;
           }
         }
 
@@ -291,5 +306,13 @@ const packages = ref<PackageDetails[]>([
       }
     }
   }
+}
+
+.earth-orange {
+  color: #d78c3b;
+}
+
+.dusty-plum {
+  color: #964d94;
 }
 </style>
