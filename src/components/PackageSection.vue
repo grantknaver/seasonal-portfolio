@@ -36,7 +36,7 @@ const packages = ref<PackageDetails[]>([
   {
     name: Packages.GrowthPackage,
     id: uuidv4(),
-    src: new URL('../assets/grow.png', import.meta.url).href,
+    src: new URL('../assets/growth.png', import.meta.url).href,
     alt: Packages.GrowthPackage,
     featuresHeader: 'For projects ready to scale and stand out.',
     features: [
@@ -58,7 +58,7 @@ const packages = ref<PackageDetails[]>([
   {
     name: Packages.PremiumPackage,
     id: uuidv4(),
-    src: new URL('../assets/premium-summer.png', import.meta.url).href,
+    src: new URL('../assets/premium.png', import.meta.url).href,
     alt: Packages.PremiumPackage,
     featuresHeader: 'For full bloom launches that need maximum impact.',
     features: [
@@ -136,39 +136,41 @@ const packages = ref<PackageDetails[]>([
         </q-card-section>
 
         <q-card-section class="section-container q-pa-sm">
-          <div class="package-container flex col column">
+          <div class="package-container col column">
             <div
               v-for="p in packages"
               :key="p.id"
-              class="package-tile row justify-center cursor-pointer"
+              class="package-tile row items-start wrap q-pa-md bg-white"
             >
               <q-list
                 dense
                 bordered
                 padding
-                class="rounded-borders q-mb-lg"
                 :separator="true"
-                :class="`${p.name.replace(' ', '')}`"
+                class="q-mb-none no-border rounded-borders"
               >
-                <q-item class="packageName">{{ p.name }}</q-item>
+                <q-item class="packageName text-accent">{{ p.name }}</q-item>
                 <q-item>
-                  <q-item-section>
+                  <q-item-section class="tagline text-dark">
                     {{ p.tagline }}
                   </q-item-section>
                 </q-item>
                 <q-item v-for="(f, index) in p.features" :key="index">
-                  <q-item-section>
+                  <q-item-section side>
+                    <q-icon name="circle" size=".5rem" class="text-dark" />
+                  </q-item-section>
+                  <q-item-section class="text-black">
                     {{ f.text }}
                   </q-item-section>
                 </q-item>
-
                 <q-item>
-                  <q-item-section>
+                  <q-item-section class="text-black">
                     <span>Cost for Package:</span>
-                    <span>{{ p.cost }}</span>
+                    <span class="cost">{{ p.cost }}</span>
                   </q-item-section>
                 </q-item>
               </q-list>
+              <img :src="p.src" />
             </div>
           </div>
         </q-card-section>
@@ -252,78 +254,40 @@ const packages = ref<PackageDetails[]>([
     }
 
     .package-container {
+      row-gap: 1.5rem;
+
       @media (min-width: $breakpoint-xl) {
         justify-content: center;
       }
 
       .package-tile {
-        position: relative;
-        overflow: hidden;
+        border-radius: 10px;
+
         .packageName {
           font-size: 2rem;
         }
+
         .q-list {
-          flex: 1 1 auto;
-          height: 100%;
+          flex: 1 1 0;
+          min-width: 240px;
+          min-inline-size: 0;
+
+          .tagline {
+            font-size: 1rem;
+          }
+
+          .cost {
+            font-size: 1.5rem;
+          }
         }
 
-        &.q-list.StarterPackage {
-          position: relative;
-          background: transparent; /* don't fight bg-* utilities */
-          border-radius: 12px; /* keep your radius if needed */
+        img {
+          flex: 0 0 auto;
+          width: clamp(160px, 28vw, 220px);
+          height: auto;
+          object-fit: contain;
+          align-self: center;
         }
-
-        &.q-list.StarterPackage::before {
-          content: '';
-          position: absolute;
-          inset: 0;
-          z-index: 0;
-          pointer-events: none;
-          border-radius: inherit;
-
-          /* Use a subtle color wash + image; edit the rgba() for strength */
-          background:
-            linear-gradient(rgba(0, 0, 0, 0.25), rgba(0, 0, 0, 0.25)),
-            url('../assets/grow.png') center/cover no-repeat;
-          /* If you prefer pure image opacity instead of a tint, swap the gradient for: */
-          /* opacity: 0.25;  // and set background to only the image */
-        }
-
-        &.q-list.StarterPackage > * {
-          position: relative;
-          z-index: 1;
-        }
-
-        .GrowthPackage {
-          display: none;
-        }
-
-        .PremiumPackage {
-          display: none;
-        }
-      }
-
-      .package-tile .q-list.StarterPackage::before {
-        content: '';
-        position: absolute;
-        inset: 0;
-        z-index: 0;
-        pointer-events: none;
-        border-radius: inherit;
-
-        /* Use a subtle color wash + image; edit the rgba() for strength */
-        background:
-          linear-gradient(rgba(255, 255, 255, 0.7)),
-          url('../assets/package-fall.jpg') center no-repeat;
-        /* If you prefer pure image opacity instead of a tint, swap the gradient for: */
-        /* opacity: 0.25;  // and set background to only the image */
-      }
-
-      /* Keep all inner content above the overlay */
-      .package-tile .q-list.StarterPackage > * {
-        position: relative;
-        z-index: 1;
-        background-color: rgba(0, 0, 0, 0.2);
       }
     }
   }
