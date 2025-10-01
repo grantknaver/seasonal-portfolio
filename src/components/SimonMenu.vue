@@ -29,13 +29,14 @@ const topics: Topic[] = [
   },
   {
     id: uuidv4(),
-    name: TopicName.CaseStudies,
+    name: TopicName.CaseStudies.replace(' ', '') as TopicName,
     icon: 'menu_book',
-    label: 'CaseStudies',
+    label: TopicName.CaseStudies,
   },
 ];
 
 const selectTopic = (name: TopicName) => {
+  console.log('selectTopic');
   if (name === activeTopic.value) {
     mainStore.SET_ACTIVE_TOPIC(null);
   } else {

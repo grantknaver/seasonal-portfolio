@@ -1,44 +1,82 @@
 <script lang="ts" setup>
 import { ref } from 'vue';
 import { v4 as uuidv4 } from 'uuid';
-import { type ProjectDetails } from '../shared/types/projectDetails';
 import { themeMap } from '../shared/constants/theme';
 import { useMainStore } from '../stores/main';
 import { storeToRefs } from 'pinia';
-import { Project } from '../shared/constants/projects';
 import { setSeasonClasses } from '../shared/utils/setSeasonColors';
+import { Packages } from 'src/shared/constants/packages';
+import { type PackageDetails } from '../shared/types/packageDetails';
 
 const mainStore = useMainStore();
 const { activeTheme } = storeToRefs(mainStore);
-
-const storytaimProject = ref<ProjectDetails>({
-  name: Project.StorytAIm,
-  id: uuidv4(),
-  src: new URL('../assets/storytaim.svg', import.meta.url).href,
-  alt: Project.StorytAIm,
-});
-const projects = ref<ProjectDetails[]>([
+const packages = ref<PackageDetails[]>([
   {
-    name: Project.RxjsCatalog,
+    name: Packages.StarterPackage,
     id: uuidv4(),
-    url: 'https://rxjs-wkwd2p.stackblitz.io/',
-    src: new URL('../assets/rxjs.svg', import.meta.url).href,
-    alt: Project.RxjsCatalog,
+    src: new URL('../assets/starter.png', import.meta.url).href,
+    alt: Packages.StarterPackage,
+    featuresHeader: 'For new ideas ready to break ground.',
+    features: [
+      {
+        featureIcon: 'movie_filter',
+        text: 'One polished GSAP animation or a single AI feature integration',
+      },
+      { featureIcon: 'phone_iphone', text: 'Mobile-friendly + performance tuned' },
+      { featureIcon: 'speed', text: 'Performance tuned' },
+      { featureIcon: 'schedule', text: 'Delivered in 1–2 weeks' },
+      {
+        featureIcon: 'rocket_launch',
+        text: 'Ideal for: landing pages, small teams, creators testing a concept',
+      },
+    ],
+    cost: '$2K–$3K',
+    tagline: 'Your first step toward a more engaging, modern experience.',
   },
   {
-    name: Project.RockWatch,
+    name: Packages.GrowthPackage,
     id: uuidv4(),
-    url: 'https://rock-watch-frontend.vercel.app/landing',
-    src: new URL('../assets/rock-watch.svg', import.meta.url).href,
-    alt: Project.RockWatch,
+    src: new URL('../assets/grow.png', import.meta.url).href,
+    alt: Packages.GrowthPackage,
+    featuresHeader: 'For projects ready to scale and stand out.',
+    features: [
+      {
+        featureIcon: 'animation',
+        text: '2–3 animations, or 1 animation + 1 AI integration together',
+      },
+      {
+        featureIcon: 'integration_instructions',
+        text: 'Integrates into your existing site/app seamlessly',
+      },
+      { featureIcon: 'brush', text: 'UX + design polish included' },
+      { featureIcon: 'description', text: 'Case-study style wrap-up you can share' },
+      { featureIcon: 'event', text: 'Delivered in 3–4 weeks' },
+    ],
+    cost: '$4K–$6K',
+    tagline: 'Perfect for startups moving from MVP to a polished product launch.',
   },
-
   {
-    name: Project.DrainData,
+    name: Packages.PremiumPackage,
     id: uuidv4(),
-    url: 'https://www.draindata.org/',
-    src: new URL('../assets/drainData-noSlogan.svg', import.meta.url).href,
-    alt: Project.DrainData,
+    src: new URL('../assets/premium-summer.png', import.meta.url).href,
+    alt: Packages.PremiumPackage,
+    featuresHeader: 'For full bloom launches that need maximum impact.',
+    features: [
+      {
+        featureIcon: 'slideshow',
+        text: 'Hero animation, product demo, and AI integration combined',
+      },
+      {
+        featureIcon: 'design_services',
+        text: 'Design + strategy prototypes in Figma before build',
+      },
+      { featureIcon: 'priority_high', text: 'Priority support throughout development' },
+      { featureIcon: 'support_agent', text: 'Optional ongoing support after delivery' },
+      { featureIcon: 'calendar_month', text: 'Delivered in 4–6 weeks' },
+    ],
+    cost: '$7K–$10K',
+    tagline:
+      'The complete experience — built for high-visibility launches, investors, or agencies needing that extra wow factor.',
   },
 ]);
 </script>
@@ -62,15 +100,12 @@ const projects = ref<ProjectDetails[]>([
             )
           "
         >
-          <h1 class="q-mt-none text-primary">Projects</h1>
+          <h1 class="q-mt-none text-primary">Packages</h1>
           <q-separator color="primary" class="q-mb-md" />
           <p>
-            This collection highlights a range of my work — from low-level reactive programming
-            demos to full-stack applications. It includes an RxJS catalog built to visualize complex
-            stream logic, a MEAN-stack asteroid tracker showcasing real-time data integration, and
-            two evolving products: DrainData, a mobile-first healthcare tool for post-op fluid
-            tracking, and StorytAIm, a creative AI platform for authors to bring their stories to
-            life with voice narration.
+            “Whether you need one polished animation, a full motion + AI upgrade, or a launch-ready
+            experience, I’ve got you covered. These packages make it simple to get started — clear
+            scope, fair pricing, and fast turnaround.”
           </p>
         </q-card-section>
 
@@ -78,37 +113,10 @@ const projects = ref<ProjectDetails[]>([
           class="section-container q-mt-md q-pa-sm"
           :style="{ backgroundColor: themeMap[activeTheme]['--q-primary'] }"
         >
-          <div class="project-container column items-center q-pt-lg q-pb-lg">
-            <div
-              v-for="project in projects"
-              :key="project.id"
-              class="project-tile finished-projects cursor-pointer"
-            >
-              <q-tooltip class="bg-dark" anchor="center middle" self="center middle">
-                {{ project.name }}
-              </q-tooltip>
-              <a class="q-ma-none relative-position q-mb-md" :href="project.url!">
-                <img :src="project.src" :alt="project.alt" ref="projectImgRefs" />
-              </a>
-            </div>
-
-            <div class="project-tile relative-position q-mt-md">
-              <q-tooltip
-                class="bg-negative"
-                anchor="top middle"
-                self="center middle"
-                :offset="[0, -60]"
-              >
-                StorytAIm
-              </q-tooltip>
-              <div class="under-construction">
-                <img src="../assets/under-construction.png" alt="under-construction" />
-                <span class="under-construction-text text-secondary text-center text-bold">
-                  Under Construction
-                </span>
-              </div>
-              <img class="storytaim-logo" :src="storytaimProject.src" :alt="storytaimProject.alt" />
-            </div>
+          <div class="package-container column items-center q-pt-lg q-pb-lg">
+            <q-card v-for="p in packages" :key="p.id" class="cursor-pointer">
+              <img :src="p.src" :alt="p.alt" />
+            </q-card>
           </div>
         </q-card-section>
       </q-card>
@@ -118,52 +126,49 @@ const projects = ref<ProjectDetails[]>([
     <div class="desktop-view full-width">
       <q-card class="full-width q-pa-sm bg-transparent">
         <q-card-section class="section-container text-primary q-pa-lg">
-          <h1 class="q-mt-none q-mb-xl text-accent text-center">Projects</h1>
+          <h1 class="q-mt-none q-mb-xl text-secondary text-center bg-dark">Packages</h1>
           <q-separator color="primary" class="q-mb-md" />
-          <p class="text-center q-mb-none">
-            This collection highlights a range of my work — from low-level reactive programming
-            demos to full-stack applications. It includes an RxJS catalog built to visualize complex
-            stream logic, a MEAN-stack asteroid tracker showcasing real-time data integration, and
-            two evolving products: DrainData, a mobile-first healthcare tool for post-op fluid
-            tracking, and StorytAIm, a creative AI platform for authors to bring their stories to
-            life with voice narration.
+          <p class="q-mb-none">
+            “Whether you need one polished animation, a full motion + AI upgrade, or a launch-ready
+            experience, I’ve got you covered. These packages make it simple to get started — clear
+            scope, fair pricing, and fast turnaround.”
           </p>
         </q-card-section>
 
-        <q-card-section
-          class="section-container q-pa-sm"
-          :style="{ backgroundColor: themeMap[activeTheme]['--q-primary'] }"
-        >
-          <div class="project-container row justify-around items-center q-pt-lg q-pb-lg">
+        <q-card-section class="section-container q-pa-sm">
+          <div class="package-container flex col column">
             <div
-              v-for="project in projects"
-              :key="project.id"
-              class="project-tile finished-projects cursor-pointer"
+              v-for="p in packages"
+              :key="p.id"
+              class="package-tile row justify-center cursor-pointer"
             >
-              <a class="q-ma-none relative-position q-mb-md" :href="project.url!">
-                <q-tooltip class="bg-dark" anchor="center middle" self="center middle">
-                  {{ project.name }}
-                </q-tooltip>
-                <img :src="project.src" :alt="project.alt" tooltip="kdfk" ref="projectImgRefs" />
-              </a>
-            </div>
-
-            <div class="project-tile relative-position q-mt-md">
-              <q-tooltip
-                class="bg-negative"
-                anchor="top middle"
-                self="center middle"
-                :offset="[0, -50]"
+              <q-list
+                dense
+                bordered
+                padding
+                class="rounded-borders q-mb-lg"
+                :separator="true"
+                :class="`${p.name.replace(' ', '')}`"
               >
-                StorytAIm
-              </q-tooltip>
-              <div class="under-construction">
-                <img src="../assets/under-construction.png" alt="under-construction" />
-                <span class="under-construction-text text-secondary text-center text-bold">
-                  Under Construction
-                </span>
-              </div>
-              <img class="storytaim-logo" :src="storytaimProject.src" :alt="storytaimProject.alt" />
+                <q-item class="packageName">{{ p.name }}</q-item>
+                <q-item>
+                  <q-item-section>
+                    {{ p.tagline }}
+                  </q-item-section>
+                </q-item>
+                <q-item v-for="(f, index) in p.features" :key="index">
+                  <q-item-section>
+                    {{ f.text }}
+                  </q-item-section>
+                </q-item>
+
+                <q-item>
+                  <q-item-section>
+                    <span>Cost for Package:</span>
+                    <span>{{ p.cost }}</span>
+                  </q-item-section>
+                </q-item>
+              </q-list>
             </div>
           </div>
         </q-card-section>
@@ -207,62 +212,6 @@ const projects = ref<ProjectDetails[]>([
             transition: transform 0.3s ease;
           }
         }
-
-        .project-tile:last-child {
-          display: none;
-        }
-
-        .finished-projects {
-          transition: transform 0.3s ease;
-        }
-
-        .finished-projects:hover {
-          transform: scale(1.05); // 5% larger on hover
-        }
-
-        .project-tile:last-child {
-          display: flex;
-          justify-content: start;
-          align-items: center;
-          position: relative;
-
-          &::after {
-            content: '';
-            position: absolute;
-            inset: 0;
-            background-color: var(--q-dark);
-            opacity: 0.5;
-            z-index: 1;
-
-            border-radius: 10px;
-          }
-
-          .under-construction {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            position: absolute;
-            z-index: 2;
-            height: auto;
-
-            top: 60%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            width: 100%;
-
-            img {
-              max-width: 50%;
-            }
-
-            .under-construction-text {
-              font-size: 1.5rem;
-              text-shadow: 2px 2px black;
-              @media (min-width: $breakpoint-sm) {
-                font-size: 2rem;
-              }
-            }
-          }
-        }
       }
     }
 
@@ -295,87 +244,86 @@ const projects = ref<ProjectDetails[]>([
 
     h1 {
       font-size: 3rem;
+      border: solid 2px var(--q-primary);
     }
 
     .section-container:nth-child(2) {
       border-radius: 10px;
     }
 
-    .project-container {
+    .package-container {
       @media (min-width: $breakpoint-xl) {
         justify-content: center;
       }
 
-      .project-tile {
-        img {
-          width: 100%;
-          height: auto;
-          transition: transform 0.3s ease;
-        }
-
-        @media (min-width: $breakpoint-sm) {
-          max-width: 200px;
-        }
-
-        @media (min-width: $breakpoint-md) {
-          max-width: 250px;
-        }
-
-        // @media (min-width: $breakpoint-lg) {
-        //   max-width: 300px;
-        // }
-      }
-
-      .finished-projects {
-        transition: transform 0.3s ease;
-      }
-
-      .finished-projects:hover {
-        transform: scale(1.05); // 5% larger on hover
-      }
-
-      .project-tile:last-child {
-        display: flex;
-        justify-content: start;
-        align-items: center;
+      .package-tile {
         position: relative;
+        overflow: hidden;
+        .packageName {
+          font-size: 2rem;
+        }
+        .q-list {
+          flex: 1 1 auto;
+          height: 100%;
+        }
 
-        &::after {
+        &.q-list.StarterPackage {
+          position: relative;
+          background: transparent; /* don't fight bg-* utilities */
+          border-radius: 12px; /* keep your radius if needed */
+        }
+
+        &.q-list.StarterPackage::before {
           content: '';
           position: absolute;
           inset: 0;
-          background-color: var(--q-dark);
-          opacity: 0.5;
+          z-index: 0;
+          pointer-events: none;
+          border-radius: inherit;
+
+          /* Use a subtle color wash + image; edit the rgba() for strength */
+          background:
+            linear-gradient(rgba(0, 0, 0, 0.25), rgba(0, 0, 0, 0.25)),
+            url('../assets/grow.png') center/cover no-repeat;
+          /* If you prefer pure image opacity instead of a tint, swap the gradient for: */
+          /* opacity: 0.25;  // and set background to only the image */
+        }
+
+        &.q-list.StarterPackage > * {
+          position: relative;
           z-index: 1;
-
-          border-radius: 10px;
         }
 
-        .under-construction {
-          display: flex;
-          flex-direction: column;
-          align-items: center;
-          position: absolute;
-          z-index: 2;
-          height: auto;
-
-          top: 60%;
-          left: 50%;
-          transform: translate(-50%, -50%);
-          width: 100%;
-
-          img {
-            max-width: 50%;
-          }
-
-          .under-construction-text {
-            font-size: 1.2rem;
-            text-shadow: 2px 2px black;
-            @media (min-width: $breakpoint-sm) {
-              font-size: 1.5rem;
-            }
-          }
+        .GrowthPackage {
+          display: none;
         }
+
+        .PremiumPackage {
+          display: none;
+        }
+      }
+
+      .package-tile .q-list.StarterPackage::before {
+        content: '';
+        position: absolute;
+        inset: 0;
+        z-index: 0;
+        pointer-events: none;
+        border-radius: inherit;
+
+        /* Use a subtle color wash + image; edit the rgba() for strength */
+        background:
+          linear-gradient(rgba(255, 255, 255, 0.7)),
+          url('../assets/package-fall.jpg') center no-repeat;
+        /* If you prefer pure image opacity instead of a tint, swap the gradient for: */
+        /* opacity: 0.25;  // and set background to only the image */
+      }
+
+      /* Keep all inner content above the overlay */
+      .package-tile .q-list.StarterPackage > * {
+        position: relative;
+        z-index: 1;
+        background-color: rgba(0, 0, 0, 0.2);
       }
     }
   }

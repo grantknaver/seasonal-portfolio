@@ -1,9 +1,9 @@
-import { type Project } from '../constants/projects';
+import { type Projects } from '../constants/projects';
 
 export interface ProjectDetails {
-  name: Project;
+  name: Projects;
   id: string;
   url?: string;
   src: string;
-  alt: Project;
+  alt: Projects;
 }

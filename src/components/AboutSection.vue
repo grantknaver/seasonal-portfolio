@@ -543,8 +543,4 @@ $winter-mobile-background: map-get($winter-theme, primary);
     background-color: initial;
   }
 }
-
-.test {
-  display: none;
-}
 </style>

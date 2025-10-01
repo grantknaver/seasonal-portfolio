@@ -8,12 +8,12 @@ import { TopicName } from '../shared/constants/topicName';
 import { type Topic } from '../shared/types/topic';
 import { v4 as uuidv4 } from 'uuid';
 import AboutSection from '../components/AboutSection.vue';
-import SkillsSection from '../components/SkillsSection.vue';
 import ContactSection from '../components/ContactSection.vue';
-import ProjectSection from '../components/ProjectSection.vue';
+import PackageSection from 'src/components/PackageSection.vue';
 import WeatherBackground from '../components/WeatherBackground.vue';
-import { type Slide } from 'src/shared/types/slide';
+import { type Slide } from '../shared/types/slide';
 import { QCarousel } from 'quasar';
+import CaseStudiesSection from '../components/CaseStudiesSection.vue';
 
 const mainStore = useMainStore();
 const { activeTheme, activeTopic } = storeToRefs(mainStore);
@@ -60,10 +60,16 @@ const topics = ref<Topic[]>([
   { id: uuidv4(), name: TopicName.Packages, icon: 'local_shipping', label: TopicName.Packages },
   { id: uuidv4(), name: TopicName.About, icon: 'info', label: TopicName.About },
   { id: uuidv4(), name: TopicName.Contact, icon: 'contact_mail', label: TopicName.Contact },
-  { id: uuidv4(), name: TopicName.CaseStudies, icon: 'menu_book', label: TopicName.CaseStudies },
+  {
+    id: uuidv4(),
+    name: TopicName.CaseStudies.replace(' ', '') as TopicName,
+    icon: 'menu_book',
+    label: TopicName.CaseStudies,
+  },
 ]);
 
 onMounted(() => {
+  console.log('topics', topics.value);
   window.addEventListener('resize', updateWidths);
 });
 
@@ -195,8 +201,8 @@ watch(slide, (newVal) => {
     >
       <q-scroll-area v-if="activeTopic !== TopicName.Contact" class="fit q-pa-md">
         <AboutSection v-if="activeTopic === TopicName.About" />
-        <SkillsSection v-else-if="activeTopic === TopicName.CaseStudies" />
-        <ProjectSection v-else-if="activeTopic === TopicName.Packages" />
+        <CaseStudiesSection v-else-if="activeTopic === TopicName.CaseStudies" />
+        <PackageSection v-else-if="activeTopic === TopicName.Packages" />
       </q-scroll-area>
 
       <div v-else class="fit flex column justify-center items-center q-pa-md">

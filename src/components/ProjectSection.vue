@@ -5,40 +5,40 @@ import { type ProjectDetails } from '../shared/types/projectDetails';
 import { themeMap } from '../shared/constants/theme';
 import { useMainStore } from '../stores/main';
 import { storeToRefs } from 'pinia';
-import { Project } from '../shared/constants/projects';
+import { Projects } from '../shared/constants/projects';
 import { setSeasonClasses } from '../shared/utils/setSeasonColors';
 
 const mainStore = useMainStore();
 const { activeTheme } = storeToRefs(mainStore);
 
 const storytaimProject = ref<ProjectDetails>({
-  name: Project.StorytAIm,
+  name: Projects.StorytAIm,
   id: uuidv4(),
   src: new URL('../assets/storytaim.svg', import.meta.url).href,
-  alt: Project.StorytAIm,
+  alt: Projects.StorytAIm,
 });
 const projects = ref<ProjectDetails[]>([
   {
-    name: Project.RxjsCatalog,
+    name: Projects.RxjsCatalog,
     id: uuidv4(),
     url: 'https://rxjs-wkwd2p.stackblitz.io/',
     src: new URL('../assets/rxjs.svg', import.meta.url).href,
-    alt: Project.RxjsCatalog,
+    alt: Projects.RxjsCatalog,
   },
   {
-    name: Project.RockWatch,
+    name: Projects.RockWatch,
     id: uuidv4(),
     url: 'https://rock-watch-frontend.vercel.app/landing',
     src: new URL('../assets/rock-watch.svg', import.meta.url).href,
-    alt: Project.RockWatch,
+    alt: Projects.RockWatch,
   },
 
   {
-    name: Project.DrainData,
+    name: Projects.DrainData,
     id: uuidv4(),
     url: 'https://www.draindata.org/',
     src: new URL('../assets/drainData-noSlogan.svg', import.meta.url).href,
-    alt: Project.DrainData,
+    alt: Projects.DrainData,
   },
 ]);
 </script>
