@@ -304,7 +304,9 @@ const packages = ref<PackageDetails[]>([
           }
 
           .tagline {
-            font-size: 1rem;
+            font-size: 1.2rem;
+            font-family: 'Prata';
+            font-weight: 400; /* only one weight is available for some scripts */
           }
 
           .cost {
