@@ -10,9 +10,7 @@ import { v4 as uuidv4 } from 'uuid';
 import AboutSection from '../components/AboutSection.vue';
 import ContactSection from '../components/ContactSection.vue';
 import PackageSection from 'src/components/PackageSection.vue';
-import WeatherBackground from '../components/WeatherBackground.vue';
-import { type Slide } from '../shared/types/slide';
-import { QCarousel } from 'quasar';
+
 import CaseStudiesSection from '../components/CaseStudiesSection.vue';
 
 const mainStore = useMainStore();
@@ -32,29 +30,6 @@ const updateWidths = () => {
 
 const mobileMenu = ref(false);
 const slide = ref<Theme>(Theme.Fall);
-
-const slides = ref<Slide[]>([
-  {
-    id: uuidv4(),
-    src: new URL('../assets/autumn-forestry.jpg', import.meta.url).href,
-    theme: Theme.Fall,
-  },
-  {
-    id: uuidv4(),
-    src: new URL('../assets/snowy-winter-landscape.jpg', import.meta.url).href,
-    theme: Theme.Winter,
-  },
-  {
-    id: uuidv4(),
-    src: new URL('../assets/beautiful-forest-spring-season.jpg', import.meta.url).href,
-    theme: Theme.Spring,
-  },
-  {
-    id: uuidv4(),
-    src: new URL('../assets/beach.jpg', import.meta.url).href,
-    theme: Theme.Summer,
-  },
-]);
 
 const topics = ref<Topic[]>([
   { id: uuidv4(), name: TopicName.Packages, icon: 'local_shipping', label: TopicName.Packages },
@@ -80,24 +55,7 @@ watch(slide, (newVal) => {
 </script>
 
 <template>
-  <q-layout view="Hhh Lpr lff">
-    <div class="carousel-background">
-      <q-carousel
-        v-model="slide"
-        transition-prev="fade"
-        transition-next="fade"
-        animated
-        infinite
-        :autoplay="15000"
-        height="100%"
-        class="carousel-absolute bg-dark"
-        :transition-duration="2500"
-      >
-        <q-carousel-slide v-for="s in slides" :key="s.id" :name="s.theme" :img-src="s.src" />
-      </q-carousel>
-    </div>
-
-    <!-- HEADER (mobile) -->
+  <q-layout view="hHh Lpr fFf">
     <q-header id="mobile-header" class="text-black">
       <q-toolbar class="bg-dark q-pa-lg">
         <q-toolbar-title>
@@ -181,15 +139,10 @@ watch(slide, (newVal) => {
       </q-toolbar>
     </q-header>
 
-    <!-- PAGE CONTAINER -->
     <q-page-container>
-      <div class="weather-layer">
-        <WeatherBackground />
-      </div>
       <router-view />
     </q-page-container>
 
-    <!-- RIGHT DRAWER (Desktop Panel) - non-overlay/push -->
     <q-drawer
       :model-value="showTopicPanel"
       side="right"
@@ -214,7 +167,6 @@ watch(slide, (newVal) => {
       </div>
     </q-drawer>
 
-    <!-- FOOTER (always below drawers in stacking) -->
     <q-footer class="bg-dark text-white">
       <q-toolbar class="justify-between">
         <q-toolbar-title class="text-subtitle2 text-weight-light">
@@ -254,39 +206,6 @@ watch(slide, (newVal) => {
 <style lang="scss">
 @import '../css/base/variables';
 
-html,
-body,
-#q-app,
-.q-layout,
-.q-page-container,
-.q-page {
-  height: 100%;
-  margin: 0;
-  padding: 0;
-}
-
-.carousel-background {
-  position: fixed;
-  top: 0;
-  left: 0;
-  z-index: 0;
-  width: 100%;
-  height: 100%;
-  pointer-events: none;
-  overflow: hidden;
-}
-
-.weather-layer {
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  z-index: 2;
-  pointer-events: none;
-  overflow: hidden;
-}
-
 .q-header {
   background-color: rgba($color: black, $alpha: 0.5) !important;
   border-bottom: 2px solid var(--q-primary);
@@ -301,26 +220,24 @@ body,
   }
 }
 
-/* Quasar renders <aside> for drawers */
+// Need this for right-side transparent drawer
 aside {
   @media (min-width: $breakpoint-sm) {
-    height: 100%;
     background-color: transparent !important;
   }
 }
 
-/* Desktop drawer (push mode) */
 .desktop-drawer {
-  height: 100%;
+  display: flex;
+  flex-direction: column;
   background-color: rgba(black, 0.5);
-  // box-shadow: none !important;
   border-left: solid 4px var(--q-primary);
   z-index: 2000; /* ensure above footer if any stacking context appears */
 
   /* Make internal scroll area own full height to prevent content overflow */
   .q-scrollarea,
   .scroll-area {
-    height: 100%;
+    flex: 1 1 0%;
   }
 }
 
@@ -329,10 +246,7 @@ aside {
   z-index: 2000;
 }
 
-/* Footer must never sit on top of drawers */
 .q-footer {
-  position: relative;
-  z-index: 1000; /* lower than drawers, higher than backgrounds */
   border-top: 1px solid var(--q-primary);
 
   @media (min-width: $breakpoint-md) {

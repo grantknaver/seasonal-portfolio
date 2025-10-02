@@ -12,6 +12,10 @@ import { scrollToElement } from '../shared/utils/scrollToElement';
 import { setSeasonClasses } from '../shared/utils/setSeasonColors';
 import SimonMenu from '../components/SimonMenu.vue';
 import CaseStudiesSection from 'src/components/CaseStudiesSection.vue';
+import { type Slide } from '../shared/types/slide';
+import { QCarousel } from 'quasar';
+import { Theme } from '../shared/constants/theme';
+import WeatherBackground from '../components/WeatherBackground.vue';
 
 const mainStore = useMainStore();
 const topics: Topic[] = [
@@ -36,7 +40,29 @@ const topics: Topic[] = [
   },
 ];
 
-// const headerHeight = ref<number>(0);
+const slides = ref<Slide[]>([
+  {
+    id: uuidv4(),
+    src: new URL('../assets/autumn-forestry.jpg', import.meta.url).href,
+    theme: Theme.Fall,
+  },
+  {
+    id: uuidv4(),
+    src: new URL('../assets/snowy-winter-landscape.jpg', import.meta.url).href,
+    theme: Theme.Winter,
+  },
+  {
+    id: uuidv4(),
+    src: new URL('../assets/beautiful-forest-spring-season.jpg', import.meta.url).href,
+    theme: Theme.Spring,
+  },
+  {
+    id: uuidv4(),
+    src: new URL('../assets/beach.jpg', import.meta.url).href,
+    theme: Theme.Summer,
+  },
+]);
+const slide = ref<Theme>(Theme.Fall);
 const { activeTheme, activeTopic, mobileScrollTarget } = storeToRefs(mainStore);
 const expandedPanel = ref<TopicName | null>(null);
 const headerHeight = ref<number>(0);
@@ -46,7 +72,6 @@ onMounted(async () => {
 
   window.addEventListener('resize', () => {
     headerHeight.value = document.getElementById('mobile-header')?.offsetHeight ?? 0;
-    console.log('headerHeight', headerHeight.value);
   });
 });
 
@@ -67,7 +92,25 @@ const handleAfterShow = async (id: TopicName) => {
 </script>
 
 <template>
-  <q-page class="page-container column scroll">
+  <q-page class="page-container column fit">
+    <div class="carousel-background">
+      <q-carousel
+        v-model="slide"
+        transition-prev="fade"
+        transition-next="fade"
+        animated
+        infinite
+        :autoplay="15000"
+        height="100%"
+        class="carousel-absolute bg-dark"
+        :transition-duration="2500"
+      >
+        <q-carousel-slide v-for="s in slides" :key="s.id" :name="s.theme" :img-src="s.src" />
+      </q-carousel>
+    </div>
+    <div class="weather-layer">
+      <WeatherBackground />
+    </div>
     <div class="logo">
       <img
         class="q-pt-sm"
@@ -191,11 +234,6 @@ const handleAfterShow = async (id: TopicName) => {
 <style scoped lang="scss">
 @import '../css/main.scss';
 
-.q-page-container {
-  margin: 0 !important;
-  padding: 0 !important;
-}
-
 .page-container {
   background-color: rgba($color: white, $alpha: 0.7);
   position: relative;
@@ -204,11 +242,31 @@ const handleAfterShow = async (id: TopicName) => {
     background-color: initial;
   }
 
+  .carousel-background {
+    position: fixed;
+    height: 100%;
+    top: 0;
+    left: 0;
+    z-index: 0;
+    width: 100%;
+    pointer-events: none;
+    overflow: hidden;
+  }
+
+  .weather-layer {
+    position: fixed;
+    inset: 0;
+    z-index: 1;
+    pointer-events: none;
+    overflow: hidden;
+  }
+
   .logo {
     display: none;
     position: absolute;
     top: 3%;
     left: 3%;
+    z-index: 2;
 
     @media (min-width: $breakpoint-md) {
       display: flex !important;
@@ -224,6 +282,7 @@ const handleAfterShow = async (id: TopicName) => {
 
   .sub-container {
     flex: 1 1 0%;
+    z-index: 2;
     @media (min-width: $breakpoint-md) {
       position: relative;
       padding: initial;
