@@ -137,54 +137,67 @@ const packages = ref<PackageDetails[]>([
 
         <q-card-section class="section-container q-pa-sm">
           <div class="package-container col column">
-            <div
+            <q-intersection
               v-for="p in packages"
               :key="p.id"
-              class="package-tile row items-start wrap q-pa-md bg-white"
+              transition="slide-up"
+              transition-duration="1000"
+              :once="true"
             >
-              <q-list
-                dense
-                bordered
-                padding
-                :separator="true"
-                class="q-mb-none no-border rounded-borders"
-              >
-                <q-item class="text-accent package-name">{{ p.name }}</q-item>
-                <q-item>
-                  <q-item-section
-                    class="tagline"
-                    :class="
-                      setSeasonClasses(
-                        {
-                          Fall: 'text-green-6',
-                          Winter: 'earth-orange',
-                          Spring: 'text-red-9',
-                          Summer: 'dusty-plum',
-                        },
-                        activeTheme,
-                      )
-                    "
-                  >
-                    {{ p.tagline }}
-                  </q-item-section>
-                </q-item>
-                <q-item v-for="(f, index) in p.features" :key="index">
-                  <q-item-section side>
-                    <q-icon name="circle" size=".5rem" class="text-dark" />
-                  </q-item-section>
-                  <q-item-section class="text-black">
-                    {{ f.text }}
-                  </q-item-section>
-                </q-item>
-                <q-item>
-                  <q-item-section class="q-pt-md text-black">
-                    <span>Cost for Package:</span>
-                    <span class="cost text-green-6">{{ p.cost }}</span>
-                  </q-item-section>
-                </q-item>
-              </q-list>
-              <img :src="p.src" />
-            </div>
+              <div class="package-tile row q-pa-md bg-white justify-around">
+                <q-list
+                  dense
+                  bordered
+                  padding
+                  :separator="true"
+                  class="col-6 q-mb-none no-border rounded-borders"
+                >
+                  <q-item class="text-accent package-name">{{ p.name }}</q-item>
+                  <q-item>
+                    <q-item-section
+                      class="tagline q-pt-md q-pb-md"
+                      :class="
+                        setSeasonClasses(
+                          {
+                            Fall: 'text-green-6',
+                            Winter: 'earth-orange',
+                            Spring: 'text-red-9',
+                            Summer: 'dusty-plum',
+                          },
+                          activeTheme,
+                        )
+                      "
+                    >
+                      {{ p.tagline }}
+                    </q-item-section>
+                  </q-item>
+                  <q-item v-for="(f, index) in p.features" :key="index">
+                    <span class="row full-width q-pa-none">
+                      <q-item-section side>
+                        <q-icon name="circle" size=".5rem" class="text-dark" />
+                      </q-item-section>
+                      <q-item-section class="text-black">
+                        {{ f.text }}
+                      </q-item-section>
+                    </span>
+                  </q-item>
+
+                  <q-item>
+                    <q-item-section class="q-pt-md text-black">
+                      <span>Cost for Package:</span>
+                      <span class="cost text-green-6">{{ p.cost }}</span>
+                    </q-item-section>
+                  </q-item>
+                </q-list>
+                <div class="cta-container col-4 column">
+                  <div class="img-container column full-width bg-primary">
+                    <img class="full-width q-pa-lg" :src="p.src" />
+                  </div>
+                  <br />
+                  <q-btn size="lg" color="accent">Get Started</q-btn>
+                </div>
+              </div>
+            </q-intersection>
           </div>
         </q-card-section>
       </q-card>
@@ -275,16 +288,20 @@ const packages = ref<PackageDetails[]>([
 
       .package-tile {
         border-radius: 10px;
+        gap: 1rem;
+        align-items: center;
 
         .package-name {
           font-size: 2rem;
           text-shadow: 1px 1px 2px black;
+          padding-bottom: 2rem !important;
         }
 
         .q-list {
-          flex: 1 1 0;
-          min-width: 240px;
-          min-inline-size: 0;
+          .q-item {
+            padding-top: 0.5rem;
+            padding-bottom: 8px;
+          }
 
           .tagline {
             font-size: 1rem;
@@ -296,12 +313,19 @@ const packages = ref<PackageDetails[]>([
           }
         }
 
-        img {
-          flex: 0 0 auto;
-          width: clamp(160px, 28vw, 220px);
-          height: auto;
-          object-fit: contain;
-          align-self: center;
+        .cta-container {
+          .img-container {
+            height: auto;
+            border: solid 2px var(--q-dark);
+
+            img {
+              object-fit: contain;
+            }
+
+            .q-btn {
+              border-top: 5px solid white;
+            }
+          }
         }
       }
     }
