@@ -69,7 +69,6 @@ const topics = ref<Topic[]>([
 ]);
 
 onMounted(() => {
-  console.log('topics', topics.value);
   window.addEventListener('resize', updateWidths);
 });
 
@@ -99,7 +98,7 @@ watch(slide, (newVal) => {
     </div>
 
     <!-- HEADER (mobile) -->
-    <q-header class="text-black">
+    <q-header id="mobile-header" class="text-black">
       <q-toolbar class="bg-dark q-pa-lg">
         <q-toolbar-title>
           <div class="logo row items-center">
@@ -199,7 +198,12 @@ watch(slide, (newVal) => {
       class="desktop-drawer"
       content-class="column no-wrap"
     >
-      <q-scroll-area v-if="activeTopic !== TopicName.Contact" class="fit q-pa-md">
+      <q-scroll-area
+        v-if="activeTopic !== TopicName.Contact"
+        visible
+        class="q-pa-md"
+        :bar-style="{ backgroundColor: 'white', opacity: '1' }"
+      >
         <AboutSection v-if="activeTopic === TopicName.About" />
         <CaseStudiesSection v-else-if="activeTopic === TopicName.CaseStudies" />
         <PackageSection v-else-if="activeTopic === TopicName.Packages" />
@@ -309,7 +313,7 @@ aside {
 .desktop-drawer {
   height: 100%;
   background-color: rgba(black, 0.5);
-  box-shadow: none !important;
+  // box-shadow: none !important;
   border-left: solid 4px var(--q-primary);
   z-index: 2000; /* ensure above footer if any stacking context appears */
 

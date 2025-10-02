@@ -35,11 +35,19 @@ const topics: Topic[] = [
     label: TopicName.CaseStudies,
   },
 ];
+
+// const headerHeight = ref<number>(0);
 const { activeTheme, activeTopic, mobileScrollTarget } = storeToRefs(mainStore);
 const expandedPanel = ref<TopicName | null>(null);
+const headerHeight = ref<number>(0);
 
 onMounted(async () => {
   await mainStore.VERIFY_HUMANITY();
+
+  window.addEventListener('resize', () => {
+    headerHeight.value = document.getElementById('mobile-header')?.offsetHeight ?? 0;
+    console.log('headerHeight', headerHeight.value);
+  });
 });
 
 watch(mobileScrollTarget, (newTopic) => {
@@ -59,129 +67,123 @@ const handleAfterShow = async (id: TopicName) => {
 </script>
 
 <template>
-  <q-page class="page-container scroll column col justify-center items-center">
-    <div>
-      <div class="logo">
-        <img
-          class="q-pt-sm"
-          style="max-width: 65px"
-          src="../assets/glkfreelance-logo.png"
-          alt="logo"
-        />
-        <span class="logo-text"
-          ><span class="text-secondary">glk</span><span class="text-primary">Freelance</span></span
-        >
-      </div>
-
-      <div class="sub-container column col items-center q-pl-md q-pr-md">
-        <section class="mobile-view column items-center full-width">
-          <div
-            inline-actions
-            class="flex full-width text-primary bg-accent q-mt-lg q-mb-sm q-pa-md"
-          >
-            <span>
-              <p class="q-ma-none text-primary bounce-text">Grant Knaver</p>
-              <p class="q-ma-none text-dark">Fullstack Developer</p>
-            </span>
-            <q-space></q-space>
-            <q-btn size="lg" color="dark">Resume</q-btn>
-          </div>
-          <blockquote
-            class="full-width q-pa-md text-center"
-            cite="http://www.worldwildlife.org/who/index.html"
-          >
-            "Successful software is built not just with code, but with trust. The best developers
-            listen first — not to respond, but to understand. Because building the right thing is
-            just as important as building it right."
-          </blockquote>
-
-          <q-list padding class="full-width q-pa-none">
-            <q-item
-              v-for="topic in topics.slice(1)"
-              :key="topic.id"
-              :name="topic.name"
-              v-model="expandedPanel"
-              class="full-width bg-transparent q-pa-none q-mb-sm"
-            >
-              <q-expansion-item
-                :icon="topic.icon"
-                :label="topic.label"
-                :model-value="expandedPanel === topic.name"
-                @update:model-value="
-                  (val) => {
-                    expandedPanel = val
-                      ? topic.name
-                      : expandedPanel === topic.name
-                        ? null
-                        : expandedPanel;
-                  }
-                "
-                :header-class="['text-dark', 'bg-secondary']"
-                class="expansion-item full-width"
-                @after-show="() => handleAfterShow(topic.name)"
-              >
-                <template v-if="topic.name === TopicName.About">
-                  <div :id="topic.name" class="full-width">
-                    <AboutSection />
-                  </div>
-                </template>
-                <template v-if="topic.name === TopicName.CaseStudies">
-                  <div :id="topic.name" class="anchor full-width">
-                    <CaseStudiesSection />
-                  </div>
-                </template>
-                <template v-if="topic.name === TopicName.Packages">
-                  <div :id="topic.name" class="anchor full-width">
-                    <PackageSection></PackageSection>
-                  </div>
-                </template>
-              </q-expansion-item>
-            </q-item>
-          </q-list>
-          <q-separator color="secondary" class="full-width q-mt-xs q-mb-lg"></q-separator>
-          <div class="full-width" :id="TopicName.Contact">
-            <ContactSection />
-          </div>
-        </section>
-        <section class="desktop-view flex col column justify-center items-center full-width">
-          <SimonMenu></SimonMenu>
-          <q-separator class="q-mt-lg q-mb-md" />
+  <q-page class="page-container column scroll">
+    <div class="logo">
+      <img
+        class="q-pt-sm"
+        style="max-width: 65px"
+        src="../assets/glkfreelance-logo.png"
+        alt="logo"
+      />
+      <span class="logo-text"
+        ><span class="text-secondary">glk</span><span class="text-primary">Freelance</span></span
+      >
+    </div>
+    <div class="sub-container column">
+      <section class="mobile-view full-width">
+        <div inline-actions class="text-primary bg-accent q-mb-sm">
           <span>
-            <p
-              class="name q-ma-none"
-              :class="
-                setSeasonClasses(
-                  {
-                    Fall: 'text-primary fall-text-shadow',
-                    Winter: 'text-primary winter-text-shadow',
-                    Spring: 'text-primary spring-text-shadow',
-                    Summer: 'text-primary summer-text-shadow',
-                  },
-                  activeTheme,
-                )
-              "
-            >
-              Grant Knaver
-            </p>
-            <p
-              class="full-stack q-ma-none text-bold text-warning text-center"
-              :class="
-                setSeasonClasses(
-                  {
-                    Fall: 'fall-text-shadow',
-                    Winter: 'winter-text-shadow',
-                    Spring: 'spring-text-shadow',
-                    Summer: ' summer-text-shadow',
-                  },
-                  activeTheme,
-                )
-              "
-            >
-              Fullstack Developer
-            </p>
+            <p class="q-ma-none text-primary bounce-text">Grant Knaver</p>
+            <p class="q-ma-none text-dark">Fullstack Developer</p>
           </span>
-        </section>
-      </div>
+          <q-space></q-space>
+          <q-btn size="lg" color="dark">Resume</q-btn>
+        </div>
+        <blockquote
+          class="full-width q-pa-md text-center"
+          cite="http://www.worldwildlife.org/who/index.html"
+        >
+          "Successful software is built not just with code, but with trust. The best developers
+          listen first — not to respond, but to understand. Because building the right thing is just
+          as important as building it right."
+        </blockquote>
+
+        <q-list padding class="full-width q-pa-none">
+          <q-item
+            v-for="topic in topics.slice(1)"
+            :key="topic.id"
+            :name="topic.name"
+            v-model="expandedPanel"
+            class="full-width bg-transparent q-pa-none q-mb-sm"
+          >
+            <q-expansion-item
+              :icon="topic.icon"
+              :label="topic.label"
+              :model-value="expandedPanel === topic.name"
+              @update:model-value="
+                (val) => {
+                  expandedPanel = val
+                    ? topic.name
+                    : expandedPanel === topic.name
+                      ? null
+                      : expandedPanel;
+                }
+              "
+              :header-class="['text-dark', 'bg-secondary']"
+              class="expansion-item full-width"
+              @after-show="() => handleAfterShow(topic.name)"
+            >
+              <template v-if="topic.name === TopicName.About">
+                <div :id="topic.name" class="full-width">
+                  <AboutSection />
+                </div>
+              </template>
+              <template v-if="topic.name === TopicName.CaseStudies">
+                <div :id="topic.name" class="anchor full-width">
+                  <CaseStudiesSection />
+                </div>
+              </template>
+              <template v-if="topic.name === TopicName.Packages">
+                <div :id="topic.name" class="anchor full-width">
+                  <PackageSection></PackageSection>
+                </div>
+              </template>
+            </q-expansion-item>
+          </q-item>
+        </q-list>
+        <q-separator color="secondary" class="full-width q-mt-xs q-mb-lg"></q-separator>
+        <div class="full-width" :id="TopicName.Contact">
+          <ContactSection />
+        </div>
+      </section>
+      <section class="desktop-view column justify-center items-center full-width">
+        <SimonMenu></SimonMenu>
+        <q-separator class="q-mt-lg q-mb-md" />
+        <span>
+          <p
+            class="name q-ma-none"
+            :class="
+              setSeasonClasses(
+                {
+                  Fall: 'text-primary fall-text-shadow',
+                  Winter: 'text-primary winter-text-shadow',
+                  Spring: 'text-primary spring-text-shadow',
+                  Summer: 'text-primary summer-text-shadow',
+                },
+                activeTheme,
+              )
+            "
+          >
+            Grant Knaver
+          </p>
+          <p
+            class="full-stack q-ma-none text-bold text-warning text-center"
+            :class="
+              setSeasonClasses(
+                {
+                  Fall: 'fall-text-shadow',
+                  Winter: 'winter-text-shadow',
+                  Spring: 'spring-text-shadow',
+                  Summer: ' summer-text-shadow',
+                },
+                activeTheme,
+              )
+            "
+          >
+            Fullstack Developer
+          </p>
+        </span>
+      </section>
     </div>
   </q-page>
 </template>
@@ -221,6 +223,7 @@ const handleAfterShow = async (id: TopicName) => {
   }
 
   .sub-container {
+    flex: 1 1 0%;
     @media (min-width: $breakpoint-md) {
       position: relative;
       padding: initial;
@@ -238,7 +241,8 @@ const handleAfterShow = async (id: TopicName) => {
     }
 
     .mobile-view {
-      max-width: 800px;
+      height: auto;
+
       @media (min-width: $breakpoint-md) {
         display: none;
       }
@@ -270,6 +274,7 @@ const handleAfterShow = async (id: TopicName) => {
         display: flex;
         justify-content: center;
         align-items: center;
+        flex: 1 0 0%;
       }
 
       hr {

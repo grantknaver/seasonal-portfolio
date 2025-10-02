@@ -84,7 +84,7 @@ const packages = ref<PackageDetails[]>([
 <template>
   <section>
     <!-- Mobile -->
-    <div class="mobile-view full-width">
+    <div class="mobile-view full-width q-ma-md">
       <q-card class="full-width">
         <q-card-section
           class="section-container q-pa-lg"
@@ -194,7 +194,7 @@ const packages = ref<PackageDetails[]>([
                     <img class="full-width q-pa-lg" :src="p.src" />
                   </div>
                   <br />
-                  <q-btn size="lg" color="accent">Get Started</q-btn>
+                  <q-btn size="lg" color="accent">Consultation</q-btn>
                 </div>
               </div>
             </q-intersection>
