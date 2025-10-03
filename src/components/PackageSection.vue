@@ -114,9 +114,9 @@ watch(activeTheme, (newTheme) => {
             )
           "
         >
-          <h1 class="q-mt-none q-mb-md bg-primary text-accent text-center">Packages</h1>
+          <h1 class="text-h1 q-mt-none q-mb-md bg-primary text-accent text-center">Packages</h1>
           <q-separator color="primary" class="q-mb-md" />
-          <p class="text-center text-primary">
+          <p class="text-body1 text-center text-primary">
             Whether you need one polished animation, a full motion + AI upgrade, or a launch-ready
             experience, I’ve got you covered. These packages make it simple to get started — clear
             scope, fair pricing, and fast turnaround.
@@ -134,13 +134,13 @@ watch(activeTheme, (newTheme) => {
               :separator="true"
               class="package-tile full-width q-pa-md bg-white col-6 q-mb-none no-border rounded-borders"
             >
-              <q-item class="package-name text-center text-accent row justify-center q-mb-md">{{
-                p.name
-              }}</q-item>
+              <q-item class="row justify-center q-mb-lg text-center text-accent">
+                <h2 class="text-h2">{{ p.name }}</h2>
+              </q-item>
 
               <q-item>
                 <q-item-section
-                  class="tagline text-center q-pt-md q-pb-md"
+                  class="tagline text-body1 text-center q-pt-md q-pb-md"
                   :class="
                     setSeasonClasses(
                       {
@@ -168,14 +168,14 @@ watch(activeTheme, (newTheme) => {
                   <q-item-section side>
                     <q-icon name="circle" size=".5rem" class="text-dark" />
                   </q-item-section>
-                  <q-item-section class="text-black">
+                  <q-item-section class="package-feature text-body2 text-black">
                     {{ f.text }}
                   </q-item-section>
                 </span>
               </q-item>
               <q-item>
                 <q-item-section class="q-pt-md text-black">
-                  <span>Cost for Package:</span>
+                  <span class="text-body2">Cost for Package:</span>
                   <span class="cost text-green-6">{{ p.cost }}</span>
                 </q-item-section>
               </q-item>
@@ -215,7 +215,9 @@ watch(activeTheme, (newTheme) => {
                   :separator="true"
                   class="col-6 q-mb-none no-border rounded-borders"
                 >
-                  <q-item class="text-accent package-name">{{ p.name }}</q-item>
+                  <q-item
+                    ><h2 class="text-accent package-header">{{ p.name }}</h2></q-item
+                  >
                   <q-item>
                     <q-item-section
                       class="tagline q-pt-md q-pb-md"
@@ -272,7 +274,7 @@ watch(activeTheme, (newTheme) => {
 @import '../css/main.scss';
 
 .mobile-view {
-  @media (min-width: $breakpoint-md) {
+  @media (min-width: $breakpoint-sm) {
     display: none;
   }
 
@@ -288,24 +290,19 @@ watch(activeTheme, (newTheme) => {
       border-left: solid 8px var(--q-secondary);
       border-right: solid 8px var(--q-secondary);
       border-top: solid 8px var(--q-secondary);
-
-      h1 {
-        font-size: 3rem;
-      }
     }
 
     .section-container {
       background-color: var(--q-secondary);
 
       .package-tile {
-        .package-name {
-          font-size: 2.7rem;
-        }
-
         .tagline {
-          font-size: 1rem;
           font-family: 'Prata';
           font-weight: 400; /* only one weight is available for some scripts */
+        }
+
+        .package-feature {
+          line-height: 1.6rem;
         }
 
         .cta-container {
@@ -330,91 +327,96 @@ watch(activeTheme, (newTheme) => {
         }
 
         .cost {
-          font-size: 1.5rem;
+          font-size: 1.4rem;
         }
       }
     }
   }
 }
 
-// .desktop-view {
-//   display: none;
+.desktop-view {
+  display: none;
 
-//   @media (min-width: $breakpoint-md) {
-//     display: flex;
-//   }
+  @media (min-width: $breakpoint-sm) {
+    display: flex;
+  }
 
-//   .q-card {
-//     display: flex !important;
-//     flex-direction: column;
-//     flex: 1 1 0%;
-//     max-width: 100%;
-//     box-sizing: border-box;
-//     border-radius: 10px !important;
+  .q-card {
+    display: flex !important;
+    flex-direction: column;
+    flex: 1 1 0%;
+    max-width: 100%;
+    box-sizing: border-box;
+    border-radius: 10px !important;
 
-//     h1 {
-//       font-size: 3rem;
-//       border: solid 2px var(--q-primary);
-//     }
+    h1 {
+      border: solid 2px var(--q-primary);
+    }
 
-//     .section-container:nth-child(2) {
-//       border-radius: 10px;
-//     }
+    .section-container:nth-child(2) {
+      border-radius: 10px;
+    }
 
-//     .package-container {
-//       row-gap: 1.5rem;
+    .package-container {
+      row-gap: 1.5rem;
 
-//       @media (min-width: $breakpoint-xl) {
-//         justify-content: center;
-//       }
+      @media (min-width: $breakpoint-xl) {
+        justify-content: center;
+      }
 
-//       .package-tile {
-//         border-radius: 10px;
-//         gap: 1rem;
-//         align-items: center;
+      .package-tile {
+        border-radius: 10px;
+        gap: 1rem;
+        align-items: center;
 
-//         .package-name {
-//           font-size: 2rem;
-//           text-shadow: 1px 1px 2px black;
-//           padding-bottom: 2rem !important;
-//         }
+        .package-header {
+          text-shadow: 1px 1px 2px black;
+          padding-bottom: 2rem !important;
+        }
 
-//         .q-list {
-//           .q-item {
-//             padding-top: 0.5rem;
-//             padding-bottom: 8px;
-//           }
+        .q-list {
+          .q-item {
+            padding-top: 0.5rem;
+            padding-bottom: 8px;
+          }
 
-//           .tagline {
-//             font-size: 1.2rem;
-//             font-family: 'Prata';
-//             font-weight: 400; /* only one weight is available for some scripts */
-//           }
+          .tagline {
+            font-family: 'Prata';
+            font-weight: 400; /* only one weight is available for some scripts */
+          }
 
-//           .cost {
-//             font-size: 1.25rem;
-//             color: #8bc34a;
-//           }
-//         }
+          .cost {
+            color: #8bc34a;
+          }
+        }
 
-//         .cta-container {
-//           .img-container {
-//             height: auto;
-//             border: solid 2px var(--q-dark);
+        .cta-container {
+          .img-container {
+            width: min(100%, 300px);
+            aspect-ratio: 1 / 1; /* keeps it square */
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden; /* hides any accidental overflow */
+            border: solid 2px var(--q-dark);
 
-//             img {
-//               object-fit: contain;
-//             }
+            img {
+              max-width: 100%;
+              max-height: 100%;
+              width: auto; /* don’t force 100% width */
+              height: auto; /* preserve aspect ratio */
+              object-fit: contain; /* fit entirely within the box */
+            }
 
-//             .q-btn {
-//               border-top: 5px solid white;
-//             }
-//           }
-//         }
-//       }
-//     }
-//   }
-// }
+            .q-btn {
+              border-top: 5px solid white;
+            }
+          }
+        }
+      }
+    }
+  }
+}
 
 .earth-orange {
   color: #d78c3b;
