@@ -1,5 +1,5 @@
 <script lang="ts" setup>
-import { computed, ref, onMounted, watch, onBeforeUnmount } from 'vue';
+import { computed, ref, onMounted, onBeforeUnmount } from 'vue';
 import { useMainStore } from '../stores/main';
 import { storeToRefs } from 'pinia';
 import { Theme } from '../shared/constants/theme';
@@ -29,7 +29,6 @@ const updateWidths = () => {
 };
 
 const mobileMenu = ref(false);
-const slide = ref<Theme>(Theme.Fall);
 
 const topics = ref<Topic[]>([
   { id: uuidv4(), name: TopicName.Packages, icon: 'local_shipping', label: TopicName.Packages },
@@ -48,14 +47,10 @@ onMounted(() => {
 });
 
 onBeforeUnmount(() => window.removeEventListener('resize', updateWidths));
-
-watch(slide, (newVal) => {
-  mainStore.SET_ACTIVE_THEME(newVal);
-});
 </script>
 
 <template>
-  <q-layout view="hHh Lpr fFf">
+  <q-layout view="hHh Lpr FFF">
     <q-header id="mobile-header" class="text-black">
       <q-toolbar class="bg-dark q-pa-lg">
         <q-toolbar-title>
@@ -170,13 +165,11 @@ watch(slide, (newVal) => {
     <q-footer class="bg-dark text-white">
       <q-toolbar class="justify-between">
         <q-toolbar-title class="text-subtitle2 text-weight-light">
-          © {{ new Date().getFullYear() }}
-          <span class="text-primary text-weight-light"
-            >glk<span style="color: #fc9944; font-size: 1em">Freelance</span></span
-          >
+          © {{ new Date().getFullYear() }} <span class="text-secondary">glk</span
+          ><span class="text-primary">Freelance</span>
         </q-toolbar-title>
 
-        <div class="q-gutter-sm">
+        <div class="">
           <a href="https://github.com/grantknaver">
             <q-btn
               flat
@@ -248,10 +241,6 @@ aside {
 
 .q-footer {
   border-top: 1px solid var(--q-primary);
-
-  @media (min-width: $breakpoint-md) {
-    background-color: rgba($color: black, $alpha: 0.5) !important;
-  }
 
   .prefix-text {
     font-size: 0.8rem;

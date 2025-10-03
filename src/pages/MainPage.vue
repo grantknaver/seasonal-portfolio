@@ -67,6 +67,11 @@ const { activeTheme, activeTopic, mobileScrollTarget } = storeToRefs(mainStore);
 const expandedPanel = ref<TopicName | null>(null);
 const headerHeight = ref<number>(0);
 
+watch(slide, (newVal) => {
+  console.log('slide', newVal);
+  mainStore.SET_ACTIVE_THEME(newVal);
+});
+
 onMounted(async () => {
   await mainStore.VERIFY_HUMANITY();
 
@@ -92,7 +97,7 @@ const handleAfterShow = async (id: TopicName) => {
 </script>
 
 <template>
-  <q-page class="page-container column fit">
+  <q-page class="page-container column">
     <div class="carousel-background">
       <q-carousel
         v-model="slide"
