@@ -99,9 +99,9 @@ watch(activeTheme, (newTheme) => {
   <section>
     <!-- Mobile -->
     <div class="mobile-view full-width q-ma-md">
-      <q-card class="package-text-container full-width">
+      <q-card class="package-container full-width column items-center q-mt-md q-pt-lg q-pb-lg">
         <q-card-section
-          class="section-container q-pa-lg"
+          class="package-header-section q-pa-lg"
           :class="
             setSeasonClasses(
               {
@@ -114,17 +114,14 @@ watch(activeTheme, (newTheme) => {
             )
           "
         >
-          <h1 class="q-mt-none text-primary">Packages</h1>
+          <h1 class="q-mt-none q-mb-md bg-primary text-accent text-center">Packages</h1>
           <q-separator color="primary" class="q-mb-md" />
-          <p>
+          <p class="text-center text-primary">
             Whether you need one polished animation, a full motion + AI upgrade, or a launch-ready
             experience, I’ve got you covered. These packages make it simple to get started — clear
             scope, fair pricing, and fast turnaround.
           </p>
         </q-card-section>
-      </q-card>
-
-      <q-card class="package-container full-width column items-center q-mt-md q-pt-lg q-pb-lg">
         <q-intersection transition="slide-up" transition-duration="1000" :once="true">
           <q-card-section
             v-for="p in packages"
@@ -137,7 +134,7 @@ watch(activeTheme, (newTheme) => {
               :separator="true"
               class="package-tile full-width q-pa-md bg-white col-6 q-mb-none no-border rounded-borders"
             >
-              <q-item class="package-name text-center text-accent q-mb-lg row justify-center">{{
+              <q-item class="package-name text-center text-accent row justify-center q-mb-md">{{
                 p.name
               }}</q-item>
 
@@ -279,23 +276,23 @@ watch(activeTheme, (newTheme) => {
     display: none;
   }
 
-  .package-text-container {
-    padding: 1rem;
-    background-color: rgba(black, 0.5);
-
-    h1 {
-      font-size: 3rem;
-      margin-bottom: 2rem;
-    }
-
-    .section-container:nth-child(1) {
-      border: solid 4px var(--primary);
-    }
-  }
-
   .package-container {
     padding: 1rem;
     background-color: rgba(black, 0.5);
+
+    .package-header-section {
+      padding: 1rem;
+      background-color: rgba(black, 0.5);
+      border-bottom-left-radius: 0;
+      border-bottom-right-radius: 0;
+      border-left: solid 8px var(--q-secondary);
+      border-right: solid 8px var(--q-secondary);
+      border-top: solid 8px var(--q-secondary);
+
+      h1 {
+        font-size: 3rem;
+      }
+    }
 
     .section-container {
       background-color: var(--q-secondary);
@@ -312,9 +309,23 @@ watch(activeTheme, (newTheme) => {
         }
 
         .cta-container {
-          img {
-            max-width: 300px;
-            height: auto;
+          .img-container {
+            width: min(100%, 300px);
+            aspect-ratio: 1 / 1; /* keeps it square */
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden; /* hides any accidental overflow */
+
+            img {
+              max-width: 100%;
+              max-height: 100%;
+              width: auto; /* don’t force 100% width */
+              height: auto; /* preserve aspect ratio */
+              object-fit: contain; /* fit entirely within the box */
+              /* remove padding from the image if you want absolute max size: */
+              /* padding: 0 !important; */
+            }
           }
         }
 
@@ -323,10 +334,6 @@ watch(activeTheme, (newTheme) => {
         }
       }
     }
-  }
-
-  .section-container {
-    border-radius: 10px;
   }
 }
 
