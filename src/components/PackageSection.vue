@@ -98,7 +98,7 @@ watch(activeTheme, (newTheme) => {
 <template>
   <section>
     <!-- Mobile -->
-    <div class="mobile-view full-width q-ma-md">
+    <!-- <div class="mobile-view full-width q-ma-md">
       <q-card class="package-container full-width column items-center q-mt-md q-pt-lg q-pb-lg">
         <q-card-section
           class="package-header-section q-pa-lg"
@@ -183,15 +183,15 @@ watch(activeTheme, (newTheme) => {
           </q-card-section>
         </q-intersection>
       </q-card>
-    </div>
+    </div> -->
 
     <!-- Desktop -->
     <div class="desktop-view full-width">
       <q-card class="full-width q-pa-sm bg-transparent">
-        <q-card-section class="section-container text-primary q-pa-lg">
-          <h1 class="q-mt-none q-mb-xl text-secondary text-center bg-dark">Packages</h1>
+        <q-card-section class="package-header-section text-primary q-pa-lg">
+          <h1 class="text-h1 text-secondary text-center bg-dark">Packages</h1>
           <q-separator color="primary" class="q-mb-md" />
-          <p class="q-mb-none">
+          <p class="text-body2 q-mb-none">
             Whether you need one polished animation, a full motion + AI upgrade, or a launch-ready
             experience, I’ve got you covered. These packages make it simple to get started — clear
             scope, fair pricing, and fast turnaround.
@@ -216,11 +216,11 @@ watch(activeTheme, (newTheme) => {
                   class="col-6 q-mb-none no-border rounded-borders"
                 >
                   <q-item
-                    ><h2 class="text-accent package-header">{{ p.name }}</h2></q-item
+                    ><h2 class="text-h2 text-accent">{{ p.name }}</h2></q-item
                   >
                   <q-item>
                     <q-item-section
-                      class="tagline q-pt-md q-pb-md"
+                      class="tagline text-body1 q-pt-md q-pb-md"
                       :class="
                         setSeasonClasses(
                           {
@@ -295,40 +295,38 @@ watch(activeTheme, (newTheme) => {
     .section-container {
       background-color: var(--q-secondary);
 
-      .package-tile {
-        .tagline {
-          font-family: 'Prata';
-          font-weight: 400; /* only one weight is available for some scripts */
-        }
+      .tagline {
+        font-family: 'Prata';
+        font-weight: 400; /* only one weight is available for some scripts */
+      }
 
-        .package-feature {
-          line-height: 1.6rem;
-        }
+      .package-feature {
+        line-height: 1.6rem;
+      }
 
-        .cta-container {
-          .img-container {
-            width: min(100%, 300px);
-            aspect-ratio: 1 / 1; /* keeps it square */
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            overflow: hidden; /* hides any accidental overflow */
+      .cta-container {
+        .img-container {
+          width: min(100%, 300px);
+          aspect-ratio: 1 / 1; /* keeps it square */
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          overflow: hidden; /* hides any accidental overflow */
 
-            img {
-              max-width: 100%;
-              max-height: 100%;
-              width: auto; /* don’t force 100% width */
-              height: auto; /* preserve aspect ratio */
-              object-fit: contain; /* fit entirely within the box */
-              /* remove padding from the image if you want absolute max size: */
-              /* padding: 0 !important; */
-            }
+          img {
+            max-width: 100%;
+            max-height: 100%;
+            width: auto; /* don’t force 100% width */
+            height: auto; /* preserve aspect ratio */
+            object-fit: contain; /* fit entirely within the box */
+            /* remove padding from the image if you want absolute max size: */
+            /* padding: 0 !important; */
           }
         }
+      }
 
-        .cost {
-          font-size: 1.4rem;
-        }
+      .cost {
+        font-size: 1.4rem;
       }
     }
   }
@@ -369,25 +367,18 @@ watch(activeTheme, (newTheme) => {
         gap: 1rem;
         align-items: center;
 
-        .package-header {
-          text-shadow: 1px 1px 2px black;
-          padding-bottom: 2rem !important;
+        .q-item {
+          padding-top: 0.5rem;
+          padding-bottom: 8px;
         }
 
-        .q-list {
-          .q-item {
-            padding-top: 0.5rem;
-            padding-bottom: 8px;
-          }
+        .tagline {
+          font-family: 'Prata';
+          font-weight: 400; /* only one weight is available for some scripts */
+        }
 
-          .tagline {
-            font-family: 'Prata';
-            font-weight: 400; /* only one weight is available for some scripts */
-          }
-
-          .cost {
-            color: #8bc34a;
-          }
+        .cost {
+          color: #8bc34a;
         }
 
         .cta-container {
