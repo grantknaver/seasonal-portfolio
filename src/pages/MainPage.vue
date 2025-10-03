@@ -307,7 +307,7 @@ const handleAfterShow = async (id: TopicName) => {
     .mobile-view {
       height: auto;
 
-      @media (min-width: $breakpoint-md) {
+      @media (min-width: $breakpoint-sm) {
         display: none;
       }
 
@@ -334,7 +334,7 @@ const handleAfterShow = async (id: TopicName) => {
     .desktop-view {
       display: none;
 
-      @media (min-width: $breakpoint-md) {
+      @media (min-width: $breakpoint-sm) {
         display: flex;
         justify-content: center;
         align-items: center;

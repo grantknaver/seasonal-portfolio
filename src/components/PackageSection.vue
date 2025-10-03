@@ -1,7 +1,7 @@
 <script lang="ts" setup>
-import { ref } from 'vue';
+import { ref, watch } from 'vue';
 import { v4 as uuidv4 } from 'uuid';
-import { themeMap } from '../shared/constants/theme';
+// import { themeMap } from '../shared/constants/theme';
 import { useMainStore } from '../stores/main';
 import { storeToRefs } from 'pinia';
 import { setSeasonClasses } from '../shared/utils/setSeasonColors';
@@ -10,11 +10,12 @@ import { type PackageDetails } from '../shared/types/packageDetails';
 
 const mainStore = useMainStore();
 const { activeTheme } = storeToRefs(mainStore);
+
 const packages = ref<PackageDetails[]>([
   {
     name: Packages.StarterPackage,
     id: uuidv4(),
-    src: new URL('../assets/starter.png', import.meta.url).href,
+    src: new URL('../assets/starter-fall.png', import.meta.url).href,
     alt: Packages.StarterPackage,
     featuresHeader: 'For new ideas ready to break ground.',
     features: [
@@ -36,7 +37,7 @@ const packages = ref<PackageDetails[]>([
   {
     name: Packages.GrowthPackage,
     id: uuidv4(),
-    src: new URL('../assets/growth.png', import.meta.url).href,
+    src: new URL('../assets/growth-fall.png', import.meta.url).href,
     alt: Packages.GrowthPackage,
     featuresHeader: 'For projects ready to scale and stand out.',
     features: [
@@ -58,7 +59,7 @@ const packages = ref<PackageDetails[]>([
   {
     name: Packages.PremiumPackage,
     id: uuidv4(),
-    src: new URL('../assets/premium.png', import.meta.url).href,
+    src: new URL('../assets/premium-fall.png', import.meta.url).href,
     alt: Packages.PremiumPackage,
     featuresHeader: 'For full bloom launches that need maximum impact.',
     features: [
@@ -79,13 +80,26 @@ const packages = ref<PackageDetails[]>([
       'The complete experience — built for high-visibility launches, investors, or agencies needing that extra wow factor.',
   },
 ]);
+
+watch(activeTheme, (newTheme) => {
+  const theme = newTheme.toLowerCase();
+  const updatedPackages = packages.value.map((p) => {
+    const name = p.name.toLowerCase().replace(' ', '').replace('package', '');
+    return {
+      ...p,
+      src: new URL(`../assets/${name}-${theme}.png`, import.meta.url).href,
+    };
+  });
+  console.log('URL should work', updatedPackages);
+  packages.value = updatedPackages;
+});
 </script>
 
 <template>
   <section>
     <!-- Mobile -->
     <div class="mobile-view full-width q-ma-md">
-      <q-card class="full-width">
+      <q-card class="package-text-container full-width">
         <q-card-section
           class="section-container q-pa-lg"
           :class="
@@ -103,21 +117,69 @@ const packages = ref<PackageDetails[]>([
           <h1 class="q-mt-none text-primary">Packages</h1>
           <q-separator color="primary" class="q-mb-md" />
           <p>
-            “Whether you need one polished animation, a full motion + AI upgrade, or a launch-ready
+            Whether you need one polished animation, a full motion + AI upgrade, or a launch-ready
             experience, I’ve got you covered. These packages make it simple to get started — clear
-            scope, fair pricing, and fast turnaround.”
+            scope, fair pricing, and fast turnaround.
           </p>
         </q-card-section>
+      </q-card>
 
-        <q-card-section
-          class="section-container q-mt-md q-pa-sm"
-          :style="{ backgroundColor: themeMap[activeTheme]['--q-primary'] }"
-        >
-          <div class="package-container column items-center q-pt-lg q-pb-lg">
-            <q-card v-for="p in packages" :key="p.id" class="cursor-pointer">
-              <img :src="p.src" :alt="p.alt" />
-            </q-card>
-          </div>
+      <q-card class="package-container full-width column items-center q-mt-md q-pt-lg q-pb-lg">
+        <q-card-section v-for="p in packages" :key="p.id" class="section-container q-pa-sm q-mb-md">
+          <q-intersection transition="slide-up" transition-duration="1000" :once="true">
+            <q-list
+              bordered
+              padding
+              :separator="true"
+              class="package-tile full-width q-pa-md bg-white col-6 q-mb-none no-border rounded-borders"
+            >
+              <q-item class="package-name text-center text-accent q-mb-lg row justify-center">{{
+                p.name
+              }}</q-item>
+
+              <q-item>
+                <q-item-section
+                  class="tagline text-center q-pt-md q-pb-md"
+                  :class="
+                    setSeasonClasses(
+                      {
+                        Fall: 'text-green-6',
+                        Winter: 'earth-orange',
+                        Spring: 'text-red-9',
+                        Summer: 'dusty-plum',
+                      },
+                      activeTheme,
+                    )
+                  "
+                >
+                  {{ p.tagline }}
+                </q-item-section>
+              </q-item>
+              <div class="cta-container column">
+                <div class="img-container column full-width items-center bg-primary">
+                  <img class="full-width q-pa-lg" :src="p.src" />
+                </div>
+                <br />
+                <q-btn size="lg" color="accent" class="q-mb-md">Consultation</q-btn>
+              </div>
+              <q-item v-for="(f, index) in p.features" :key="index">
+                <span class="row full-width q-pa-none">
+                  <q-item-section side>
+                    <q-icon name="circle" size=".5rem" class="text-dark" />
+                  </q-item-section>
+                  <q-item-section class="text-black">
+                    {{ f.text }}
+                  </q-item-section>
+                </span>
+              </q-item>
+              <q-item>
+                <q-item-section class="q-pt-md text-black">
+                  <span>Cost for Package:</span>
+                  <span class="cost text-green-6">{{ p.cost }}</span>
+                </q-item-section>
+              </q-item>
+            </q-list>
+          </q-intersection>
         </q-card-section>
       </q-card>
     </div>
@@ -129,9 +191,9 @@ const packages = ref<PackageDetails[]>([
           <h1 class="q-mt-none q-mb-xl text-secondary text-center bg-dark">Packages</h1>
           <q-separator color="primary" class="q-mb-md" />
           <p class="q-mb-none">
-            “Whether you need one polished animation, a full motion + AI upgrade, or a launch-ready
+            Whether you need one polished animation, a full motion + AI upgrade, or a launch-ready
             experience, I’ve got you covered. These packages make it simple to get started — clear
-            scope, fair pricing, and fast turnaround.”
+            scope, fair pricing, and fast turnaround.
           </p>
         </q-card-section>
 
@@ -213,126 +275,135 @@ const packages = ref<PackageDetails[]>([
     display: none;
   }
 
-  .q-card {
+  .package-text-container {
     padding: 1rem;
     background-color: rgba(black, 0.5);
-    border-top-left-radius: 10px;
-    border-top-right-radius: 10px;
 
     h1 {
       font-size: 3rem;
       margin-bottom: 2rem;
     }
 
+    .section-container:nth-child(1) {
+      border: solid 4px var(--primary);
+    }
+  }
+
+  .package-container {
+    padding: 1rem;
+    background-color: rgba(black, 0.5);
+
     .section-container {
       background-color: var(--q-secondary);
-      .project-container {
-        .project-tile {
-          width: 100%;
-          max-width: 80%;
-
-          @media (min-width: $breakpoint-sm) {
-            max-width: 300px;
-          }
-          img {
-            width: 100%;
-            height: auto;
-            transition: transform 0.3s ease;
-          }
-        }
-      }
-    }
-
-    .section-container:nth-child(1) {
-      border: solid 4px var(--q-primary);
-      border-bottom-left-radius: 10px;
-      border-bottom-right-radius: 10px;
-    }
-
-    .section-container:nth-child(2) {
-      border-radius: 10px;
-    }
-  }
-}
-
-.desktop-view {
-  display: none;
-
-  @media (min-width: $breakpoint-md) {
-    display: flex;
-  }
-
-  .q-card {
-    display: flex !important;
-    flex-direction: column;
-    flex: 1 1 0%;
-    max-width: 100%;
-    box-sizing: border-box;
-    border-radius: 10px !important;
-
-    h1 {
-      font-size: 3rem;
-      border: solid 2px var(--q-primary);
-    }
-
-    .section-container:nth-child(2) {
-      border-radius: 10px;
-    }
-
-    .package-container {
-      row-gap: 1.5rem;
-
-      @media (min-width: $breakpoint-xl) {
-        justify-content: center;
-      }
 
       .package-tile {
-        border-radius: 10px;
-        gap: 1rem;
-        align-items: center;
-
         .package-name {
-          font-size: 2rem;
-          text-shadow: 1px 1px 2px black;
-          padding-bottom: 2rem !important;
+          font-size: 2.7rem;
         }
 
-        .q-list {
-          .q-item {
-            padding-top: 0.5rem;
-            padding-bottom: 8px;
-          }
-
-          .tagline {
-            font-size: 1.2rem;
-            font-family: 'Prata';
-            font-weight: 400; /* only one weight is available for some scripts */
-          }
-
-          .cost {
-            font-size: 1.25rem;
-            color: #8bc34a;
-          }
+        .tagline {
+          font-size: 1rem;
+          font-family: 'Prata';
+          font-weight: 400; /* only one weight is available for some scripts */
         }
 
         .cta-container {
-          .img-container {
+          img {
+            max-width: 300px;
             height: auto;
-            border: solid 2px var(--q-dark);
-
-            img {
-              object-fit: contain;
-            }
-
-            .q-btn {
-              border-top: 5px solid white;
-            }
           }
+        }
+
+        .cost {
+          font-size: 1.5rem;
         }
       }
     }
   }
+
+  .section-container {
+    border-radius: 10px;
+  }
 }
+
+// .desktop-view {
+//   display: none;
+
+//   @media (min-width: $breakpoint-md) {
+//     display: flex;
+//   }
+
+//   .q-card {
+//     display: flex !important;
+//     flex-direction: column;
+//     flex: 1 1 0%;
+//     max-width: 100%;
+//     box-sizing: border-box;
+//     border-radius: 10px !important;
+
+//     h1 {
+//       font-size: 3rem;
+//       border: solid 2px var(--q-primary);
+//     }
+
+//     .section-container:nth-child(2) {
+//       border-radius: 10px;
+//     }
+
+//     .package-container {
+//       row-gap: 1.5rem;
+
+//       @media (min-width: $breakpoint-xl) {
+//         justify-content: center;
+//       }
+
+//       .package-tile {
+//         border-radius: 10px;
+//         gap: 1rem;
+//         align-items: center;
+
+//         .package-name {
+//           font-size: 2rem;
+//           text-shadow: 1px 1px 2px black;
+//           padding-bottom: 2rem !important;
+//         }
+
+//         .q-list {
+//           .q-item {
+//             padding-top: 0.5rem;
+//             padding-bottom: 8px;
+//           }
+
+//           .tagline {
+//             font-size: 1.2rem;
+//             font-family: 'Prata';
+//             font-weight: 400; /* only one weight is available for some scripts */
+//           }
+
+//           .cost {
+//             font-size: 1.25rem;
+//             color: #8bc34a;
+//           }
+//         }
+
+//         .cta-container {
+//           .img-container {
+//             height: auto;
+//             border: solid 2px var(--q-dark);
+
+//             img {
+//               object-fit: contain;
+//             }
+
+//             .q-btn {
+//               border-top: 5px solid white;
+//             }
+//           }
+//         }
+//       }
+//     }
+//   }
+// }
 
 .earth-orange {
   color: #d78c3b;
