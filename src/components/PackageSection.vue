@@ -125,8 +125,12 @@ watch(activeTheme, (newTheme) => {
       </q-card>
 
       <q-card class="package-container full-width column items-center q-mt-md q-pt-lg q-pb-lg">
-        <q-card-section v-for="p in packages" :key="p.id" class="section-container q-pa-sm q-mb-md">
-          <q-intersection transition="slide-up" transition-duration="1000" :once="true">
+        <q-intersection transition="slide-up" transition-duration="1000" :once="true">
+          <q-card-section
+            v-for="p in packages"
+            :key="p.id"
+            class="section-container q-pa-sm q-mb-md"
+          >
             <q-list
               bordered
               padding
@@ -179,8 +183,8 @@ watch(activeTheme, (newTheme) => {
                 </q-item-section>
               </q-item>
             </q-list>
-          </q-intersection>
-        </q-card-section>
+          </q-card-section>
+        </q-intersection>
       </q-card>
     </div>
 
