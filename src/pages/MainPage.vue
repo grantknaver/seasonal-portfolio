@@ -18,7 +18,7 @@ import { Theme } from '../shared/constants/theme';
 import WeatherBackground from '../components/WeatherBackground.vue';
 
 const mainStore = useMainStore();
-const topics: Topic[] = [
+const mobileTopics: Topic[] = [
   { id: uuidv4(), name: TopicName.Packages, icon: 'local_shipping', label: 'Packages' },
   {
     id: uuidv4(),
@@ -128,7 +128,7 @@ const handleAfterShow = async (id: TopicName) => {
       >
     </div>
     <div class="sub-container column">
-      <section class="mobile-view full-width">
+      <section class="mobile-view full-width q-pa-md">
         <div inline-actions class="text-primary bg-accent q-mb-sm">
           <span>
             <p class="q-ma-none text-primary bounce-text">Grant Knaver</p>
@@ -148,7 +148,7 @@ const handleAfterShow = async (id: TopicName) => {
 
         <q-list padding class="full-width q-pa-none">
           <q-item
-            v-for="topic in topics.slice(1)"
+            v-for="topic in mobileTopics.filter((topic) => topic.name !== TopicName.Contact)"
             :key="topic.id"
             :name="topic.name"
             v-model="expandedPanel"
@@ -171,9 +171,9 @@ const handleAfterShow = async (id: TopicName) => {
               class="expansion-item full-width"
               @after-show="() => handleAfterShow(topic.name)"
             >
-              <template v-if="topic.name === TopicName.About">
+              <template v-if="topic.name === TopicName.Packages">
                 <div :id="topic.name" class="full-width">
-                  <AboutSection />
+                  <PackageSection />
                 </div>
               </template>
               <template v-if="topic.name === TopicName.CaseStudies">
@@ -181,9 +181,9 @@ const handleAfterShow = async (id: TopicName) => {
                   <CaseStudiesSection />
                 </div>
               </template>
-              <template v-if="topic.name === TopicName.Packages">
-                <div :id="topic.name" class="anchor full-width">
-                  <PackageSection></PackageSection>
+              <template v-if="topic.name === TopicName.About">
+                <div :id="topic.name" class="full-width">
+                  <AboutSection />
                 </div>
               </template>
             </q-expansion-item>
