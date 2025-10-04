@@ -90,7 +90,6 @@ watch(activeTheme, (newTheme) => {
       src: new URL(`../assets/${name}-${theme}.png`, import.meta.url).href,
     };
   });
-  console.log('URL should work', updatedPackages);
   packages.value = updatedPackages;
 });
 </script>
@@ -114,7 +113,7 @@ watch(activeTheme, (newTheme) => {
             )
           "
         >
-          <h1 class="text-h1 q-mt-none q-mb-md bg-primary text-accent text-center">Packages</h1>
+          <h1 class="text-h1-alt q-mt-none q-mb-md bg-primary text-accent text-center">Packages</h1>
           <q-separator color="primary" class="q-mb-md" />
           <p class="text-body1 text-center text-primary">
             Whether you need one polished animation, a full motion + AI upgrade, or a launch-ready
@@ -196,7 +195,7 @@ watch(activeTheme, (newTheme) => {
           scope, fair pricing, and fast turnaround.
         </p>
       </div>
-      <div class="test column items-center full-width">
+      <div class="q-gutter-y-md column items-center full-width">
         <q-intersection
           v-for="p in packages"
           :key="p.id"
@@ -391,10 +390,6 @@ watch(activeTheme, (newTheme) => {
       }
     }
   }
-}
-
-.test {
-  row-gap: 1.5rem;
 }
 
 .earth-orange {
