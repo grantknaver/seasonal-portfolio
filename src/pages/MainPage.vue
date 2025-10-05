@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref, nextTick, watch, onMounted } from 'vue';
+import { ref, watch, onMounted } from 'vue';
 import { useMainStore } from '../stores/main';
 import { type Topic } from '../shared/types/topic';
 import { v4 as uuidv4 } from 'uuid';
@@ -8,7 +8,7 @@ import { TopicName } from '../shared/constants/topicName';
 import AboutSection from '../components/AboutSection.vue';
 import ContactSection from '../components/ContactSection.vue';
 import PackageSection from '../components/PackageSection.vue';
-import { scrollToElement } from '../shared/utils/scrollToElement';
+// import { scrollToElement } from '../shared/utils/scrollToElement';
 import { setSeasonClasses } from '../shared/utils/setSeasonColors';
 import SimonMenu from '../components/SimonMenu.vue';
 import CaseStudiesSection from 'src/components/CaseStudiesSection.vue';
@@ -90,10 +90,10 @@ watch(activeTopic, (newTopic: TopicName | null) => {
   expandedPanel.value = newTopic;
 });
 
-const handleAfterShow = async (id: TopicName) => {
-  await nextTick();
-  scrollToElement(id);
-};
+// const handleAfterShow = async (id: TopicName) => {
+//   await nextTick();
+//   scrollToElement(id);
+// };
 </script>
 
 <template>
@@ -169,7 +169,6 @@ const handleAfterShow = async (id: TopicName) => {
               "
               :header-class="['text-dark', 'bg-secondary']"
               class="expansion-item full-width"
-              @after-show="() => handleAfterShow(topic.name)"
             >
               <template v-if="topic.name === TopicName.Packages">
                 <div :id="topic.name" class="full-width">

@@ -7,7 +7,6 @@ export interface PackageDetails {
   alt: Packages;
   featuresHeader: string;
   features: FeatureIcon[];
-  cost: string;
   tagline: string;
 }
 

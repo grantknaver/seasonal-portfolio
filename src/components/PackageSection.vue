@@ -31,7 +31,6 @@ const packages = ref<PackageDetails[]>([
         text: 'Ideal for: landing pages, small teams, creators testing a concept',
       },
     ],
-    cost: '$2K–$3K',
     tagline: 'Your first step toward a more engaging, modern experience.',
   },
   {
@@ -53,7 +52,6 @@ const packages = ref<PackageDetails[]>([
       { featureIcon: 'description', text: 'Case-study style wrap-up you can share' },
       { featureIcon: 'event', text: 'Delivered in 3–4 weeks' },
     ],
-    cost: '$4K–$6K',
     tagline: 'Perfect for startups moving from MVP to a polished product launch.',
   },
   {
@@ -75,7 +73,6 @@ const packages = ref<PackageDetails[]>([
       { featureIcon: 'support_agent', text: 'Optional ongoing support after delivery' },
       { featureIcon: 'calendar_month', text: 'Delivered in 4–6 weeks' },
     ],
-    cost: '$7K–$10K',
     tagline:
       'The complete experience — built for high-visibility launches, investors, or agencies needing that extra wow factor.',
   },
@@ -97,23 +94,38 @@ watch(activeTheme, (newTheme) => {
 <template>
   <section>
     <!-- Mobile -->
-    <div class="mobile-view full-width q-ma-md">
-      <q-card class="package-container full-width column items-center q-mt-md q-pt-lg q-pb-lg">
+    <div class="mobile-view full-width column items-center q-gutter-y-md">
+      <q-card class="full-width column items-center">
         <q-card-section
-          class="package-header-section full-width q-pa-lg"
+          class="package-header-section full-width q-pa-lg text-primary"
           :class="
             setSeasonClasses(
               {
-                Fall: 'bg-accent text-primary',
-                Winter: 'bg-accent text-primary',
-                Spring: 'bg-accent text-primary',
-                Summer: 'bg-dark text-primary',
+                Fall: 'bg-accent ',
+                Winter: 'bg-accent',
+                Spring: 'bg-accent ',
+                Summer: 'bg-dark ',
               },
               activeTheme,
             )
           "
         >
-          <h1 class="text-h1-alt q-mt-none q-mb-md bg-primary text-accent text-center">Packages</h1>
+          <h1
+            class="text-h1-alt q-mt-none q-mb-md bg-white text-center"
+            :class="
+              setSeasonClasses(
+                {
+                  Fall: 'text-accent',
+                  Winter: 'text-accent',
+                  Spring: 'text-accent',
+                  Summer: 'text-dark',
+                },
+                activeTheme,
+              )
+            "
+          >
+            Packages
+          </h1>
           <q-separator color="primary" class="q-mb-md" />
           <p class="text-body1 text-center text-primary">
             Whether you need one polished animation, a full motion + AI upgrade, or a launch-ready
@@ -121,40 +133,66 @@ watch(activeTheme, (newTheme) => {
             scope, fair pricing, and fast turnaround.
           </p>
         </q-card-section>
-        <q-intersection transition="slide-up" transition-duration="1000" :once="true">
-          <q-card-section
-            v-for="p in packages"
-            :key="p.id"
-            class="section-container column q-pa-sm q-mb-md bg-green"
+
+        <q-card-section class="section-container column">
+          <div
+            bordered
+            padding
+            :separator="true"
+            class="package-tile full-width q-pa-md bg-white col-6 q-mb-none no-border rounded-borders"
           >
-            <q-list
-              bordered
-              padding
-              :separator="true"
+            <div class="h2-container row justify-center q-mb-lg text-center bg-accent text-white">
+              <h2 class="text-h2">{{ packages[0]?.name }}</h2>
+            </div>
+
+            <div class="tagline-container bg-dark q-pa-lg">
+              <p class="text-body2 text-center text-primary q-ma-none">
+                {{ packages[0]?.tagline }}
+              </p>
+            </div>
+            <div class="cta-container column">
+              <div class="img-container column full-width items-center bg-primary">
+                <img class="full-width q-pa-lg" :src="packages[0]?.src" />
+              </div>
+              <br />
+              <q-btn size="lg" color="accent" class="q-mb-md">Consultation</q-btn>
+            </div>
+            <q-item v-for="(f, index) in packages[0]?.features" :key="index">
+              <span class="row full-width q-pa-none">
+                <q-item-section side>
+                  <q-icon name="circle" size=".5rem" class="text-dark" />
+                </q-item-section>
+                <q-item-section class="package-feature text-body2 text-black">
+                  {{ f.text }}
+                </q-item-section>
+              </span>
+            </q-item>
+          </div>
+        </q-card-section>
+      </q-card>
+      <q-intersection
+        v-for="p in packages.slice(1)"
+        :key="p.id"
+        transition="slide-up"
+        transition-duration="1500"
+        :once="true"
+        class="q-card-container"
+      >
+        <q-card class="full-width column items-center">
+          <q-card-section class="section-container column">
+            <div
               class="package-tile full-width q-pa-md bg-white col-6 q-mb-none no-border rounded-borders"
             >
-              <q-item class="row justify-center q-mb-lg text-center text-accent">
+              <div class="h2-container row justify-center q-mb-lg text-center bg-accent text-white">
                 <h2 class="text-h2">{{ p.name }}</h2>
-              </q-item>
+              </div>
 
-              <q-item>
-                <q-item-section
-                  class="tagline text-body2 text-center q-pt-md q-pb-md"
-                  :class="
-                    setSeasonClasses(
-                      {
-                        Fall: 'text-green-6',
-                        Winter: 'earth-orange',
-                        Spring: 'text-red-9',
-                        Summer: 'dusty-plum',
-                      },
-                      activeTheme,
-                    )
-                  "
-                >
+              <div class="tagline-container bg-dark q-pa-lg">
+                <p class="text-body2 text-center text-primary q-ma-none">
                   {{ p.tagline }}
-                </q-item-section>
-              </q-item>
+                </p>
+              </div>
+
               <div class="cta-container column">
                 <div class="img-container column full-width items-center bg-primary">
                   <img class="full-width q-pa-lg" :src="p.src" />
@@ -162,31 +200,27 @@ watch(activeTheme, (newTheme) => {
                 <br />
                 <q-btn size="lg" color="accent" class="q-mb-md">Consultation</q-btn>
               </div>
-              <q-item v-for="(f, index) in p.features" :key="index">
-                <span class="row full-width q-pa-none">
-                  <q-item-section side>
-                    <q-icon name="circle" size=".5rem" class="text-dark" />
-                  </q-item-section>
-                  <q-item-section class="package-feature text-body2 text-black">
-                    {{ f.text }}
-                  </q-item-section>
-                </span>
-              </q-item>
-              <q-item>
-                <q-item-section class="q-pt-md text-black">
-                  <span class="text-body2">Cost for Package:</span>
-                  <span class="cost text-green-6">{{ p.cost }}</span>
-                </q-item-section>
-              </q-item>
-            </q-list>
+              <q-list>
+                <q-item v-for="(f, index) in p.features" :key="index">
+                  <span class="row full-width q-pa-none">
+                    <q-item-section side>
+                      <q-icon name="circle" size=".5rem" class="text-dark" />
+                    </q-item-section>
+                    <q-item-section class="package-feature text-body2 text-black">
+                      {{ f.text }}
+                    </q-item-section>
+                  </span>
+                </q-item>
+              </q-list>
+            </div>
           </q-card-section>
-        </q-intersection>
-      </q-card>
+        </q-card></q-intersection
+      >
     </div>
 
     <!-- Desktop -->
     <div class="desktop-view full-width column items-center">
-      <div class="package-header-section full-width text-primary q-pa-lg">
+      <div class="full-width text-primary q-pa-lg">
         <h1 class="text-h1 text-secondary text-center bg-dark">Packages</h1>
         <q-separator color="primary" class="q-mb-md" />
         <p class="text-body2 text-center q-mb-none">
@@ -195,7 +229,7 @@ watch(activeTheme, (newTheme) => {
           scope, fair pricing, and fast turnaround.
         </p>
       </div>
-      <div class="q-gutter-y-md column items-center full-width">
+      <div class="column items-center q-gutter-y-md full-width">
         <q-intersection
           v-for="p in packages"
           :key="p.id"
@@ -262,53 +296,48 @@ watch(activeTheme, (newTheme) => {
     display: none;
   }
 
-  .package-container {
-    border: solid 4px var(--q-accent);
+  .package-header-section {
+    padding: 1rem;
+    background-color: rgba(black, 0.5);
+    border-bottom-left-radius: 0;
+    border-bottom-right-radius: 0;
 
-    .package-header-section {
-      padding: 1rem;
-      background-color: rgba(black, 0.5);
-      border-bottom-left-radius: 0;
-      border-bottom-right-radius: 0;
-      border-left: solid 8px var(--q-secondary);
-      border-right: solid 8px var(--q-secondary);
-      border-top: solid 8px var(--q-secondary);
+    h1 {
+      border: solid 2px var(--q-dark);
+    }
+  }
+
+  .section-container {
+    background-color: var(--q-secondary);
+
+    .h2-container {
+      border: solid 2px var(--q-dark);
     }
 
-    .section-container {
-      background-color: var(--q-secondary);
-      border: solid 4px var(--q-accent);
-
-      .tagline {
-        font-weight: 400; /* only one weight is available for some scripts */
-      }
-
-      .package-feature {
-        line-height: 1.6rem;
-      }
-
-      .cost {
-        font-size: 1.4rem;
-      }
+    .tagline-container {
+      border-bottom: 4px solid white;
+      font-weight: 400; /* only one weight is available for some scripts */
     }
 
-    .img-container {
-      width: min(100%, 300px);
-      aspect-ratio: 1 / 1; /* keeps it square */
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      overflow: hidden; /* hides any accidental overflow */
+    .package-feature {
+      line-height: 1.6rem;
+    }
+  }
 
-      img {
-        max-width: 100%;
-        max-height: 100%;
-        width: auto; /* don’t force 100% width */
-        height: auto; /* preserve aspect ratio */
-        object-fit: contain; /* fit entirely within the box */
-        /* remove padding from the image if you want absolute max size: */
-        /* padding: 0 !important; */
-      }
+  .img-container {
+    width: min(100%, 300px);
+    aspect-ratio: 1 / 1; /* keeps it square */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden; /* hides any accidental overflow */
+
+    img {
+      max-width: 100%;
+      max-height: 100%;
+      width: auto; /* don’t force 100% width */
+      height: auto; /* preserve aspect ratio */
+      object-fit: contain; /* fit entirely within the box */
     }
   }
 }
@@ -325,7 +354,7 @@ watch(activeTheme, (newTheme) => {
   }
 
   .q-card-container {
-    width: 75%;
+    width: 70%;
     box-shadow: 1rem 1rem 1rem dark;
 
     .q-card {
