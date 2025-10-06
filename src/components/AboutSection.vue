@@ -1,11 +1,11 @@
 <script lang="ts" setup>
-// import { ref } from 'vue';
+import { ref } from 'vue';
 import { v4 as uuidv4 } from 'uuid';
 import { setSeasonClasses } from 'src/shared/utils/setSeasonColors';
 import { useMainStore } from '../stores/main';
 import { storeToRefs } from 'pinia';
 import { type AboutBulletPoints } from 'src/shared/types/aboutBulletPoints';
-import { ref } from 'vue';
+
 const mainStore = useMainStore();
 const { activeTheme } = storeToRefs(mainStore);
 const generalBullets = ref<AboutBulletPoints[]>([
@@ -72,18 +72,18 @@ const whyClientsBullets = ref<AboutBulletPoints[]>([
 
 <template>
   <section>
-    <div class="mobile-view full-width">
+    <div class="mobile-view column q-gutter-y-md">
       <q-card class="full-width">
         <q-card-section class="section-container q-pa-lg">
           <h1
-            class="q-mt-none q-mb-xl text-center"
+            class="text-h1-alt q-mt-none q-mb-md bg-white text-center"
             :class="
               setSeasonClasses(
                 {
-                  Fall: 'text-secondary',
-                  Winter: 'text-secondary',
-                  Spring: 'text-secondary',
-                  Summer: 'text-accent',
+                  Fall: 'text-accent',
+                  Winter: 'text-accent',
+                  Spring: 'text-accent',
+                  Summer: 'text-dark',
                 },
                 activeTheme,
               )
@@ -92,20 +92,33 @@ const whyClientsBullets = ref<AboutBulletPoints[]>([
             About Me
           </h1>
           <q-separator color="primary" class="q-mb-md" />
-          <p class="text-primary q-mb-none">
-            I’m Grant, a frontend engineer and creative problem-solver. For the past 7+ years, I’ve
-            worked at the intersection of design, code, and storytelling — helping companies and
-            creators bring their ideas to life on the web.
-          </p>
           <p
-            class="q-pt-lg"
+            class="text-body1"
             :class="
               setSeasonClasses(
                 {
                   Fall: 'text-primary',
                   Winter: 'text-primary',
-                  Spring: 'text-primary',
-                  Summer: 'text-accent',
+                  Spring: 'text-dark',
+                  Summer: 'text-dark',
+                },
+                activeTheme,
+              )
+            "
+          >
+            I’m Grant, a frontend engineer and creative problem-solver. For the past 7+ years, I’ve
+            worked at the intersection of design, code, and storytelling — helping companies and
+            creators bring their ideas to life on the web.
+          </p>
+          <p
+            class="text-body1 q-mb-none"
+            :class="
+              setSeasonClasses(
+                {
+                  Fall: 'text-primary',
+                  Winter: 'text-primary',
+                  Spring: 'text-dark',
+                  Summer: 'text-dark',
                 },
                 activeTheme,
               )
@@ -122,7 +135,7 @@ const whyClientsBullets = ref<AboutBulletPoints[]>([
               expand-separator
               :label="bullet.label"
             >
-              <q-expansion-item group="aboutMe" header-class="bg-dark">
+              <q-expansion-item group="aboutMe" header-class="bg-primary">
                 <template v-slot:header>
                   <q-item-section avatar>
                     <q-avatar>
@@ -133,11 +146,9 @@ const whyClientsBullets = ref<AboutBulletPoints[]>([
                   <q-item-section> {{ bullet.label }} </q-item-section>
                 </template>
 
-                <q-card>
-                  <q-card-section>
-                    Lorem ipsum dolor sit amet, consectetur adipisicing elit. Quidem, eius
-                    reprehenderit eos corrupti commodi magni quaerat ex numquam, dolorum officiis
-                    modi facere maiores architecto suscipit iste eveniet doloribus ullam aliquid.
+                <q-card class="bg-dark">
+                  <q-card-section class="text-primary">
+                    {{ bullet.text }}
                   </q-card-section>
                 </q-card>
               </q-expansion-item>
@@ -145,40 +156,75 @@ const whyClientsBullets = ref<AboutBulletPoints[]>([
             </div>
           </q-list>
 
-          <p>
-            I’ve built tools for industries as diverse as healthcare, publishing, and SaaS — and
-            I’ve learned that whether you’re a startup founder or a creative team, you need more
-            than just a functioning app. You need an experience that stands out.
-          </p>
-        </q-card-section>
-        <q-card-section class="section-container q-pa-lg">
-          <h2
-            class="q-mt-none q-mb-xl text-center"
+          <p
+            class="q-mt-lg text-body1"
             :class="
               setSeasonClasses(
                 {
-                  Fall: 'text-secondary',
-                  Winter: 'text-secondary',
-                  Spring: 'text-secondary',
-                  Summer: 'text-accent',
+                  Fall: 'text-primary',
+                  Winter: 'text-primary',
+                  Spring: 'text-dark',
+                  Summer: 'text-dark',
                 },
                 activeTheme,
               )
             "
           >
-            🌱 My Approach
-          </h2>
+            I’ve built tools for industries as diverse as healthcare, publishing, and SaaS — and
+            I’ve learned that whether you’re a startup founder or a creative team, you need more
+            than just a functioning app. You need an experience that stands out.
+          </p>
+        </q-card-section>
+      </q-card>
+      <q-card class="full-width">
+        <q-card-section class="section-container q-pa-lg">
+          <div class="h2-container row justify-center q-mb-lg text-center bg-white text-white">
+            <h2
+              class="text-h2-alt"
+              :class="
+                setSeasonClasses(
+                  {
+                    Fall: 'text-accent',
+                    Winter: 'text-accent',
+                    Spring: 'text-accent',
+                    Summer: 'text-dark',
+                  },
+                  activeTheme,
+                )
+              "
+            >
+              My Approach
+            </h2>
+          </div>
           <q-separator color="primary" class="q-mb-md" />
-          <p class="text-primary q-mb-none">
+          <p
+            class="q-mb-none text-body1"
+            :class="
+              setSeasonClasses(
+                {
+                  Fall: 'text-primary',
+                  Winter: 'text-primary',
+                  Spring: 'text-dark',
+                  Summer: 'text-dark',
+                },
+                activeTheme,
+              )
+            "
+          >
             Before I dive into code, I focus on understanding the vision behind the project. Every
             product has a story, and my role is to translate that story into an interface that feels
             intuitive, engaging, and alive.
           </p>
           <br />
           <q-separator></q-separator>
-          <q-list bordered class="bg-primary">
+          <q-list bordered>
             <div v-for="bullet in myApproachBullets" :key="bullet.id" :name="bullet.id">
-              <q-expansion-item expand-separator :label="bullet.label" group="myApproach">
+              <q-expansion-item
+                expand-separator
+                :label="bullet.label"
+                group="myApproach"
+                header-class="bg-primary"
+              >
                 <template v-slot:header>
                   <q-item-section avatar>
                     <q-avatar>
@@ -189,8 +235,8 @@ const whyClientsBullets = ref<AboutBulletPoints[]>([
                   <q-item-section> {{ bullet.label }} </q-item-section>
                 </template>
 
-                <q-card>
-                  <q-card-section>
+                <q-card class="bg-dark">
+                  <q-card-section class="text-primary">
                     {{ bullet.text }}
                   </q-card-section>
                 </q-card>
@@ -199,32 +245,49 @@ const whyClientsBullets = ref<AboutBulletPoints[]>([
             </div>
           </q-list>
         </q-card-section>
+      </q-card>
+      <q-card class="full-width">
         <q-card-section class="section-container q-pa-lg">
-          <h2
-            class="q-mt-none q-mb-xl text-center"
+          <div class="h2-container row justify-center q-mb-lg text-center bg-white text-white">
+            <h2
+              class="text-h2-alt"
+              :class="
+                setSeasonClasses(
+                  {
+                    Fall: 'text-accent',
+                    Winter: 'text-accent',
+                    Spring: 'text-accent',
+                    Summer: 'text-dark',
+                  },
+                  activeTheme,
+                )
+              "
+            >
+              Why Clients Work With Me
+            </h2>
+          </div>
+          <q-separator color="primary" class="q-mb-md" />
+          <p
+            class="q-mb-none text-body1"
             :class="
               setSeasonClasses(
                 {
-                  Fall: 'text-secondary',
-                  Winter: 'text-secondary',
-                  Spring: 'text-secondary',
-                  Summer: 'text-accent',
+                  Fall: 'text-primary',
+                  Winter: 'text-primary',
+                  Spring: 'text-dark',
+                  Summer: 'text-dark',
                 },
                 activeTheme,
               )
             "
           >
-            ✨ Why Clients Work With Me
-          </h2>
-          <q-separator color="primary" class="q-mb-md" />
-          <p class="text-primary q-mb-none">
             I know you’re not just looking for code — you’re looking for results. My clients come to
             me when they want their projects to stand out, attract attention, and deliver value
             quickly.
           </p>
           <br />
           <q-separator></q-separator>
-          <q-list bordered class="bg-primary">
+          <q-list bordered>
             <q-expansion-item
               v-for="bullet in whyClientsBullets"
               :key="bullet.id"
@@ -232,6 +295,7 @@ const whyClientsBullets = ref<AboutBulletPoints[]>([
               expand-separator
               :label="bullet.label"
               group="whyClientsWorkWithMe"
+              header-class="bg-primary"
             >
               <template v-slot:header>
                 <q-item-section avatar>
@@ -243,8 +307,8 @@ const whyClientsBullets = ref<AboutBulletPoints[]>([
                 <q-item-section> {{ bullet.label }} </q-item-section>
               </template>
 
-              <q-card>
-                <q-card-section>
+              <q-card class="bg-dark">
+                <q-card-section class="text-primary">
                   {{ bullet.text }}
                 </q-card-section>
               </q-card>
@@ -258,14 +322,14 @@ const whyClientsBullets = ref<AboutBulletPoints[]>([
       <q-card class="full-width q-pa-sm">
         <q-card-section class="section-container q-pa-lg">
           <h1
-            class="q-mt-none q-mb-xl text-center bg-dark"
+            class="text-h1 q-mt-none text-center bg-white"
             :class="
               setSeasonClasses(
                 {
-                  Fall: 'text-secondary',
-                  Winter: 'text-secondary',
-                  Spring: 'text-primary',
-                  Summer: 'text-primary',
+                  Fall: 'text-accent',
+                  Winter: 'text-accent',
+                  Spring: 'text-accent',
+                  Summer: 'text-dark',
                 },
                 activeTheme,
               )
@@ -274,13 +338,13 @@ const whyClientsBullets = ref<AboutBulletPoints[]>([
             About Me
           </h1>
           <q-separator color="primary" class="q-mb-md" />
-          <p class="text-primary q-mb-none">
+          <p class="text-body2 text-primary q-mb-none">
             I’m Grant, a frontend engineer and creative problem-solver. For the past 7+ years, I’ve
             worked at the intersection of design, code, and storytelling — helping companies and
             creators bring their ideas to life on the web.
           </p>
           <p
-            class="q-pt-lg q-mb-none"
+            class="q-pt-lg text-body2 q-mb-none"
             :class="
               setSeasonClasses(
                 {
@@ -297,7 +361,7 @@ const whyClientsBullets = ref<AboutBulletPoints[]>([
           </p>
           <br />
           <q-separator></q-separator>
-          <q-list bordered class="bg-primary">
+          <q-list bordered>
             <div
               v-for="bullet in generalBullets"
               :key="bullet.id"
@@ -305,7 +369,7 @@ const whyClientsBullets = ref<AboutBulletPoints[]>([
               expand-separator
               :label="bullet.label"
             >
-              <q-expansion-item group="aboutMe" header-class="bg-dark text-primary">
+              <q-expansion-item group="aboutMe" header-class="bg-primary text-dark">
                 <template v-slot:header>
                   <q-item-section avatar>
                     <q-avatar>
@@ -316,9 +380,9 @@ const whyClientsBullets = ref<AboutBulletPoints[]>([
                   <q-item-section> {{ bullet.label }}</q-item-section>
                 </template>
 
-                <q-card>
+                <q-card class="bg-white">
                   <q-card-section>
-                    <p class="text-dark">{{ bullet.text }}</p>
+                    <p>{{ bullet.text }}</p>
                   </q-card-section>
                 </q-card>
               </q-expansion-item>
@@ -326,7 +390,7 @@ const whyClientsBullets = ref<AboutBulletPoints[]>([
             </div>
           </q-list>
           <br />
-          <p class="q-mb-none text-primary">
+          <p class="text-body2 q-mb-none text-primary">
             I’ve built tools for industries as diverse as healthcare, publishing, and SaaS — and
             I’ve learned that whether you’re a startup founder or a creative team, you need more
             than just a functioning app. You need an experience that stands out.
@@ -334,14 +398,14 @@ const whyClientsBullets = ref<AboutBulletPoints[]>([
         </q-card-section>
         <q-card-section class="section-container q-pa-lg">
           <h2
-            class="q-mt-none q-mb-xl text-center"
+            class="text-h2 q-mt-none q-pt-md q-pb-md text-secondary text-center bg-white"
             :class="
               setSeasonClasses(
                 {
-                  Fall: 'text-secondary',
-                  Winter: 'text-secondary',
-                  Spring: 'text-secondary',
-                  Summer: 'text-accent',
+                  Fall: 'text-accent',
+                  Winter: 'text-accent',
+                  Spring: 'text-accent',
+                  Summer: 'text-dark',
                 },
                 activeTheme,
               )
@@ -350,20 +414,20 @@ const whyClientsBullets = ref<AboutBulletPoints[]>([
             My Approach
           </h2>
           <q-separator color="primary" class="q-mb-md" />
-          <p class="text-primary q-mb-none">
+          <p class="text-body2 text-primary q-mb-none">
             Before I dive into code, I focus on understanding the vision behind the project. Every
             product has a story, and my role is to translate that story into an interface that feels
             intuitive, engaging, and alive.
           </p>
           <br />
           <q-separator></q-separator>
-          <q-list bordered class="bg-primary">
+          <q-list bordered>
             <div v-for="bullet in myApproachBullets" :key="bullet.id" :name="bullet.id">
               <q-expansion-item
                 expand-separator
                 :label="bullet.label"
                 group="myApproach"
-                header-class="bg-dark text-primary"
+                header-class="bg-primary text-dark"
               >
                 <template v-slot:header>
                   <q-item-section avatar>
@@ -375,9 +439,9 @@ const whyClientsBullets = ref<AboutBulletPoints[]>([
                   <q-item-section> {{ bullet.label }} </q-item-section>
                 </template>
 
-                <q-card>
+                <q-card class="bg-white">
                   <q-card-section>
-                    <p class="text-dark">{{ bullet.text }}</p>
+                    <p>{{ bullet.text }}</p>
                   </q-card-section>
                 </q-card>
               </q-expansion-item>
@@ -387,14 +451,14 @@ const whyClientsBullets = ref<AboutBulletPoints[]>([
         </q-card-section>
         <q-card-section class="section-container q-pa-lg">
           <h2
-            class="q-mt-none q-mb-xl text-center"
+            class="text-h2 q-mt-none q-pt-md q-pb-md text-secondary text-center bg-white"
             :class="
               setSeasonClasses(
                 {
-                  Fall: 'text-secondary',
-                  Winter: 'text-secondary',
-                  Spring: 'text-secondary',
-                  Summer: 'text-accent',
+                  Fall: 'text-accent',
+                  Winter: 'text-accent',
+                  Spring: 'text-accent',
+                  Summer: 'text-dark',
                 },
                 activeTheme,
               )
@@ -403,20 +467,20 @@ const whyClientsBullets = ref<AboutBulletPoints[]>([
             Why Clients Work With Me
           </h2>
           <q-separator color="primary" class="q-mb-md" />
-          <p class="text-primary q-mb-none">
+          <p class="text-body2 text-primary q-mb-none">
             I know you’re not just looking for code — you’re looking for results. My clients come to
             me when they want their projects to stand out, attract attention, and deliver value
             quickly.
           </p>
           <br />
           <q-separator></q-separator>
-          <q-list bordered class="bg-primary">
+          <q-list bordered>
             <div v-for="bullet in whyClientsBullets" :key="bullet.id" :name="bullet.id">
               <q-expansion-item
                 expand-separator
                 :label="bullet.label"
                 group="whyClientsWorkForMe"
-                header-class="bg-dark text-primary"
+                header-class="bg-primary text-dark"
               >
                 <template v-slot:header>
                   <q-item-section avatar>
@@ -428,7 +492,7 @@ const whyClientsBullets = ref<AboutBulletPoints[]>([
                   <q-item-section> {{ bullet.label }} </q-item-section>
                 </template>
 
-                <q-card>
+                <q-card class="bg-white">
                   <q-card-section>
                     <p class="text-dark">{{ bullet.text }}</p>
                   </q-card-section>
@@ -463,16 +527,14 @@ $winter-mobile-background: map-get($winter-theme, primary);
       border-radius: 10px;
 
       h1 {
-        font-size: 3rem;
-        margin-bottom: 2rem;
+        border: solid 2px var(--q-dark);
       }
 
-      h2 {
-        font-size: 2rem;
+      .h2-container {
+        border: solid 2px var(--q-dark);
       }
 
       p {
-        font-size: 1rem;
         line-height: 1.4rem;
 
         .name {
@@ -512,16 +574,11 @@ $winter-mobile-background: map-get($winter-theme, primary);
 
     .section-container {
       h1 {
-        font-size: 3rem;
-        border: solid 2px var(--q-primary);
+        border: solid 2px var(--q-dark);
       }
 
       h2 {
-        font-size: 3rem;
-      }
-
-      h2:nth-child(2) {
-        font-size: 2.5rem;
+        border: solid 2px var(--q-dark);
       }
 
       .bulletContent {

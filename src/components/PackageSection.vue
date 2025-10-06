@@ -1,7 +1,6 @@
 <script lang="ts" setup>
 import { ref, watch } from 'vue';
 import { v4 as uuidv4 } from 'uuid';
-// import { themeMap } from '../shared/constants/theme';
 import { useMainStore } from '../stores/main';
 import { storeToRefs } from 'pinia';
 import { setSeasonClasses } from '../shared/utils/setSeasonColors';
@@ -127,7 +126,7 @@ watch(activeTheme, (newTheme) => {
             Packages
           </h1>
           <q-separator color="primary" class="q-mb-md" />
-          <p class="text-body1 text-center text-primary">
+          <p class="text-body1 text-center text-primary text-weight-bold">
             Whether you need one polished animation, a full motion + AI upgrade, or a launch-ready
             experience, I’ve got you covered. These packages make it simple to get started — clear
             scope, fair pricing, and fast turnaround.
@@ -220,69 +219,71 @@ watch(activeTheme, (newTheme) => {
 
     <!-- Desktop -->
     <div class="desktop-view full-width column items-center">
-      <div class="full-width text-primary q-pa-lg">
-        <h1 class="text-h1 text-secondary text-center bg-dark">Packages</h1>
-        <q-separator color="primary" class="q-mb-md" />
-        <p class="text-body2 text-center q-mb-none">
-          Whether you need one polished animation, a full motion + AI upgrade, or a launch-ready
-          experience, I’ve got you covered. These packages make it simple to get started — clear
-          scope, fair pricing, and fast turnaround.
-        </p>
-      </div>
-      <div class="column items-center q-gutter-y-md full-width">
-        <q-intersection
-          v-for="p in packages"
-          :key="p.id"
-          transition="slide-up"
-          transition-duration="1500"
-          :once="true"
-          class="q-card-container"
-        >
-          <q-card class="bg-dark">
-            <q-card-section class="section-container">
-              <div class="package-tile q-pa-md bg-white">
-                <q-expansion-item
-                  header-class="expandable-header"
-                  class="expandable-header full-width q-mb-md"
-                  :label="p.name"
-                >
-                  <q-card class="header-content full-width bg-dark">
-                    <q-card-section class="text-primary">
-                      {{ p.tagline }}
-                    </q-card-section>
-                  </q-card>
-                </q-expansion-item>
+      <div class="q-card-custom">
+        <div class="full-width text-primary q-mb-lg">
+          <h1 class="text-h1 q-mt-none text-secondary text-center bg-dark">Packages</h1>
+          <q-separator color="primary" class="q-mb-md" />
+          <p class="text-body2 text-center q-mb-none">
+            Whether you need one polished animation, a full motion + AI upgrade, or a launch-ready
+            experience, I’ve got you covered. These packages make it simple to get started — clear
+            scope, fair pricing, and fast turnaround.
+          </p>
+        </div>
+        <div class="column items-center q-gutter-y-md full-width">
+          <q-intersection
+            v-for="p in packages"
+            :key="p.id"
+            transition="slide-up"
+            transition-duration="1500"
+            :once="true"
+            class="q-card-container"
+          >
+            <q-card class="bg-dark">
+              <q-card-section class="section-container">
+                <div class="package-tile q-pa-md bg-white">
+                  <q-expansion-item
+                    header-class="expandable-header"
+                    class="expandable-header full-width q-mb-md"
+                    :label="p.name"
+                  >
+                    <q-card class="header-content full-width bg-dark">
+                      <q-card-section class="text-primary">
+                        {{ p.tagline }}
+                      </q-card-section>
+                    </q-card>
+                  </q-expansion-item>
 
-                <div class="column no-wrap items-center q-mb-none q-pa-md border rounded-borders">
-                  <div class="img-container column justify-center items-center bg-primary">
-                    <img class="full-width q-pa-lg" :src="p.src" />
+                  <div class="column no-wrap items-center q-mb-none q-pa-md border rounded-borders">
+                    <div class="img-container column justify-center items-center bg-primary">
+                      <img class="full-width q-pa-lg" :src="p.src" />
+                    </div>
+                    <q-btn color="accent" class="q-mt-md full-width">Consultation</q-btn>
                   </div>
-                  <q-btn color="accent" class="q-mt-md full-width">Consultation</q-btn>
+
+                  <hr class="full-width q-mt-sm q-mb-lg" />
+
+                  <q-list
+                    bordered
+                    padding
+                    :separator="true"
+                    class="q-mb-none q-pt-none no-border rounded-borders bg-primary"
+                  >
+                    <q-item v-for="(f, index) in p.features" :key="index">
+                      <span class="row full-width q-pa-none">
+                        <q-item-section side>
+                          <q-icon name="circle" size=".5rem" class="text-dark" />
+                        </q-item-section>
+                        <q-item-section class="text-body3 text-dark">
+                          {{ f.text }}
+                        </q-item-section>
+                      </span>
+                    </q-item>
+                  </q-list>
                 </div>
-
-                <hr class="full-width q-mt-sm q-mb-lg" />
-
-                <q-list
-                  bordered
-                  padding
-                  :separator="true"
-                  class="q-mb-none q-pt-none no-border rounded-borders bg-primary"
-                >
-                  <q-item v-for="(f, index) in p.features" :key="index">
-                    <span class="row full-width q-pa-none">
-                      <q-item-section side>
-                        <q-icon name="circle" size=".5rem" class="text-dark" />
-                      </q-item-section>
-                      <q-item-section class="text-body3 text-dark">
-                        {{ f.text }}
-                      </q-item-section>
-                    </span>
-                  </q-item>
-                </q-list>
-              </div>
-            </q-card-section>
-          </q-card>
-        </q-intersection>
+              </q-card-section>
+            </q-card>
+          </q-intersection>
+        </div>
       </div>
     </div>
   </section>
@@ -349,71 +350,71 @@ watch(activeTheme, (newTheme) => {
     display: flex;
   }
 
-  h1 {
-    border: solid 2px var(--q-primary);
-  }
+  .q-card-custom {
+    padding: 2rem;
 
-  .q-card-container {
-    width: 70%;
-    box-shadow: 1rem 1rem 1rem dark;
-
-    .q-card {
-      box-sizing: border-box;
+    h1 {
       border: solid 2px var(--q-primary);
-      border-radius: 10px !important;
+    }
 
-      .section-container:nth-child(2) {
-        border-radius: 10px;
-      }
+    .q-card-container {
+      width: 70%;
+      box-shadow: 1rem 1rem 1rem dark;
 
-      .package-tile {
-        border-radius: 10px;
-        border: solid 4px var(--q-secondary);
+      .q-card {
+        box-sizing: border-box;
+        border: solid 2px var(--q-primary);
+        border-radius: 10px !important;
 
-        .header-content,
-        .header-content.q-card-section {
-          border-radius: 0 !important;
-          border-top: 1px solid lightgray;
+        .section-container:nth-child(2) {
+          border-radius: 10px;
         }
 
-        .expandable-header {
-          border: solid 1px lightgray;
-        }
+        .package-tile {
+          border-radius: 10px;
+          border: solid 4px var(--q-secondary);
 
-        hr {
-          width: 90%;
-        }
-
-        .q-item {
-          padding-top: 0.5rem;
-          padding-bottom: 8px;
-        }
-
-        .tagline {
-          font-weight: 400; /* only one weight is available for some scripts */
-        }
-
-        .cost {
-          color: #8bc34a;
-        }
-
-        .img-container {
-          width: 100%;
-          aspect-ratio: 1 / 1; /* keeps it square */
-          overflow: hidden; /* hides any accidental overflow */
-          border: solid 2px var(--q-dark);
-
-          img {
-            max-width: 100%;
-            max-height: 100%;
-            width: auto; /* don’t force 100% width */
-            height: auto; /* preserve aspect ratio */
-            object-fit: contain; /* fit entirely within the box */
-            border: 2px solid var(--q-accent);
+          .header-content,
+          .header-content.q-card-section {
+            border-radius: 0 !important;
+            border-top: 1px solid lightgray;
           }
 
-          .q-btn {
-            border-top: 5px solid white;
+          .expandable-header {
+            border: solid 1px lightgray;
+          }
+
+          hr {
+            width: 90%;
+          }
+
+          .q-item {
+            padding-top: 0.5rem;
+            padding-bottom: 8px;
+          }
+
+          .tagline {
+            font-weight: 400; /* only one weight is available for some scripts */
+          }
+
+          .img-container {
+            width: 100%;
+            aspect-ratio: 1 / 1; /* keeps it square */
+            overflow: hidden; /* hides any accidental overflow */
+            border: solid 2px var(--q-dark);
+
+            img {
+              max-width: 100%;
+              max-height: 100%;
+              width: auto; /* don’t force 100% width */
+              height: auto; /* preserve aspect ratio */
+              object-fit: contain; /* fit entirely within the box */
+              border: 2px solid var(--q-accent);
+            }
+
+            .q-btn {
+              border-top: 5px solid white;
+            }
           }
         }
       }
