@@ -93,7 +93,7 @@ const whyClientsBullets = ref<AboutBulletPoints[]>([
           </h1>
           <q-separator color="primary" class="q-mb-md" />
           <p
-            class="text-body1"
+            class="text-body-1"
             :class="
               setSeasonClasses(
                 {
@@ -111,7 +111,7 @@ const whyClientsBullets = ref<AboutBulletPoints[]>([
             creators bring their ideas to life on the web.
           </p>
           <p
-            class="text-body1 q-mb-none"
+            class="text-body-1 q-mb-none"
             :class="
               setSeasonClasses(
                 {
@@ -157,7 +157,7 @@ const whyClientsBullets = ref<AboutBulletPoints[]>([
           </q-list>
 
           <p
-            class="q-mt-lg text-body1"
+            class="q-mt-lg text-body-1"
             :class="
               setSeasonClasses(
                 {
@@ -198,7 +198,7 @@ const whyClientsBullets = ref<AboutBulletPoints[]>([
           </div>
           <q-separator color="primary" class="q-mb-md" />
           <p
-            class="q-mb-none text-body1"
+            class="q-mb-none text-body-1"
             :class="
               setSeasonClasses(
                 {
@@ -268,7 +268,7 @@ const whyClientsBullets = ref<AboutBulletPoints[]>([
           </div>
           <q-separator color="primary" class="q-mb-md" />
           <p
-            class="q-mb-none text-body1"
+            class="q-mb-none text-body-1"
             :class="
               setSeasonClasses(
                 {
@@ -338,13 +338,13 @@ const whyClientsBullets = ref<AboutBulletPoints[]>([
             About Me
           </h1>
           <q-separator color="primary" class="q-mb-md" />
-          <p class="text-body2 text-primary q-mb-none">
+          <p class="text-body-2 text-primary q-mb-none">
             I’m Grant, a frontend engineer and creative problem-solver. For the past 7+ years, I’ve
             worked at the intersection of design, code, and storytelling — helping companies and
             creators bring their ideas to life on the web.
           </p>
           <p
-            class="q-pt-lg text-body2 q-mb-none"
+            class="q-pt-lg text-body-2 q-mb-none"
             :class="
               setSeasonClasses(
                 {
@@ -390,7 +390,7 @@ const whyClientsBullets = ref<AboutBulletPoints[]>([
             </div>
           </q-list>
           <br />
-          <p class="text-body2 q-mb-none text-primary">
+          <p class="text-body-2 q-mb-none text-primary">
             I’ve built tools for industries as diverse as healthcare, publishing, and SaaS — and
             I’ve learned that whether you’re a startup founder or a creative team, you need more
             than just a functioning app. You need an experience that stands out.
@@ -414,7 +414,7 @@ const whyClientsBullets = ref<AboutBulletPoints[]>([
             My Approach
           </h2>
           <q-separator color="primary" class="q-mb-md" />
-          <p class="text-body2 text-primary q-mb-none">
+          <p class="text-body-2 text-primary q-mb-none">
             Before I dive into code, I focus on understanding the vision behind the project. Every
             product has a story, and my role is to translate that story into an interface that feels
             intuitive, engaging, and alive.
@@ -467,7 +467,7 @@ const whyClientsBullets = ref<AboutBulletPoints[]>([
             Why Clients Work With Me
           </h2>
           <q-separator color="primary" class="q-mb-md" />
-          <p class="text-body2 text-primary q-mb-none">
+          <p class="text-body-2 text-primary q-mb-none">
             I know you’re not just looking for code — you’re looking for results. My clients come to
             me when they want their projects to stand out, attract attention, and deliver value
             quickly.

@@ -126,7 +126,7 @@ watch(activeTheme, (newTheme) => {
             Packages
           </h1>
           <q-separator color="primary" class="q-mb-md" />
-          <p class="text-body1 text-center text-primary text-weight-bold">
+          <p class="text-body-1 text-center text-primary text-weight-bold">
             Whether you need one polished animation, a full motion + AI upgrade, or a launch-ready
             experience, I’ve got you covered. These packages make it simple to get started — clear
             scope, fair pricing, and fast turnaround.
@@ -145,7 +145,7 @@ watch(activeTheme, (newTheme) => {
             </div>
 
             <div class="tagline-container bg-dark q-pa-lg">
-              <p class="text-body2 text-center text-primary q-ma-none">
+              <p class="text-body-2 text-center text-primary q-ma-none">
                 {{ packages[0]?.tagline }}
               </p>
             </div>
@@ -161,7 +161,7 @@ watch(activeTheme, (newTheme) => {
                 <q-item-section side>
                   <q-icon name="circle" size=".5rem" class="text-dark" />
                 </q-item-section>
-                <q-item-section class="package-feature text-body2 text-black">
+                <q-item-section class="package-feature text-body-2 text-black">
                   {{ f.text }}
                 </q-item-section>
               </span>
@@ -187,7 +187,7 @@ watch(activeTheme, (newTheme) => {
               </div>
 
               <div class="tagline-container bg-dark q-pa-lg">
-                <p class="text-body2 text-center text-primary q-ma-none">
+                <p class="text-body-2 text-center text-primary q-ma-none">
                   {{ p.tagline }}
                 </p>
               </div>
@@ -205,7 +205,7 @@ watch(activeTheme, (newTheme) => {
                     <q-item-section side>
                       <q-icon name="circle" size=".5rem" class="text-dark" />
                     </q-item-section>
-                    <q-item-section class="package-feature text-body2 text-black">
+                    <q-item-section class="package-feature text-body-2 text-black">
                       {{ f.text }}
                     </q-item-section>
                   </span>
@@ -223,57 +223,58 @@ watch(activeTheme, (newTheme) => {
         <div class="full-width text-primary q-mb-lg">
           <h1 class="text-h1 q-mt-none text-secondary text-center bg-dark">Packages</h1>
           <q-separator color="primary" class="q-mb-md" />
-          <p class="text-body2 text-center q-mb-none">
+          <p class="text-body-2 q-mb-none">
             Whether you need one polished animation, a full motion + AI upgrade, or a launch-ready
             experience, I’ve got you covered. These packages make it simple to get started — clear
             scope, fair pricing, and fast turnaround.
           </p>
         </div>
-        <div class="column items-center q-gutter-y-md full-width">
+        <div class="column full-width q-gutter-y-md">
           <q-intersection
             v-for="p in packages"
             :key="p.id"
             transition="slide-up"
             transition-duration="1500"
             :once="true"
-            class="q-card-container"
+            class="q-card-container full-width"
           >
             <q-card class="bg-dark">
               <q-card-section class="section-container">
-                <div class="package-tile q-pa-md bg-white">
-                  <q-expansion-item
-                    header-class="expandable-header"
-                    class="expandable-header full-width q-mb-md"
-                    :label="p.name"
-                  >
-                    <q-card class="header-content full-width bg-dark">
-                      <q-card-section class="text-primary">
-                        {{ p.tagline }}
-                      </q-card-section>
-                    </q-card>
-                  </q-expansion-item>
+                <div class="package-tile row bg-white">
+                  <div class="col-6">
+                    <q-expansion-item
+                      header-class="expandable-header"
+                      class="full-width q-mb-md"
+                      :label="p.name"
+                    >
+                      <q-card class="header-content full-width bg-dark">
+                        <q-card-section class="text-primary">
+                          {{ p.tagline }}
+                        </q-card-section>
+                      </q-card>
+                    </q-expansion-item>
 
-                  <div class="column no-wrap items-center q-mb-none q-pa-md border rounded-borders">
-                    <div class="img-container column justify-center items-center bg-primary">
-                      <img class="full-width q-pa-lg" :src="p.src" />
+                    <div
+                      class="column no-wrap items-center q-mb-none q-pa-md border rounded-borders"
+                    >
+                      <div class="img-container column justify-center items-center bg-primary">
+                        <img class="full-width q-pa-lg" :src="p.src" />
+                      </div>
+                      <q-btn color="accent" class="q-mt-md full-width">Consultation</q-btn>
                     </div>
-                    <q-btn color="accent" class="q-mt-md full-width">Consultation</q-btn>
                   </div>
-
-                  <hr class="full-width q-mt-sm q-mb-lg" />
-
                   <q-list
                     bordered
                     padding
                     :separator="true"
-                    class="q-mb-none q-pt-none no-border rounded-borders bg-primary"
+                    class="col-6 q-mb-none no-border rounded-borders bg-primary"
                   >
                     <q-item v-for="(f, index) in p.features" :key="index">
                       <span class="row full-width q-pa-none">
                         <q-item-section side>
                           <q-icon name="circle" size=".5rem" class="text-dark" />
                         </q-item-section>
-                        <q-item-section class="text-body3 text-dark">
+                        <q-item-section class="text-body-2 text-dark">
                           {{ f.text }}
                         </q-item-section>
                       </span>
@@ -317,7 +318,7 @@ watch(activeTheme, (newTheme) => {
 
     .tagline-container {
       border-bottom: 4px solid white;
-      font-weight: 400; /* only one weight is available for some scripts */
+      font-weight: 400;
     }
 
     .package-feature {
@@ -327,18 +328,18 @@ watch(activeTheme, (newTheme) => {
 
   .img-container {
     width: min(100%, 300px);
-    aspect-ratio: 1 / 1; /* keeps it square */
+    aspect-ratio: 1 / 1;
     display: flex;
     align-items: center;
     justify-content: center;
-    overflow: hidden; /* hides any accidental overflow */
+    overflow: hidden;
 
     img {
       max-width: 100%;
       max-height: 100%;
-      width: auto; /* don’t force 100% width */
-      height: auto; /* preserve aspect ratio */
-      object-fit: contain; /* fit entirely within the box */
+      width: auto;
+      height: auto;
+      object-fit: contain;
     }
   }
 }
@@ -358,7 +359,6 @@ watch(activeTheme, (newTheme) => {
     }
 
     .q-card-container {
-      width: 70%;
       box-shadow: 1rem 1rem 1rem dark;
 
       .q-card {
