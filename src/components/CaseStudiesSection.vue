@@ -1,5 +1,7 @@
-<script setup lang="ts"></script>
+<script setup lang="ts">
+import AIAssitant from './AIAssitant.vue';
+</script>
 <template>
-  <p>Case Studies</p>
+  <AIAssitant></AIAssitant>
 </template>
 <style scoped lang="scss"></style>

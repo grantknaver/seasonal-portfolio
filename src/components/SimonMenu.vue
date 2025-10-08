@@ -36,7 +36,6 @@ const topics: Topic[] = [
 ];
 
 const selectTopic = (name: TopicName) => {
-  console.log('selectTopic');
   if (name === activeTopic.value) {
     mainStore.SET_ACTIVE_TOPIC(null);
   } else {

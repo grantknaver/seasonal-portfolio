@@ -8,7 +8,6 @@ import { TopicName } from '../shared/constants/topicName';
 import AboutSection from '../components/AboutSection.vue';
 import ContactSection from '../components/ContactSection.vue';
 import PackageSection from '../components/PackageSection.vue';
-// import { scrollToElement } from '../shared/utils/scrollToElement';
 import { setSeasonClasses } from '../shared/utils/setSeasonColors';
 import SimonMenu from '../components/SimonMenu.vue';
 import CaseStudiesSection from 'src/components/CaseStudiesSection.vue';
@@ -67,10 +66,7 @@ const { activeTheme, activeTopic, mobileScrollTarget } = storeToRefs(mainStore);
 const expandedPanel = ref<TopicName | null>(null);
 const headerHeight = ref<number>(0);
 
-watch(slide, (newVal) => {
-  console.log('slide', newVal);
-  mainStore.SET_ACTIVE_THEME(newVal);
-});
+watch(slide, (newVal) => mainStore.SET_ACTIVE_THEME(newVal));
 
 onMounted(async () => {
   await mainStore.VERIFY_HUMANITY();
@@ -89,11 +85,6 @@ watch(activeTopic, (newTopic: TopicName | null) => {
   if (!newTopic) return;
   expandedPanel.value = newTopic;
 });
-
-// const handleAfterShow = async (id: TopicName) => {
-//   await nextTick();
-//   scrollToElement(id);
-// };
 </script>
 
 <template>
@@ -138,15 +129,14 @@ watch(activeTopic, (newTopic: TopicName | null) => {
           <q-btn size="lg" color="dark">Resume</q-btn>
         </div>
         <blockquote
-          class="full-width q-pa-md text-center"
+          class="full-width q-pa-md text-center q-ma-none"
           cite="http://www.worldwildlife.org/who/index.html"
         >
           "Successful software is built not just with code, but with trust. The best developers
           listen first — not to respond, but to understand. Because building the right thing is just
           as important as building it right."
         </blockquote>
-
-        <q-list padding class="full-width q-pa-none">
+        <q-list class="full-width">
           <q-item
             v-for="topic in mobileTopics.filter((topic) => topic.name !== TopicName.Contact)"
             :key="topic.id"
@@ -188,7 +178,6 @@ watch(activeTopic, (newTopic: TopicName | null) => {
             </q-expansion-item>
           </q-item>
         </q-list>
-        <q-separator color="secondary" class="full-width q-mt-xs q-mb-lg"></q-separator>
         <div class="full-width" :id="TopicName.Contact">
           <ContactSection />
         </div>

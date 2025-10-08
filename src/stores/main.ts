@@ -16,9 +16,13 @@ import { useErrorNotifier } from '../shared/composables/useErrorNotifier';
 
 export const useMainStore = defineStore('main', () => {
   const activeTopic = ref<TopicName | null>(null);
+
   const activeTheme = ref<Theme>(Theme.Fall);
   const activeAiAssistLogo = ref<string>(
     new URL('/src/assets/ai-chat_fall.png', import.meta.url).href,
+  );
+  const activeRecaptchaBackground = ref<string>(
+    new URL('/src/assets/recaptcha-fall.png', import.meta.url).href,
   );
   const $q = useQuasar();
   const contactSectionRef = ref<HTMLElement | null>(null);
@@ -39,6 +43,7 @@ export const useMainStore = defineStore('main', () => {
   const lastAssistantIndex = ref<number>(-1);
   const isLoading = ref<boolean>(false);
   const { notifyHttp, notifyGeneric } = useErrorNotifier();
+  const recaptchaWidgetId = ref<number | null>();
 
   const SET_MOBILE_SCROLL_TARGET = (topicName: TopicName | null): void => {
     mobileScrollTarget.value = topicName;
@@ -47,6 +52,12 @@ export const useMainStore = defineStore('main', () => {
     activeTopic.value = topicName;
   };
   const SET_ACTIVE_THEME = (theme: Theme): void => {
+    const recaptchaBackgrounds = {
+      [Theme.Fall]: new URL('/src/assets/recaptcha-fall.png', import.meta.url).href,
+      [Theme.Winter]: new URL('/src/assets/recaptcha-winter.png', import.meta.url).href,
+      [Theme.Spring]: new URL('/src/assets/recaptcha-spring.png', import.meta.url).href,
+      [Theme.Summer]: new URL('/src/assets/recaptcha-summer.png', import.meta.url).href,
+    };
     const aiAssistLogos = {
       [Theme.Fall]: new URL('/src/assets/ai-chat_fall.png', import.meta.url).href,
       [Theme.Winter]: new URL('/src/assets/ai-chat_winter.png', import.meta.url).href,
@@ -57,6 +68,7 @@ export const useMainStore = defineStore('main', () => {
     activeTheme.value = theme;
     syncThemeGlobals(theme);
     activeAiAssistLogo.value = aiAssistLogos[theme];
+    activeRecaptchaBackground.value = recaptchaBackgrounds[theme];
   };
   const SET_CONTACT_SECTION_REF = (element: HTMLElement | null): void => {
     contactSectionRef.value = element;
@@ -174,6 +186,7 @@ export const useMainStore = defineStore('main', () => {
     }
   };
 
+  const SET_RECAPTCHA_WIDGET_ID = (id: number | null) => (recaptchaWidgetId.value = id);
   return {
     activeTopic,
     activeTheme,
@@ -185,6 +198,9 @@ export const useMainStore = defineStore('main', () => {
     oaLogs,
     lastAssistantIndex,
     isLoading,
+    recaptchaWidgetId,
+    activeRecaptchaBackground,
+    SET_RECAPTCHA_WIDGET_ID,
     SET_ACTIVE_TOPIC,
     SET_ACTIVE_THEME,
     SET_CONTACT_SECTION_REF,

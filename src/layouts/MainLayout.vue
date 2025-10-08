@@ -153,7 +153,7 @@ onBeforeUnmount(() => window.removeEventListener('resize', updateWidths));
         :bar-style="{ backgroundColor: 'white', opacity: '1' }"
       >
         <AboutSection v-if="activeTopic === TopicName.About" />
-        <CaseStudiesSection v-else-if="activeTopic === TopicName.CaseStudies" />
+        <CaseStudiesSection v-else-if="activeTopic === TopicName.CaseStudies.replace(' ', '')" />
         <PackageSection v-else-if="activeTopic === TopicName.Packages" />
       </q-scroll-area>
 

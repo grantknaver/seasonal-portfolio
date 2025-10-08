@@ -322,14 +322,14 @@ const whyClientsBullets = ref<AboutBulletPoints[]>([
       <q-card class="full-width q-pa-sm">
         <q-card-section class="section-container q-pa-lg">
           <h1
-            class="text-h1 q-mt-none text-center bg-white"
+            class="text-h1 q-mt-none text-center bg-dark"
             :class="
               setSeasonClasses(
                 {
-                  Fall: 'text-accent',
+                  Fall: 'text-secondary',
                   Winter: 'text-accent',
                   Spring: 'text-accent',
-                  Summer: 'text-dark',
+                  Summer: 'text-accent',
                 },
                 activeTheme,
               )
@@ -398,11 +398,11 @@ const whyClientsBullets = ref<AboutBulletPoints[]>([
         </q-card-section>
         <q-card-section class="section-container q-pa-lg">
           <h2
-            class="text-h2 q-mt-none q-pt-md q-pb-md text-secondary text-center bg-white"
+            class="text-h2 q-mt-none q-pt-md q-pb-md text-secondary text-center bg-dark"
             :class="
               setSeasonClasses(
                 {
-                  Fall: 'text-accent',
+                  Fall: 'text-secondary',
                   Winter: 'text-accent',
                   Spring: 'text-accent',
                   Summer: 'text-dark',
@@ -451,11 +451,11 @@ const whyClientsBullets = ref<AboutBulletPoints[]>([
         </q-card-section>
         <q-card-section class="section-container q-pa-lg">
           <h2
-            class="text-h2 q-mt-none q-pt-md q-pb-md text-secondary text-center bg-white"
+            class="text-h2 q-mt-none q-pt-md q-pb-md text-secondary text-center bg-dark"
             :class="
               setSeasonClasses(
                 {
-                  Fall: 'text-accent',
+                  Fall: 'text-secondary',
                   Winter: 'text-accent',
                   Spring: 'text-accent',
                   Summer: 'text-dark',
@@ -574,11 +574,11 @@ $winter-mobile-background: map-get($winter-theme, primary);
 
     .section-container {
       h1 {
-        border: solid 2px var(--q-dark);
+        border: solid 2px var(--q-primary);
       }
 
       h2 {
-        border: solid 2px var(--q-dark);
+        border: solid 2px var(--q-primary);
       }
 
       .bulletContent {
