@@ -13,3 +13,35 @@
 .message textarea {
   min-height: 200px !important;
 }
+
+.primary-text-shadow {
+  text-shadow:
+    -1px -1px 0 var(--q-primary),
+    1px -1px 0 var(--q-primary),
+    -1px 1px 0 var(--q-primary),
+    1px 1px 0 var(--q-primary);
+}
+
+.dark-text-shadow {
+  text-shadow:
+    -1px -1px 0 var(--q-dark),
+    1px -1px 0 var(--q-dark),
+    -1px 1px 0 var(--q-dark),
+    1px 1px 0 var(--q-dark);
+}
+
+.accent-text-shadow {
+  text-shadow:
+    -1px -1px 0 var(--q-accent),
+    1px -1px 0 var(--q-accent),
+    -1px 1px 0 var(--q-accent),
+    1px 1px 0 var(--q-accent);
+}
+
+.secondary-text-shadow {
+  text-shadow:
+    -1px -1px 0 var(--q-secondary),
+    1px -1px 0 var(--q-secondary),
+    -1px 1px 0 var(--q-secondary),
+    1px 1px 0 var(--q-secondary);
+}

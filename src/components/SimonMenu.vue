@@ -70,8 +70,8 @@ const simonRef = ref();
   position: relative;
   border-radius: 10px;
   overflow: visible;
-  width: 275px;
-  height: 275px;
+  width: 250px;
+  height: 250px;
 }
 
 .simon-quadrant {

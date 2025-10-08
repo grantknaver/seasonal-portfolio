@@ -166,7 +166,10 @@ onBeforeUnmount(() => window.removeEventListener('resize', updateWidths));
       <q-toolbar class="justify-between">
         <q-toolbar-title class="text-subtitle2 text-weight-light">
           © {{ new Date().getFullYear() }} <span class="text-secondary">glk</span
-          ><span class="text-primary">Freelance</span>
+          ><span class="text-primary">Freelance</span> | Crafted with
+          <q-icon name="favorite" color="accent" size="16px" /> using
+          <a href="https://vuejs.org/" target="_blank" class="text-primary">Vue</a>,
+          <a href="https://gsap.com/" target="_blank" class="text-primary">GSAP</a>, and AI tools.
         </q-toolbar-title>
 
         <div class="">

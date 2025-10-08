@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref, watch, onMounted } from 'vue';
+import { ref, watch, onMounted, nextTick } from 'vue';
 import { useMainStore } from '../stores/main';
 import { type Topic } from '../shared/types/topic';
 import { v4 as uuidv4 } from 'uuid';
@@ -15,6 +15,7 @@ import { type Slide } from '../shared/types/slide';
 import { QCarousel } from 'quasar';
 import { Theme } from '../shared/constants/theme';
 import WeatherBackground from '../components/WeatherBackground.vue';
+import gsap from 'gsap';
 
 const mainStore = useMainStore();
 const mobileTopics: Topic[] = [
@@ -38,7 +39,6 @@ const mobileTopics: Topic[] = [
     label: TopicName.CaseStudies,
   },
 ];
-
 const slides = ref<Slide[]>([
   {
     id: uuidv4(),
@@ -65,10 +65,52 @@ const slide = ref<Theme>(Theme.Fall);
 const { activeTheme, activeTopic, mobileScrollTarget } = storeToRefs(mainStore);
 const expandedPanel = ref<TopicName | null>(null);
 const headerHeight = ref<number>(0);
+const root = ref<HTMLElement | null>(null);
 
 watch(slide, (newVal) => mainStore.SET_ACTIVE_THEME(newVal));
 
 onMounted(async () => {
+  await nextTick();
+  const el = root.value; // ✅ real HTMLElement
+  if (!el) return;
+
+  gsap.context(() => {
+    gsap.to('.name', {
+      keyframes: {
+        '0%': { rotation: 15 },
+        '50%': { rotation: -10 },
+        '100%': { rotation: 0, y: 0 },
+      },
+      ease: 'bounce',
+      duration: 3.8,
+    });
+
+    gsap.to('.simon', {
+      keyframes: {
+        '0%': { scale: 0.5, rotation: 15 },
+        '50%': { scale: 1.1, rotation: -10 }, // finetune with individual eases
+        '100%': { scale: 1, rotation: 0 },
+      },
+      ease: 'bounce',
+      duration: 3.8,
+    });
+
+    gsap.to('.title-content', {
+      y: 0,
+      autoAlpha: 1,
+      ease: 'bounce',
+      duration: 1.5,
+      delay: 3,
+    });
+
+    gsap.to('.services-description', {
+      x: 0,
+      autoAlpha: 1,
+      ease: 'bounce',
+      duration: 1.5,
+      delay: 3.3,
+    });
+  }, el);
   await mainStore.VERIFY_HUMANITY();
 
   window.addEventListener('resize', () => {
@@ -118,7 +160,7 @@ watch(activeTopic, (newTopic: TopicName | null) => {
         ><span class="text-secondary">glk</span><span class="text-primary">Freelance</span></span
       >
     </div>
-    <div class="sub-container column">
+    <div ref="root" class="sub-container column">
       <section class="mobile-view full-width q-pa-md">
         <div inline-actions class="text-primary bg-accent q-mb-sm">
           <span>
@@ -182,19 +224,17 @@ watch(activeTopic, (newTopic: TopicName | null) => {
           <ContactSection />
         </div>
       </section>
-      <section class="desktop-view column justify-center items-center full-width">
-        <SimonMenu></SimonMenu>
-        <q-separator class="q-mt-lg q-mb-md" />
-        <span>
+      <section class="desktop-view row justify-end items-center full-width">
+        <div class="home-contaier column no-wrap q-pa-md">
           <p
-            class="name q-ma-none"
+            class="name q-mb-lg text-body-1 text-left"
             :class="
               setSeasonClasses(
                 {
-                  Fall: 'text-primary fall-text-shadow',
-                  Winter: 'text-primary winter-text-shadow',
-                  Spring: 'text-primary spring-text-shadow',
-                  Summer: 'text-primary summer-text-shadow',
+                  Fall: 'text-white dark-text-shadow',
+                  Winter: 'text-white dark-text-shadow',
+                  Spring: 'text-white dark-text-shadow',
+                  Summer: 'text-white dark-text-shadow',
                 },
                 activeTheme,
               )
@@ -202,23 +242,113 @@ watch(activeTopic, (newTopic: TopicName | null) => {
           >
             Grant Knaver
           </p>
-          <p
-            class="full-stack q-ma-none text-bold text-warning text-center"
+          <div class="simon-container row no-wrap">
+            <SimonMenu class="simon"></SimonMenu>
+            <div class="title-container row items-center full-width q-pa-md">
+              <p
+                ref="titleContent"
+                class="title-content q-mb-none q-pl-lg text-secondary text-left"
+              >
+                <span
+                  class="frontend"
+                  :class="
+                    setSeasonClasses(
+                      {
+                        Fall: 'dark-text-shadow text-white',
+                        Winter: 'dark-text-shadow text-white',
+                        Spring: 'dark-text-shadow text-white',
+                        Summer: 'dark-text-shadow text-white',
+                      },
+                      activeTheme,
+                    )
+                  "
+                  >Frontend Developer</span
+                >
+                <span
+                  :class="
+                    setSeasonClasses(
+                      {
+                        Fall: 'dark-text-shadow text-white',
+                        Winter: 'dark-text-shadow text-secondary',
+                        Spring: 'dark-text-shadow text-secondary',
+                        Summer: 'dark-text-shadow text-secondary',
+                      },
+                      activeTheme,
+                    )
+                  "
+                >
+                  •
+                </span>
+                <span
+                  class="gsap"
+                  :class="
+                    setSeasonClasses(
+                      {
+                        Fall: 'text-secondary dark-text-shadow ',
+                        Winter: 'text-secondary dark-text-shadow ',
+                        Spring: 'text-secondary dark-text-shadow ',
+                        Summer: 'text-secondary dark-text-shadow ',
+                      },
+                      activeTheme,
+                    )
+                  "
+                  >GSAP</span
+                >
+                <span
+                  :class="
+                    setSeasonClasses(
+                      {
+                        Fall: 'dark-text-shadow text-white',
+                        Winter: 'dark-text-shadow text-white',
+                        Spring: 'dark-text-shadow text-white',
+                        Summer: ' dark-text-shadow text-white',
+                      },
+                      activeTheme,
+                    )
+                  "
+                >
+                  &
+                </span>
+                <span
+                  class="aiIntegration"
+                  :class="
+                    setSeasonClasses(
+                      {
+                        Fall: 'secondary-text-shadow text-dark',
+                        Winter: 'secondary-text-shadow text-dark',
+                        Spring: 'secondary-text-shadow text-dark',
+                        Summer: 'secondary-text-shadow text-dark',
+                      },
+                      activeTheme,
+                    )
+                  "
+                  >AI Integration</span
+                >
+              </p>
+            </div>
+          </div>
+          <q-separator class="q-mt-lg full-width bg-accent text-seon"></q-separator>
+          <div
+            ref="servicesDescription"
+            class="services-description start-animation row q-mt-md text-bold text-body-1 wrap justify-center"
             :class="
               setSeasonClasses(
                 {
-                  Fall: 'fall-text-shadow',
-                  Winter: 'winter-text-shadow',
-                  Spring: 'spring-text-shadow',
-                  Summer: ' summer-text-shadow',
+                  Fall: 'text-white dark-text-shadow',
+                  Winter: 'text-white dark-text-shadow',
+                  Spring: 'dark-text-shadow text-white',
+                  Summer: 'dark-text-shadow text-white',
                 },
                 activeTheme,
               )
             "
           >
-            Fullstack Developer
-          </p>
-        </span>
+            <i
+              >I design and build interactive, high-performance web experiences that blend motion,
+              data, and intelligence.</i
+            >
+          </div>
+        </div>
       </section>
     </div>
   </q-page>
@@ -327,24 +457,39 @@ watch(activeTopic, (newTopic: TopicName | null) => {
         justify-content: center;
         align-items: center;
         flex: 1 0 0%;
+        position: relative;
       }
 
-      hr {
-        background-color: var(--q-primary);
-        width: 100px;
-      }
+      .home-contaier {
+        max-width: 750px;
 
-      .name {
-        font-size: 1.6rem;
-      }
+        .name {
+          font-size: 2rem;
+          transform: translateY(-100px);
+        }
+        .simon-container {
+          .simon {
+            width: 65%;
+            min-width: 275px;
+            max-width: 275px;
+            scale: 0;
+            transform-origin: 50% 50%;
+          }
 
-      .full-stack {
-        font-size: 1.2rem;
-      }
+          .title-container {
+            font-size: 1.5rem;
+            width: 35%;
 
-      a {
-        color: var(--q-primary);
-        cursor: pointer;
+            .title-content {
+              opacity: 0;
+              transform: translateY(120px);
+            }
+          }
+        }
+        .services-description {
+          opacity: 0;
+          transform: translateX(-100px);
+        }
       }
     }
   }
@@ -360,41 +505,5 @@ watch(activeTopic, (newTopic: TopicName | null) => {
       display: initial;
     }
   }
-}
-
-.resume {
-  text-decoration: none;
-}
-
-.fall-text-shadow {
-  text-shadow:
-    -1px -1px 0 var(--q-dark),
-    1px -1px 0 var(--q-dark),
-    -1px 1px 0 var(--q-dark),
-    1px 1px 0 var(--q-dark);
-}
-
-.winter-text-shadow {
-  text-shadow:
-    -1px -1px 0 var(--q-dark),
-    1px -1px 0 var(--q-dark),
-    -1px 1px 0 var(--q-dark),
-    1px 1px 0 var(--q-dark);
-}
-
-.spring-text-shadow {
-  text-shadow:
-    -1px -1px 0 black,
-    1px -1px 0 black,
-    -1px 1px 0 black,
-    1px 1px 0 black;
-}
-
-.summer-text-shadow {
-  text-shadow:
-    -1px -1px 0 black,
-    1px -1px 0 black,
-    -1px 1px 0 black,
-    1px 1px 0 black;
 }
 </style>
