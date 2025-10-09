@@ -12,10 +12,11 @@ import { setSeasonClasses } from '../shared/utils/setSeasonColors';
 import SimonMenu from '../components/SimonMenu.vue';
 import CaseStudiesSection from 'src/components/CaseStudiesSection.vue';
 import { type Slide } from '../shared/types/slide';
-import { QCarousel } from 'quasar';
+import { QCarousel, scroll } from 'quasar';
 import { Theme } from '../shared/constants/theme';
 import WeatherBackground from '../components/WeatherBackground.vue';
 import gsap from 'gsap';
+const { getScrollTarget, setVerticalScrollPosition } = scroll;
 
 const mainStore = useMainStore();
 const mobileTopics: Topic[] = [
@@ -66,8 +67,15 @@ const { activeTheme, activeTopic, mobileScrollTarget } = storeToRefs(mainStore);
 const expandedPanel = ref<TopicName | null>(null);
 const headerHeight = ref<number>(0);
 const root = ref<HTMLElement | null>(null);
+const showFooter = ref<boolean>(false);
 
 watch(slide, (newVal) => mainStore.SET_ACTIVE_THEME(newVal));
+
+const hasElementInViewport = (el: Element, margin = 10) => {
+  const top = el.getBoundingClientRect().top;
+  const viewHeight = window.innerHeight || document.documentElement.clientHeight;
+  return top >= -margin && top <= viewHeight + margin;
+};
 
 onMounted(async () => {
   await nextTick();
@@ -124,6 +132,12 @@ onMounted(async () => {
   window.addEventListener('resize', () => {
     headerHeight.value = document.getElementById('mobile-header')?.offsetHeight ?? 0;
   });
+
+  window.addEventListener('scroll', () => {
+    const footerEl = document.getElementById('footer');
+    if (!footerEl) return;
+    showFooter.value = hasElementInViewport(footerEl);
+  });
 });
 
 watch(mobileScrollTarget, (newTopic) => {
@@ -135,6 +149,22 @@ watch(activeTopic, (newTopic: TopicName | null) => {
   if (!newTopic) return;
   expandedPanel.value = newTopic;
 });
+
+const scrollToFooter = () => {
+  if (!showFooter.value) {
+    const footerEl = document.getElementById('footer');
+    if (!footerEl) return;
+    const target = getScrollTarget(footerEl); // auto-detects the correct scrollable container
+    const y = footerEl.offsetTop; // position inside that container
+    setVerticalScrollPosition(target, y, 500); // smooth scroll (ms)
+  } else {
+    const logoEl = document.getElementById('logo');
+    if (!logoEl) return;
+    const target = getScrollTarget(logoEl); // auto-detects the correct scrollable container
+    const y = logoEl.offsetHeight; // position inside that container
+    setVerticalScrollPosition(target, y, 500); // smooth scroll (ms)
+  }
+};
 </script>
 
 <template>
@@ -247,7 +277,7 @@ watch(activeTopic, (newTopic: TopicName | null) => {
             <div class="title-container row items-center full-width q-pa-md">
               <p
                 ref="titleContent"
-                class="title-content q-mb-none q-pl-lg text-secondary text-left"
+                class="title-content full-width q-mb-none q-pl-lg text-secondary text-left"
               >
                 <span
                   class="frontend text-white"
@@ -312,14 +342,14 @@ watch(activeTopic, (newTopic: TopicName | null) => {
                   &
                 </span>
                 <span
-                  class="aiIntegration"
+                  class="aiIntegration text-secondary"
                   :class="
                     setSeasonClasses(
                       {
-                        Fall: 'secondary-text-outline text-dark',
-                        Winter: 'secondary-text-outline text-dark',
-                        Spring: 'secondary-text-outline text-dark',
-                        Summer: 'secondary-text-outline text-dark',
+                        Fall: 'dark-text-outline',
+                        Winter: 'dark-text-outline',
+                        Spring: 'black-text-outline',
+                        Summer: 'black-text-outline',
                       },
                       activeTheme,
                     )
@@ -332,7 +362,7 @@ watch(activeTopic, (newTopic: TopicName | null) => {
           <q-separator class="separator q-mt-lg full-width bg-accent text-seon"></q-separator>
           <div
             ref="servicesDescription"
-            class="services-description start-animation row q-mt-md q-pa-md text-bold text-body-1 wrap justify-center text-white"
+            class="services-description start-animation row q-mt-md q-pa-md text-bold wrap justify-center text-white"
             :class="
               setSeasonClasses(
                 {
@@ -351,6 +381,15 @@ watch(activeTopic, (newTopic: TopicName | null) => {
             >
           </div>
         </div>
+        <q-btn
+          id="showFooterBtn"
+          round
+          color="secondary"
+          :icon="!showFooter ? 'south' : 'north'"
+          class="q-px-sm"
+          @click="scrollToFooter"
+          aria-label="Scroll to footer"
+        />
       </section>
     </div>
   </q-page>
@@ -463,10 +502,11 @@ watch(activeTopic, (newTopic: TopicName | null) => {
       }
 
       .home-contaier {
-        max-width: 750px;
+        margin-top: 4rem;
+        max-width: 700px;
 
         .name {
-          font-size: 2rem;
+          font-size: 1.8rem;
           transform: translateY(-100px);
         }
         .simon-container {
@@ -482,10 +522,9 @@ watch(activeTopic, (newTopic: TopicName | null) => {
             width: 35%;
 
             .title-content {
-              width: 70%;
               opacity: 0;
               transform: translateY(120px);
-              font-size: 1.2rem;
+              font-size: 1.4rem;
             }
           }
         }
@@ -496,22 +535,17 @@ watch(activeTopic, (newTopic: TopicName | null) => {
         }
 
         .services-description {
+          font-size: 1rem;
           opacity: 0;
           transform: translateX(-100px);
         }
       }
-    }
-  }
 
-  .contact-btn {
-    display: none;
-    position: absolute;
-    max-width: 80px;
-    bottom: 2rem;
-    right: 2rem;
-
-    @media (min-width: $breakpoint-md) {
-      display: initial;
+      #showFooterBtn {
+        position: absolute;
+        bottom: 1rem;
+        left: 1rem;
+      }
     }
   }
 }
