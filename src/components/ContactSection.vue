@@ -78,7 +78,7 @@ const sendEmail = async () => {
 </script>
 
 <template>
-  <div id="contact" ref="contactRef" class="mobile-view full-width">
+  <div id="contact" ref="contactRef" class="responsive-view full-width">
     <q-form
       @submit.prevent="sendEmail"
       class="full-width bg-accent q-pt-md q-pr-xl q-pb-xl q-pl-xl"
@@ -226,8 +226,8 @@ const sendEmail = async () => {
 <style lang="scss" scoped>
 @import '../css/main.scss';
 
-.mobile-view {
-  @media (min-width: $breakpoint-md) {
+.responsive-view {
+  @media (min-width: $breakpoint-lg) {
     display: none;
   }
 }
@@ -235,7 +235,7 @@ const sendEmail = async () => {
 .desktop-view {
   display: none;
 
-  @media (min-width: $breakpoint-md) {
+  @media (min-width: $breakpoint-lg) {
     display: flex;
     flex-direction: column;
   }

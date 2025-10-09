@@ -18,7 +18,7 @@ const { activeTheme, activeTopic } = storeToRefs(mainStore);
 
 const windowWidth = ref(window.innerWidth);
 const desktopDrawerWidth = ref(window.innerWidth * 0.5);
-const showTopicBreakpoint = +`${getCustomCssVar('breakpoint-md')}`.slice(0, -2);
+const showTopicBreakpoint = +`${getCustomCssVar('breakpoint-lg')}`.slice(0, -2);
 const showTopicPanel = computed(
   () => !!activeTopic.value && windowWidth.value > showTopicBreakpoint,
 );
@@ -207,7 +207,7 @@ onBeforeUnmount(() => window.removeEventListener('resize', updateWidths));
   border-bottom: 2px solid var(--q-primary);
   background-color: pink;
 
-  @media (min-width: $breakpoint-md) {
+  @media (min-width: $breakpoint-lg) {
     display: none;
   }
 

@@ -93,7 +93,7 @@ watch(activeTheme, (newTheme) => {
 <template>
   <section>
     <!-- Mobile -->
-    <div class="mobile-view full-width column items-center q-gutter-y-md">
+    <div class="responsive-view full-width column items-center q-gutter-y-md">
       <q-card class="full-width column items-center">
         <q-card-section
           class="package-header-section full-width q-pa-lg text-primary"
@@ -293,8 +293,8 @@ watch(activeTheme, (newTheme) => {
 <style scoped lang="scss">
 @import '../css/main.scss';
 
-.mobile-view {
-  @media (min-width: $breakpoint-md) {
+.responsive-view {
+  @media (min-width: $breakpoint-lg) {
     display: none;
   }
 
@@ -347,7 +347,7 @@ watch(activeTheme, (newTheme) => {
 .desktop-view {
   display: none;
 
-  @media (min-width: $breakpoint-md) {
+  @media (min-width: $breakpoint-lg) {
     display: flex;
   }
 
@@ -420,13 +420,5 @@ watch(activeTheme, (newTheme) => {
       }
     }
   }
-}
-
-.earth-orange {
-  color: #d78c3b;
-}
-
-.dusty-plum {
-  color: #964d94;
 }
 </style>

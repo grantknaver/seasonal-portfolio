@@ -169,7 +169,7 @@ watch(activeTopic, (newTopic: TopicName | null) => {
       >
     </div>
     <div ref="root" class="sub-container column">
-      <section class="mobile-view full-width q-pa-md">
+      <section class="responsive-view full-width q-pa-md">
         <div inline-actions class="text-primary bg-accent q-mb-sm">
           <span>
             <p class="q-ma-none text-primary bounce-text">Grant Knaver</p>
@@ -225,7 +225,7 @@ watch(activeTopic, (newTopic: TopicName | null) => {
         </div>
       </section>
       <section class="desktop-view row justify-end items-center full-width">
-        <div class="home-contaier column no-wrap">
+        <div class="home-contaier q-pl-xl q-pr-xl column">
           <p
             class="name q-mb-lg text-body-1 text-left text-white"
             :class="
@@ -393,7 +393,7 @@ watch(activeTopic, (newTopic: TopicName | null) => {
     left: 3%;
     z-index: 2;
 
-    @media (min-width: $breakpoint-md) {
+    @media (min-width: $breakpoint-lg) {
       display: flex !important;
       align-items: center;
       z-index: 10;
@@ -409,7 +409,7 @@ watch(activeTopic, (newTopic: TopicName | null) => {
     flex: 1 1 0%;
     z-index: 2;
 
-    @media (min-width: $breakpoint-md) {
+    @media (min-width: $breakpoint-lg) {
       position: relative;
       padding: initial;
     }
@@ -424,10 +424,10 @@ watch(activeTopic, (newTopic: TopicName | null) => {
       font-size: 1rem;
     }
 
-    .mobile-view {
+    .responsive-view {
       height: auto;
 
-      @media (min-width: $breakpoint-md) {
+      @media (min-width: $breakpoint-lg) {
         display: none;
       }
 
@@ -454,7 +454,7 @@ watch(activeTopic, (newTopic: TopicName | null) => {
     .desktop-view {
       display: none;
 
-      @media (min-width: $breakpoint-md) {
+      @media (min-width: $breakpoint-lg) {
         display: flex;
         justify-content: center;
         align-items: center;

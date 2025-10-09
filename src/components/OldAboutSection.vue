@@ -61,7 +61,7 @@ const workHistoryTimeline = ref<TimelineEntry[]>([
 
 <template>
   <section>
-    <div class="mobile-view full-width">
+    <div class="responsive-view full-width">
       <q-card class="full-width">
         <q-card-section
           class="section-container q-pa-lg text-primary"
@@ -317,7 +317,7 @@ const workHistoryTimeline = ref<TimelineEntry[]>([
 @import '../css/main.scss';
 $winter-mobile-background: map-get($winter-theme, primary);
 
-.mobile-view {
+.responsive-view {
   @media (min-width: $breakpoint-md) {
     display: none;
   }

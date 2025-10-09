@@ -269,7 +269,7 @@ onMounted(async () => {
 
 <template>
   <section>
-    <div class="mobile-view full-width">
+    <div class="responsive-view full-width">
       <q-card class="full-width">
         <q-card-section class="section-container q-pa-lg bg-accent">
           <h1 class="q-mt-none text-primary">Skills</h1>
@@ -428,7 +428,7 @@ onMounted(async () => {
 <style scoped lang="scss">
 @import '../css/main.scss';
 
-.mobile-view {
+.responsive-view {
   @media (min-width: $breakpoint-md) {
     display: none;
   }

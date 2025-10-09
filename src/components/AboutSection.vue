@@ -72,7 +72,7 @@ const whyClientsBullets = ref<AboutBulletPoints[]>([
 
 <template>
   <section>
-    <div class="mobile-view column q-gutter-y-md">
+    <div class="responsive-view column q-gutter-y-md">
       <q-card class="full-width">
         <q-card-section class="section-container q-pa-lg">
           <h1
@@ -511,8 +511,8 @@ const whyClientsBullets = ref<AboutBulletPoints[]>([
 @import '../css/main.scss';
 $winter-mobile-background: map-get($winter-theme, primary);
 
-.mobile-view {
-  @media (min-width: $breakpoint-md) {
+.responsive-view {
+  @media (min-width: $breakpoint-lg) {
     display: none;
   }
 
@@ -565,7 +565,7 @@ $winter-mobile-background: map-get($winter-theme, primary);
 .desktop-view {
   display: none;
 
-  @media (min-width: $breakpoint-md) {
+  @media (min-width: $breakpoint-lg) {
     display: flex;
   }
 

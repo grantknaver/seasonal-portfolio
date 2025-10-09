@@ -101,7 +101,7 @@ onBeforeUnmount(() => mainStore.SET_RECAPTCHA_WIDGET_ID(null));
   transform: scale(0.75); /* Scales to 70% */
   transform-origin: 0 0; /* Aligns to top-left */
 
-  @media (min-width: $breakpoint-md) {
+  @media (min-width: $breakpoint-lg) {
     width: auto;
     max-width: none;
     transform: none;

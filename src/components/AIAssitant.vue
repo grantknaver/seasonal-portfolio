@@ -137,7 +137,7 @@ watch(oaLogs, async () => {
     box-shadow: 5px 5px 10px black;
     max-height: 100%;
 
-    @media (min-width: $breakpoint-md) {
+    @media (min-width: $breakpoint-lg) {
       right: 8px;
     }
 

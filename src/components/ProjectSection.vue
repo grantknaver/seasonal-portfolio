@@ -46,7 +46,7 @@ const projects = ref<ProjectDetails[]>([
 <template>
   <section>
     <!-- Mobile -->
-    <div class="mobile-view full-width">
+    <div class="responsive-view full-width">
       <q-card class="full-width">
         <q-card-section
           class="section-container q-pa-lg"
@@ -175,7 +175,7 @@ const projects = ref<ProjectDetails[]>([
 <style scoped lang="scss">
 @import '../css/main.scss';
 
-.mobile-view {
+.responsive-view {
   @media (min-width: $breakpoint-md) {
     display: none;
   }
