@@ -103,12 +103,20 @@ onMounted(async () => {
       delay: 3,
     });
 
+    gsap.to('.separator', {
+      y: 0,
+      autoAlpha: 1,
+      ease: 'none',
+      duration: 1,
+      delay: 1.8,
+    });
+
     gsap.to('.services-description', {
       x: 0,
       autoAlpha: 1,
       ease: 'bounce',
       duration: 1.5,
-      delay: 3.3,
+      delay: 4.5,
     });
   }, el);
   await mainStore.VERIFY_HUMANITY();
@@ -170,14 +178,6 @@ watch(activeTopic, (newTopic: TopicName | null) => {
           <q-space></q-space>
           <q-btn size="lg" color="dark">Resume</q-btn>
         </div>
-        <blockquote
-          class="full-width q-pa-md text-center q-ma-none"
-          cite="http://www.worldwildlife.org/who/index.html"
-        >
-          "Successful software is built not just with code, but with trust. The best developers
-          listen first — not to respond, but to understand. Because building the right thing is just
-          as important as building it right."
-        </blockquote>
         <q-list class="full-width">
           <q-item
             v-for="topic in mobileTopics.filter((topic) => topic.name !== TopicName.Contact)"
@@ -225,16 +225,16 @@ watch(activeTopic, (newTopic: TopicName | null) => {
         </div>
       </section>
       <section class="desktop-view row justify-end items-center full-width">
-        <div class="home-contaier column no-wrap q-pa-md">
+        <div class="home-contaier column no-wrap">
           <p
-            class="name q-mb-lg text-body-1 text-left"
+            class="name q-mb-lg text-body-1 text-left text-white"
             :class="
               setSeasonClasses(
                 {
-                  Fall: 'text-white dark-text-shadow',
-                  Winter: 'text-white dark-text-shadow',
-                  Spring: 'text-white dark-text-shadow',
-                  Summer: 'text-white dark-text-shadow',
+                  Fall: 'dark-text-outline',
+                  Winter: 'dark-text-outline',
+                  Spring: 'black-text-outline',
+                  Summer: 'black-text-outline',
                 },
                 activeTheme,
               )
@@ -250,14 +250,14 @@ watch(activeTopic, (newTopic: TopicName | null) => {
                 class="title-content q-mb-none q-pl-lg text-secondary text-left"
               >
                 <span
-                  class="frontend"
+                  class="frontend text-white"
                   :class="
                     setSeasonClasses(
                       {
-                        Fall: 'dark-text-shadow text-white',
-                        Winter: 'dark-text-shadow text-white',
-                        Spring: 'dark-text-shadow text-white',
-                        Summer: 'dark-text-shadow text-white',
+                        Fall: 'dark-text-outline',
+                        Winter: 'dark-text-outline',
+                        Spring: 'dark-text-outline',
+                        Summer: 'black-text-outline',
                       },
                       activeTheme,
                     )
@@ -265,13 +265,14 @@ watch(activeTopic, (newTopic: TopicName | null) => {
                   >Frontend Developer</span
                 >
                 <span
+                  class="text-white"
                   :class="
                     setSeasonClasses(
                       {
-                        Fall: 'dark-text-shadow text-white',
-                        Winter: 'dark-text-shadow text-secondary',
-                        Spring: 'dark-text-shadow text-secondary',
-                        Summer: 'dark-text-shadow text-secondary',
+                        Fall: 'dark-text-outline',
+                        Winter: 'dark-text-outline',
+                        Spring: 'dark-text-outline',
+                        Summer: 'black-text-outline',
                       },
                       activeTheme,
                     )
@@ -280,14 +281,14 @@ watch(activeTopic, (newTopic: TopicName | null) => {
                   •
                 </span>
                 <span
-                  class="gsap"
+                  class="gsap text-secondary"
                   :class="
                     setSeasonClasses(
                       {
-                        Fall: 'text-secondary dark-text-shadow ',
-                        Winter: 'text-secondary dark-text-shadow ',
-                        Spring: 'text-secondary dark-text-shadow ',
-                        Summer: 'text-secondary dark-text-shadow ',
+                        Fall: 'dark-text-outline',
+                        Winter: 'dark-text-outline',
+                        Spring: 'black-text-outline',
+                        Summer: 'black-text-outline',
                       },
                       activeTheme,
                     )
@@ -295,13 +296,14 @@ watch(activeTopic, (newTopic: TopicName | null) => {
                   >GSAP</span
                 >
                 <span
+                  class="text-white"
                   :class="
                     setSeasonClasses(
                       {
-                        Fall: 'dark-text-shadow text-white',
-                        Winter: 'dark-text-shadow text-white',
-                        Spring: 'dark-text-shadow text-white',
-                        Summer: ' dark-text-shadow text-white',
+                        Fall: 'dark-text-outline',
+                        Winter: 'dark-text-outline',
+                        Spring: 'black-text-outline',
+                        Summer: 'black-text-outline',
                       },
                       activeTheme,
                     )
@@ -314,10 +316,10 @@ watch(activeTopic, (newTopic: TopicName | null) => {
                   :class="
                     setSeasonClasses(
                       {
-                        Fall: 'secondary-text-shadow text-dark',
-                        Winter: 'secondary-text-shadow text-dark',
-                        Spring: 'secondary-text-shadow text-dark',
-                        Summer: 'secondary-text-shadow text-dark',
+                        Fall: 'secondary-text-outline text-dark',
+                        Winter: 'secondary-text-outline text-dark',
+                        Spring: 'secondary-text-outline text-dark',
+                        Summer: 'secondary-text-outline text-dark',
                       },
                       activeTheme,
                     )
@@ -327,17 +329,17 @@ watch(activeTopic, (newTopic: TopicName | null) => {
               </p>
             </div>
           </div>
-          <q-separator class="q-mt-lg full-width bg-accent text-seon"></q-separator>
+          <q-separator class="separator q-mt-lg full-width bg-accent text-seon"></q-separator>
           <div
             ref="servicesDescription"
-            class="services-description start-animation row q-mt-md text-bold text-body-1 wrap justify-center"
+            class="services-description start-animation row q-mt-md q-pa-md text-bold text-body-1 wrap justify-center text-white"
             :class="
               setSeasonClasses(
                 {
-                  Fall: 'text-white dark-text-shadow',
-                  Winter: 'text-white dark-text-shadow',
-                  Spring: 'dark-text-shadow text-white',
-                  Summer: 'dark-text-shadow text-white',
+                  Fall: 'black-text-outline',
+                  Winter: 'black-text-outline',
+                  Spring: 'black-text-outline',
+                  Summer: ' text-white black-text-outline',
                 },
                 activeTheme,
               )
@@ -406,6 +408,7 @@ watch(activeTopic, (newTopic: TopicName | null) => {
   .sub-container {
     flex: 1 1 0%;
     z-index: 2;
+
     @media (min-width: $breakpoint-md) {
       position: relative;
       padding: initial;
@@ -413,7 +416,6 @@ watch(activeTopic, (newTopic: TopicName | null) => {
 
     p:nth-of-type(1) {
       font-weight: bold;
-      font-size: 1.5rem;
       line-height: 2.2rem;
       text-transform: uppercase;
     }
@@ -425,7 +427,7 @@ watch(activeTopic, (newTopic: TopicName | null) => {
     .mobile-view {
       height: auto;
 
-      @media (min-width: $breakpoint-sm) {
+      @media (min-width: $breakpoint-md) {
         display: none;
       }
 
@@ -452,7 +454,7 @@ watch(activeTopic, (newTopic: TopicName | null) => {
     .desktop-view {
       display: none;
 
-      @media (min-width: $breakpoint-sm) {
+      @media (min-width: $breakpoint-md) {
         display: flex;
         justify-content: center;
         align-items: center;
@@ -477,15 +479,22 @@ watch(activeTopic, (newTopic: TopicName | null) => {
           }
 
           .title-container {
-            font-size: 1.5rem;
             width: 35%;
 
             .title-content {
+              width: 70%;
               opacity: 0;
               transform: translateY(120px);
+              font-size: 1.2rem;
             }
           }
         }
+
+        .separator {
+          opacity: 0;
+          transform: translateY(150px);
+        }
+
         .services-description {
           opacity: 0;
           transform: translateX(-100px);

@@ -205,6 +205,7 @@ onBeforeUnmount(() => window.removeEventListener('resize', updateWidths));
 .q-header {
   background-color: rgba($color: black, $alpha: 0.5) !important;
   border-bottom: 2px solid var(--q-primary);
+  background-color: pink;
 
   @media (min-width: $breakpoint-md) {
     display: none;
@@ -256,10 +257,5 @@ aside {
 .activeTopic {
   color: var(--q-accent);
   font-weight: bold;
-}
-
-.resume {
-  text-decoration: none;
-  color: var(--q-accent);
 }
 </style>

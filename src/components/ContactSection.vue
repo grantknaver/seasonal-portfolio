@@ -126,7 +126,7 @@ const sendEmail = async () => {
         autogrow
         :disable="!isHuman"
       />
-      <RecaptchaWidget v-show="!isHuman" class="recaptcha q-mt-md"></RecaptchaWidget>
+      <RecaptchaWidget v-show="!isHuman" class="full-width q-mt-md"></RecaptchaWidget>
       <q-btn
         v-show="isHuman"
         class="full-width"
@@ -200,7 +200,7 @@ const sendEmail = async () => {
         autogrow
         :disable="!isHuman"
       />
-      <RecaptchaWidget v-show="!isHuman" class="recaptcha q-mt-md"></RecaptchaWidget>
+      <RecaptchaWidget v-show="!isHuman" class="q-mt-md"></RecaptchaWidget>
       <q-btn
         v-show="isHuman"
         class="q-mt-md"
@@ -229,15 +229,6 @@ const sendEmail = async () => {
 .mobile-view {
   @media (min-width: $breakpoint-md) {
     display: none;
-  }
-
-  .recaptcha-container {
-    min-height: 400px;
-
-    h2 {
-      position: relative;
-      font-size: 3rem;
-    }
   }
 }
 

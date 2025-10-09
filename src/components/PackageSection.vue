@@ -294,7 +294,7 @@ watch(activeTheme, (newTheme) => {
 @import '../css/main.scss';
 
 .mobile-view {
-  @media (min-width: $breakpoint-sm) {
+  @media (min-width: $breakpoint-md) {
     display: none;
   }
 
@@ -347,7 +347,7 @@ watch(activeTheme, (newTheme) => {
 .desktop-view {
   display: none;
 
-  @media (min-width: $breakpoint-sm) {
+  @media (min-width: $breakpoint-md) {
     display: flex;
   }
 

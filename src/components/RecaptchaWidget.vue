@@ -54,7 +54,6 @@ async function init() {
 
   grecaptcha.ready(() => {
     // ✅ render into the element, not the string id
-    console.log('recaptcha fires');
     const id = grecaptcha.render(recaptchaEl.value!, {
       sitekey: '6Lfgtr8rAAAAAMLTtsoeUz0tkVGKcGLog0JWasz6',
       theme: 'light',
@@ -90,5 +89,23 @@ onBeforeUnmount(() => mainStore.SET_RECAPTCHA_WIDGET_ID(null));
 </script>
 
 <template>
-  <div ref="recaptchaEl" class="q-mt-sm"></div>
+  <div class="g-recaptcha full-width" ref="recaptchaEl"></div>
 </template>
+
+<style scoped lang="scss">
+@import '../css/main.scss';
+
+.g-recaptcha {
+  width: 175px;
+  max-width: 175px;
+  transform: scale(0.75); /* Scales to 70% */
+  transform-origin: 0 0; /* Aligns to top-left */
+
+  @media (min-width: $breakpoint-md) {
+    width: auto;
+    max-width: none;
+    transform: none;
+    transform-origin: 0%;
+  }
+}
+</style>

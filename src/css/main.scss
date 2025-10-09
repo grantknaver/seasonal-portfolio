@@ -14,7 +14,15 @@
   min-height: 200px !important;
 }
 
-.primary-text-shadow {
+.black-text-outline {
+  text-shadow:
+    -1px -1px 0 black,
+    1px -1px 0 black,
+    -1px 1px 0 black,
+    1px 1px 0 black;
+}
+
+.primary-text-outline {
   text-shadow:
     -1px -1px 0 var(--q-primary),
     1px -1px 0 var(--q-primary),
@@ -22,7 +30,7 @@
     1px 1px 0 var(--q-primary);
 }
 
-.dark-text-shadow {
+.dark-text-outline {
   text-shadow:
     -1px -1px 0 var(--q-dark),
     1px -1px 0 var(--q-dark),
@@ -30,7 +38,7 @@
     1px 1px 0 var(--q-dark);
 }
 
-.accent-text-shadow {
+.accent-text-outline {
   text-shadow:
     -1px -1px 0 var(--q-accent),
     1px -1px 0 var(--q-accent),
@@ -38,7 +46,7 @@
     1px 1px 0 var(--q-accent);
 }
 
-.secondary-text-shadow {
+.secondary-text-outline {
   text-shadow:
     -1px -1px 0 var(--q-secondary),
     1px -1px 0 var(--q-secondary),
