@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref, watch, onMounted, nextTick } from 'vue';
+import { ref, watch, onMounted, nextTick, onBeforeUnmount } from 'vue';
 import { useMainStore } from '../stores/main';
 import { type Topic } from '../shared/types/topic';
 import { v4 as uuidv4 } from 'uuid';
@@ -68,14 +68,15 @@ const expandedPanel = ref<TopicName | null>(null);
 const headerHeight = ref<number>(0);
 const root = ref<HTMLElement | null>(null);
 const showFooter = ref<boolean>(false);
+const io = ref<IntersectionObserver | null>(null);
 
 watch(slide, (newVal) => mainStore.SET_ACTIVE_THEME(newVal));
 
-const hasElementInViewport = (el: Element, margin = 10) => {
-  const top = el.getBoundingClientRect().top;
-  const viewHeight = window.innerHeight || document.documentElement.clientHeight;
-  return top >= -margin && top <= viewHeight + margin;
-};
+// const hasElementInViewport = (el: Element, margin = 10) => {
+//   const top = el.getBoundingClientRect().top;
+//   const viewHeight = window.innerHeight || document.documentElement.clientHeight;
+//   return top >= -margin && top <= viewHeight + margin;
+// };
 
 onMounted(async () => {
   await nextTick();
@@ -133,11 +134,31 @@ onMounted(async () => {
     headerHeight.value = document.getElementById('mobile-header')?.offsetHeight ?? 0;
   });
 
-  window.addEventListener('scroll', () => {
-    const footerEl = document.getElementById('footer');
-    if (!footerEl) return;
-    showFooter.value = hasElementInViewport(footerEl);
-  });
+  const footerEl = document.getElementById('footer');
+  if (!footerEl) return;
+
+  const footerRoot = getScrollTarget(footerEl); // Element or Window
+  io.value = new IntersectionObserver(
+    ([entry]) => {
+      showFooter.value = entry ? entry.isIntersecting : false;
+    },
+    {
+      root: footerRoot === window ? null : (footerRoot as Element), // null = window viewport
+      threshold: 0,
+      rootMargin: '0px',
+    },
+  );
+  io.value.observe(footerEl);
+  // window.addEventListener('scroll', () => {
+  //   const footerEl = document.getElementById('footer');
+  //   if (!footerEl) return;
+
+  //   showFooter.value = hasElementInViewport(footerEl);
+  // });
+});
+
+onBeforeUnmount(() => {
+  io.value?.disconnect();
 });
 
 watch(mobileScrollTarget, (newTopic) => {
@@ -270,7 +291,7 @@ const scrollToFooter = () => {
               )
             "
           >
-            Grant Knaver
+            Grant Knaver {{ showFooter }}
           </p>
           <div class="simon-container row no-wrap">
             <SimonMenu class="simon"></SimonMenu>
