@@ -96,15 +96,15 @@ const FALL_SPIN_PROB = 0.6; // 60% of leaves can rotate this cycle
 // DOM / layout utilities
 // -----------------------------------------------------
 
-const getAbsoluteOffsetTop = (el: HTMLElement): number => {
-  let top = el.offsetTop;
-  let parent = el.offsetParent as HTMLElement | null;
-  while (parent) {
-    top += parent.offsetTop;
-    parent = parent.offsetParent as HTMLElement | null;
-  }
-  return top;
-};
+// const getAbsoluteOffsetTop = (el: HTMLElement): number => {
+//   let top = el.offsetTop;
+//   let parent = el.offsetParent as HTMLElement | null;
+//   while (parent) {
+//     top += parent.offsetTop;
+//     parent = parent.offsetParent as HTMLElement | null;
+//   }
+//   return top;
+// };
 
 // Fall duration scales w/ size (adjusted for small/mobile view)
 const assignFallDuration = (artifactSizePx: number) => {
@@ -129,7 +129,7 @@ type SeasonCfg = {
   spawn: (element: HTMLElement, artifactSizePx: number) => Spawn;
 
   // Target Y position for "falling" animations (null => y is driven in keyframes)
-  targetY: (footerTopPx: number) => number | null;
+  targetY: (footerTopPx?: number) => number | null;
 
   // Keyframed motion pattern for the season
   motion: (element: HTMLElement, artifactSizePx: number) => Motion;
@@ -164,7 +164,7 @@ const SEASONS: Record<Theme, SeasonCfg> = {
       };
     },
     /** Limit fall distance to just above the footer (or a padded bottom-of-viewport). */
-    targetY: (footerTopPx) => Math.min(footerTopPx, vh() + 140),
+    targetY: () => vh() + 160,
     /**
      * Gentle drift with optional spinning “tumbles”.
      * Uses smoothed wind for lateral drift and a spin envelope for bursts of rotation.
@@ -254,7 +254,7 @@ const SEASONS: Record<Theme, SeasonCfg> = {
     },
 
     /** Same vertical target behavior as Fall. */
-    targetY: (footerTopPx) => Math.min(footerTopPx, vh() + 140),
+    targetY: () => vh() + 160,
 
     /**
      * Snow-like drift: slow, smoothed lateral wander driven by wind.
@@ -322,7 +322,7 @@ const SEASONS: Record<Theme, SeasonCfg> = {
       };
     },
     /** Limit fall distance to just above the footer (or a padded bottom-of-viewport). */
-    targetY: (footerTopPx) => Math.min(footerTopPx, vh() + 140),
+    targetY: () => vh() + 160,
     /**
      * Gentle drift with optional spinning “tumbles”.
      * Uses smoothed wind for lateral drift and a spin envelope for bursts of rotation.
@@ -538,9 +538,9 @@ const animateArtifacts = () => {
     const spawnState = seasonCfg.spawn(nodeEl, artifact.size);
 
     // determine vertical target (footer or padded bottom)
-    const footerEl = document.querySelector('footer.q-footer') as HTMLElement;
-    const footerTopPx = footerEl ? getAbsoluteOffsetTop(footerEl) : vh();
-    const targetYPx = seasonCfg.targetY(footerTopPx);
+    // const footerEl = document.getElementById('footer') as HTMLElement;
+    // const footerTopPx = footerEl ? getAbsoluteOffsetTop(footerEl) : vh();
+    const targetYPx = seasonCfg.targetY();
 
     // motion keyframes/ease for this season
     const motionCfg = seasonCfg.motion(nodeEl, artifact.size);

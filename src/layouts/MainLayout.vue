@@ -139,7 +139,7 @@ onBeforeUnmount(() => window.removeEventListener('resize', updateWidths));
       <div class="footer-spacer" />
 
       <!-- "Footer" lives in normal flow so we can scroll to it -->
-      <section id="footer" class="my-footer q-pa-md bg-dark text-white" aria-label="Site footer">
+      <section id="footer" class="q-pa-md bg-dark text-white" aria-label="Site footer">
         <q-toolbar class="justify-between">
           <q-toolbar-title class="text-subtitle2 text-weight-light">
             © {{ new Date().getFullYear() }} <span class="text-secondary">glk</span
@@ -235,7 +235,7 @@ aside {
   flex-direction: column;
   background-color: rgba(black, 0.5);
   border-left: solid 4px var(--q-primary);
-  z-index: 2000;
+  z-index: 2;
 
   .q-scrollarea,
   .scroll-area {
@@ -245,16 +245,15 @@ aside {
 
 /* Mobile drawer overlays above content */
 .drawer-mobile {
-  z-index: 2000;
-}
-
-.footer-btn {
-  z-index: 1000;
+  z-index: 2;
 }
 
 /* removed fixed q-footer; style our flow footer instead */
-.my-footer {
+#footer {
+  position: relative;
   border-top: 1px solid var(--q-primary);
+  z-index: 10;
+
   .prefix-text {
     font-size: 0.8rem;
   }

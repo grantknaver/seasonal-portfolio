@@ -384,7 +384,7 @@ const scrollToFooter = () => {
         <q-btn
           id="showFooterBtn"
           round
-          color="secondary"
+          color="accent"
           :icon="!showFooter ? 'south' : 'north'"
           class="q-px-sm"
           @click="scrollToFooter"
@@ -435,7 +435,7 @@ const scrollToFooter = () => {
     @media (min-width: $breakpoint-lg) {
       display: flex !important;
       align-items: center;
-      z-index: 10;
+      z-index: 2;
 
       .logo-text {
         padding-left: 0.5rem;
