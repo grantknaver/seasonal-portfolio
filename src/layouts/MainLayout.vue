@@ -148,7 +148,14 @@ onBeforeUnmount(() => window.removeEventListener('resize', updateWidths));
             <q-icon name="favorite" color="accent" size="16px" />
             using
             <a href="https://vuejs.org/" target="_blank" class="text-primary">Vue</a>,
-            <a href="https://gsap.com/" target="_blank" class="text-primary">GSAP</a>, and AI tools.
+            <a href="https://gsap.com/" target="_blank" class="text-primary">GSAP</a>,
+            <a
+              href="https://start.elevenlabs.io/cp/for-developers?utm_source=google&utm_medium=cpc&utm_campaign=t2_nonbrandsearch_developers_english&utm_id=23036483182&utm_term=elevenlabs%20api&utm_content=developer_-_other&gad_source=1&gad_campaignid=23036483182&gbraid=0AAAAA_PU6FZ0M3R23svUfxzzlK4tMIVv3&gclid=CjwKCAjwup3HBhAAEiwA7euZupVrpPtMDwT4bTGbiBeuLGRgeJRvvD2WxgM5nLfSbMAo1CMsKbfPtRoCiB0QAvD_BwE"
+              target="_blank"
+              class="text-primary"
+              >Elevenlabs API</a
+            >, and
+            <a href="https://openai.com/api/" target="_blank" class="text-primary">ChatGPT API</a>.
           </q-toolbar-title>
 
           <div>
