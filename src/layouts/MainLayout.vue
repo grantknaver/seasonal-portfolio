@@ -139,7 +139,7 @@ onBeforeUnmount(() => window.removeEventListener('resize', updateWidths));
       <div class="footer-spacer" />
 
       <!-- "Footer" lives in normal flow so we can scroll to it -->
-      <section id="footer" class="q-pa-md bg-dark text-white" aria-label="Site footer">
+      <section id="footer" class="bg-dark text-white" aria-label="Site footer">
         <q-toolbar class="justify-between">
           <q-toolbar-title class="text-subtitle2 text-weight-light">
             © {{ new Date().getFullYear() }} <span class="text-secondary">glk</span

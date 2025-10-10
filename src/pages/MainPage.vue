@@ -72,19 +72,25 @@ const io = ref<IntersectionObserver | null>(null);
 
 watch(slide, (newVal) => mainStore.SET_ACTIVE_THEME(newVal));
 
-// const hasElementInViewport = (el: Element, margin = 10) => {
-//   const top = el.getBoundingClientRect().top;
-//   const viewHeight = window.innerHeight || document.documentElement.clientHeight;
-//   return top >= -margin && top <= viewHeight + margin;
-// };
-
 onMounted(async () => {
   await nextTick();
-  const el = root.value; // ✅ real HTMLElement
+  const el = root.value;
   if (!el) return;
 
+  const titleEl = el.querySelector('.title-content') as HTMLElement;
+  const sepEl = el.querySelector('.separator') as HTMLElement;
+
   gsap.context(() => {
-    gsap.to('.name', {
+    // Set initial states (important for consistent transitions)
+    gsap.set('.name', { y: -100 });
+    gsap.set('.simon', { scale: 0, transformOrigin: '50% 50%' });
+    gsap.set(sepEl, { y: 150, autoAlpha: 0 });
+    gsap.set(titleEl, { y: 123, autoAlpha: 0 });
+    gsap.set('.services-description', { x: -100, autoAlpha: 0 });
+
+    const tl = gsap.timeline();
+    // Name animation
+    tl.to('.name', {
       keyframes: {
         '0%': { rotation: 15 },
         '50%': { rotation: -10 },
@@ -94,40 +100,52 @@ onMounted(async () => {
       duration: 3.8,
     });
 
-    gsap.to('.simon', {
-      keyframes: {
-        '0%': { scale: 0.5, rotation: 15 },
-        '50%': { scale: 1.1, rotation: -10 }, // finetune with individual eases
-        '100%': { scale: 1, rotation: 0 },
+    // Simon animation
+    tl.to(
+      '.simon',
+      {
+        keyframes: {
+          '0%': { scale: 0.5, rotation: 15 },
+          '50%': { scale: 1.1, rotation: -10 },
+          '100%': { scale: 1, rotation: 0 },
+        },
+        ease: 'bounce',
+        duration: 3.8,
       },
-      ease: 'bounce',
-      duration: 3.8,
-    });
+      0,
+    ); // Overlaps with name animation
 
-    gsap.to('.title-content', {
-      y: 0,
-      autoAlpha: 1,
-      ease: 'bounce',
-      duration: 1.5,
-      delay: 3,
-    });
+    // Separator animation (starts later)
+    tl.to(sepEl, { y: 0, autoAlpha: 1, ease: 'none', duration: 1 }, 1.8);
 
-    gsap.to('.separator', {
-      y: 0,
-      autoAlpha: 1,
-      ease: 'none',
-      duration: 1,
-      delay: 1.8,
-    });
+    // Move title to final position, GAP_PERCENT above separator
+    tl.to(
+      titleEl,
+      {
+        keyframes: {
+          '5%': { autoAlpha: 1 },
+          '100%': { y: 0 },
+        },
+        duration: 1.5,
+        ease: 'bounce',
+      },
+      3,
+    );
 
-    gsap.to('.services-description', {
-      x: 0,
-      autoAlpha: 1,
-      ease: 'bounce',
-      duration: 1.5,
-      delay: 4.5,
-    });
+    // Services description appears later
+    tl.to(
+      '.services-description',
+      {
+        x: 0,
+        autoAlpha: 1,
+        ease: 'bounce',
+        duration: 1.5,
+      },
+      3.5,
+    );
   }, el);
+
+  // --- Other logic (unchanged) ---
   await mainStore.VERIFY_HUMANITY();
 
   window.addEventListener('resize', () => {
@@ -137,24 +155,19 @@ onMounted(async () => {
   const footerEl = document.getElementById('footer');
   if (!footerEl) return;
 
-  const footerRoot = getScrollTarget(footerEl); // Element or Window
+  const footerRoot = getScrollTarget(footerEl);
   io.value = new IntersectionObserver(
     ([entry]) => {
       showFooter.value = entry ? entry.isIntersecting : false;
     },
     {
-      root: footerRoot === window ? null : (footerRoot as Element), // null = window viewport
+      root: footerRoot === window ? null : (footerRoot as Element),
       threshold: 0,
       rootMargin: '0px',
     },
   );
-  io.value.observe(footerEl);
-  // window.addEventListener('scroll', () => {
-  //   const footerEl = document.getElementById('footer');
-  //   if (!footerEl) return;
 
-  //   showFooter.value = hasElementInViewport(footerEl);
-  // });
+  io.value.observe(footerEl);
 });
 
 onBeforeUnmount(() => {
@@ -291,7 +304,7 @@ const scrollToFooter = () => {
               )
             "
           >
-            Grant Knaver {{ showFooter }}
+            Grant Knaver
           </p>
           <div class="simon-container row no-wrap">
             <SimonMenu class="simon"></SimonMenu>
@@ -383,7 +396,7 @@ const scrollToFooter = () => {
           <q-separator class="separator q-mt-lg full-width bg-accent text-seon"></q-separator>
           <div
             ref="servicesDescription"
-            class="services-description start-animation row q-mt-md q-pa-md text-bold wrap justify-center text-white"
+            class="services-description start-animation row q-mt-md q-pa-md text-bold wrap justify-center text-white test"
             :class="
               setSeasonClasses(
                 {
@@ -544,7 +557,7 @@ const scrollToFooter = () => {
 
             .title-content {
               opacity: 0;
-              transform: translateY(120px);
+              transform: translateY(123px);
               font-size: 1.4rem;
             }
           }
@@ -556,9 +569,22 @@ const scrollToFooter = () => {
         }
 
         .services-description {
-          font-size: 1rem;
+          position: relative;
+          z-index: 1;
+          font-size: 1.2rem;
           opacity: 0;
           transform: translateX(-100px);
+          border-radius: 5px;
+        }
+
+        .services-description::before {
+          content: '';
+          position: absolute;
+          inset: 0; /* cover entire element */
+          background-color: rgba(black, 0.4);
+          filter: blur(20px);
+          z-index: -1;
+          margin: -10px; /* expands the blurred area beyond edges */
         }
       }
 
