@@ -16,7 +16,6 @@ import { QCarousel, scroll } from 'quasar';
 import { Theme } from '../shared/constants/theme';
 import WeatherBackground from '../components/WeatherBackground.vue';
 import gsap from 'gsap';
-const { getScrollTarget, setVerticalScrollPosition } = scroll;
 
 const mainStore = useMainStore();
 const mobileTopics: Topic[] = [
@@ -62,6 +61,7 @@ const slides = ref<Slide[]>([
     theme: Theme.Summer,
   },
 ]);
+const { getScrollTarget, setVerticalScrollPosition } = scroll;
 const slide = ref<Theme>(Theme.Fall);
 const { activeTheme, activeTopic, mobileScrollTarget } = storeToRefs(mainStore);
 const expandedPanel = ref<TopicName | null>(null);
@@ -69,8 +69,6 @@ const headerHeight = ref<number>(0);
 const root = ref<HTMLElement | null>(null);
 const showFooter = ref<boolean>(false);
 const io = ref<IntersectionObserver | null>(null);
-
-watch(slide, (newVal) => mainStore.SET_ACTIVE_THEME(newVal));
 
 onMounted(async () => {
   await nextTick();
@@ -183,6 +181,8 @@ watch(activeTopic, (newTopic: TopicName | null) => {
   if (!newTopic) return;
   expandedPanel.value = newTopic;
 });
+
+watch(slide, (newVal) => mainStore.SET_ACTIVE_THEME(newVal));
 
 const scrollToFooter = () => {
   if (!showFooter.value) {
@@ -309,10 +309,7 @@ const scrollToFooter = () => {
           <div class="simon-container row no-wrap">
             <SimonMenu class="simon"></SimonMenu>
             <div class="title-container row items-center full-width q-pa-md">
-              <p
-                ref="titleContent"
-                class="title-content full-width q-mb-none q-pl-lg text-secondary text-left"
-              >
+              <p class="title-content full-width q-mb-none q-pl-lg text-secondary text-left">
                 <span
                   class="frontend text-white"
                   :class="
@@ -395,7 +392,6 @@ const scrollToFooter = () => {
           </div>
           <q-separator class="separator q-mt-lg full-width bg-accent text-seon"></q-separator>
           <div
-            ref="servicesDescription"
             class="services-description start-animation row q-mt-md q-pa-md text-bold wrap justify-center text-white test"
             :class="
               setSeasonClasses(
