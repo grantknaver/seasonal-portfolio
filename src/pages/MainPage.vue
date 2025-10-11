@@ -16,6 +16,8 @@ import { QCarousel, scroll } from 'quasar';
 import { Theme } from '../shared/constants/theme';
 import WeatherBackground from '../components/WeatherBackground.vue';
 import gsap from 'gsap';
+import { vw } from '../shared/utils/viewWidth';
+import { getCustomCssVar } from 'src/shared/utils/getCustomCssVar';
 
 const mainStore = useMainStore();
 const mobileTopics: Topic[] = [
@@ -69,78 +71,171 @@ const headerHeight = ref<number>(0);
 const root = ref<HTMLElement | null>(null);
 const showFooter = ref<boolean>(false);
 const io = ref<IntersectionObserver | null>(null);
+const introTimelines = {
+  responsiveTimeline: gsap.timeline({ paused: true }),
+  desktopTimeline: gsap.timeline({ paused: true }),
+};
+const startResponsiveIntroAnimation = (el: HTMLElement) => {
+  console.log('startResponsiveIntroAnimation', el);
+  // const { responsiveTimeline } = introTimelines;
+  // const desktopNameEl = el.querySelector('.desktop-name') as HTMLElement;
+  // const desktopTitleEl = el.querySelector('.desktop-title-content') as HTMLElement;
+  // const desktopSepEl = el.querySelector('.desktop-separator') as HTMLElement;
+  // const desktopServicesDescription = el.querySelector(
+  //   '.desktop-services-description',
+  // ) as HTMLElement;
+
+  // gsap.set(desktopNameEl, { y: -200 });
+  // gsap.set('.simon', { scale: 0, transformOrigin: '50% 50%' });
+  // gsap.set(desktopSepEl, { y: 150, autoAlpha: 0 });
+  // gsap.set(desktopTitleEl, { y: 123, autoAlpha: 0 });
+  // gsap.set(desktopServicesDescription, { x: -100, autoAlpha: 0 });
+
+  // // // Name animation
+  // desktopTimeline.to(desktopNameEl, {
+  //   keyframes: {
+  //     '0%': { rotation: 15 },
+  //     '50%': { rotation: -10 },
+  //     '100%': { rotation: 0, y: 0 },
+  //   },
+  //   ease: 'bounce',
+  //   duration: 3.8,
+  // });
+
+  // // // Simon animation
+  // desktopTimeline.to(
+  //   '.simon',
+  //   {
+  //     keyframes: {
+  //       '0%': { scale: 0.5, rotation: 15 },
+  //       '10%': { scale: 0.5, rotation: 15, autoAlpha: 1 },
+  //       '50%': { scale: 1.1, rotation: -10 },
+  //       '100%': { scale: 1, rotation: 0 },
+  //     },
+  //     ease: 'bounce',
+  //     duration: 3.8,
+  //   },
+  //   0,
+  // ); // Overlaps with name animation
+
+  // // // Separator animation (starts later)
+  // desktopTimeline.to(desktopSepEl, { y: 0, autoAlpha: 1, ease: 'none', duration: 1 }, 1.8);
+
+  // // // Move title to final position, GAP_PERCENT above separator
+  // desktopTimeline.to(
+  //   desktopTitleEl,
+  //   {
+  //     keyframes: {
+  //       '5%': { autoAlpha: 1 },
+  //       '100%': { y: 0 },
+  //     },
+  //     duration: 1.5,
+  //     ease: 'bounce',
+  //   },
+  //   3,
+  // );
+
+  // // // Services description appears later
+  // desktopTimeline.to(
+  //   desktopServicesDescription,
+  //   {
+  //     x: 0,
+  //     autoAlpha: 1,
+  //     ease: 'bounce',
+  //     duration: 1.5,
+  //   },
+  //   3.5,
+  // );
+};
+const desktopBreakpoint = +getCustomCssVar('breakpoint-lg').slice(0, -2);
+const startDesktopIntroAnimation = (el: HTMLElement) => {
+  const { desktopTimeline } = introTimelines;
+  const desktopNameEl = el.querySelector('.desktop-name') as HTMLElement;
+  const desktopTitleEl = el.querySelector('.desktop-title') as HTMLElement;
+  const desktopSepEl = el.querySelector('.desktop-separator') as HTMLElement;
+  const desktopServicesDescription = el.querySelector(
+    '.desktop-services-description',
+  ) as HTMLElement;
+
+  gsap.set(desktopNameEl, { y: -200 });
+  gsap.set('.simon', { scale: 0, transformOrigin: '50% 50%' });
+  gsap.set(desktopSepEl, { y: 150, autoAlpha: 0 });
+  gsap.set(desktopTitleEl, { y: 123, autoAlpha: 0 });
+  gsap.set(desktopServicesDescription, { x: -100, autoAlpha: 0 });
+
+  // // Name animation
+  desktopTimeline.to(desktopNameEl, {
+    keyframes: {
+      '0%': { rotation: 15 },
+      '50%': { rotation: -10 },
+      '100%': { rotation: 0, y: 0 },
+    },
+    ease: 'bounce',
+    duration: 3.8,
+  });
+
+  // // Simon animation
+  desktopTimeline.to(
+    '.simon',
+    {
+      keyframes: {
+        '0%': { scale: 0.5, rotation: 15 },
+        '10%': { scale: 0.5, rotation: 15, autoAlpha: 1 },
+        '50%': { scale: 1.1, rotation: -10 },
+        '100%': { scale: 1, rotation: 0 },
+      },
+      ease: 'bounce',
+      duration: 3.8,
+    },
+    0,
+  ); // Overlaps with name animation
+
+  // // Separator animation (starts later)
+  desktopTimeline.to(desktopSepEl, { y: 0, autoAlpha: 1, ease: 'none', duration: 1 }, 1.8);
+
+  // // Move title to final position, GAP_PERCENT above separator
+  desktopTimeline.to(
+    desktopTitleEl,
+    {
+      keyframes: {
+        '5%': { autoAlpha: 1 },
+        '100%': { y: 0 },
+      },
+      duration: 1.5,
+      ease: 'bounce',
+    },
+    3,
+  );
+
+  // // Services description appears later
+  desktopTimeline.to(
+    desktopServicesDescription,
+    {
+      x: 0,
+      autoAlpha: 1,
+      ease: 'bounce',
+      duration: 1.5,
+    },
+    3.5,
+  );
+  desktopTimeline.play();
+};
+
+const startIntroAnimation = (el: HTMLElement) => {
+  if (vw() < desktopBreakpoint) {
+    startResponsiveIntroAnimation(el);
+  } else {
+    startDesktopIntroAnimation(el);
+  }
+};
 
 onMounted(async () => {
   await nextTick();
   const el = root.value;
   if (!el) return;
 
-  const titleEl = el.querySelector('.title-content') as HTMLElement;
-  const sepEl = el.querySelector('.separator') as HTMLElement;
-
   gsap.context(() => {
-    // Set initial states (important for consistent transitions)
-    gsap.set('.name', { y: -100 });
-    gsap.set('.simon', { scale: 0, transformOrigin: '50% 50%' });
-    gsap.set(sepEl, { y: 150, autoAlpha: 0 });
-    gsap.set(titleEl, { y: 123, autoAlpha: 0 });
-    gsap.set('.services-description', { x: -100, autoAlpha: 0 });
-
-    const tl = gsap.timeline();
-    // Name animation
-    tl.to('.name', {
-      keyframes: {
-        '0%': { rotation: 15 },
-        '50%': { rotation: -10 },
-        '100%': { rotation: 0, y: 0 },
-      },
-      ease: 'bounce',
-      duration: 3.8,
-    });
-
-    // Simon animation
-    tl.to(
-      '.simon',
-      {
-        keyframes: {
-          '0%': { scale: 0.5, rotation: 15 },
-          '50%': { scale: 1.1, rotation: -10 },
-          '100%': { scale: 1, rotation: 0 },
-        },
-        ease: 'bounce',
-        duration: 3.8,
-      },
-      0,
-    ); // Overlaps with name animation
-
-    // Separator animation (starts later)
-    tl.to(sepEl, { y: 0, autoAlpha: 1, ease: 'none', duration: 1 }, 1.8);
-
-    // Move title to final position, GAP_PERCENT above separator
-    tl.to(
-      titleEl,
-      {
-        keyframes: {
-          '5%': { autoAlpha: 1 },
-          '100%': { y: 0 },
-        },
-        duration: 1.5,
-        ease: 'bounce',
-      },
-      3,
-    );
-
-    // Services description appears later
-    tl.to(
-      '.services-description',
-      {
-        x: 0,
-        autoAlpha: 1,
-        ease: 'bounce',
-        duration: 1.5,
-      },
-      3.5,
-    );
+    startIntroAnimation(el);
   }, el);
 
   // --- Other logic (unchanged) ---
@@ -234,13 +329,96 @@ const scrollToFooter = () => {
     </div>
     <div ref="root" class="sub-container column">
       <section class="responsive-view full-width q-pa-md">
-        <div inline-actions class="text-primary bg-accent q-mb-sm">
+        <div class="responsive-home-contaier column text-primary bg-accent q-mb-sm q-pa-lg">
           <span>
-            <p class="q-ma-none text-primary bounce-text">Grant Knaver</p>
-            <p class="q-ma-none text-dark">Fullstack Developer</p>
+            <p class="responsive-name q-mb-none text-white">Grant Knaver</p>
+            <p class="responsive-title text-secondary">
+              <span
+                class="frontend text-white"
+                :class="
+                  setSeasonClasses(
+                    {
+                      Fall: 'dark-text-outline',
+                      Winter: 'dark-text-outline',
+                      Spring: 'dark-text-outline',
+                      Summer: 'black-text-outline',
+                    },
+                    activeTheme,
+                  )
+                "
+                >Frontend Developer</span
+              >
+              <span
+                class="text-white"
+                :class="
+                  setSeasonClasses(
+                    {
+                      Fall: 'dark-text-outline',
+                      Winter: 'dark-text-outline',
+                      Spring: 'dark-text-outline',
+                      Summer: 'black-text-outline',
+                    },
+                    activeTheme,
+                  )
+                "
+              >
+                •
+              </span>
+              <span
+                class="gsap text-secondary"
+                :class="
+                  setSeasonClasses(
+                    {
+                      Fall: 'dark-text-outline',
+                      Winter: 'dark-text-outline',
+                      Spring: 'black-text-outline',
+                      Summer: 'black-text-outline',
+                    },
+                    activeTheme,
+                  )
+                "
+                >GSAP</span
+              >
+              <span
+                class="text-white"
+                :class="
+                  setSeasonClasses(
+                    {
+                      Fall: 'dark-text-outline',
+                      Winter: 'dark-text-outline',
+                      Spring: 'black-text-outline',
+                      Summer: 'black-text-outline',
+                    },
+                    activeTheme,
+                  )
+                "
+              >
+                &
+              </span>
+              <span
+                class="text-secondary"
+                :class="
+                  setSeasonClasses(
+                    {
+                      Fall: 'dark-text-outline',
+                      Winter: 'dark-text-outline',
+                      Spring: 'black-text-outline',
+                      Summer: 'black-text-outline',
+                    },
+                    activeTheme,
+                  )
+                "
+                >AI Integration</span
+              >
+            </p>
+            <q-separator></q-separator>
+            <p class="responsive-services-description q-mt-md q-mb-none text-body-2">
+              <i
+                >I design and build interactive, high-performance web experiences that blend motion,
+                data, and intelligence.</i
+              >
+            </p>
           </span>
-          <q-space></q-space>
-          <q-btn size="lg" color="dark">Resume</q-btn>
         </div>
         <q-list class="full-width">
           <q-item
@@ -289,9 +467,9 @@ const scrollToFooter = () => {
         </div>
       </section>
       <section class="desktop-view row justify-end items-center full-width">
-        <div class="home-contaier q-pl-xl q-pr-xl column">
+        <div class="desktop-home-contaier q-pl-xl q-pr-xl column">
           <p
-            class="name q-mb-lg text-body-1 text-left text-white"
+            class="desktop-name q-mb-lg text-body-1 text-left text-white"
             :class="
               setSeasonClasses(
                 {
@@ -308,8 +486,8 @@ const scrollToFooter = () => {
           </p>
           <div class="simon-container row no-wrap">
             <SimonMenu class="simon"></SimonMenu>
-            <div class="title-container row items-center full-width q-pa-md">
-              <p class="title-content full-width q-mb-none q-pl-lg text-secondary text-left">
+            <div class="desktop-title-container row items-center full-width q-pa-md">
+              <p class="desktop-title full-width q-mb-none q-pl-lg text-secondary text-left">
                 <span
                   class="frontend text-white"
                   :class="
@@ -373,7 +551,7 @@ const scrollToFooter = () => {
                   &
                 </span>
                 <span
-                  class="aiIntegration text-secondary"
+                  class="text-secondary"
                   :class="
                     setSeasonClasses(
                       {
@@ -390,9 +568,11 @@ const scrollToFooter = () => {
               </p>
             </div>
           </div>
-          <q-separator class="separator q-mt-lg full-width bg-accent text-seon"></q-separator>
+          <q-separator
+            class="desktop-separator q-mt-lg full-width bg-accent text-seon"
+          ></q-separator>
           <div
-            class="services-description start-animation row q-mt-md q-pa-md text-bold wrap justify-center text-white test"
+            class="desktop-services-description start-animation row q-mt-md q-pa-md text-bold wrap justify-center text-white test"
             :class="
               setSeasonClasses(
                 {
@@ -500,22 +680,14 @@ const scrollToFooter = () => {
         display: none;
       }
 
-      blockquote {
-        border-left: 4px solid var(--q-dark);
-        padding: 1rem 1.5rem;
-        font-style: italic;
-        background-color: rgba(0, 0, 0, 0.5);
-        color: var(--q-primary);
-        text-shadow: 1px 1px 20px var(--q-dark);
-      }
-
-      .expansion-item {
-        .anchor {
-          scroll-margin-top: 72px;
-
-          @media (min-width: $breakpoint-md) {
-            scroll-margin-top: 0;
-          }
+      .responsive-home-contaier {
+        .responsive-name {
+          font-size: 1.5rem;
+        }
+        .responsive-title {
+          font-size: 1.2rem;
+        }
+        .responsive-services-description {
         }
       }
     }
@@ -531,16 +703,17 @@ const scrollToFooter = () => {
         position: relative;
       }
 
-      .home-contaier {
+      .desktop-home-contaier {
         margin-top: 4rem;
         max-width: 700px;
 
-        .name {
+        .desktop-name {
           font-size: 1.8rem;
-          transform: translateY(-100px);
+          transform: translateY(-200px);
         }
         .simon-container {
           .simon {
+            opacity: 0;
             width: 65%;
             min-width: 275px;
             max-width: 275px;
@@ -548,10 +721,11 @@ const scrollToFooter = () => {
             transform-origin: 50% 50%;
           }
 
-          .title-container {
+          .desktop-title-container {
             width: 35%;
 
-            .title-content {
+            .desktop-title {
+              width: 35%;
               opacity: 0;
               transform: translateY(123px);
               font-size: 1.4rem;
@@ -559,12 +733,12 @@ const scrollToFooter = () => {
           }
         }
 
-        .separator {
+        .desktop-separator {
           opacity: 0;
           transform: translateY(150px);
         }
 
-        .services-description {
+        .desktop-services-description {
           position: relative;
           z-index: 1;
           font-size: 1.2rem;
@@ -573,7 +747,7 @@ const scrollToFooter = () => {
           border-radius: 5px;
         }
 
-        .services-description::before {
+        .desktop-services-description::before {
           content: '';
           position: absolute;
           inset: 0; /* cover entire element */
