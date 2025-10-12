@@ -16,8 +16,40 @@ import { QCarousel, scroll } from 'quasar';
 import { Theme } from '../shared/constants/theme';
 import WeatherBackground from '../components/WeatherBackground.vue';
 import gsap from 'gsap';
-import { vw } from '../shared/utils/viewWidth';
-import { getCustomCssVar } from 'src/shared/utils/getCustomCssVar';
+import { isResponsive } from '../shared/utils/isResponsive';
+
+const responsiveAnimations = {
+  intro: {
+    timeline: gsap.timeline({
+      paused: true,
+      onComplete: () => {
+        // responsiveAnimations.intro.hasAnimated = true;
+        // console.log('responsive has finished');
+      },
+    }),
+    reset: (elements: unknown[]) => {
+      elements.forEach((target) => {
+        gsap.killTweensOf(target as gsap.TweenTarget);
+      });
+      responsiveAnimations.intro.timeline.pause(0).clear();
+      responsiveAnimations.intro.timeline?.kill();
+      responsiveAnimations.intro.timeline = gsap.timeline({ paused: true });
+    },
+  },
+};
+
+const desktopAnimations = {
+  intro: {
+    timeline: gsap.timeline({
+      paused: true,
+      onComplete: () => {
+        desktopAnimations.intro.hasAnimated = true;
+        console.log('desktop has finished');
+      },
+    }),
+    hasAnimated: false,
+  },
+};
 
 const mainStore = useMainStore();
 const mobileTopics: Topic[] = [
@@ -71,91 +103,31 @@ const headerHeight = ref<number>(0);
 const root = ref<HTMLElement | null>(null);
 const showFooter = ref<boolean>(false);
 const io = ref<IntersectionObserver | null>(null);
-const introTimelines = {
-  responsiveTimeline: gsap.timeline({ paused: true }),
-  desktopTimeline: gsap.timeline({ paused: true }),
-};
 const startResponsiveIntroAnimation = (el: HTMLElement) => {
-  console.log('startResponsiveIntroAnimation', el);
-  // const { responsiveTimeline } = introTimelines;
-  // const desktopNameEl = el.querySelector('.desktop-name') as HTMLElement;
-  // const desktopTitleEl = el.querySelector('.desktop-title-content') as HTMLElement;
-  // const desktopSepEl = el.querySelector('.desktop-separator') as HTMLElement;
-  // const desktopServicesDescription = el.querySelector(
-  //   '.desktop-services-description',
-  // ) as HTMLElement;
+  const { timeline } = responsiveAnimations.intro;
+  timeline.pause(0).clear().invalidate();
+  const responsiveIntroEls = el.querySelectorAll('.responsive-intro-element');
+  gsap.killTweensOf(responsiveIntroEls); // stop any in-flight tweens touching targets
+  timeline.fromTo(
+    responsiveIntroEls,
+    { x: 200, autoAlpha: 0 }, // explicit start (matches your inline set)
+    { x: 0, autoAlpha: 1, duration: 2, ease: 'bounce', stagger: 1, immediateRender: false },
+  );
 
-  // gsap.set(desktopNameEl, { y: -200 });
-  // gsap.set('.simon', { scale: 0, transformOrigin: '50% 50%' });
-  // gsap.set(desktopSepEl, { y: 150, autoAlpha: 0 });
-  // gsap.set(desktopTitleEl, { y: 123, autoAlpha: 0 });
-  // gsap.set(desktopServicesDescription, { x: -100, autoAlpha: 0 });
-
-  // // // Name animation
-  // desktopTimeline.to(desktopNameEl, {
-  //   keyframes: {
-  //     '0%': { rotation: 15 },
-  //     '50%': { rotation: -10 },
-  //     '100%': { rotation: 0, y: 0 },
-  //   },
-  //   ease: 'bounce',
-  //   duration: 3.8,
-  // });
-
-  // // // Simon animation
-  // desktopTimeline.to(
-  //   '.simon',
-  //   {
-  //     keyframes: {
-  //       '0%': { scale: 0.5, rotation: 15 },
-  //       '10%': { scale: 0.5, rotation: 15, autoAlpha: 1 },
-  //       '50%': { scale: 1.1, rotation: -10 },
-  //       '100%': { scale: 1, rotation: 0 },
-  //     },
-  //     ease: 'bounce',
-  //     duration: 3.8,
-  //   },
-  //   0,
-  // ); // Overlaps with name animation
-
-  // // // Separator animation (starts later)
-  // desktopTimeline.to(desktopSepEl, { y: 0, autoAlpha: 1, ease: 'none', duration: 1 }, 1.8);
-
-  // // // Move title to final position, GAP_PERCENT above separator
-  // desktopTimeline.to(
-  //   desktopTitleEl,
-  //   {
-  //     keyframes: {
-  //       '5%': { autoAlpha: 1 },
-  //       '100%': { y: 0 },
-  //     },
-  //     duration: 1.5,
-  //     ease: 'bounce',
-  //   },
-  //   3,
-  // );
-
-  // // // Services description appears later
-  // desktopTimeline.to(
-  //   desktopServicesDescription,
-  //   {
-  //     x: 0,
-  //     autoAlpha: 1,
-  //     ease: 'bounce',
-  //     duration: 1.5,
-  //   },
-  //   3.5,
-  // );
+  timeline.play();
 };
-const desktopBreakpoint = +getCustomCssVar('breakpoint-lg').slice(0, -2);
 const startDesktopIntroAnimation = (el: HTMLElement) => {
-  const { desktopTimeline } = introTimelines;
+  const { timeline, hasAnimated } = desktopAnimations.intro;
+  if (hasAnimated) return;
+  console.log('cleared desktop check');
   const desktopNameEl = el.querySelector('.desktop-name') as HTMLElement;
   const desktopTitleEl = el.querySelector('.desktop-title') as HTMLElement;
   const desktopSepEl = el.querySelector('.desktop-separator') as HTMLElement;
   const desktopServicesDescription = el.querySelector(
     '.desktop-services-description',
   ) as HTMLElement;
+
+  // timeline.clear();
 
   gsap.set(desktopNameEl, { y: -200 });
   gsap.set('.simon', { scale: 0, transformOrigin: '50% 50%' });
@@ -164,7 +136,7 @@ const startDesktopIntroAnimation = (el: HTMLElement) => {
   gsap.set(desktopServicesDescription, { x: -100, autoAlpha: 0 });
 
   // // Name animation
-  desktopTimeline.to(desktopNameEl, {
+  timeline.to(desktopNameEl, {
     keyframes: {
       '0%': { rotation: 15 },
       '50%': { rotation: -10 },
@@ -175,7 +147,7 @@ const startDesktopIntroAnimation = (el: HTMLElement) => {
   });
 
   // // Simon animation
-  desktopTimeline.to(
+  timeline.to(
     '.simon',
     {
       keyframes: {
@@ -191,10 +163,10 @@ const startDesktopIntroAnimation = (el: HTMLElement) => {
   ); // Overlaps with name animation
 
   // // Separator animation (starts later)
-  desktopTimeline.to(desktopSepEl, { y: 0, autoAlpha: 1, ease: 'none', duration: 1 }, 1.8);
+  timeline.to(desktopSepEl, { y: 0, autoAlpha: 1, ease: 'none', duration: 1 }, 1.8);
 
   // // Move title to final position, GAP_PERCENT above separator
-  desktopTimeline.to(
+  timeline.to(
     desktopTitleEl,
     {
       keyframes: {
@@ -208,7 +180,7 @@ const startDesktopIntroAnimation = (el: HTMLElement) => {
   );
 
   // // Services description appears later
-  desktopTimeline.to(
+  timeline.to(
     desktopServicesDescription,
     {
       x: 0,
@@ -218,15 +190,7 @@ const startDesktopIntroAnimation = (el: HTMLElement) => {
     },
     3.5,
   );
-  desktopTimeline.play();
-};
-
-const startIntroAnimation = (el: HTMLElement) => {
-  if (vw() < desktopBreakpoint) {
-    startResponsiveIntroAnimation(el);
-  } else {
-    startDesktopIntroAnimation(el);
-  }
+  timeline.play();
 };
 
 onMounted(async () => {
@@ -235,7 +199,14 @@ onMounted(async () => {
   if (!el) return;
 
   gsap.context(() => {
-    startIntroAnimation(el);
+    if (isResponsive()) {
+      const { rebuild } = responsiveAnimations.intro;
+      rebuild();
+      startResponsiveIntroAnimation(el);
+    } else {
+      console.log('runing desktop');
+      startDesktopIntroAnimation(el);
+    }
   }, el);
 
   // --- Other logic (unchanged) ---
@@ -243,6 +214,16 @@ onMounted(async () => {
 
   window.addEventListener('resize', () => {
     headerHeight.value = document.getElementById('mobile-header')?.offsetHeight ?? 0;
+    const el = root.value;
+    if (!el) return;
+    if (isResponsive()) {
+      console.log('running responsive');
+      responsiveAnimations.intro.rebuild();
+      startResponsiveIntroAnimation(el);
+    } else {
+      console.log('runing desktop');
+      startDesktopIntroAnimation(el);
+    }
   });
 
   const footerEl = document.getElementById('footer');
@@ -331,8 +312,10 @@ const scrollToFooter = () => {
       <section class="responsive-view full-width q-pa-md">
         <div class="responsive-home-contaier column text-primary bg-accent q-mb-sm q-pa-lg">
           <span>
-            <p class="responsive-name q-mb-none text-white">Grant Knaver</p>
-            <p class="responsive-title text-secondary">
+            <p class="responsive-name responsive-intro-element q-mb-none text-white">
+              Grant Knaver
+            </p>
+            <p class="responsive-title responsive-intro-element text-secondary">
               <span
                 class="frontend text-white"
                 :class="
@@ -412,7 +395,9 @@ const scrollToFooter = () => {
               >
             </p>
             <q-separator></q-separator>
-            <p class="responsive-services-description q-mt-md q-mb-none text-body-2">
+            <p
+              class="responsive-services-description responsive-intro-element text-white q-mt-md q-mb-none text-body-2"
+            >
               <i
                 >I design and build interactive, high-performance web experiences that blend motion,
                 data, and intelligence.</i
@@ -680,12 +665,18 @@ const scrollToFooter = () => {
         display: none;
       }
 
+      .responsive-intro-element {
+        opacity: 0;
+      }
+
       .responsive-home-contaier {
         .responsive-name {
           font-size: 1.5rem;
+          opacity: 0;
         }
         .responsive-title {
           font-size: 1.2rem;
+          opacity: 0;
         }
         .responsive-services-description {
         }
@@ -709,7 +700,6 @@ const scrollToFooter = () => {
 
         .desktop-name {
           font-size: 1.8rem;
-          transform: translateY(-200px);
         }
         .simon-container {
           .simon {
