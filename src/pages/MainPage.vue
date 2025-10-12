@@ -20,13 +20,7 @@ import { isResponsive } from '../shared/utils/isResponsive';
 
 const responsiveAnimations = {
   intro: {
-    timeline: gsap.timeline({
-      paused: true,
-      onComplete: () => {
-        // responsiveAnimations.intro.hasAnimated = true;
-        // console.log('responsive has finished');
-      },
-    }),
+    timeline: ,
     reset: (elements: unknown[]) => {
       elements.forEach((target) => {
         gsap.killTweensOf(target as gsap.TweenTarget);
@@ -198,33 +192,34 @@ onMounted(async () => {
   const el = root.value;
   if (!el) return;
 
+  const introAnimations = gsap.timeline({
+      paused: true,
+      onComplete: () => {
+        // responsiveAnimations.intro.hasAnimated = true;
+        // console.log('responsive has finished');
+      },
+    })
+
   gsap.context(() => {
-    if (isResponsive()) {
-      const { rebuild } = responsiveAnimations.intro;
-      rebuild();
-      startResponsiveIntroAnimation(el);
-    } else {
-      console.log('runing desktop');
-      startDesktopIntroAnimation(el);
-    }
+
   }, el);
 
   // --- Other logic (unchanged) ---
   await mainStore.VERIFY_HUMANITY();
 
-  window.addEventListener('resize', () => {
-    headerHeight.value = document.getElementById('mobile-header')?.offsetHeight ?? 0;
-    const el = root.value;
-    if (!el) return;
-    if (isResponsive()) {
-      console.log('running responsive');
-      responsiveAnimations.intro.rebuild();
-      startResponsiveIntroAnimation(el);
-    } else {
-      console.log('runing desktop');
-      startDesktopIntroAnimation(el);
-    }
-  });
+  // window.addEventListener('resize', () => {
+  //   headerHeight.value = document.getElementById('mobile-header')?.offsetHeight ?? 0;
+  //   const el = root.value;
+  //   if (!el) return;
+  //   if (isResponsive()) {
+  //     console.log('running responsive');
+  //     responsiveAnimations.intro.rebuild();
+  //     startResponsiveIntroAnimation(el);
+  //   } else {
+  //     console.log('runing desktop');
+  //     startDesktopIntroAnimation(el);
+  //   }
+  // });
 
   const footerEl = document.getElementById('footer');
   if (!footerEl) return;
