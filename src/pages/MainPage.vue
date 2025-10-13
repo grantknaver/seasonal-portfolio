@@ -197,14 +197,14 @@ onMounted(async () => {
   const bp = getCustomCssVar('breakpoint-lg') || '1024px'; // should already be like "1024px"
 
   // Mobile
-  mm.add(`(max-width: ${bp})`, () => {
-    currentMode = ViewType.Mobile;
-    buildAnimations(el, ViewType.Mobile);
-    return () => {
-      currentMode = null;
-      kill();
-    };
-  });
+  // mm.add(`(max-width: ${bp})`, () => {
+  //   currentMode = ViewType.Mobile;
+  //   buildAnimations(el, ViewType.Mobile);
+  //   return () => {
+  //     currentMode = null;
+  //     kill();
+  //   };
+  // });
 
   // Desktop
   mm.add(`(min-width: ${bp})`, () => {
@@ -216,7 +216,7 @@ onMounted(async () => {
     };
   });
 
-  window.addEventListener('resize', onResize);
+  // window.addEventListener('resize', onResize);
 
   await mainStore.VERIFY_HUMANITY();
 
@@ -304,7 +304,7 @@ const scrollToFooter = () => {
         ><span class="text-secondary">glk</span><span class="text-primary">Freelance</span></span
       >
     </div>
-    <div ref="root" class="sub-container column">
+    <div ref="root" class="sub-container column items-center">
       <section class="responsive-view full-width q-pa-md">
         <div class="home-contaier column text-primary bg-accent q-mb-sm q-pa-lg">
           <span>
@@ -654,19 +654,23 @@ const scrollToFooter = () => {
     .responsive-view {
       height: auto;
 
+      @media (min-width: $breakpoint-md) {
+        max-width: 800px;
+      }
+
       @media (min-width: $breakpoint-lg) {
         display: none;
       }
 
       .home-content {
-        opacity: 0;
+        // opacity: 0;
+      }
 
-        .name {
-          font-size: 1.5rem;
-        }
-        .title {
-          font-size: 1.2rem;
-        }
+      .name {
+        font-size: 1.5rem;
+      }
+      .title {
+        font-size: 1.2rem;
       }
     }
 
