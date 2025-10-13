@@ -10,40 +10,16 @@ import ContactSection from '../components/ContactSection.vue';
 import PackageSection from '../components/PackageSection.vue';
 import { setSeasonClasses } from '../shared/utils/setSeasonColors';
 import SimonMenu from '../components/SimonMenu.vue';
-import CaseStudiesSection from 'src/components/CaseStudiesSection.vue';
+import CaseStudiesSection from '../components/CaseStudiesSection.vue';
 import { type Slide } from '../shared/types/slide';
 import { QCarousel, scroll } from 'quasar';
 import { Theme } from '../shared/constants/theme';
 import WeatherBackground from '../components/WeatherBackground.vue';
 import gsap from 'gsap';
-import { isResponsive } from '../shared/utils/isResponsive';
-
-const responsiveAnimations = {
-  intro: {
-    timeline: ,
-    reset: (elements: unknown[]) => {
-      elements.forEach((target) => {
-        gsap.killTweensOf(target as gsap.TweenTarget);
-      });
-      responsiveAnimations.intro.timeline.pause(0).clear();
-      responsiveAnimations.intro.timeline?.kill();
-      responsiveAnimations.intro.timeline = gsap.timeline({ paused: true });
-    },
-  },
-};
-
-const desktopAnimations = {
-  intro: {
-    timeline: gsap.timeline({
-      paused: true,
-      onComplete: () => {
-        desktopAnimations.intro.hasAnimated = true;
-        console.log('desktop has finished');
-      },
-    }),
-    hasAnimated: false,
-  },
-};
+import { useGsapTimeline } from '../shared/composables/useGsapTimeline';
+import { type Mode } from '../shared/types/mode';
+import { ViewType } from 'src/shared/constants/viewType';
+import { getCustomCssVar } from 'src/shared/utils/getCustomCssVar';
 
 const mainStore = useMainStore();
 const mobileTopics: Topic[] = [
@@ -93,133 +69,156 @@ const { getScrollTarget, setVerticalScrollPosition } = scroll;
 const slide = ref<Theme>(Theme.Fall);
 const { activeTheme, activeTopic, mobileScrollTarget } = storeToRefs(mainStore);
 const expandedPanel = ref<TopicName | null>(null);
-const headerHeight = ref<number>(0);
 const root = ref<HTMLElement | null>(null);
 const showFooter = ref<boolean>(false);
 const io = ref<IntersectionObserver | null>(null);
-const startResponsiveIntroAnimation = (el: HTMLElement) => {
-  const { timeline } = responsiveAnimations.intro;
-  timeline.pause(0).clear().invalidate();
-  const responsiveIntroEls = el.querySelectorAll('.responsive-intro-element');
-  gsap.killTweensOf(responsiveIntroEls); // stop any in-flight tweens touching targets
-  timeline.fromTo(
-    responsiveIntroEls,
-    { x: 200, autoAlpha: 0 }, // explicit start (matches your inline set)
-    { x: 0, autoAlpha: 1, duration: 2, ease: 'bounce', stagger: 1, immediateRender: false },
-  );
+const { resetSequence, kill } = useGsapTimeline();
+let currentMode: Mode | null = null;
 
-  timeline.play();
+const buildAnimations = (el: HTMLElement, mode: Mode) => {
+  if (mode === ViewType.Mobile) {
+    resetSequence([
+      {
+        type: 'fromTo',
+        targets: el.querySelectorAll(':scope .home-content'),
+        from: { x: 200, autoAlpha: 0 },
+        to: {
+          x: 0,
+          autoAlpha: 1,
+          duration: 2,
+          ease: 'bounce',
+          stagger: 1,
+          immediateRender: false,
+        },
+        at: 0,
+      },
+    ]);
+  } else if (mode === ViewType.Desktop) {
+    const nameEl = el.querySelector(':scope .desktop-view .name') as HTMLElement;
+    const titleEl = el.querySelector(':scope .desktop-view .title') as HTMLElement;
+    const sepEl = el.querySelector(':scope .desktop-view .separator') as HTMLElement;
+    const simonEl = el.querySelector(':scope .desktop-view .simon ') as HTMLElement;
+    const servicesDescriptionEl = el.querySelector(
+      ':scope .desktop-view .services-description',
+    ) as HTMLElement;
+
+    gsap.killTweensOf([nameEl, titleEl, sepEl, titleEl, servicesDescriptionEl, simonEl]);
+
+    resetSequence([
+      // Name element
+      { type: 'set', targets: nameEl, vars: { y: -200 }, at: 0 },
+      {
+        type: 'to',
+        targets: nameEl,
+        vars: {
+          keyframes: [{ rotation: 15 }, { rotation: -10, y: -10 }, { rotation: 0, y: 0 }],
+          ease: 'bounce',
+          duration: 3.8,
+        },
+        at: 0, // starts at timeline position 0
+      },
+      // Simon Element
+      {
+        type: 'set',
+        targets: simonEl,
+        vars: { scale: 0, transformOrigin: '50% 50%', autoAlpha: 0 },
+        at: 0,
+      },
+      {
+        type: 'to',
+        targets: simonEl,
+        vars: {
+          keyframes: [
+            { scale: 0.5, rotation: 15, autoAlpha: 1 },
+            { scale: 1.1, rotation: -10 },
+            { scale: 1, rotation: 0 },
+          ],
+          ease: 'bounce',
+          duration: 3.8,
+        },
+        at: 0, // overlaps name animation
+      },
+      // Separator
+      { type: 'set', targets: sepEl, vars: { y: 150, autoAlpha: 0 } },
+
+      {
+        type: 'to',
+        targets: sepEl,
+        vars: { y: 0, ease: 'none', duration: 1, autoAlpha: 1 },
+        at: 2,
+      },
+      // Title
+      { type: 'set', targets: titleEl, vars: { y: 250 }, at: 0 },
+      {
+        type: 'to',
+        targets: titleEl,
+        vars: {
+          y: 0,
+          duration: 3,
+          ease: 'bounce',
+        },
+        at: 2.5,
+      },
+
+      // Service Description
+      { type: 'set', targets: servicesDescriptionEl, vars: { x: -100, autoAlpha: 0 }, at: 0 },
+      {
+        type: 'to',
+        targets: servicesDescriptionEl,
+        vars: {
+          x: 0,
+          autoAlpha: 1,
+          ease: 'bounce',
+          duration: 1.5,
+        },
+        at: 3.5,
+      },
+    ]);
+  }
 };
-const startDesktopIntroAnimation = (el: HTMLElement) => {
-  const { timeline, hasAnimated } = desktopAnimations.intro;
-  if (hasAnimated) return;
-  console.log('cleared desktop check');
-  const desktopNameEl = el.querySelector('.desktop-name') as HTMLElement;
-  const desktopTitleEl = el.querySelector('.desktop-title') as HTMLElement;
-  const desktopSepEl = el.querySelector('.desktop-separator') as HTMLElement;
-  const desktopServicesDescription = el.querySelector(
-    '.desktop-services-description',
-  ) as HTMLElement;
 
-  // timeline.clear();
-
-  gsap.set(desktopNameEl, { y: -200 });
-  gsap.set('.simon', { scale: 0, transformOrigin: '50% 50%' });
-  gsap.set(desktopSepEl, { y: 150, autoAlpha: 0 });
-  gsap.set(desktopTitleEl, { y: 123, autoAlpha: 0 });
-  gsap.set(desktopServicesDescription, { x: -100, autoAlpha: 0 });
-
-  // // Name animation
-  timeline.to(desktopNameEl, {
-    keyframes: {
-      '0%': { rotation: 15 },
-      '50%': { rotation: -10 },
-      '100%': { rotation: 0, y: 0 },
-    },
-    ease: 'bounce',
-    duration: 3.8,
+let animationId = 0;
+const onResize = () => {
+  cancelAnimationFrame(animationId);
+  animationId = requestAnimationFrame(() => {
+    const el = root.value;
+    if (!el || !currentMode) return;
+    buildAnimations(el, currentMode);
   });
-
-  // // Simon animation
-  timeline.to(
-    '.simon',
-    {
-      keyframes: {
-        '0%': { scale: 0.5, rotation: 15 },
-        '10%': { scale: 0.5, rotation: 15, autoAlpha: 1 },
-        '50%': { scale: 1.1, rotation: -10 },
-        '100%': { scale: 1, rotation: 0 },
-      },
-      ease: 'bounce',
-      duration: 3.8,
-    },
-    0,
-  ); // Overlaps with name animation
-
-  // // Separator animation (starts later)
-  timeline.to(desktopSepEl, { y: 0, autoAlpha: 1, ease: 'none', duration: 1 }, 1.8);
-
-  // // Move title to final position, GAP_PERCENT above separator
-  timeline.to(
-    desktopTitleEl,
-    {
-      keyframes: {
-        '5%': { autoAlpha: 1 },
-        '100%': { y: 0 },
-      },
-      duration: 1.5,
-      ease: 'bounce',
-    },
-    3,
-  );
-
-  // // Services description appears later
-  timeline.to(
-    desktopServicesDescription,
-    {
-      x: 0,
-      autoAlpha: 1,
-      ease: 'bounce',
-      duration: 1.5,
-    },
-    3.5,
-  );
-  timeline.play();
 };
+
+const mm = gsap.matchMedia();
 
 onMounted(async () => {
   await nextTick();
   const el = root.value;
   if (!el) return;
 
-  const introAnimations = gsap.timeline({
-      paused: true,
-      onComplete: () => {
-        // responsiveAnimations.intro.hasAnimated = true;
-        // console.log('responsive has finished');
-      },
-    })
+  const bp = getCustomCssVar('breakpoint-lg') || '1024px'; // should already be like "1024px"
 
-  gsap.context(() => {
+  // Mobile
+  mm.add(`(max-width: ${bp})`, () => {
+    currentMode = ViewType.Mobile;
+    buildAnimations(el, ViewType.Mobile);
+    return () => {
+      currentMode = null;
+      kill();
+    };
+  });
 
-  }, el);
+  // Desktop
+  mm.add(`(min-width: ${bp})`, () => {
+    currentMode = ViewType.Desktop;
+    buildAnimations(el, ViewType.Desktop);
+    return () => {
+      currentMode = null;
+      kill();
+    };
+  });
 
-  // --- Other logic (unchanged) ---
+  window.addEventListener('resize', onResize);
+
   await mainStore.VERIFY_HUMANITY();
-
-  // window.addEventListener('resize', () => {
-  //   headerHeight.value = document.getElementById('mobile-header')?.offsetHeight ?? 0;
-  //   const el = root.value;
-  //   if (!el) return;
-  //   if (isResponsive()) {
-  //     console.log('running responsive');
-  //     responsiveAnimations.intro.rebuild();
-  //     startResponsiveIntroAnimation(el);
-  //   } else {
-  //     console.log('runing desktop');
-  //     startDesktopIntroAnimation(el);
-  //   }
-  // });
 
   const footerEl = document.getElementById('footer');
   if (!footerEl) return;
@@ -241,6 +240,8 @@ onMounted(async () => {
 
 onBeforeUnmount(() => {
   io.value?.disconnect();
+  window.removeEventListener('resize', onResize);
+  mm.kill();
 });
 
 watch(mobileScrollTarget, (newTopic) => {
@@ -305,12 +306,10 @@ const scrollToFooter = () => {
     </div>
     <div ref="root" class="sub-container column">
       <section class="responsive-view full-width q-pa-md">
-        <div class="responsive-home-contaier column text-primary bg-accent q-mb-sm q-pa-lg">
+        <div class="home-contaier column text-primary bg-accent q-mb-sm q-pa-lg">
           <span>
-            <p class="responsive-name responsive-intro-element q-mb-none text-white">
-              Grant Knaver
-            </p>
-            <p class="responsive-title responsive-intro-element text-secondary">
+            <p class="name home-content q-mb-none text-white">Grant Knaver</p>
+            <p class="title home-content text-secondary">
               <span
                 class="frontend text-white"
                 :class="
@@ -390,9 +389,7 @@ const scrollToFooter = () => {
               >
             </p>
             <q-separator></q-separator>
-            <p
-              class="responsive-services-description responsive-intro-element text-white q-mt-md q-mb-none text-body-2"
-            >
+            <p class="services-description home-content text-white q-mt-md q-mb-none text-body-2">
               <i
                 >I design and build interactive, high-performance web experiences that blend motion,
                 data, and intelligence.</i
@@ -447,9 +444,9 @@ const scrollToFooter = () => {
         </div>
       </section>
       <section class="desktop-view row justify-end items-center full-width">
-        <div class="desktop-home-contaier q-pl-xl q-pr-xl column">
+        <div class="home-contaier q-pl-xl q-pr-xl column">
           <p
-            class="desktop-name q-mb-lg text-body-1 text-left text-white"
+            class="name q-mb-lg text-body-1 text-left text-white"
             :class="
               setSeasonClasses(
                 {
@@ -464,95 +461,96 @@ const scrollToFooter = () => {
           >
             Grant Knaver
           </p>
-          <div class="simon-container row no-wrap">
+          <div class="row no-wrap">
             <SimonMenu class="simon"></SimonMenu>
-            <div class="desktop-title-container row items-center full-width q-pa-md">
-              <p class="desktop-title full-width q-mb-none q-pl-lg text-secondary text-left">
-                <span
-                  class="frontend text-white"
-                  :class="
-                    setSeasonClasses(
-                      {
-                        Fall: 'dark-text-outline',
-                        Winter: 'dark-text-outline',
-                        Spring: 'dark-text-outline',
-                        Summer: 'black-text-outline',
-                      },
-                      activeTheme,
-                    )
-                  "
-                  >Frontend Developer</span
-                >
-                <span
-                  class="text-white"
-                  :class="
-                    setSeasonClasses(
-                      {
-                        Fall: 'dark-text-outline',
-                        Winter: 'dark-text-outline',
-                        Spring: 'dark-text-outline',
-                        Summer: 'black-text-outline',
-                      },
-                      activeTheme,
-                    )
-                  "
-                >
-                  •
-                </span>
-                <span
-                  class="gsap text-secondary"
-                  :class="
-                    setSeasonClasses(
-                      {
-                        Fall: 'dark-text-outline',
-                        Winter: 'dark-text-outline',
-                        Spring: 'black-text-outline',
-                        Summer: 'black-text-outline',
-                      },
-                      activeTheme,
-                    )
-                  "
-                  >GSAP</span
-                >
-                <span
-                  class="text-white"
-                  :class="
-                    setSeasonClasses(
-                      {
-                        Fall: 'dark-text-outline',
-                        Winter: 'dark-text-outline',
-                        Spring: 'black-text-outline',
-                        Summer: 'black-text-outline',
-                      },
-                      activeTheme,
-                    )
-                  "
-                >
-                  &
-                </span>
-                <span
-                  class="text-secondary"
-                  :class="
-                    setSeasonClasses(
-                      {
-                        Fall: 'dark-text-outline',
-                        Winter: 'dark-text-outline',
-                        Spring: 'black-text-outline',
-                        Summer: 'black-text-outline',
-                      },
-                      activeTheme,
-                    )
-                  "
-                  >AI Integration</span
-                >
-              </p>
+            <div class="title-container column justify-center items-center q-pa-md">
+              <div class="clip-container relative-position overflow-hidden">
+                <p class="title full-width q-mb-lg q-pl-lg text-secondary text-left">
+                  <span
+                    class="frontend text-white"
+                    :class="
+                      setSeasonClasses(
+                        {
+                          Fall: 'dark-text-outline',
+                          Winter: 'dark-text-outline',
+                          Spring: 'dark-text-outline',
+                          Summer: 'black-text-outline',
+                        },
+                        activeTheme,
+                      )
+                    "
+                    >Frontend Developer</span
+                  >
+                  <span
+                    class="text-white"
+                    :class="
+                      setSeasonClasses(
+                        {
+                          Fall: 'dark-text-outline',
+                          Winter: 'dark-text-outline',
+                          Spring: 'dark-text-outline',
+                          Summer: 'black-text-outline',
+                        },
+                        activeTheme,
+                      )
+                    "
+                  >
+                    •
+                  </span>
+                  <span
+                    class="gsap text-secondary"
+                    :class="
+                      setSeasonClasses(
+                        {
+                          Fall: 'dark-text-outline',
+                          Winter: 'dark-text-outline',
+                          Spring: 'black-text-outline',
+                          Summer: 'black-text-outline',
+                        },
+                        activeTheme,
+                      )
+                    "
+                    >GSAP</span
+                  >
+                  <span
+                    class="text-white"
+                    :class="
+                      setSeasonClasses(
+                        {
+                          Fall: 'dark-text-outline',
+                          Winter: 'dark-text-outline',
+                          Spring: 'black-text-outline',
+                          Summer: 'black-text-outline',
+                        },
+                        activeTheme,
+                      )
+                    "
+                  >
+                    &
+                  </span>
+                  <span
+                    class="text-secondary"
+                    :class="
+                      setSeasonClasses(
+                        {
+                          Fall: 'dark-text-outline',
+                          Winter: 'dark-text-outline',
+                          Spring: 'black-text-outline',
+                          Summer: 'black-text-outline',
+                        },
+                        activeTheme,
+                      )
+                    "
+                    >AI Integration</span
+                  >
+                </p>
+              </div>
+              <q-separator class="separator bg-accent text-seon"></q-separator>
             </div>
           </div>
-          <q-separator
-            class="desktop-separator q-mt-lg full-width bg-accent text-seon"
-          ></q-separator>
+
           <div
-            class="desktop-services-description start-animation row q-mt-md q-pa-md text-bold wrap justify-center text-white test"
+            class="services-description start-animation row q-mt-md q-pa-md text-bold wrap justify-center text-white test"
             :class="
               setSeasonClasses(
                 {
@@ -660,20 +658,14 @@ const scrollToFooter = () => {
         display: none;
       }
 
-      .responsive-intro-element {
+      .home-content {
         opacity: 0;
-      }
 
-      .responsive-home-contaier {
-        .responsive-name {
+        .name {
           font-size: 1.5rem;
-          opacity: 0;
         }
-        .responsive-title {
+        .title {
           font-size: 1.2rem;
-          opacity: 0;
-        }
-        .responsive-services-description {
         }
       }
     }
@@ -689,41 +681,39 @@ const scrollToFooter = () => {
         position: relative;
       }
 
-      .desktop-home-contaier {
+      .home-contaier {
         margin-top: 4rem;
         max-width: 700px;
 
-        .desktop-name {
+        .name {
+          transform: translateY(-200px);
           font-size: 1.8rem;
         }
-        .simon-container {
-          .simon {
-            opacity: 0;
-            width: 65%;
-            min-width: 275px;
-            max-width: 275px;
-            scale: 0;
-            transform-origin: 50% 50%;
-          }
-
-          .desktop-title-container {
-            width: 35%;
-
-            .desktop-title {
-              width: 35%;
-              opacity: 0;
-              transform: translateY(123px);
-              font-size: 1.4rem;
-            }
-          }
-        }
-
-        .desktop-separator {
+        .simon {
           opacity: 0;
-          transform: translateY(150px);
+          width: 45%;
+          min-width: 275px;
+          max-width: 275px;
+          scale: 0;
+          transform-origin: 50% 50%;
         }
 
-        .desktop-services-description {
+        .title-container {
+          width: 55%;
+
+          .title {
+            transform: translateY(250px);
+            font-size: 1.4rem;
+          }
+
+          .separator {
+            opacity: 0;
+            width: 75%;
+            transform: translateY(150px);
+          }
+        }
+
+        .services-description {
           position: relative;
           z-index: 1;
           font-size: 1.2rem;
@@ -732,7 +722,7 @@ const scrollToFooter = () => {
           border-radius: 5px;
         }
 
-        .desktop-services-description::before {
+        .services-description::before {
           content: '';
           position: absolute;
           inset: 0; /* cover entire element */

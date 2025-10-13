@@ -1,25 +1,49 @@
+// composables/useGsapTimeline.ts
 import gsap from 'gsap';
+import { type GsapStep } from '../types/gsapStep';
+import { GsapStepType } from '../constants/gsapStepType';
 
 export function useGsapTimeline() {
-  let tl = gsap.timeline({ paused: true });
+  let tl = gsap.timeline({
+    paused: true,
+    defaults: {
+      overwrite: true,
+    },
+  });
 
-  const reset = (
-    el: Element | Document,
-    selector: string,
-    fromVars: gsap.TweenVars,
-    toVars: gsap.TweenVars,
-  ) => {
-    const targets = (el as Element).querySelectorAll(selector);
-    gsap.killTweensOf(targets);
-    tl.pause(0);
-    gsap.set(targets, fromVars);
-    tl.fromTo(targets, fromVars, { ...toVars, immediateRender: false }, 0).play(0);
+  /** Kill + rebuild + add full sequence (sets + tweens) and play from 0 */
+  function resetSequence(steps: GsapStep[]) {
+    tl.kill();
+    tl = gsap.timeline({
+      paused: true,
+      defaults: {
+        overwrite: true,
+      },
+    });
+
+    for (const s of steps) {
+      if (s.type === GsapStepType.Label) {
+        tl.addLabel(s.name, s.at ?? '>');
+      } else if (s.type === 'set') {
+        tl.set(s.targets, s.vars, s.at ?? '>');
+      } else if (s.type === 'fromTo') {
+        tl.fromTo(s.targets, s.from, { ...s.to, immediateRender: false }, s.at ?? '>');
+      } else {
+        tl.to(s.targets, s.vars, s.at ?? '>');
+      }
+    }
+    tl.play(0);
     return tl;
-  };
+  }
 
-  const kill = () => {
+  function kill() {
     tl.kill();
     tl = gsap.timeline({ paused: true });
-  };
-  return { kill, reset, timeline: () => tl };
+  }
+
+  function timeline() {
+    return tl;
+  }
+
+  return { resetSequence, kill, timeline };
 }
