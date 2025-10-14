@@ -76,14 +76,14 @@ const whyClientsBullets = ref<AboutBulletPoints[]>([
       <q-card class="full-width">
         <q-card-section class="section-container q-pa-lg">
           <h1
-            class="text-h1-alt q-mt-none q-mb-md bg-white text-center"
+            class="text-h1-alt q-mt-none q-mb-md bg-dark text-center"
             :class="
               setSeasonClasses(
                 {
-                  Fall: 'text-accent',
-                  Winter: 'text-accent',
-                  Spring: 'text-accent',
-                  Summer: 'text-dark',
+                  Fall: 'text-secondary',
+                  Winter: 'text-primary',
+                  Spring: 'text-primary',
+                  Summer: 'text-primary',
                 },
                 activeTheme,
               )
@@ -99,8 +99,8 @@ const whyClientsBullets = ref<AboutBulletPoints[]>([
                 {
                   Fall: 'text-primary',
                   Winter: 'text-primary',
-                  Spring: 'text-dark',
-                  Summer: 'text-dark',
+                  Spring: 'text-primary',
+                  Summer: 'text-primary',
                 },
                 activeTheme,
               )
@@ -117,8 +117,8 @@ const whyClientsBullets = ref<AboutBulletPoints[]>([
                 {
                   Fall: 'text-primary',
                   Winter: 'text-primary',
-                  Spring: 'text-dark',
-                  Summer: 'text-dark',
+                  Spring: 'text-primary',
+                  Summer: 'text-primary',
                 },
                 activeTheme,
               )
@@ -163,8 +163,8 @@ const whyClientsBullets = ref<AboutBulletPoints[]>([
                 {
                   Fall: 'text-primary',
                   Winter: 'text-primary',
-                  Spring: 'text-dark',
-                  Summer: 'text-dark',
+                  Spring: 'text-primary',
+                  Summer: 'text-primary',
                 },
                 activeTheme,
               )
@@ -178,16 +178,16 @@ const whyClientsBullets = ref<AboutBulletPoints[]>([
       </q-card>
       <q-card class="full-width">
         <q-card-section class="section-container q-pa-lg">
-          <div class="h2-container row justify-center q-mb-lg text-center bg-white text-white">
+          <div class="h2-container row justify-center q-mb-lg text-center bg-dark text-white">
             <h2
-              class="text-h2-alt"
+              class="bg-dark text-h2-alt"
               :class="
                 setSeasonClasses(
                   {
-                    Fall: 'text-accent',
-                    Winter: 'text-accent',
-                    Spring: 'text-accent',
-                    Summer: 'text-dark',
+                    Fall: 'text-primary',
+                    Winter: 'text-primary',
+                    Spring: 'text-primary',
+                    Summer: 'text-primary',
                   },
                   activeTheme,
                 )
@@ -204,8 +204,8 @@ const whyClientsBullets = ref<AboutBulletPoints[]>([
                 {
                   Fall: 'text-primary',
                   Winter: 'text-primary',
-                  Spring: 'text-dark',
-                  Summer: 'text-dark',
+                  Spring: 'text-primary',
+                  Summer: 'text-primary',
                 },
                 activeTheme,
               )
@@ -248,16 +248,16 @@ const whyClientsBullets = ref<AboutBulletPoints[]>([
       </q-card>
       <q-card class="full-width">
         <q-card-section class="section-container q-pa-lg">
-          <div class="h2-container row justify-center q-mb-lg text-center bg-white text-white">
+          <div class="h2-container row justify-center q-mb-lg text-center bg-dark text-white">
             <h2
-              class="text-h2-alt"
+              class="bg-dark text-h2-alt"
               :class="
                 setSeasonClasses(
                   {
-                    Fall: 'text-accent',
-                    Winter: 'text-accent',
-                    Spring: 'text-accent',
-                    Summer: 'text-dark',
+                    Fall: 'text-primary',
+                    Winter: 'text-primary',
+                    Spring: 'text-primary',
+                    Summer: 'text-primary',
                   },
                   activeTheme,
                 )
@@ -274,8 +274,8 @@ const whyClientsBullets = ref<AboutBulletPoints[]>([
                 {
                   Fall: 'text-primary',
                   Winter: 'text-primary',
-                  Spring: 'text-dark',
-                  Summer: 'text-dark',
+                  Spring: 'text-primary',
+                  Summer: 'text-primary',
                 },
                 activeTheme,
               )
@@ -326,10 +326,10 @@ const whyClientsBullets = ref<AboutBulletPoints[]>([
             :class="
               setSeasonClasses(
                 {
-                  Fall: 'text-secondary',
-                  Winter: 'text-accent',
-                  Spring: 'text-accent',
-                  Summer: 'text-accent',
+                  Fall: 'text-accent',
+                  Winter: 'text-primary',
+                  Spring: 'text-primary',
+                  Summer: 'text-primary',
                 },
                 activeTheme,
               )

@@ -1,13 +1,12 @@
 <script lang="ts" setup>
-import { ref, watch } from 'vue';
+import { computed, ref, watch } from 'vue';
 import { v4 as uuidv4 } from 'uuid';
 import { useMainStore } from '../stores/main';
 import { storeToRefs } from 'pinia';
 import { setSeasonClasses } from '../shared/utils/setSeasonColors';
-import { Packages } from 'src/shared/constants/packages';
+import { Packages } from '../shared/constants/packages';
 import { type PackageDetails } from '../shared/types/packageDetails';
-import { vw } from 'src/shared/utils/viewWidth';
-import { getCustomCssVar } from 'src/shared/utils/getCustomCssVar';
+import { useViewport } from '../shared/utils/viewWidth';
 
 const mainStore = useMainStore();
 const { activeTheme } = storeToRefs(mainStore);
@@ -77,8 +76,7 @@ const packages = ref<PackageDetails[]>([
       'The complete experience — built for high-visibility launches, investors, or agencies needing that extra wow factor.',
   },
 ]);
-// const midBreakpoint = +getCustomCssVar('breakpoint-md').slice(0, -2);
-const largeBreakpoint = +getCustomCssVar('breakpoint-lg').slice(0, -2);
+const isBelowLgBreakpoint = computed(() => useViewport().width.value < useViewport().lgBreakpoint);
 watch(activeTheme, (newTheme) => {
   const theme = newTheme.toLowerCase();
   const updatedPackages = packages.value.map((p) => {
@@ -112,14 +110,14 @@ watch(activeTheme, (newTheme) => {
           "
         >
           <h1
-            class="text-h1-alt q-mt-none q-mb-md bg-white text-center"
+            class="text-h1-alt q-mt-none q-mb-md bg-dark text-center"
             :class="
               setSeasonClasses(
                 {
-                  Fall: 'text-accent',
-                  Winter: 'text-accent',
-                  Spring: 'text-accent',
-                  Summer: 'text-dark',
+                  Fall: 'text-secondary',
+                  Winter: 'text-secondary',
+                  Spring: 'text-secondary',
+                  Summer: 'text-secondary',
                 },
                 activeTheme,
               )
@@ -127,8 +125,34 @@ watch(activeTheme, (newTheme) => {
           >
             Packages
           </h1>
-          <q-separator color="primary" class="q-mb-md" />
-          <p class="text-body-1 text-center text-primary text-weight-bold">
+          <q-separator
+            :color="
+              setSeasonClasses(
+                {
+                  Fall: 'primary',
+                  Winter: 'primary',
+                  Spring: 'primary',
+                  Summer: 'primary',
+                },
+                activeTheme,
+              )
+            "
+            class="q-mb-md"
+          />
+          <p
+            class="text-body-1 text-center"
+            :class="
+              setSeasonClasses(
+                {
+                  Fall: 'text-primary',
+                  Winter: 'text-primary',
+                  Spring: 'text-primary',
+                  Summer: 'text-white',
+                },
+                activeTheme,
+              )
+            "
+          >
             Whether you need one polished animation, a full motion + AI upgrade, or a launch-ready
             experience, I’ve got you covered. These packages make it simple to get started — clear
             scope, fair pricing, and fast turnaround.
@@ -226,33 +250,32 @@ watch(activeTheme, (newTheme) => {
         :class="
           setSeasonClasses(
             {
-              Fall: vw() < largeBreakpoint ? 'bg-primary ' : 'bg-transparent',
-              Winter: vw() < largeBreakpoint ? 'bg-primary ' : 'bg-transparent',
-              Spring: vw() < largeBreakpoint ? 'bg-primary ' : 'bg-transparent',
-              Summer: vw() < largeBreakpoint ? 'bg-primary ' : 'bg-transparent',
+              Fall: isBelowLgBreakpoint ? 'bg-primary ' : 'bg-transparent',
+              Winter: isBelowLgBreakpoint ? 'bg-primary ' : 'bg-transparent',
+              Spring: isBelowLgBreakpoint ? 'bg-primary ' : 'bg-transparent',
+              Summer: isBelowLgBreakpoint ? 'bg-white ' : 'bg-transparent',
             },
             activeTheme,
           )
         "
       >
         <h1
-          class="text-h1 q-mt-none text-center border-white"
+          class="text-h1 q-mt-none text-center"
           :class="
             setSeasonClasses(
               {
-                Fall:
-                  vw() < largeBreakpoint
-                    ? 'bg-accent text-white border-white'
-                    : 'bg-dark text-secondary border-black',
-                Winter:
-                  vw() < largeBreakpoint
-                    ? 'bg-accent text-white border-white'
-                    : 'bg-accent text-white border-white',
-                Spring: vw() < largeBreakpoint ? 'bg-accent text-white' : 'bg-accent text-white',
-                Summer:
-                  vw() < largeBreakpoint
-                    ? 'bg-accent text-white border-white'
-                    : 'bg-dark text-white border-white',
+                Fall: isBelowLgBreakpoint
+                  ? 'bg-dark text-secondary'
+                  : 'bg-dark text-secondary border-black',
+                Winter: isBelowLgBreakpoint
+                  ? 'bg-dark text-secondary'
+                  : 'bg-dark text-secondary border-white',
+                Spring: isBelowLgBreakpoint
+                  ? 'bg-dark text-secondary'
+                  : 'bg-accent text-white border-white',
+                Summer: isBelowLgBreakpoint
+                  ? 'bg-dark text-secondary'
+                  : 'bg-dark text-secondary border-white',
               },
               activeTheme,
             )
@@ -260,15 +283,28 @@ watch(activeTheme, (newTheme) => {
         >
           Packages
         </h1>
-        <q-separator color="primary" class="q-mb-md" />
+        <q-separator
+          :color="
+            setSeasonClasses(
+              {
+                Fall: isBelowLgBreakpoint ? 'accent' : 'secondary',
+                Winter: isBelowLgBreakpoint ? 'accent' : 'primary',
+                Spring: isBelowLgBreakpoint ? 'accent ' : 'primary',
+                Summer: isBelowLgBreakpoint ? 'accent ' : 'secondary',
+              },
+              activeTheme,
+            )
+          "
+          class="q-mb-md"
+        />
         <p
           :class="
             setSeasonClasses(
               {
-                Fall: vw() < largeBreakpoint ? 'text-center text-dark' : 'text-primary',
-                Winter: vw() < largeBreakpoint ? 'text-center text-dark' : 'text-primary',
-                Spring: vw() < largeBreakpoint ? 'text-center text-dark' : 'text-primary',
-                Summer: vw() < largeBreakpoint ? 'text-center text-dark' : 'text-primary',
+                Fall: isBelowLgBreakpoint ? 'text-center text-dark' : 'text-primary',
+                Winter: isBelowLgBreakpoint ? 'text-center text-dark' : 'text-primary',
+                Spring: isBelowLgBreakpoint ? 'text-center text-dark' : 'text-primary',
+                Summer: isBelowLgBreakpoint ? 'text-center text-dark' : 'text-white',
               },
               activeTheme,
             )
@@ -414,7 +450,7 @@ watch(activeTheme, (newTheme) => {
   .intro-container {
     @media (max-width: $breakpoint-lg) {
       background-color: var(--q-accent);
-      border-bottom: solid 2px white;
+      border-bottom: solid 4px var(--q-secondary);
     }
     @media (min-width: $breakpoint-lg) {
       background-color: transparent;
@@ -424,7 +460,6 @@ watch(activeTheme, (newTheme) => {
       font-weight: normal;
       font-size: 1rem;
       @media (max-width: $breakpoint-md) {
-        font-weight: bold;
         font-size: 1.2rem;
       }
     }
