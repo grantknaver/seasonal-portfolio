@@ -81,9 +81,9 @@ const whyClientsBullets = ref<AboutBulletPoints[]>([
               setSeasonClasses(
                 {
                   Fall: 'text-secondary',
-                  Winter: 'text-primary',
-                  Spring: 'text-primary',
-                  Summer: 'text-primary',
+                  Winter: 'text-secondary',
+                  Spring: 'text-secondary',
+                  Summer: 'text-secondary',
                 },
                 activeTheme,
               )
@@ -184,10 +184,10 @@ const whyClientsBullets = ref<AboutBulletPoints[]>([
               :class="
                 setSeasonClasses(
                   {
-                    Fall: 'text-primary',
-                    Winter: 'text-primary',
-                    Spring: 'text-primary',
-                    Summer: 'text-primary',
+                    Fall: 'text-secondary',
+                    Winter: 'text-secondary',
+                    Spring: 'text-secondary',
+                    Summer: 'text-secondary',
                   },
                   activeTheme,
                 )
@@ -254,10 +254,10 @@ const whyClientsBullets = ref<AboutBulletPoints[]>([
               :class="
                 setSeasonClasses(
                   {
-                    Fall: 'text-primary',
-                    Winter: 'text-primary',
-                    Spring: 'text-primary',
-                    Summer: 'text-primary',
+                    Fall: 'text-secondary',
+                    Winter: 'text-secondary',
+                    Spring: 'text-secondary',
+                    Summer: 'text-secondary',
                   },
                   activeTheme,
                 )
@@ -322,14 +322,14 @@ const whyClientsBullets = ref<AboutBulletPoints[]>([
       <q-card class="full-width q-pa-sm">
         <q-card-section class="section-container q-pa-lg">
           <h1
-            class="text-h1 q-mt-none text-center bg-dark"
+            class="text-h1 q-mt-none text-center bg-dark border-black"
             :class="
               setSeasonClasses(
                 {
-                  Fall: 'text-accent',
-                  Winter: 'text-primary',
-                  Spring: 'text-primary',
-                  Summer: 'text-primary',
+                  Fall: 'text-secondary',
+                  Winter: 'text-secondary',
+                  Spring: 'text-secondary',
+                  Summer: 'text-secondary',
                 },
                 activeTheme,
               )
@@ -338,7 +338,20 @@ const whyClientsBullets = ref<AboutBulletPoints[]>([
             About Me
           </h1>
           <q-separator color="primary" class="q-mb-md" />
-          <p class="text-body-2 text-primary q-mb-none">
+          <p
+            class="text-body-2 text-primary q-mb-none"
+            :class="
+              setSeasonClasses(
+                {
+                  Fall: 'text-white',
+                  Winter: 'text-white',
+                  Spring: 'text-white',
+                  Summer: 'text-white',
+                },
+                activeTheme,
+              )
+            "
+          >
             I’m Grant, a frontend engineer and creative problem-solver. For the past 7+ years, I’ve
             worked at the intersection of design, code, and storytelling — helping companies and
             creators bring their ideas to life on the web.
@@ -351,7 +364,7 @@ const whyClientsBullets = ref<AboutBulletPoints[]>([
                   Fall: 'text-primary',
                   Winter: 'text-primary',
                   Spring: 'text-primary',
-                  Summer: 'text-accent',
+                  Summer: 'text-white',
                 },
                 activeTheme,
               )
@@ -390,7 +403,20 @@ const whyClientsBullets = ref<AboutBulletPoints[]>([
             </div>
           </q-list>
           <br />
-          <p class="text-body-2 q-mb-none text-primary">
+          <p
+            class="text-body-2 q-mb-none"
+            :class="
+              setSeasonClasses(
+                {
+                  Fall: 'text-primary',
+                  Winter: 'text-primary',
+                  Spring: 'text-primary',
+                  Summer: 'text-white',
+                },
+                activeTheme,
+              )
+            "
+          >
             I’ve built tools for industries as diverse as healthcare, publishing, and SaaS — and
             I’ve learned that whether you’re a startup founder or a creative team, you need more
             than just a functioning app. You need an experience that stands out.
@@ -398,14 +424,14 @@ const whyClientsBullets = ref<AboutBulletPoints[]>([
         </q-card-section>
         <q-card-section class="section-container q-pa-lg">
           <h2
-            class="text-h2 q-mt-none q-pt-md q-pb-md text-secondary text-center bg-dark"
+            class="text-h2 q-mt-none q-pt-md q-pb-md text-secondary text-center bg-dark border-black"
             :class="
               setSeasonClasses(
                 {
                   Fall: 'text-secondary',
-                  Winter: 'text-accent',
-                  Spring: 'text-accent',
-                  Summer: 'text-dark',
+                  Winter: 'text-secondary',
+                  Spring: 'text-secondary',
+                  Summer: 'text-secondary',
                 },
                 activeTheme,
               )
@@ -414,7 +440,20 @@ const whyClientsBullets = ref<AboutBulletPoints[]>([
             My Approach
           </h2>
           <q-separator color="primary" class="q-mb-md" />
-          <p class="text-body-2 text-primary q-mb-none">
+          <p
+            class="text-body-2 q-mb-none"
+            :class="
+              setSeasonClasses(
+                {
+                  Fall: 'text-primary',
+                  Winter: 'text-primary',
+                  Spring: 'text-primary',
+                  Summer: 'text-white',
+                },
+                activeTheme,
+              )
+            "
+          >
             Before I dive into code, I focus on understanding the vision behind the project. Every
             product has a story, and my role is to translate that story into an interface that feels
             intuitive, engaging, and alive.
@@ -451,14 +490,14 @@ const whyClientsBullets = ref<AboutBulletPoints[]>([
         </q-card-section>
         <q-card-section class="section-container q-pa-lg">
           <h2
-            class="text-h2 q-mt-none q-pt-md q-pb-md text-secondary text-center bg-dark"
+            class="text-h2 q-mt-none q-pt-md q-pb-md text-secondary text-center bg-dark border-black"
             :class="
               setSeasonClasses(
                 {
                   Fall: 'text-secondary',
-                  Winter: 'text-accent',
-                  Spring: 'text-accent',
-                  Summer: 'text-dark',
+                  Winter: 'text-secondary',
+                  Spring: 'text-secondary',
+                  Summer: 'text-secondary',
                 },
                 activeTheme,
               )
@@ -467,7 +506,20 @@ const whyClientsBullets = ref<AboutBulletPoints[]>([
             Why Clients Work With Me
           </h2>
           <q-separator color="primary" class="q-mb-md" />
-          <p class="text-body-2 text-primary q-mb-none">
+          <p
+            class="text-body-2 q-mb-none"
+            :class="
+              setSeasonClasses(
+                {
+                  Fall: 'text-primary',
+                  Winter: 'text-primary',
+                  Spring: 'text-primary',
+                  Summer: 'text-white',
+                },
+                activeTheme,
+              )
+            "
+          >
             I know you’re not just looking for code — you’re looking for results. My clients come to
             me when they want their projects to stand out, attract attention, and deliver value
             quickly.
@@ -573,14 +625,6 @@ $winter-mobile-background: map-get($winter-theme, primary);
     background-color: transparent;
 
     .section-container {
-      h1 {
-        border: solid 2px var(--q-primary);
-      }
-
-      h2 {
-        border: solid 2px var(--q-primary);
-      }
-
       .bulletContent {
         opacity: 0;
       }

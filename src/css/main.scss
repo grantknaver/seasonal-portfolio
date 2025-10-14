@@ -53,3 +53,15 @@
     -1px 1px 0 var(--q-secondary),
     1px 1px 0 var(--q-secondary);
 }
+
+.border-white {
+  border: solid 2px white;
+}
+
+.border-dark {
+  border: solid 2px var(--q-dark);
+}
+
+.border-black {
+  border: solid 2px black;
+}

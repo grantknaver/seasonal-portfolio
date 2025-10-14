@@ -381,18 +381,6 @@ watch(activeTheme, (newTheme) => {
 <style scoped lang="scss">
 @import '../css/main.scss';
 
-.border-white {
-  border: solid 2px white;
-}
-
-.border-dark {
-  border: solid 2px var(--q-dark);
-}
-
-.border-black {
-  border: solid 2px black;
-}
-
 .responsive-view {
   @media (min-width: $breakpoint-md) {
     display: none;
