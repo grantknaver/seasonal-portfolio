@@ -7,27 +7,27 @@ export enum Theme {
 
 export const themeMap = {
   Fall: {
-    '--q-primary': '#f4e7e1',
-    '--q-secondary': '#ff9b45',
-    '--q-accent': '#d5451b',
-    '--q-dark': '#521c0d',
+    '--q-primary': '#f7eddc',
+    '--q-secondary': '#eac08c',
+    '--q-accent': '#8d3a1e',
+    '--q-dark': '#3b2718',
   },
   Winter: {
-    '--q-primary': '#e0f7fa',
-    '--q-secondary': '#81d4fa',
-    '--q-accent': '#00acc1',
-    '--q-dark': '#37474f',
+    '--q-primary': '#e3f2fd',
+    '--q-secondary': '#bbdefb',
+    '--q-accent': '#0d47a1',
+    '--q-dark': '#0b1f3b',
   },
   Spring: {
-    '--q-primary': '#dcedc8',
-    '--q-secondary': '#aed581',
-    '--q-accent': '#8bc34a',
-    '--q-dark': '#33691e',
+    '--q-primary': '#e8f5e9',
+    '--q-secondary': '#c8e6c9',
+    '--q-accent': '#00796b',
+    '--q-dark': '#233129',
   },
   Summer: {
     '--q-primary': '#fff9c4',
     '--q-secondary': '#ffe082',
-    '--q-accent': '#ffca28',
-    '--q-dark': '#ef6c00',
+    '--q-accent': '#006064',
+    '--q-dark': '#0D3B66',
   },
 };
