@@ -18,8 +18,8 @@ import WeatherBackground from '../components/WeatherBackground.vue';
 import gsap from 'gsap';
 import { useGsapTimeline } from '../shared/composables/useGsapTimeline';
 import { type Mode } from '../shared/types/mode';
-import { ViewType } from 'src/shared/constants/viewType';
-import { getCustomCssVar } from 'src/shared/utils/getCustomCssVar';
+import { ViewType } from '../shared/constants/viewType';
+import { useViewport } from '../shared/utils/viewWidth';
 
 const mainStore = useMainStore();
 const mobileTopics: Topic[] = [
@@ -74,9 +74,10 @@ const showFooter = ref<boolean>(false);
 const io = ref<IntersectionObserver | null>(null);
 const { resetSequence, kill } = useGsapTimeline();
 let currentMode: Mode | null = null;
+const lgBreakpoint = useViewport().lgBreakpoint; // should already be like "1024px"
 
 const buildAnimations = (el: HTMLElement, mode: Mode) => {
-  if (mode === ViewType.Mobile) {
+  if (mode === ViewType.NotDesktop) {
     resetSequence([
       {
         type: 'fromTo',
@@ -194,20 +195,21 @@ onMounted(async () => {
   const el = root.value;
   if (!el) return;
 
-  const bp = getCustomCssVar('breakpoint-lg') || '1024px'; // should already be like "1024px"
-
+  window.addEventListener('resize', onResize);
   // Mobile
-  // mm.add(`(max-width: ${bp})`, () => {
-  //   currentMode = ViewType.Mobile;
-  //   buildAnimations(el, ViewType.Mobile);
-  //   return () => {
-  //     currentMode = null;
-  //     kill();
-  //   };
-  // });
+  mm.add(`(max-width: ${lgBreakpoint}px)`, () => {
+    console.log('Not Desktop');
+    currentMode = ViewType.NotDesktop;
+    buildAnimations(el, ViewType.NotDesktop);
+    return () => {
+      currentMode = null;
+      kill();
+    };
+  });
 
   // Desktop
-  mm.add(`(min-width: ${bp})`, () => {
+  mm.add(`(min-width: ${lgBreakpoint}px)`, () => {
+    console.log('Desktop');
     currentMode = ViewType.Desktop;
     buildAnimations(el, ViewType.Desktop);
     return () => {
@@ -215,8 +217,6 @@ onMounted(async () => {
       kill();
     };
   });
-
-  // window.addEventListener('resize', onResize);
 
   await mainStore.VERIFY_HUMANITY();
 

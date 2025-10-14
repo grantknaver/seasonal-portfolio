@@ -269,13 +269,13 @@ watch(activeTheme, (newTheme) => {
                   : 'bg-dark text-secondary border-black',
                 Winter: isBelowLgBreakpoint
                   ? 'bg-dark text-secondary'
-                  : 'bg-dark text-secondary border-white',
+                  : 'bg-dark text-secondary border-black',
                 Spring: isBelowLgBreakpoint
                   ? 'bg-dark text-secondary'
-                  : 'bg-accent text-white border-white',
+                  : 'bg-accent text-secondary border-black',
                 Summer: isBelowLgBreakpoint
                   ? 'bg-dark text-secondary'
-                  : 'bg-dark text-secondary border-white',
+                  : 'bg-dark text-secondary border-black',
               },
               activeTheme,
             )
