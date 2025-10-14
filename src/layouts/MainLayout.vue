@@ -165,7 +165,7 @@ onBeforeUnmount(() => window.removeEventListener('resize', updateWidths));
                 round
                 icon="fab fa-github"
                 target="_blank"
-                :class="activeTheme !== Theme.Spring ? 'text-accent' : 'text-secondary'"
+                :class="activeTheme !== Theme.Summer ? 'text-primary' : 'text-secondary'"
                 aria-label="GitHub"
               />
             </a>
@@ -176,7 +176,7 @@ onBeforeUnmount(() => window.removeEventListener('resize', updateWidths));
                 round
                 icon="fab fa-linkedin"
                 target="_blank"
-                :class="[activeTheme !== Theme.Spring ? 'text-accent' : 'text-secondary']"
+                :class="activeTheme !== Theme.Summer ? 'text-primary' : 'text-secondary'"
                 aria-label="LinkedIn"
               />
             </a>
