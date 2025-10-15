@@ -1,3 +1,0 @@
-import { type ViewType } from '../constants/viewType';
-
-export type Mode = ViewType.Desktop | ViewType.Tablet | ViewType.Mobile | ViewType.NotDesktop;

@@ -17,9 +17,11 @@ import { Theme } from '../shared/constants/theme';
 import WeatherBackground from '../components/WeatherBackground.vue';
 import gsap from 'gsap';
 import { useGsapTimeline } from '../shared/composables/useGsapTimeline';
-import { type Mode } from '../shared/types/mode';
 import { ViewType } from '../shared/constants/viewType';
 import { useViewport } from '../shared/utils/viewWidth';
+import { useMediaAnimations } from '../shared/composables/useMediaAnimations';
+import { gsapPreflightReset } from '../shared/utils/preflightReset';
+import viewRendered from '../shared/utils/viewRendered';
 
 const mainStore = useMainStore();
 const mobileTopics: Topic[] = [
@@ -73,62 +75,74 @@ const root = ref<HTMLElement | null>(null);
 const showFooter = ref<boolean>(false);
 const io = ref<IntersectionObserver | null>(null);
 const { resetSequence, kill } = useGsapTimeline();
-let currentMode: Mode | null = null;
-const lgBreakpoint = useViewport().lgBreakpoint; // should already be like "1024px"
+const { runAtMedia } = useMediaAnimations();
+const LG = useViewport().lgBreakpoint;
 
-const buildAnimations = (el: HTMLElement, mode: Mode) => {
-  if (mode === ViewType.NotDesktop) {
+const buildAnimations = (el: HTMLElement, mode: ViewType): (() => void) => {
+  const dv = el.querySelector('.desktop-view');
+  const notDv = el.querySelector('.responsive-view');
+  if (
+    viewRendered.hasDesktopRendered(mode, dv) ||
+    viewRendered.hasNotDesktopRendered(mode, notDv)
+  ) {
+    return () => {};
+  }
+
+  const ctx = gsap.context(() => {
+    if (mode === ViewType.NotDesktop) {
+      const mobileTargets = el.querySelectorAll(':scope .home-content');
+      gsapPreflightReset(mobileTargets);
+      resetSequence([
+        {
+          type: 'fromTo',
+          targets: mobileTargets,
+          from: { x: 200, autoAlpha: 0 },
+          to: {
+            x: 0,
+            autoAlpha: 1,
+            duration: 2,
+            ease: 'bounce',
+            stagger: 1,
+            immediateRender: false,
+          },
+          at: 0,
+        },
+      ]);
+      return;
+    }
+
+    // --- Desktop targets ---
+    const nameEl = el.querySelector('.desktop-view .name');
+    const titleEl = el.querySelector('.desktop-view .title');
+    const sepEl = el.querySelector('.desktop-view .separator');
+    const simonEl = el.querySelector('.desktop-view .simon');
+    const servEl = el.querySelector('.desktop-view .services-description');
+
+    const targets = [nameEl, titleEl, sepEl, simonEl, servEl].filter(Boolean) as Element[];
+    gsapPreflightReset(targets);
     resetSequence([
+      // Name
+      { type: 'label', name: 'name', at: 0 },
       {
         type: 'fromTo',
-        targets: el.querySelectorAll(':scope .home-content'),
-        from: { x: 200, autoAlpha: 0 },
+        targets: nameEl!,
+        from: { y: -200, rotation: 0, autoAlpha: 1 },
         to: {
-          x: 0,
-          autoAlpha: 1,
-          duration: 2,
-          ease: 'bounce',
-          stagger: 1,
-          immediateRender: false,
-        },
-        at: 0,
-      },
-    ]);
-  } else if (mode === ViewType.Desktop) {
-    const nameEl = el.querySelector(':scope .desktop-view .name') as HTMLElement;
-    const titleEl = el.querySelector(':scope .desktop-view .title') as HTMLElement;
-    const sepEl = el.querySelector(':scope .desktop-view .separator') as HTMLElement;
-    const simonEl = el.querySelector(':scope .desktop-view .simon ') as HTMLElement;
-    const servicesDescriptionEl = el.querySelector(
-      ':scope .desktop-view .services-description',
-    ) as HTMLElement;
-
-    gsap.killTweensOf([nameEl, titleEl, sepEl, titleEl, servicesDescriptionEl, simonEl]);
-
-    resetSequence([
-      // Name element
-      { type: 'set', targets: nameEl, vars: { y: -200 }, at: 0 },
-      {
-        type: 'to',
-        targets: nameEl,
-        vars: {
           keyframes: [{ rotation: 15 }, { rotation: -10, y: -10 }, { rotation: 0, y: 0 }],
           ease: 'bounce',
           duration: 3.8,
+          immediateRender: false,
         },
-        at: 0, // starts at timeline position 0
+        at: 'name',
       },
-      // Simon Element
+
+      // Simon
+      { type: 'label', name: 'simon', at: 0 },
       {
-        type: 'set',
-        targets: simonEl,
-        vars: { scale: 0, transformOrigin: '50% 50%', autoAlpha: 0 },
-        at: 0,
-      },
-      {
-        type: 'to',
-        targets: simonEl,
-        vars: {
+        type: 'fromTo',
+        targets: simonEl!,
+        from: { scale: 0, rotation: 0, autoAlpha: 0, transformOrigin: '50% 50%' },
+        to: {
           keyframes: [
             { scale: 0.5, rotation: 15, autoAlpha: 1 },
             { scale: 1.1, rotation: -10 },
@@ -136,56 +150,47 @@ const buildAnimations = (el: HTMLElement, mode: Mode) => {
           ],
           ease: 'bounce',
           duration: 3.8,
+          immediateRender: false,
         },
-        at: 0, // overlaps name animation
+        at: 'simon',
       },
+
       // Separator
-      { type: 'set', targets: sepEl, vars: { y: 150, autoAlpha: 0 } },
-
+      { type: 'label', name: 'separator', at: 1 },
       {
-        type: 'to',
-        targets: sepEl,
-        vars: { y: 0, ease: 'none', duration: 1, autoAlpha: 1 },
-        at: 2,
+        type: 'fromTo',
+        targets: sepEl!,
+        from: { y: 150, autoAlpha: 0 },
+        to: { y: 0, autoAlpha: 1, duration: 1, ease: 'none', immediateRender: false },
+        at: 'separator',
       },
+
       // Title
-      { type: 'set', targets: titleEl, vars: { y: 250 }, at: 0 },
+      { type: 'label', name: 'title', at: 1.5 },
       {
-        type: 'to',
-        targets: titleEl,
-        vars: {
-          y: 0,
-          duration: 3,
-          ease: 'bounce',
-        },
-        at: 2.5,
+        type: 'fromTo',
+        targets: titleEl!,
+        from: { y: 250 },
+        to: { y: 0, duration: 3, ease: 'bounce', immediateRender: false },
+        at: 'title',
       },
 
-      // Service Description
-      { type: 'set', targets: servicesDescriptionEl, vars: { x: -100, autoAlpha: 0 }, at: 0 },
+      // Services
+      { type: 'label', name: 'services', at: 2 },
       {
-        type: 'to',
-        targets: servicesDescriptionEl,
-        vars: {
-          x: 0,
-          autoAlpha: 1,
-          ease: 'bounce',
-          duration: 1.5,
-        },
-        at: 3.5,
+        type: 'fromTo',
+        targets: servEl!,
+        from: { x: -100, autoAlpha: 0 },
+        to: { x: 0, autoAlpha: 1, duration: 1.5, ease: 'bounce', immediateRender: false },
+        at: 'services',
       },
     ]);
-  }
-};
+  }, el);
 
-let animationId = 0;
-const onResize = () => {
-  cancelAnimationFrame(animationId);
-  animationId = requestAnimationFrame(() => {
-    const el = root.value;
-    if (!el || !currentMode) return;
-    buildAnimations(el, currentMode);
-  });
+  return () => {
+    kill();
+    ctx.revert();
+  };
 };
 
 const mm = gsap.matchMedia();
@@ -195,52 +200,14 @@ onMounted(async () => {
   const el = root.value;
   if (!el) return;
 
-  window.addEventListener('resize', onResize);
   // Mobile
-  mm.add(`(max-width: ${lgBreakpoint}px)`, () => {
-    console.log('Not Desktop');
-    currentMode = ViewType.NotDesktop;
-    buildAnimations(el, ViewType.NotDesktop);
-    return () => {
-      currentMode = null;
-      kill();
-    };
-  });
-
+  runAtMedia(`(max-width: ${LG - 1}px)`, () => buildAnimations(el, ViewType.NotDesktop));
   // Desktop
-  mm.add(`(min-width: ${lgBreakpoint}px)`, () => {
-    console.log('Desktop');
-    currentMode = ViewType.Desktop;
-    buildAnimations(el, ViewType.Desktop);
-    return () => {
-      currentMode = null;
-      kill();
-    };
-  });
-
-  await mainStore.VERIFY_HUMANITY();
-
-  const footerEl = document.getElementById('footer');
-  if (!footerEl) return;
-
-  const footerRoot = getScrollTarget(footerEl);
-  io.value = new IntersectionObserver(
-    ([entry]) => {
-      showFooter.value = entry ? entry.isIntersecting : false;
-    },
-    {
-      root: footerRoot === window ? null : (footerRoot as Element),
-      threshold: 0,
-      rootMargin: '0px',
-    },
-  );
-
-  io.value.observe(footerEl);
+  runAtMedia(`(min-width: ${LG}px)`, () => buildAnimations(el, ViewType.Desktop));
 });
 
 onBeforeUnmount(() => {
   io.value?.disconnect();
-  window.removeEventListener('resize', onResize);
   mm.kill();
 });
 
@@ -550,7 +517,7 @@ const scrollToFooter = () => {
           </div>
 
           <div
-            class="services-description start-animation row q-mt-md q-pa-md text-bold wrap justify-center text-white test"
+            class="services-description start-animation row q-mt-md q-pa-md text-bold wrap justify-center text-white"
             :class="
               setSeasonClasses(
                 {
@@ -705,7 +672,6 @@ const scrollToFooter = () => {
 
         .title-container {
           width: 55%;
-
           .title {
             transform: translateY(250px);
             font-size: 1.4rem;
