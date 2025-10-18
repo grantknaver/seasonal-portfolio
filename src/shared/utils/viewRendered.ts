@@ -12,7 +12,7 @@ const hasTabletRendered = (mode: ViewType, el: Element | null) => {
 
 const hasNotDesktopRendered = (mode: ViewType, el: Element | null) => {
   if (!el) return;
-  return mode === ViewType.NotDesktop && getComputedStyle(el).display === 'none';
+  return mode === ViewType.Responsive && getComputedStyle(el).display === 'none';
 };
 
 const hasMobileRendered = (mode: ViewType, el: Element) => {

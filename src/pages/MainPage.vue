@@ -19,7 +19,7 @@ import gsap from 'gsap';
 import { ViewType } from '../shared/constants/viewType';
 import { useViewport } from '../shared/utils/viewWidth';
 import { waitForLayout } from 'src/shared/utils/waitForLayout';
-import { areElements } from 'src/shared/utils/areElements';
+import { flattenElements } from '../shared/utils/flattenElements';
 
 const mainStore = useMainStore();
 const mobileTopics: Topic[] = [
@@ -73,7 +73,7 @@ const root = ref<HTMLElement | null>(null);
 const showFooter = ref<boolean>(false);
 const io = ref<IntersectionObserver | null>(null);
 const { lgBreakpoint, width } = useViewport();
-const isNotDesktop = computed(() => width.value < lgBreakpoint);
+const isResponsive = computed(() => width.value < lgBreakpoint);
 const dispose = ref<() => void>(() => {});
 const nameRef = ref<HTMLElement | null>(null);
 const simonRef = ref<HTMLElement | null>(null);
@@ -84,11 +84,11 @@ const servRef = ref<HTMLElement | null>(null);
 onMounted(async () => {
   await nextTick();
   await waitForLayout(root.value);
-  dispose.value = buildAnimations(isNotDesktop.value ? ViewType.NotDesktop : ViewType.Desktop);
+  dispose.value = buildAnimations(isResponsive.value ? ViewType.Responsive : ViewType.Desktop);
 });
 
 watch(
-  isNotDesktop,
+  isResponsive,
   async (viewNow) => {
     try {
       dispose.value();
@@ -97,7 +97,7 @@ watch(
     }
     await nextTick();
     await waitForLayout(root.value);
-    dispose.value = buildAnimations(viewNow ? ViewType.NotDesktop : ViewType.Desktop);
+    dispose.value = buildAnimations(viewNow ? ViewType.Responsive : ViewType.Desktop);
   },
   { flush: 'post' },
 );
@@ -126,80 +126,100 @@ watch(slide, (newVal) => mainStore.SET_ACTIVE_THEME(newVal));
 const buildAnimations = (mode: ViewType) => {
   const el = root.value;
   if (!el) return () => {};
+  const homeConentEls = document.querySelectorAll('.home-content');
+  const responsiveEls = [homeConentEls];
   const desktopEls = [nameRef.value, simonRef.value, titleRef.value, sepRef.value, servRef.value];
+  if (mode === ViewType.Responsive) {
+    if (!flattenElements(responsiveEls)) return () => {};
+    console.log('responsiveEls', responsiveEls);
+    gsap.killTweensOf(responsiveEls);
+    gsap.set(responsiveEls, { clearProps: 'all' });
 
+    gsap.fromTo(
+      homeConentEls,
+      { x: 150, autoAlpha: 0 },
+      {
+        keyframes: [{ x: 0, autoAlpha: 1 }],
+        ease: 'bounce',
+        duration: 1,
+        overwrite: 'auto',
+        stagger: 1,
+      },
+    );
+  }
   // Only animate desktop in this block
-  if (mode !== ViewType.Desktop) return () => {};
+  if (mode === ViewType.Desktop) {
+    console.log('desktop entered');
+    if (!flattenElements(desktopEls)) return () => {};
+    console.log('cleared areEleemnts');
+    gsap.killTweensOf(desktopEls);
+    gsap.set(desktopEls, { clearProps: 'all' });
 
-  if (!areElements(desktopEls)) return () => {};
+    gsap.fromTo(
+      nameRef.value,
+      { y: -150, autoAlpha: 0, rotation: 0 },
+      {
+        keyframes: [{ rotation: 15 }, { rotation: -10, y: -10 }, { rotation: 0, y: 0 }],
+        autoAlpha: 1,
+        ease: 'bounce.out',
+        duration: 3.8,
+        overwrite: 'auto',
+      },
+    );
 
-  gsap.killTweensOf(desktopEls);
-  gsap.set(desktopEls, { clearProps: 'all' });
+    gsap.fromTo(
+      simonRef.value,
+      {
+        scale: 0,
+        autoAlpha: 0,
+        rotation: 0,
+        transformOrigin: '50% 50%',
+      },
+      {
+        keyframes: [
+          { scale: 0.5, rotation: 15, autoAlpha: 1 },
+          { scale: 1.1, rotation: -10 },
+          { scale: 1, rotation: 0 },
+        ],
+        ease: 'bounce.out',
+        duration: 3.8,
+        overwrite: 'auto',
+      },
+    );
 
-  gsap.fromTo(
-    nameRef.value,
-    { y: -150, autoAlpha: 0, rotation: 0 },
-    {
-      keyframes: [{ rotation: 15 }, { rotation: -10, y: -10 }, { rotation: 0, y: 0 }],
-      autoAlpha: 1,
-      ease: 'bounce.out',
-      duration: 3.8,
-      overwrite: 'auto',
-    },
-  );
+    gsap.fromTo(
+      titleRef.value,
+      { y: 150, autoAlpha: 0 },
+      {
+        keyframes: [{ y: 0, autoAlpha: 1 }],
+        ease: 'bounce.out',
+        duration: 3,
+        overwrite: 'auto',
+      },
+    );
 
-  gsap.fromTo(
-    simonRef.value,
-    {
-      scale: 0,
-      autoAlpha: 0,
-      rotation: 0,
-      transformOrigin: '50% 50%',
-    },
-    {
-      keyframes: [
-        { scale: 0.5, rotation: 15, autoAlpha: 1 },
-        { scale: 1.1, rotation: -10 },
-        { scale: 1, rotation: 0 },
-      ],
-      ease: 'bounce.out',
-      duration: 3.8,
-      overwrite: 'auto',
-    },
-  );
+    gsap.fromTo(
+      sepRef.value,
+      { y: 150, autoAlpha: 0 },
+      {
+        keyframes: [{ y: 0, autoAlpha: 1 }],
+        ease: 'bounce.out',
+        duration: 1,
+        overwrite: 'auto',
+      },
+    );
 
-  gsap.fromTo(
-    titleRef.value,
-    { y: 150, autoAlpha: 0 },
-    {
-      keyframes: [{ y: 0, autoAlpha: 1 }],
-      ease: 'bounce.out',
-      duration: 3,
-      overwrite: 'auto',
-    },
-  );
-
-  gsap.fromTo(
-    sepRef.value,
-    { y: 150, autoAlpha: 0 },
-    {
-      keyframes: [{ y: 0, autoAlpha: 1 }],
-      ease: 'bounce.out',
-      duration: 1,
-      overwrite: 'auto',
-    },
-  );
-
-  gsap.fromTo(
-    servRef.value,
-    { x: -100, autoAlpha: 0 },
-    {
-      keyframes: [{ x: 0, autoAlpha: 1 }],
-      ease: 'bounce.out',
-      duration: 1.5,
-      overwrite: 'auto',
-    },
-  );
+    gsap.fromTo(
+      servRef.value,
+      { x: -100, autoAlpha: 0 },
+      {
+        keyframes: [{ x: 0, autoAlpha: 1 }],
+        ease: 'bounce.out',
+        duration: 1.5,
+        overwrite: 'auto',
+      },
+    );
+  }
 
   // Cleanup
   return () => {
@@ -257,7 +277,7 @@ const scrollToFooter = () => {
       >
     </div>
     <div ref="root" class="sub-container column items-center">
-      <section v-if="isNotDesktop" key="mobile" class="responsive-view full-width q-pa-md">
+      <section v-if="isResponsive" key="mobile" class="responsive-view full-width q-pa-md">
         <div class="home-container column text-primary bg-accent q-mb-sm q-pa-lg">
           <span>
             <p class="name home-content q-mb-none text-white">Grant Knaver</p>
@@ -275,7 +295,7 @@ const scrollToFooter = () => {
                     activeTheme,
                   )
                 "
-                >Frontend Developer {{ isNotDesktop }}</span
+                >Frontend Developer</span
               >
               <span
                 class="text-white"
@@ -396,7 +416,7 @@ const scrollToFooter = () => {
         </div>
       </section>
       <section
-        v-if="!isNotDesktop"
+        v-if="!isResponsive"
         key="desktop"
         class="desktop-view row justify-end items-center full-width"
       >
@@ -545,157 +565,6 @@ const scrollToFooter = () => {
 
 <style scoped lang="scss">
 @import '../css/main.scss';
-// .page-container {
-//   background-color: rgba($color: white, $alpha: 0.7);
-//   position: relative;
-
-//   @media (min-width: $breakpoint-md) {
-//     background-color: initial;
-//   }
-
-//   .carousel-background {
-//     position: fixed;
-//     height: 100%;
-//     top: 0;
-//     left: 0;
-//     z-index: 0;
-//     width: 100%;
-//     pointer-events: none;
-//     overflow: hidden;
-//   }
-
-//   .weather-layer {
-//     position: fixed;
-//     inset: 0;
-//     z-index: 1;
-//     pointer-events: none;
-//     overflow: hidden;
-//   }
-
-//   .logo {
-//     display: none;
-//     position: absolute;
-//     top: 3%;
-//     left: 3%;
-//     z-index: 2;
-
-//     @media (min-width: $breakpoint-lg) {
-//       display: flex !important;
-//       align-items: center;
-//       z-index: 2;
-
-//       .logo-text {
-//         padding-left: 0.5rem;
-//         font-size: 1.5rem;
-//       }
-//     }
-//   }
-
-//   .sub-container {
-//     flex: 1 1 0%;
-//     z-index: 2;
-
-//     @media (min-width: $breakpoint-lg) {
-//       position: relative;
-//       padding: initial;
-//     }
-
-//     p:nth-of-type(1) {
-//       font-weight: bold;
-//       line-height: 2.2rem;
-//       text-transform: uppercase;
-//     }
-
-//     p:nth-of-type(2) {
-//       font-size: 1rem;
-//     }
-
-//     .responsive-view {
-//       height: auto;
-//       max-width: 800px;
-
-//       @media (min-width: $breakpoint-md) {
-//         max-width: 1000px;
-//       }
-
-//       .home-content {
-//         // opacity: 0;
-//       }
-
-//       .name {
-//         font-size: 1.5rem;
-//       }
-//       .title {
-//         font-size: 1.2rem;
-//       }
-//     }
-
-//     .desktop-view {
-//       display: flex;
-//       justify-content: center;
-//       align-items: center;
-//       flex: 1 0 0%;
-//       position: relative;
-
-//       .home-container {
-//         margin-top: 4rem;
-//         max-width: 700px;
-
-//         .name {
-//           // opacity: 0;
-//           // transform: translateY(-150px);
-//           font-size: 1.8rem;
-//         }
-//         .simon {
-//           // opacity: 0;
-//           width: 45%;
-//           min-width: 275px;
-//           max-width: 275px;
-//           scale: 0;
-//           transform-origin: 50% 50%;
-//         }
-
-//         .title-container {
-//           width: 55%;
-//           .title {
-//             font-size: 1.4rem;
-//           }
-
-//           .separator {
-//             // opacity: 0;
-//             width: 75%;
-//             // transform: translateY(150px);
-//           }
-//         }
-
-//         .services-description {
-//           position: relative;
-//           z-index: 1;
-//           font-size: 1.2rem;
-//           // opacity: 0;
-//           // transform: translateX(-100px);
-//           border-radius: 5px;
-//         }
-
-//         .services-description::before {
-//           content: '';
-//           position: absolute;
-//           inset: 0; /* cover entire element */
-//           background-color: rgba(black, 0.4);
-//           filter: blur(20px);
-//           z-index: -1;
-//           margin: -10px; /* expands the blurred area beyond edges */
-//         }
-//       }
-
-//       #showFooterBtn {
-//         position: absolute;
-//         bottom: 1rem;
-//         left: 1rem;
-//       }
-//     }
-//   }
-// }
 
 .page-container {
   background-color: rgba($color: white, $alpha: 0.7);
