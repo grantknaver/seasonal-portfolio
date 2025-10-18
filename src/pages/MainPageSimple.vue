@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref, watch, nextTick, onBeforeUnmount, computed } from 'vue';
+import { ref, watch, nextTick, onBeforeUnmount, computed, onMounted } from 'vue';
 import { useMainStore } from '../stores/main';
 import { type Topic } from '../shared/types/topic';
 import { v4 as uuidv4 } from 'uuid';
@@ -16,11 +16,9 @@ import { QCarousel, scroll } from 'quasar';
 import { Theme } from '../shared/constants/theme';
 import WeatherBackground from '../components/WeatherBackground.vue';
 import gsap from 'gsap';
-import { useGsapTimeline } from '../shared/composables/useGsapTimeline';
 import { ViewType } from '../shared/constants/viewType';
 import { useViewport } from '../shared/utils/viewWidth';
-import { gsapPreflightReset } from '../shared/utils/preflightReset';
-import { twoRaf } from '../shared/utils/toRaf';
+import { waitForLayout } from 'src/shared/utils/waitForLayout';
 
 const mainStore = useMainStore();
 const mobileTopics: Topic[] = [
@@ -73,13 +71,44 @@ const expandedPanel = ref<TopicName | null>(null);
 const root = ref<HTMLElement | null>(null);
 const showFooter = ref<boolean>(false);
 const io = ref<IntersectionObserver | null>(null);
-const { resetSequence, kill } = useGsapTimeline();
-const lgBreakpoint = useViewport().lgBreakpoint;
-const width = useViewport().width;
+const { lgBreakpoint, width } = useViewport();
 const isNotDesktop = computed(() => width.value < lgBreakpoint);
+const dispose = ref<() => void>(() => {});
+const nameRef = ref<HTMLElement | null>(null);
+const simonRef = ref<HTMLElement | null>(null);
+const titleRef = ref<HTMLElement | null>(null);
+const sepRef = ref<HTMLElement | null>(null);
+const servRef = ref<HTMLElement | null>(null);
+
+onMounted(async () => {
+  await nextTick();
+  await waitForLayout(root.value);
+  dispose.value = buildAnimations(isNotDesktop.value ? ViewType.NotDesktop : ViewType.Desktop);
+});
+
+watch(
+  isNotDesktop,
+  async (viewNow) => {
+    try {
+      dispose.value();
+    } catch (e) {
+      console.log(e);
+    }
+    await nextTick();
+    await waitForLayout(root.value);
+    console.log('Desktop setup');
+    dispose.value = buildAnimations(viewNow ? ViewType.NotDesktop : ViewType.Desktop);
+  },
+  { flush: 'post' },
+);
 
 onBeforeUnmount(() => {
   io.value?.disconnect();
+  try {
+    dispose.value();
+  } catch (e) {
+    console.log('onBeforeUnmount dispose err', e);
+  }
 });
 
 watch(mobileScrollTarget, (newTopic) => {
@@ -94,167 +123,76 @@ watch(activeTopic, (newTopic: TopicName | null) => {
 
 watch(slide, (newVal) => mainStore.SET_ACTIVE_THEME(newVal));
 
-const buildForMode = async (mode: ViewType) => {
-  await nextTick();
-  await twoRaf(); // ensure DOM & styles are final
-
+const buildAnimations = (mode: ViewType) => {
   const el = root.value;
   if (!el) return () => {};
 
-  // ensure the container for the mode is really present/visible
-  const container =
-    mode === ViewType.NotDesktop
-      ? el.querySelector('.responsive-view')
-      : el.querySelector('.desktop-view');
+  // Only animate desktop in this block
+  if (mode !== ViewType.Desktop) return () => {};
 
-  if (
-    !container ||
-    (container as HTMLElement).offsetParent === null ||
-    (container as HTMLElement).offsetWidth === 0
-  ) {
-    // one more paint if needed
-    await twoRaf();
-    if (
-      !container ||
-      (container as HTMLElement).offsetParent === null ||
-      (container as HTMLElement).offsetWidth === 0
-    ) {
-      return () => {};
-    }
-  }
+  // Make a tuple so TS can narrow each slot
+  const els = [nameRef.value, simonRef.value, titleRef.value, sepRef.value, servRef.value] as const;
 
-  return buildAnimations(el, mode);
-};
-watch(
-  isNotDesktop,
-  async (viewNow) => {
-    const dispose = ref<() => void>(() => {});
-    // cleanup previous
-    try {
-      dispose.value();
-    } catch (err) {
-      console.log('dispose error', err);
-    }
+  // User-defined type predicate — no Boolean(), be explicit
+  const allElements = (
+    arr: readonly (Element | null)[],
+  ): arr is readonly [Element, Element, Element, Element, Element] =>
+    arr.every((x): x is Element => x instanceof Element);
 
-    // ensure DOM is mounted & updated
-    await nextTick(); // Vue flushed
-    await twoRaf(); // browser laid out & painted
+  if (!allElements(els)) return () => {};
 
-    // build for current mode
-    dispose.value = await buildForMode(viewNow ? ViewType.NotDesktop : ViewType.Desktop);
-  },
-  { immediate: true, flush: 'post' }, // run after mount & DOM updates
-);
+  // After this, all 5 are real Elements (not undefined/null)
+  const [nameEl, simonEl, titleEl, sepEl, servEl] = els;
 
-const buildAnimations = (el: HTMLElement, mode: ViewType): (() => void) => {
-  const ctx = gsap.context(() => {
-    if (mode === ViewType.NotDesktop) {
-      const mobileTargets = el.querySelectorAll(':scope .home-content');
-      gsapPreflightReset(mobileTargets);
-      resetSequence([
-        {
-          type: 'fromTo',
-          targets: mobileTargets,
-          from: { x: 200, autoAlpha: 0 },
-          to: {
-            x: 0,
-            autoAlpha: 1,
-            duration: 2,
-            ease: 'bounce',
-            stagger: 1,
-            immediateRender: false,
-          },
-          at: 0,
-        },
-      ]);
-    } else if (mode === ViewType.Desktop) {
-      // --- Desktop targets ---
-      const nameEl = el.querySelector('.desktop-view .name');
-      const titleEl = el.querySelector('.desktop-view .title');
-      const sepEl = el.querySelector('.desktop-view .separator');
-      const simonEl = el.querySelector('.desktop-view .simon');
-      const servEl = el.querySelector('.desktop-view .services-description');
-      const targets = [nameEl, titleEl, sepEl, simonEl, servEl].filter(Boolean) as Element[];
-      gsapPreflightReset(targets);
-      resetSequence([
-        // Name
-        { type: 'label', name: 'name', at: 0 },
-        {
-          type: 'fromTo',
-          targets: nameEl!,
-          from: { y: -200, rotation: 0, autoAlpha: 1 },
-          to: {
-            keyframes: [{ rotation: 15 }, { rotation: -10, y: -10 }, { rotation: 0, y: 0 }],
-            ease: 'bounce',
-            duration: 3.8,
-            immediateRender: false,
-          },
-          at: 'name',
-        },
+  gsap.killTweensOf(els);
+  gsap.set(els, { clearProps: 'all' });
 
-        // Simon
-        { type: 'label', name: 'simon', at: 0 },
-        {
-          type: 'fromTo',
-          targets: simonEl!,
-          from: { scale: 0, rotation: 0, autoAlpha: 0, transformOrigin: '50% 50%' },
-          to: {
-            keyframes: [
-              { scale: 0.5, rotation: 15, autoAlpha: 1 },
-              { scale: 1.1, rotation: -10 },
-              { scale: 1, rotation: 0 },
-            ],
-            ease: 'bounce',
-            duration: 3.8,
-            immediateRender: false,
-          },
-          at: 'simon',
-        },
+  // Baselines owned by JS
+  gsap.set(nameEl, { y: -150, autoAlpha: 0, rotation: 0 });
+  gsap.set(simonEl, {
+    scale: 0,
+    autoAlpha: 0,
+    rotation: 0,
+    transformOrigin: '50% 50%',
+  });
+  gsap.set(titleEl, { y: 150, autoAlpha: 0 });
+  gsap.set(sepEl, { y: 150, autoAlpha: 0 });
+  gsap.set(servEl, { x: -100, autoAlpha: 0 });
 
-        // Separator
-        { type: 'label', name: 'separator', at: 1 },
-        {
-          type: 'fromTo',
-          targets: sepEl!,
-          from: { y: 150, autoAlpha: 0 },
-          to: { y: 0, autoAlpha: 1, duration: 1, ease: 'none', immediateRender: false },
-          at: 'separator',
-        },
+  // Animations
+  gsap.to(nameEl, {
+    keyframes: [{ rotation: 15 }, { rotation: -10, y: -10 }, { rotation: 0, y: 0 }],
+    autoAlpha: 1,
+    ease: 'bounce.out',
+    duration: 3.8,
+    overwrite: 'auto',
+  });
 
-        // Title
-        { type: 'label', name: 'title', at: 1.5 },
-        {
-          type: 'fromTo',
-          targets: titleEl!,
-          from: { y: 250, autoAlpha: 0 },
-          to: { y: 0, autoAlpha: 1, duration: 3, ease: 'bounce', immediateRender: false },
-          at: 'title',
-        },
+  gsap.to(simonEl, {
+    keyframes: [
+      { scale: 0.5, rotation: 15, autoAlpha: 1 },
+      { scale: 1.1, rotation: -10 },
+      { scale: 1, rotation: 0 },
+    ],
+    ease: 'bounce.out',
+    duration: 3.8,
+    overwrite: 'auto',
+  });
 
-        // Services
-        { type: 'label', name: 'services', at: 2 },
-        {
-          type: 'fromTo',
-          targets: servEl!,
-          from: { x: -100, autoAlpha: 0 },
-          to: { x: 0, autoAlpha: 1, duration: 1.5, ease: 'bounce', immediateRender: false },
-          at: 'services',
-        },
-      ]);
-    }
-  }, el);
+  gsap.to(titleEl, {
+    keyframes: [{ y: 0, autoAlpha: 1, duration: 3, ease: 'bounce.out', overwrite: 'auto' }],
+  });
+  gsap.to(sepEl, {
+    keyframes: [{ y: 0, autoAlpha: 1, duration: 1, ease: 'bounce.out', overwrite: 'auto' }],
+  });
+  gsap.to(servEl, {
+    keyframes: [{ x: 0, autoAlpha: 1, duration: 1.5, ease: 'bounce.out', overwrite: 'auto' }],
+  });
 
+  // Cleanup
   return () => {
-    try {
-      kill();
-    } catch (err) {
-      console.log('kill() Error', err);
-    }
-    try {
-      ctx.revert();
-    } catch (err) {
-      console.log('ctx.revert() Error', err);
-    }
+    gsap.killTweensOf(els);
+    gsap.set(els, { clearProps: 'all' });
   };
 };
 
@@ -307,8 +245,8 @@ const scrollToFooter = () => {
       >
     </div>
     <div ref="root" class="sub-container column items-center">
-      <section v-show="isNotDesktop" class="responsive-view full-width q-pa-md">
-        <div class="home-contaier column text-primary bg-accent q-mb-sm q-pa-lg">
+      <section v-if="isNotDesktop" key="mobile" class="responsive-view full-width q-pa-md">
+        <div class="home-container column text-primary bg-accent q-mb-sm q-pa-lg">
           <span>
             <p class="name home-content q-mb-none text-white">Grant Knaver</p>
             <p class="title home-content text-secondary">
@@ -325,7 +263,7 @@ const scrollToFooter = () => {
                     activeTheme,
                   )
                 "
-                >Frontend Developer</span
+                >Frontend Developer {{ isNotDesktop }}</span
               >
               <span
                 class="text-white"
@@ -445,9 +383,14 @@ const scrollToFooter = () => {
           <ContactSection />
         </div>
       </section>
-      <section v-show="!isNotDesktop" class="desktop-view row justify-end items-center full-width">
-        <div class="home-contaier q-pl-xl q-pr-xl column">
+      <section
+        v-if="!isNotDesktop"
+        key="desktop"
+        class="desktop-view row justify-end items-center full-width"
+      >
+        <div class="home-container q-pl-xl q-pr-xl column">
           <p
+            ref="nameRef"
             class="name q-mb-lg text-body-1 text-left text-white"
             :class="
               setSeasonClasses(
@@ -464,10 +407,10 @@ const scrollToFooter = () => {
             Grant Knaver
           </p>
           <div class="row no-wrap">
-            <SimonMenu class="simon"></SimonMenu>
+            <div ref="simonRef" class="simon"><SimonMenu></SimonMenu></div>
             <div class="title-container column justify-center items-center q-pa-md">
               <div class="clip-container relative-position overflow-hidden">
-                <p class="title full-width q-mb-lg q-pl-lg text-secondary text-left">
+                <p ref="titleRef" class="title full-width q-mb-lg q-pl-lg text-secondary text-left">
                   <span
                     class="frontend text-white"
                     :class="
@@ -547,11 +490,14 @@ const scrollToFooter = () => {
                   >
                 </p>
               </div>
-              <q-separator class="separator bg-accent text-seon"></q-separator>
+              <div ref="sepRef" class="separator bg-accent text-secondary">
+                <q-separator></q-separator>
+              </div>
             </div>
           </div>
 
           <div
+            ref="servRef"
             class="services-description start-animation row q-mt-md q-pa-md text-bold wrap justify-center text-white"
             :class="
               setSeasonClasses(
@@ -587,6 +533,157 @@ const scrollToFooter = () => {
 
 <style scoped lang="scss">
 @import '../css/main.scss';
+// .page-container {
+//   background-color: rgba($color: white, $alpha: 0.7);
+//   position: relative;
+
+//   @media (min-width: $breakpoint-md) {
+//     background-color: initial;
+//   }
+
+//   .carousel-background {
+//     position: fixed;
+//     height: 100%;
+//     top: 0;
+//     left: 0;
+//     z-index: 0;
+//     width: 100%;
+//     pointer-events: none;
+//     overflow: hidden;
+//   }
+
+//   .weather-layer {
+//     position: fixed;
+//     inset: 0;
+//     z-index: 1;
+//     pointer-events: none;
+//     overflow: hidden;
+//   }
+
+//   .logo {
+//     display: none;
+//     position: absolute;
+//     top: 3%;
+//     left: 3%;
+//     z-index: 2;
+
+//     @media (min-width: $breakpoint-lg) {
+//       display: flex !important;
+//       align-items: center;
+//       z-index: 2;
+
+//       .logo-text {
+//         padding-left: 0.5rem;
+//         font-size: 1.5rem;
+//       }
+//     }
+//   }
+
+//   .sub-container {
+//     flex: 1 1 0%;
+//     z-index: 2;
+
+//     @media (min-width: $breakpoint-lg) {
+//       position: relative;
+//       padding: initial;
+//     }
+
+//     p:nth-of-type(1) {
+//       font-weight: bold;
+//       line-height: 2.2rem;
+//       text-transform: uppercase;
+//     }
+
+//     p:nth-of-type(2) {
+//       font-size: 1rem;
+//     }
+
+//     .responsive-view {
+//       height: auto;
+//       max-width: 800px;
+
+//       @media (min-width: $breakpoint-md) {
+//         max-width: 1000px;
+//       }
+
+//       .home-content {
+//         // opacity: 0;
+//       }
+
+//       .name {
+//         font-size: 1.5rem;
+//       }
+//       .title {
+//         font-size: 1.2rem;
+//       }
+//     }
+
+//     .desktop-view {
+//       display: flex;
+//       justify-content: center;
+//       align-items: center;
+//       flex: 1 0 0%;
+//       position: relative;
+
+//       .home-container {
+//         margin-top: 4rem;
+//         max-width: 700px;
+
+//         .name {
+//           // opacity: 0;
+//           // transform: translateY(-150px);
+//           font-size: 1.8rem;
+//         }
+//         .simon {
+//           // opacity: 0;
+//           width: 45%;
+//           min-width: 275px;
+//           max-width: 275px;
+//           scale: 0;
+//           transform-origin: 50% 50%;
+//         }
+
+//         .title-container {
+//           width: 55%;
+//           .title {
+//             font-size: 1.4rem;
+//           }
+
+//           .separator {
+//             // opacity: 0;
+//             width: 75%;
+//             // transform: translateY(150px);
+//           }
+//         }
+
+//         .services-description {
+//           position: relative;
+//           z-index: 1;
+//           font-size: 1.2rem;
+//           // opacity: 0;
+//           // transform: translateX(-100px);
+//           border-radius: 5px;
+//         }
+
+//         .services-description::before {
+//           content: '';
+//           position: absolute;
+//           inset: 0; /* cover entire element */
+//           background-color: rgba(black, 0.4);
+//           filter: blur(20px);
+//           z-index: -1;
+//           margin: -10px; /* expands the blurred area beyond edges */
+//         }
+//       }
+
+//       #showFooterBtn {
+//         position: absolute;
+//         bottom: 1rem;
+//         left: 1rem;
+//       }
+//     }
+//   }
+// }
 
 .page-container {
   background-color: rgba($color: white, $alpha: 0.7);
@@ -653,16 +750,13 @@ const scrollToFooter = () => {
       font-size: 1rem;
     }
 
+    /* ---------- Mobile / NotDesktop ---------- */
     .responsive-view {
       height: auto;
       max-width: 800px;
 
       @media (min-width: $breakpoint-md) {
         max-width: 1000px;
-      }
-
-      .home-content {
-        opacity: 0;
       }
 
       .name {
@@ -673,6 +767,7 @@ const scrollToFooter = () => {
       }
     }
 
+    /* ---------- Desktop ---------- */
     .desktop-view {
       display: flex;
       justify-content: center;
@@ -680,34 +775,31 @@ const scrollToFooter = () => {
       flex: 1 0 0%;
       position: relative;
 
-      .home-contaier {
+      .home-container {
         margin-top: 4rem;
         max-width: 700px;
 
+        /* NOTE: No opacity/transform here; GSAP controls them */
         .name {
-          transform: translateY(-200px);
           font-size: 1.8rem;
         }
+
         .simon {
-          opacity: 0;
           width: 45%;
           min-width: 275px;
           max-width: 275px;
-          scale: 0;
-          transform-origin: 50% 50%;
+          /* no transform-origin/scale here; GSAP sets them */
         }
 
         .title-container {
           width: 55%;
+
           .title {
-            transform: translateY(250px);
-            font-size: 1.4rem;
+            font-size: 1.4rem; /* GSAP handles opacity/transform */
           }
 
           .separator {
-            opacity: 0;
-            width: 75%;
-            transform: translateY(150px);
+            width: 75%; /* GSAP handles opacity/transform */
           }
         }
 
@@ -715,19 +807,17 @@ const scrollToFooter = () => {
           position: relative;
           z-index: 1;
           font-size: 1.2rem;
-          opacity: 0;
-          transform: translateX(-100px);
-          border-radius: 5px;
+          border-radius: 5px; /* GSAP handles opacity/transform */
         }
 
         .services-description::before {
           content: '';
           position: absolute;
-          inset: 0; /* cover entire element */
+          inset: 0;
           background-color: rgba(black, 0.4);
           filter: blur(20px);
           z-index: -1;
-          margin: -10px; /* expands the blurred area beyond edges */
+          margin: -10px;
         }
       }
 

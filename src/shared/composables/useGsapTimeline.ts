@@ -7,7 +7,7 @@ export function useGsapTimeline() {
   let tl = gsap.timeline({
     paused: true,
     defaults: {
-      overwrite: true,
+      overwrite: 'auto',
     },
   });
 
@@ -17,13 +17,13 @@ export function useGsapTimeline() {
     tl = gsap.timeline({
       paused: true,
       defaults: {
-        overwrite: true,
+        overwrite: 'auto',
       },
     });
 
     for (const s of steps) {
       if (s.type === GsapStepType.Label) {
-        tl.addLabel(s.name, s.at ?? '>');
+        tl.addLabel(s.name, s.at);
       } else if (s.type === 'set') {
         tl.set(s.targets, s.vars, s.at ?? '>');
       } else if (s.type === 'fromTo') {
@@ -32,6 +32,7 @@ export function useGsapTimeline() {
         tl.to(s.targets, s.vars, s.at ?? '>');
       }
     }
+    console.log('tl is playing');
     tl.play(0);
     return tl;
   }
