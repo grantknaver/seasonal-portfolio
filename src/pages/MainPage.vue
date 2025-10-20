@@ -217,6 +217,7 @@ const buildAnimations = (mode: ViewType) => {
         ease: 'bounce.out',
         duration: 1.5,
         overwrite: 'auto',
+        delay: 2,
       },
     );
   }
@@ -273,12 +274,13 @@ const scrollToFooter = () => {
         alt="logo"
       />
       <span class="logo-text"
-        ><span class="text-secondary">glk</span><span class="text-primary">Freelance</span></span
+        ><span class="text-secondary">glk</span
+        ><span class="text-primary-font">Freelance</span></span
       >
     </div>
     <div ref="root" class="sub-container column items-center">
       <section v-if="isResponsive" key="mobile" class="responsive-view full-width q-pa-md">
-        <div class="home-container column text-primary bg-accent q-mb-sm q-pa-lg">
+        <div class="home-container column text-primary-font bg-accent q-mb-sm q-pa-lg font-primary">
           <span>
             <p class="name home-content q-mb-none text-white">Grant Knaver</p>
             <p class="title home-content text-secondary">
@@ -369,7 +371,7 @@ const scrollToFooter = () => {
             </p>
           </span>
         </div>
-        <q-list class="full-width">
+        <q-list class="full-width font-primary">
           <q-item
             v-for="topic in mobileTopics.filter((topic) => topic.name !== TopicName.Contact)"
             :key="topic.id"
@@ -411,7 +413,7 @@ const scrollToFooter = () => {
             </q-expansion-item>
           </q-item>
         </q-list>
-        <div class="full-width" :id="TopicName.Contact">
+        <div class="full-width font-primary" :id="TopicName.Contact">
           <ContactSection />
         </div>
       </section>
@@ -427,10 +429,10 @@ const scrollToFooter = () => {
             :class="
               setSeasonClasses(
                 {
-                  Fall: 'dark-text-outline',
-                  Winter: 'dark-text-outline',
-                  Spring: 'black-text-outline',
-                  Summer: 'black-text-outline',
+                  Fall: 'secondary-font fall-secondary dark-text-outline',
+                  Winter: 'secondary-font winter-secondary dark-text-outline',
+                  Spring: 'secondary-font spring-secondary black-text-outline',
+                  Summer: 'secondary-font summer-secondary black-text-outline',
                 },
                 activeTheme,
               )
@@ -442,14 +444,28 @@ const scrollToFooter = () => {
             <div ref="simonRef" class="simon"><SimonMenu></SimonMenu></div>
             <div class="title-container column justify-center items-center q-pa-md">
               <div class="clip-container relative-position overflow-hidden">
-                <p ref="titleRef" class="title full-width q-mb-lg q-pl-lg text-secondary text-left">
+                <p
+                  ref="titleRef"
+                  class="title full-width q-mb-lg q-pl-lg text-secondary text-left"
+                  :class="
+                    setSeasonClasses(
+                      {
+                        Fall: 'secondary-font fall-secondary',
+                        Winter: 'secondary-font winter-secondary',
+                        Spring: 'secondary-font spring-secondary',
+                        Summer: 'secondary-font summer-secondary',
+                      },
+                      activeTheme,
+                    )
+                  "
+                >
                   <span
                     class="frontend text-white"
                     :class="
                       setSeasonClasses(
                         {
                           Fall: 'dark-text-outline',
-                          Winter: 'dark-text-outline',
+                          Winter: ' dark-text-outline',
                           Spring: 'dark-text-outline',
                           Summer: 'black-text-outline',
                         },
@@ -479,10 +495,10 @@ const scrollToFooter = () => {
                     :class="
                       setSeasonClasses(
                         {
-                          Fall: 'dark-text-outline',
-                          Winter: 'dark-text-outline',
-                          Spring: 'black-text-outline',
-                          Summer: 'black-text-outline',
+                          Fall: 'fall-secondary dark-text-outline',
+                          Winter: 'winter-secondary dark-text-outline',
+                          Spring: 'spring-secondary black-text-outline',
+                          Summer: 'summer-secondary black-text-outline',
                         },
                         activeTheme,
                       )
@@ -494,10 +510,10 @@ const scrollToFooter = () => {
                     :class="
                       setSeasonClasses(
                         {
-                          Fall: 'dark-text-outline',
-                          Winter: 'dark-text-outline',
-                          Spring: 'black-text-outline',
-                          Summer: 'black-text-outline',
+                          Fall: 'fall-secondary dark-text-outline',
+                          Winter: 'winter-secondary dark-text-outline',
+                          Spring: 'spring-secondary black-text-outline',
+                          Summer: 'summer-secondary black-text-outline',
                         },
                         activeTheme,
                       )
@@ -510,10 +526,10 @@ const scrollToFooter = () => {
                     :class="
                       setSeasonClasses(
                         {
-                          Fall: 'dark-text-outline',
-                          Winter: 'dark-text-outline',
-                          Spring: 'black-text-outline',
-                          Summer: 'black-text-outline',
+                          Fall: 'fall-secondary dark-text-outline',
+                          Winter: 'winter-secondary dark-text-outline',
+                          Spring: 'spring-secondary black-text-outline',
+                          Summer: 'summer-secondary black-text-outline',
                         },
                         activeTheme,
                       )
@@ -530,14 +546,14 @@ const scrollToFooter = () => {
 
           <div
             ref="servRef"
-            class="services-description start-animation row q-mt-md q-pa-md text-bold wrap justify-center text-white"
+            class="services-description accent-text-outline black-text-glow start-animation row q-mt-md q-pa-md text-bold wrap justify-center text-white"
             :class="
               setSeasonClasses(
                 {
-                  Fall: 'black-text-outline',
-                  Winter: 'black-text-outline',
-                  Spring: 'black-text-outline',
-                  Summer: ' text-white black-text-outline',
+                  Fall: 'primary-font black-text-outline',
+                  Winter: 'primary-font black-text-outline',
+                  Spring: 'primary-font black-text-outline',
+                  Summer: 'primary-font text-white black-text-outline',
                 },
                 activeTheme,
               )
@@ -644,7 +660,7 @@ const scrollToFooter = () => {
         font-size: 1.5rem;
       }
       .title {
-        font-size: 1.2rem;
+        font-size: 1rem;
       }
     }
 
@@ -666,17 +682,17 @@ const scrollToFooter = () => {
         }
 
         .simon {
-          width: 45%;
+          width: 40%;
           min-width: 275px;
           max-width: 275px;
           /* no transform-origin/scale here; GSAP sets them */
         }
 
         .title-container {
-          width: 55%;
+          width: 60%;
 
           .title {
-            font-size: 1.4rem; /* GSAP handles opacity/transform */
+            font-size: 1.3rem;
           }
 
           .separator {
@@ -695,8 +711,6 @@ const scrollToFooter = () => {
           content: '';
           position: absolute;
           inset: 0;
-          background-color: rgba(black, 0.4);
-          filter: blur(20px);
           z-index: -1;
           margin: -10px;
         }

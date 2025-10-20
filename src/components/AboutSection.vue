@@ -1,10 +1,11 @@
 <script lang="ts" setup>
-import { ref } from 'vue';
+import { ref, onMounted } from 'vue';
 import { v4 as uuidv4 } from 'uuid';
 import { setSeasonClasses } from 'src/shared/utils/setSeasonColors';
 import { useMainStore } from '../stores/main';
 import { storeToRefs } from 'pinia';
 import { type AboutBulletPoints } from 'src/shared/types/aboutBulletPoints';
+import { hasScrollbar } from 'src/shared/utils/hasScrollbar';
 
 const mainStore = useMainStore();
 const { activeTheme } = storeToRefs(mainStore);
@@ -68,6 +69,13 @@ const whyClientsBullets = ref<AboutBulletPoints[]>([
     text: 'I focus on the “wow” factor — animations, interactions, and storytelling that make your product stand out and leave a lasting impression.',
   },
 ]);
+
+onMounted(() => {
+  mainStore.HAS_SCROLLBAR(hasScrollbar());
+  window.addEventListener('resize', () => {
+    mainStore.HAS_SCROLLBAR(hasScrollbar());
+  });
+});
 </script>
 
 <template>
@@ -76,7 +84,7 @@ const whyClientsBullets = ref<AboutBulletPoints[]>([
       <q-card class="full-width">
         <q-card-section class="section-container q-pa-lg">
           <h1
-            class="text-h1-alt q-mt-none q-mb-md bg-dark text-center"
+            class="text-h1-alt q-mt-none q-mb-md bg-dark text-center font-secondary"
             :class="
               setSeasonClasses(
                 {
@@ -93,7 +101,7 @@ const whyClientsBullets = ref<AboutBulletPoints[]>([
           </h1>
           <q-separator color="primary" class="q-mb-md" />
           <p
-            class="text-body-1"
+            class="text-body-1 font-primary"
             :class="
               setSeasonClasses(
                 {
@@ -111,7 +119,7 @@ const whyClientsBullets = ref<AboutBulletPoints[]>([
             creators bring their ideas to life on the web.
           </p>
           <p
-            class="text-body-1 q-mb-none"
+            class="text-body-1 q-mb-none font-primary"
             :class="
               setSeasonClasses(
                 {
@@ -134,6 +142,7 @@ const whyClientsBullets = ref<AboutBulletPoints[]>([
               :name="bullet.id"
               expand-separator
               :label="bullet.label"
+              class="font-primary"
             >
               <q-expansion-item group="aboutMe" header-class="bg-primary">
                 <template v-slot:header>
@@ -157,7 +166,7 @@ const whyClientsBullets = ref<AboutBulletPoints[]>([
           </q-list>
 
           <p
-            class="q-mt-lg text-body-1"
+            class="q-mt-lg text-body-1 font-primary"
             :class="
               setSeasonClasses(
                 {
@@ -180,7 +189,7 @@ const whyClientsBullets = ref<AboutBulletPoints[]>([
         <q-card-section class="section-container q-pa-lg">
           <div class="h2-container row justify-center q-mb-lg text-center bg-dark text-white">
             <h2
-              class="bg-dark text-h2-alt"
+              class="bg-dark text-h2-alt font-secondary"
               :class="
                 setSeasonClasses(
                   {
@@ -198,7 +207,7 @@ const whyClientsBullets = ref<AboutBulletPoints[]>([
           </div>
           <q-separator color="primary" class="q-mb-md" />
           <p
-            class="q-mb-none text-body-1"
+            class="q-mb-none text-body-1 font-primary"
             :class="
               setSeasonClasses(
                 {
@@ -223,7 +232,7 @@ const whyClientsBullets = ref<AboutBulletPoints[]>([
                 expand-separator
                 :label="bullet.label"
                 group="myApproach"
-                header-class="bg-primary"
+                header-class="bg-primary font-primary"
               >
                 <template v-slot:header>
                   <q-item-section avatar>
@@ -250,7 +259,7 @@ const whyClientsBullets = ref<AboutBulletPoints[]>([
         <q-card-section class="section-container q-pa-lg">
           <div class="h2-container row justify-center q-mb-lg text-center bg-dark text-white">
             <h2
-              class="bg-dark text-h2-alt"
+              class="bg-dark text-h2-alt font-secondary"
               :class="
                 setSeasonClasses(
                   {
@@ -268,7 +277,7 @@ const whyClientsBullets = ref<AboutBulletPoints[]>([
           </div>
           <q-separator color="primary" class="q-mb-md" />
           <p
-            class="q-mb-none text-body-1"
+            class="q-mb-none text-body-1 font-primary"
             :class="
               setSeasonClasses(
                 {
@@ -295,7 +304,7 @@ const whyClientsBullets = ref<AboutBulletPoints[]>([
               expand-separator
               :label="bullet.label"
               group="whyClientsWorkWithMe"
-              header-class="bg-primary"
+              header-class="bg-primary font-primary"
             >
               <template v-slot:header>
                 <q-item-section avatar>
@@ -318,11 +327,11 @@ const whyClientsBullets = ref<AboutBulletPoints[]>([
       </q-card>
     </div>
 
-    <div class="desktop-view full-width">
+    <div class="desktop-view full-width bg-orange" style="margin-right: 50px">
       <q-card class="full-width q-pa-sm">
         <q-card-section class="section-container q-pa-lg">
           <h1
-            class="text-h1 q-mt-none text-center bg-dark border-black"
+            class="text-h1 q-mt-none text-center bg-dark border-black font-secondary"
             :class="
               setSeasonClasses(
                 {
@@ -339,7 +348,7 @@ const whyClientsBullets = ref<AboutBulletPoints[]>([
           </h1>
           <q-separator color="primary" class="q-mb-md" />
           <p
-            class="text-body-2 text-primary q-mb-none"
+            class="text-body-2 text-primary q-mb-none font-primary"
             :class="
               setSeasonClasses(
                 {
@@ -357,7 +366,7 @@ const whyClientsBullets = ref<AboutBulletPoints[]>([
             creators bring their ideas to life on the web.
           </p>
           <p
-            class="q-pt-lg text-body-2 q-mb-none"
+            class="q-pt-lg text-body-2 q-mb-none font-primary"
             :class="
               setSeasonClasses(
                 {
@@ -381,6 +390,7 @@ const whyClientsBullets = ref<AboutBulletPoints[]>([
               :name="bullet.id"
               expand-separator
               :label="bullet.label"
+              class="font-primary"
             >
               <q-expansion-item group="aboutMe" header-class="bg-primary text-dark">
                 <template v-slot:header>
@@ -404,7 +414,7 @@ const whyClientsBullets = ref<AboutBulletPoints[]>([
           </q-list>
           <br />
           <p
-            class="text-body-2 q-mb-none"
+            class="font-primary text-body-2 q-mb-none"
             :class="
               setSeasonClasses(
                 {
@@ -424,7 +434,7 @@ const whyClientsBullets = ref<AboutBulletPoints[]>([
         </q-card-section>
         <q-card-section class="section-container q-pa-lg">
           <h2
-            class="text-h2 q-mt-none q-pt-md q-pb-md text-secondary text-center bg-dark border-black"
+            class="text-h2 font-secondary q-mt-none q-pt-md q-pb-md text-secondary text-center bg-dark border-black"
             :class="
               setSeasonClasses(
                 {
@@ -441,7 +451,7 @@ const whyClientsBullets = ref<AboutBulletPoints[]>([
           </h2>
           <q-separator color="primary" class="q-mb-md" />
           <p
-            class="text-body-2 q-mb-none"
+            class="font-primary text-body-2 q-mb-none"
             :class="
               setSeasonClasses(
                 {
@@ -490,7 +500,7 @@ const whyClientsBullets = ref<AboutBulletPoints[]>([
         </q-card-section>
         <q-card-section class="section-container q-pa-lg">
           <h2
-            class="text-h2 q-mt-none q-pt-md q-pb-md text-secondary text-center bg-dark border-black"
+            class="font-secondary text-h2 q-mt-none q-pt-md q-pb-md text-secondary text-center bg-dark border-black"
             :class="
               setSeasonClasses(
                 {
@@ -507,7 +517,7 @@ const whyClientsBullets = ref<AboutBulletPoints[]>([
           </h2>
           <q-separator color="primary" class="q-mb-md" />
           <p
-            class="text-body-2 q-mb-none"
+            class="font-primary text-body-2 q-mb-none"
             :class="
               setSeasonClasses(
                 {
@@ -532,7 +542,7 @@ const whyClientsBullets = ref<AboutBulletPoints[]>([
                 expand-separator
                 :label="bullet.label"
                 group="whyClientsWorkForMe"
-                header-class="bg-primary text-dark"
+                header-class="primary-font bg-primary text-dark"
               >
                 <template v-slot:header>
                   <q-item-section avatar>
@@ -643,5 +653,9 @@ $winter-mobile-background: map-get($winter-theme, primary);
   @media (min-width: $breakpoint-md) {
     background-color: initial;
   }
+}
+
+.drawer-content-offset {
+  display: none;
 }
 </style>

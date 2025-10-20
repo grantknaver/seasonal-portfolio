@@ -16,7 +16,6 @@ import { useErrorNotifier } from '../shared/composables/useErrorNotifier';
 
 export const useMainStore = defineStore('main', () => {
   const activeTopic = ref<TopicName | null>(null);
-
   const activeTheme = ref<Theme>(Theme.Fall);
   const activeAiAssistLogo = ref<string>(
     new URL('/src/assets/ai-chat_fall.png', import.meta.url).href,
@@ -44,6 +43,7 @@ export const useMainStore = defineStore('main', () => {
   const isLoading = ref<boolean>(false);
   const { notifyHttp, notifyGeneric } = useErrorNotifier();
   const recaptchaWidgetId = ref<number | null>();
+  const containsScrollbar = ref<boolean>(false);
 
   const SET_MOBILE_SCROLL_TARGET = (topicName: TopicName | null): void => {
     mobileScrollTarget.value = topicName;
@@ -186,6 +186,10 @@ export const useMainStore = defineStore('main', () => {
     }
   };
 
+  const HAS_SCROLLBAR = (status: boolean) => {
+    containsScrollbar.value = status;
+  };
+
   const SET_RECAPTCHA_WIDGET_ID = (id: number | null) => (recaptchaWidgetId.value = id);
   return {
     activeTopic,
@@ -200,6 +204,7 @@ export const useMainStore = defineStore('main', () => {
     isLoading,
     recaptchaWidgetId,
     activeRecaptchaBackground,
+    containsScrollbar,
     SET_RECAPTCHA_WIDGET_ID,
     SET_ACTIVE_TOPIC,
     SET_ACTIVE_THEME,
@@ -209,5 +214,6 @@ export const useMainStore = defineStore('main', () => {
     VERIFY_RECAPTCHA,
     VERIFY_HUMANITY,
     SET_OALOG,
+    HAS_SCROLLBAR,
   };
 });

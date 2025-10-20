@@ -60,7 +60,7 @@ watch(oaLogs, async () => {
 </script>
 
 <template>
-  <div class="container">
+  <div class="container font-primary">
     <div v-if="isChatting" class="assistant-chat full-width q-pa-lg">
       <q-scroll-area ref="chatScroll" class="chat-feed q-pa-md" :visible="false" v-if="isHuman">
         <q-chat-message

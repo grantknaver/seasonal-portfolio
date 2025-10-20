@@ -1,6 +1,9 @@
 @import 'variables';
 @import '../quasar.variables';
 
+$font-stack: 'Roboto', sans-serif;
+$cursive-stack: 'Dancing Script', 'cursive';
+
 $text-sizes: (
   'h1': (
     3rem,
@@ -25,6 +28,18 @@ $text-sizes: (
     2.1rem,
     1.8rem,
     1.8rem,
+  ),
+  'h3': (
+    2.4rem,
+    2.2rem,
+    1.9rem,
+    1.9rem,
+  ),
+  'h3-alt': (
+    1.8rem,
+    1.8rem,
+    1.6rem,
+    1.6rem,
   ),
   'body-1': (
     1.2rem,
@@ -66,4 +81,69 @@ $text-sizes: (
       font-size: nth($sizes, 4);
     }
   }
+}
+
+// Map of outline colors using Quasar theme vars
+$text-outlines: (
+  'black': black,
+  'primary': var(--q-primary),
+  'secondary': var(--q-secondary),
+  'accent': var(--q-accent),
+  'dark': var(--q-dark),
+);
+
+@each $name, $color in $text-outlines {
+  .#{$name}-text-outline {
+    text-shadow:
+      -1px -1px 0 #{$color},
+      1px -1px 0 #{$color},
+      -1px 1px 0 #{$color},
+      1px 1px 0 #{$color};
+  }
+}
+
+$border-colors: (
+  'white': white,
+  'black': black,
+  'dark': var(--q-dark),
+  'primary': var(--q-primary),
+  'secondary': var(--q-secondary),
+  'accent': var(--q-accent),
+);
+
+@each $name, $color in $border-colors {
+  .border-#{$name} {
+    border: solid 2px #{$color};
+  }
+}
+
+$text-glows: (
+  'white': white,
+  'black': black,
+  'primary': var(--q-primary),
+  'secondary': var(--q-secondary),
+  'accent': var(--q-accent),
+  'dark': var(--q-dark),
+);
+
+@each $name, $color in $text-glows {
+  .#{$name}-text-glow {
+    text-shadow:
+      0 0 5px rgba($color, 0.7),
+      0 0 10px rgba($color, 0.5),
+      0 0 20px rgba($color, 0.3),
+      0 0 40px rgba($color, 0.2);
+  }
+}
+
+$primary-font: 'Manrope', 'Avenir Next', 'Helvetica Neue', Arial, sans-serif;
+$secondary-font: 'DM Serif Display', Georgia, 'Times New Roman', serif;
+
+// === Summer ===
+.primary-font {
+  font-family: $primary-font;
+}
+
+.secondary-font {
+  font-family: $secondary-font;
 }

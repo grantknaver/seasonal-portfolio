@@ -76,7 +76,9 @@ const packages = ref<PackageDetails[]>([
       'The complete experience — built for high-visibility launches, investors, or agencies needing that extra wow factor.',
   },
 ]);
-const isBelowLgBreakpoint = computed(() => useViewport().width.value < useViewport().lgBreakpoint);
+const { lgBreakpoint, width } = useViewport();
+const isResponsive = computed(() => width.value < lgBreakpoint);
+// const isBelowLgBreakpoint = computed(() => useViewport().width.value < useViewport().lgBreakpoint);
 watch(activeTheme, (newTheme) => {
   const theme = newTheme.toLowerCase();
   const updatedPackages = packages.value.map((p) => {
@@ -93,7 +95,7 @@ watch(activeTheme, (newTheme) => {
 <template>
   <section>
     <!-- Mobile -->
-    <div class="responsive-view full-width column items-center q-gutter-y-md">
+    <div v-if="isResponsive" class="responsive-view full-width column items-center q-gutter-y-md">
       <q-card class="first-card full-width column items-center bg-secondary">
         <q-card-section
           class="package-header-section full-width q-pa-lg text-primary"
@@ -153,9 +155,9 @@ watch(activeTheme, (newTheme) => {
               )
             "
           >
-            Whether you need one polished animation, a full motion + AI upgrade, or a launch-ready
-            experience, I’ve got you covered. These packages make it simple to get started — clear
-            scope, fair pricing, and fast turnaround.
+            Each project below demonstrates how design, animation, and intelligence combine to make
+            interfaces <i>feel alive</i>. From motion systems to AI-integrated tools, these builds
+            show how creative engineering turns complexity into clarity.
           </p>
         </q-card-section>
 
@@ -244,16 +246,16 @@ watch(activeTheme, (newTheme) => {
     </div>
 
     <!-- Desktop -->
-    <div class="desktop-view full-width column">
+    <div v-if="!isResponsive" class="desktop-view full-width column">
       <div
         class="intro-container full-width q-pa-md"
         :class="
           setSeasonClasses(
             {
-              Fall: isBelowLgBreakpoint ? 'bg-primary ' : 'bg-transparent',
-              Winter: isBelowLgBreakpoint ? 'bg-primary ' : 'bg-transparent',
-              Spring: isBelowLgBreakpoint ? 'bg-primary ' : 'bg-transparent',
-              Summer: isBelowLgBreakpoint ? 'bg-white ' : 'bg-transparent',
+              Fall: isResponsive ? 'bg-primary ' : 'bg-transparent',
+              Winter: isResponsive ? 'bg-primary ' : 'bg-transparent',
+              Spring: isResponsive ? 'bg-primary ' : 'bg-transparent',
+              Summer: isResponsive ? 'bg-white ' : 'bg-transparent',
             },
             activeTheme,
           )
@@ -264,16 +266,16 @@ watch(activeTheme, (newTheme) => {
           :class="
             setSeasonClasses(
               {
-                Fall: isBelowLgBreakpoint
+                Fall: isResponsive
                   ? 'bg-dark text-secondary'
                   : 'bg-dark text-secondary border-black',
-                Winter: isBelowLgBreakpoint
+                Winter: isResponsive
                   ? 'bg-dark text-secondary'
                   : 'bg-dark text-secondary border-black',
-                Spring: isBelowLgBreakpoint
+                Spring: isResponsive
                   ? 'bg-dark text-secondary'
                   : 'bg-accent text-secondary border-black',
-                Summer: isBelowLgBreakpoint
+                Summer: isResponsive
                   ? 'bg-dark text-secondary'
                   : 'bg-dark text-secondary border-black',
               },
@@ -287,10 +289,10 @@ watch(activeTheme, (newTheme) => {
           :color="
             setSeasonClasses(
               {
-                Fall: isBelowLgBreakpoint ? 'accent' : 'secondary',
-                Winter: isBelowLgBreakpoint ? 'accent' : 'primary',
-                Spring: isBelowLgBreakpoint ? 'accent ' : 'primary',
-                Summer: isBelowLgBreakpoint ? 'accent ' : 'secondary',
+                Fall: isResponsive ? 'accent' : 'secondary',
+                Winter: isResponsive ? 'accent' : 'primary',
+                Spring: isResponsive ? 'accent ' : 'primary',
+                Summer: isResponsive ? 'accent ' : 'secondary',
               },
               activeTheme,
             )
@@ -301,10 +303,10 @@ watch(activeTheme, (newTheme) => {
           :class="
             setSeasonClasses(
               {
-                Fall: isBelowLgBreakpoint ? 'text-center text-dark' : 'text-primary',
-                Winter: isBelowLgBreakpoint ? 'text-center text-dark' : 'text-primary',
-                Spring: isBelowLgBreakpoint ? 'text-center text-dark' : 'text-primary',
-                Summer: isBelowLgBreakpoint ? 'text-center text-dark' : 'text-white',
+                Fall: isResponsive ? 'text-center text-dark' : 'text-primary',
+                Winter: isResponsive ? 'text-center text-dark' : 'text-primary',
+                Spring: isResponsive ? 'text-center text-dark' : 'text-primary',
+                Summer: isResponsive ? 'text-center text-dark' : 'text-white',
               },
               activeTheme,
             )
