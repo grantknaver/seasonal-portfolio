@@ -166,7 +166,7 @@ watch(activeTheme, (newTheme) => {
             bordered
             padding
             :separator="true"
-            class="package-tile full-width q-pa-md bg-white col-6 q-mb-none no-border"
+            class="package-tile full-width q-pa-md bg-white q-mb-none no-border"
           >
             <div class="h2-container row justify-center q-mb-lg text-center bg-accent text-white">
               <h2 class="text-h2">{{ packages[0]?.name }}</h2>
@@ -208,7 +208,7 @@ watch(activeTheme, (newTheme) => {
         <q-card class="full-width column items-center bg-secondary">
           <q-card-section class="section-container column">
             <div
-              class="package-tile full-width q-pa-md bg-white col-6 q-mb-none no-border rounded-borders"
+              class="package-tile full-width q-pa-md bg-white q-mb-none no-border rounded-borders"
             >
               <div class="h2-container row justify-center q-mb-lg text-center bg-accent text-white">
                 <h2 class="text-h2">{{ p.name }}</h2>
@@ -384,10 +384,6 @@ watch(activeTheme, (newTheme) => {
 @import '../css/main.scss';
 
 .responsive-view {
-  @media (min-width: $breakpoint-md) {
-    display: none;
-  }
-
   .first-card {
     border-top-left-radius: 0;
     border-top-right-radius: 0;
@@ -431,11 +427,7 @@ watch(activeTheme, (newTheme) => {
 }
 
 .desktop-view {
-  display: none;
-
-  @media (min-width: $breakpoint-md) {
-    display: flex;
-  }
+  display: flex;
 
   .intro-container {
     @media (max-width: $breakpoint-lg) {

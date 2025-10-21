@@ -84,7 +84,7 @@ onMounted(() => {
       <q-card class="full-width">
         <q-card-section class="section-container q-pa-lg">
           <h1
-            class="text-h1-alt q-mt-none q-mb-md bg-dark text-center font-secondary"
+            class="text-h1 q-mt-none q-mb-md bg-dark text-center font-secondary"
             :class="
               setSeasonClasses(
                 {
@@ -189,7 +189,7 @@ onMounted(() => {
         <q-card-section class="section-container q-pa-lg">
           <div class="h2-container row justify-center q-mb-lg text-center bg-dark text-white">
             <h2
-              class="bg-dark text-h2-alt font-secondary"
+              class="bg-dark text-h2 font-secondary"
               :class="
                 setSeasonClasses(
                   {
@@ -327,18 +327,18 @@ onMounted(() => {
       </q-card>
     </div>
 
-    <div class="desktop-view full-width bg-orange" style="margin-right: 50px">
+    <div class="desktop-view full-width">
       <q-card class="full-width q-pa-sm">
         <q-card-section class="section-container q-pa-lg">
           <h1
-            class="text-h1 q-mt-none text-center bg-dark border-black font-secondary"
+            class="text-h1 q-mt-none text-center border-black font-secondary"
             :class="
               setSeasonClasses(
                 {
-                  Fall: 'text-secondary',
-                  Winter: 'text-secondary',
-                  Spring: 'text-secondary',
-                  Summer: 'text-secondary',
+                  Fall: 'bg-dark text-secondary',
+                  Winter: 'bg-dark text-secondary',
+                  Spring: 'bg-accent text-secondary',
+                  Summer: 'bg-dark text-secondary',
                 },
                 activeTheme,
               )
