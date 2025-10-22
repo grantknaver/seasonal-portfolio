@@ -1,27 +1,35 @@
 @import 'variables';
 @import '../quasar.variables';
 
+// ----------------------------
+// Font stacks
+// ----------------------------
 $font-stack: 'Roboto', sans-serif;
-$cursive-stack: 'Dancing Script', 'cursive';
+$cursive-stack: 'Dancing Script', cursive;
+$secondary-font: 'Manrope', 'Avenir Next', 'Helvetica Neue', Arial, sans-serif;
+$primary-font: 'Raleway', 'Helvetica Neue', Helvetica, Arial, sans-serif;
 
+// ----------------------------
+// Text sizes (per breakpoint)
+// ----------------------------
 $text-sizes: (
   'h1': (
-    2.4rem,
-    2.6rem,
+    2.7rem,
     2.8rem,
+    2.9rem,
     3rem,
   ),
   'h2': (
     1.8rem,
-    2rem,
+    1.8rem,
     2.2rem,
-    2.4rem,
+    2.2rem,
   ),
   'h3': (
     1.6rem,
-    1.8rem,
+    1.6rem,
     2rem,
-    2.2rem,
+    2rem,
   ),
   'body-1': (
     1.2rem,
@@ -30,47 +38,56 @@ $text-sizes: (
     1.4rem,
   ),
   'body-2': (
-    0.8rem,
-    0.8rem,
+    0.9rem,
+    0.9rem,
     1rem,
     1rem,
   ),
   'caption': (
-    0.5rem,
-    0.5rem,
-    0.5rem,
-    0.5rem,
+    0.7rem,
+    0.7rem,
+    0.8rem,
+    0.8rem,
   ),
 );
 
+// ----------------------------
+// Sensible line-heights
+// ----------------------------
+$text-leading: (
+  'h1': 1.2,
+  'h2': 1.25,
+  'h3': 1.3,
+  'body-1': 1.6,
+  'body-2': 1.5,
+  'caption': 1.3,
+);
+
+// ----------------------------
+// Responsive typography classes
+// ----------------------------
 @each $class, $sizes in $text-sizes {
   .text-#{$class} {
     font-size: nth($sizes, 1);
-
-    // Set sensible defaults by type
-    @if str-index($class, 'h') {
-      line-height: 1.3;
-    } @else if $class == 'body-1' {
-      line-height: 1.5;
-    } @else if $class == 'body-2' {
-      line-height: 1.4;
-    } @else if $class == 'caption' {
-      line-height: 1.3;
-    }
+    line-height: map-get($text-leading, $class);
 
     @media (min-width: $breakpoint-sm) {
       font-size: nth($sizes, 2);
     }
+
     @media (min-width: $breakpoint-md) {
       font-size: nth($sizes, 3);
     }
+
     @media (min-width: $breakpoint-lg) {
       font-size: nth($sizes, 4);
     }
   }
 }
 
-// Map of outline colors using Quasar theme vars
+// ----------------------------
+// Text outline utilities
+// ----------------------------
 $text-outlines: (
   'black': black,
   'primary': var(--q-primary),
@@ -89,6 +106,9 @@ $text-outlines: (
   }
 }
 
+// ----------------------------
+// Border color utilities
+// ----------------------------
 $border-colors: (
   'white': white,
   'black': black,
@@ -104,6 +124,9 @@ $border-colors: (
   }
 }
 
+// ----------------------------
+// Text glow utilities
+// ----------------------------
 $text-glows: (
   'white': white,
   'black': black,
@@ -123,13 +146,26 @@ $text-glows: (
   }
 }
 
-$secondary-font: 'Manrope', 'Avenir Next', 'Helvetica Neue', Arial, sans-serif;
-$primary-font: 'Raleway', 'Helvetica Neue', Helvetica, Arial, sans-serif;
-
+// ----------------------------
+// Font family helpers
+// ----------------------------
 .primary-font {
   font-family: $primary-font;
 }
 
 .secondary-font {
   font-family: $secondary-font;
+}
+
+// ----------------------------
+// Optional: adjust body text
+// on very large screens
+// ----------------------------
+@media (min-width: $breakpoint-lg) {
+  .text-body-1 {
+    line-height: 1.65;
+  }
+  .text-body-2 {
+    line-height: 1.55;
+  }
 }

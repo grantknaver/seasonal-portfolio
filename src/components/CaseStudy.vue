@@ -99,7 +99,7 @@ const cardBackgrounds = {
             {{ props.header.text }}
           </h2>
           <p
-            class="q-mt-md q-mb-lg text-body-2 text-center text-accent primary-font bg-transparent"
+            class="q-mt-sm q-mb-lg text-body-2 text-center text-accent primary-font bg-transparent"
           >
             {{ props.header.subHeader }}
           </p>
@@ -188,7 +188,7 @@ const cardBackgrounds = {
             <div class="row items-start">
               <blockquote class="primary-font row text-dark q-pl-lg">
                 <q-intersection transition="scale" transition-duration="1250" once>
-                  <i class="text-body-2 q-mb-none">
+                  <i class="q-mb-none">
                     "Built a dynamic Weather/Theme System with layered parallax and ambient effects,
                     driven by GSAP and Vue 3. Fixed a critical resize bug for seamless
                     responsiveness across devices."
@@ -210,7 +210,7 @@ const cardBackgrounds = {
     >
       <q-card-section class="header-section">
         <h2
-          class="text-h2 text-center q-mt-none q-mb-none text-bold secondary-font"
+          class="text-center q-mt-sm text-h2 q-mt-none q-mb-none text-bold secondary-font"
           :class="
             setSeasonClasses(
               {
@@ -227,7 +227,7 @@ const cardBackgrounds = {
         >
           {{ props.header.text }}
         </h2>
-        <p class="text-body-1 text-center q-mb-lg text-dark primary-font">
+        <p class="text-body-1 text-center text-dark primary-font">
           {{ props.header.subHeader }}
         </p>
       </q-card-section>
@@ -300,7 +300,7 @@ const cardBackgrounds = {
           <q-card-section>
             <h3 class="text-h3 q-mt-none q-mb-md secondary-font">{{ topic.header }}</h3>
             <p>{{ topic.subHeader }}</p>
-            <p class="text-body-2 q-mb-sm primary-font">
+            <p class="text-body-2 q-ml-md q-mb-sm primary-font">
               {{ topic.text }}
             </p>
           </q-card-section>
@@ -311,7 +311,7 @@ const cardBackgrounds = {
         <q-card-section class="blockquote-section q-pa-md">
           <q-intersection transition="scale" transition-duration="1250">
             <div class="row items-start">
-              <blockquote class="text-body-1 primary-font row text-dark q-pl-md">
+              <blockquote class="primary-font row text-dark q-pl-md">
                 <i class="q-mb-md">
                   "Built a dynamic Weather/Theme System with layered parallax and ambient effects,
                   driven by GSAP and Vue 3. Fixed a critical resize bug for seamless responsiveness
@@ -334,6 +334,12 @@ const cardBackgrounds = {
   }
 
   .topic {
+    .header-section {
+      p {
+        font-size: 1rem;
+        background-color: transparent;
+      }
+    }
     .blockquote-section {
       background: var(--q-primary);
       border-radius: 6px;
@@ -344,6 +350,7 @@ const cardBackgrounds = {
         cursor: pointer;
         border-left: 3px solid var(--q-dark);
         p {
+          font-size: 1.2rem;
           line-height: 1.5;
         }
       }
@@ -363,8 +370,7 @@ const cardBackgrounds = {
   .topic {
     .header-section {
       p {
-        line-height: 1.5;
-        font-family: $cursive-stack;
+        font-size: 1.2rem;
         background-color: transparent;
       }
     }
@@ -383,6 +389,7 @@ const cardBackgrounds = {
       blockquote {
         position: relative;
         cursor: pointer;
+        font-size: 1.2rem;
 
         p {
           line-height: 1.5;
