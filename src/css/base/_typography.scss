@@ -12,34 +12,28 @@ $text-sizes: (
     3rem,
   ),
   'h2': (
-    2rem,
-    2.2rem,
-    2.4rem,
-    2.6rem,
-  ),
-  'h3': (
     1.8rem,
     2rem,
     2.2rem,
     2.4rem,
   ),
+  'h3': (
+    1.6rem,
+    1.8rem,
+    2rem,
+    2.2rem,
+  ),
   'body-1': (
     1.2rem,
     1.2rem,
-    1.2rem,
-    1.2rem,
+    1.4rem,
+    1.4rem,
   ),
   'body-2': (
+    0.8rem,
+    0.8rem,
     1rem,
     1rem,
-    1rem,
-    1rem,
-  ),
-  'body-3': (
-    0.7rem,
-    0.7rem,
-    0.7rem,
-    0.7rem,
   ),
   'caption': (
     0.5rem,
@@ -52,6 +46,17 @@ $text-sizes: (
 @each $class, $sizes in $text-sizes {
   .text-#{$class} {
     font-size: nth($sizes, 1);
+
+    // Set sensible defaults by type
+    @if str-index($class, 'h') {
+      line-height: 1.3;
+    } @else if $class == 'body-1' {
+      line-height: 1.5;
+    } @else if $class == 'body-2' {
+      line-height: 1.4;
+    } @else if $class == 'caption' {
+      line-height: 1.3;
+    }
 
     @media (min-width: $breakpoint-sm) {
       font-size: nth($sizes, 2);
@@ -118,10 +123,9 @@ $text-glows: (
   }
 }
 
-$primary-font: 'Manrope', 'Avenir Next', 'Helvetica Neue', Arial, sans-serif;
-$secondary-font: 'DM Serif Display', Georgia, 'Times New Roman', serif;
+$secondary-font: 'Manrope', 'Avenir Next', 'Helvetica Neue', Arial, sans-serif;
+$primary-font: 'Raleway', 'Helvetica Neue', Helvetica, Arial, sans-serif;
 
-// === Summer ===
 .primary-font {
   font-family: $primary-font;
 }
