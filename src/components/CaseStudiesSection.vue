@@ -25,6 +25,7 @@ const caseStudies = ref<CS[]>([
       topics: [
         {
           id: uuidv4(),
+          name: 'weather-and-theme-overview',
           icon: 'dashboard',
           label: 'Overview',
           text: 'A custom GSAP + Vue 3 system that dynamically shifts backgrounds, colors, and animation sequences based on real-time weather or time-of-day conditions.',
@@ -32,6 +33,7 @@ const caseStudies = ref<CS[]>([
         },
         {
           id: uuidv4(),
+          name: 'weather-and-theme-challenge',
           icon: 'sports_mma',
           label: 'Challenge',
           text: 'Most animation libraries break when Vue’s reactivity and lifecycle rebuilds occur (especially on resize or layout shift). Ac',
@@ -44,6 +46,7 @@ const caseStudies = ref<CS[]>([
       topics: [
         {
           id: uuidv4(),
+          name: 'weather-and-theme-solution',
           header: 'Solution:',
           list: [
             {
@@ -71,6 +74,7 @@ const caseStudies = ref<CS[]>([
       topics: [
         {
           id: uuidv4(),
+          name: 'weather-and-theme-solution',
           header: 'Result:',
           text: 'Built a dynamic Weather/Theme System with layered parallax and ambient effects, driven by GSAP and Vue 3. Fixed a critical resize bug for seamless responsiveness across devices.',
           hasSeparator: false,
@@ -93,6 +97,7 @@ const caseStudies = ref<CS[]>([
       topics: [
         {
           id: uuidv4(),
+          name: 'ai-chat-overview',
           icon: 'dashboard',
           label: 'Overview:',
           text: 'AI interfaces often feel sterile — fast responses but no sense of pacing, emotion, or engagement. The goal was to build a frontend that feels human through subtle motion cues.',
@@ -100,6 +105,7 @@ const caseStudies = ref<CS[]>([
         },
         {
           id: uuidv4(),
+          name: 'ai-chat-challenge',
           icon: 'sports_mma',
           label: 'Challenge:',
           text: 'Most animation libraries break when Vue’s reactivity and lifecycle rebuilds occur (especially on resize or layout shift). Achieving <i>fluid, context-aware motion</i> without memory leaks or stale timelines required deep integration between GSAP context lifecycles and Vue composables.',
@@ -112,6 +118,7 @@ const caseStudies = ref<CS[]>([
       topics: [
         {
           id: uuidv4(),
+          name: 'ai-chat-solution',
           header: 'Solution:',
           list: [
             {
@@ -139,6 +146,7 @@ const caseStudies = ref<CS[]>([
       topics: [
         {
           id: uuidv4(),
+          name: 'ai-chat-result',
           header: 'Result:',
           text: 'A chat experience that feels alive, expressive, and emotionally timed — showing how animation enhances usability and presence in AI-driven apps.',
           hasSeparator: false,
@@ -160,6 +168,7 @@ const caseStudies = ref<CS[]>([
       topics: [
         {
           id: uuidv4(),
+          name: 'waveform-overview',
           icon: 'dashboard',
           label: 'Overview:',
           text: 'A waveform visualizer built for the StorytAIm project — animating live audio output from AI narration.',
@@ -167,6 +176,7 @@ const caseStudies = ref<CS[]>([
         },
         {
           id: uuidv4(),
+          name: 'waveform-challenge',
           icon: 'sports_mma',
           label: 'Challenge:',
           text: 'Voice synthesis creates continuous audio streams, but standard waveform tools are static or laggy. The task was to create a real-time visualization that reacts perfectly in sync with generated speech.',
@@ -179,6 +189,7 @@ const caseStudies = ref<CS[]>([
       topics: [
         {
           id: uuidv4(),
+          name: 'waveform-solution',
           header: 'Solution:',
           list: [
             {
@@ -206,6 +217,7 @@ const caseStudies = ref<CS[]>([
       topics: [
         {
           id: uuidv4(),
+          name: 'waveform-result',
           header: 'Result:',
           text: 'A dynamic, emotionally resonant audio interface — bridging the technical and the artistic. Demonstrates mastery of timing, motion, and audio-driven state updates.',
           hasSeparator: true,
@@ -217,8 +229,8 @@ const caseStudies = ref<CS[]>([
   },
   {
     id: uuidv4(),
-    name: 'projects-prove',
-    label: 'So What',
+    name: 'proof',
+    label: 'Proof',
     header: {
       text: 'What These Projects Prove',
       subHeader:
@@ -228,6 +240,7 @@ const caseStudies = ref<CS[]>([
       topics: [
         {
           id: uuidv4(),
+          name: 'proof-evidence',
           header: 'Together, they show:',
           list: [
             {
@@ -259,10 +272,11 @@ const caseStudies = ref<CS[]>([
     defaultTopics: {
       topics: [
         {
+          id: uuidv4(),
+          name: 'proof-result',
           header: 'Result:',
           text: 'A dynamic, emotionally resonant audio interface — bridging the technical and the artistic. Demonstrates mastery of timing, motion, and audio-driven state updates.',
           hasSeparator: true,
-          id: uuidv4(),
         },
       ],
       hasSeparator: false,
@@ -489,7 +503,11 @@ const tab = ref('weather-and-theme');
           :listTopics="study.listTopics"
           :defaultTopics="study.defaultTopics"
           :blockquote="study.blockquote"
-        ></CaseStudy>
+        >
+          <template #header>
+            <h1>Header Content</h1>
+          </template>
+        </CaseStudy>
       </q-tab-panel>
     </q-tab-panels>
   </div>

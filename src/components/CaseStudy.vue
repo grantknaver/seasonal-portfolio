@@ -118,6 +118,7 @@ const cardBackgrounds = {
                   </q-card-section>
                 </q-card>
               </q-expansion-item>
+              <slot :name="topic.name"></slot>
               <q-separator v-if="topic.hasSeparator"></q-separator>
             </span>
           </q-card-section>
@@ -157,6 +158,7 @@ const cardBackgrounds = {
               </q-list>
             </q-card-section>
           </q-intersection>
+          <slot :name="topic.name"></slot>
         </div>
         <q-separator v-if="listTopics.hasSeparator"></q-separator>
       </span>
@@ -170,6 +172,7 @@ const cardBackgrounds = {
             </p>
             <span></span>
           </q-card-section>
+          <slot :name="topic.name"></slot>
         </div>
       </span>
       <span v-if="blockquote">

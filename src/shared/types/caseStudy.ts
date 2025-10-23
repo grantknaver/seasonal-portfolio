@@ -1,14 +1,6 @@
-// import type { CSSProperties } from 'vue';
-
-// export interface Img {
-//   src: string;
-//   styles: CSSProperties;
-// }
-
 export interface CaseStudyHeader {
   text: string;
   subHeader?: string;
-  // images?: Img[];
 }
 
 export interface CaseStudyExpansionTopic {
@@ -16,7 +8,7 @@ export interface CaseStudyExpansionTopic {
   icon?: string;
   label?: string;
   text?: string;
-  // images?: Img[];
+  name: string;
   hasSeparator: boolean;
 }
 
@@ -34,6 +26,7 @@ export interface CaseStudyListItem {
 export interface CaseStudyListTopic {
   id: string;
   header?: string;
+  name: string;
   list?: CaseStudyListItem[];
   hasSeparator: boolean;
 }
@@ -45,9 +38,9 @@ export interface CaseStudyListTopicGroup {
 export interface CaseStudyDefaultTopic {
   id: string;
   header: string;
+  name?: string;
   subHeader?: string;
   text?: string;
-  // images?: Img[];
   hasSeparator: boolean;
 }
 
