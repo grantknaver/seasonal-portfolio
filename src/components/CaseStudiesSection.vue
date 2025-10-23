@@ -12,7 +12,7 @@ const { activeTheme } = storeToRefs(mainStore);
 const { lgBreakpoint, width } = useViewport();
 const isResponsive = computed(() => width.value < lgBreakpoint);
 const isBelowLgBreakpoint = computed(() => useViewport().width.value < useViewport().lgBreakpoint);
-const studies = ref<CS[]>([
+const caseStudies = ref<CS[]>([
   {
     id: uuidv4(),
     name: 'weather-and-theme',
@@ -21,43 +21,63 @@ const studies = ref<CS[]>([
       text: 'GSAP Weather & Theme System',
       subHeader: 'Dynamic seasonal motion meets engineering precision.',
     },
-    expansionTopics: [
-      {
-        icon: 'dashboard',
-        label: 'Overview',
-        text: 'A custom GSAP + Vue 3 system that dynamically shifts backgrounds, colors, and animation sequences based on real-time weather or time-of-day conditions.',
-      },
-      {
-        icon: 'sports_mma',
-        label: 'Challenge',
-        text: 'Most animation libraries break when Vue’s reactivity and lifecycle rebuilds occur (especially on resize or layout shift). Achieving fluid, context-aware motion without memory leaks or stale timelines required deep integration between GSAP context lifecycles and Vue composables.',
-      },
-    ],
-    listTopics: [
-      {
-        header: 'Solution:',
-        list: [
-          {
-            icon: 'wb_sunny',
-            text: 'Engineered a responsive GSAP orchestration system using context() and matchMedia() for adaptive breakpoints.',
-          },
-          {
-            icon: 'animation',
-            text: 'Automated animation rebuilds on viewport resize.',
-          },
-          {
-            icon: 'layers',
-            text: 'Layered parallax + ambient effects tied to weather and theme data.',
-          },
-        ],
-      },
-    ],
-    defaultTopics: [
-      {
-        header: 'Result:',
-        text: 'Built a dynamic Weather/Theme System with layered parallax and ambient effects, driven by GSAP and Vue 3. Fixed a critical resize bug for seamless responsiveness across devices.',
-      },
-    ],
+    expansionTopics: {
+      topics: [
+        {
+          id: uuidv4(),
+          icon: 'dashboard',
+          label: 'Overview',
+          text: 'A custom GSAP + Vue 3 system that dynamically shifts backgrounds, colors, and animation sequences based on real-time weather or time-of-day conditions.',
+          hasSeparator: false,
+        },
+        {
+          id: uuidv4(),
+          icon: 'sports_mma',
+          label: 'Challenge',
+          text: 'Most animation libraries break when Vue’s reactivity and lifecycle rebuilds occur (especially on resize or layout shift). Ac',
+          hasSeparator: false,
+        },
+      ],
+      hasSeparator: true,
+    },
+    listTopics: {
+      topics: [
+        {
+          id: uuidv4(),
+          header: 'Solution:',
+          list: [
+            {
+              id: uuidv4(),
+              icon: 'wb_sunny',
+              text: 'Engineered a responsive GSAP orchestration system using context() and matchMedia() for adaptive breakpoints.',
+            },
+            {
+              id: uuidv4(),
+              icon: 'animation',
+              text: 'Automated animation rebuilds on viewport resize.',
+            },
+            {
+              id: uuidv4(),
+              icon: 'layers',
+              text: 'Layered parallax + ambient effects tied to weather and theme data.',
+            },
+          ],
+          hasSeparator: true,
+        },
+      ],
+      hasSeparator: false,
+    },
+    defaultTopics: {
+      topics: [
+        {
+          id: uuidv4(),
+          header: 'Result:',
+          text: 'Built a dynamic Weather/Theme System with layered parallax and ambient effects, driven by GSAP and Vue 3. Fixed a critical resize bug for seamless responsiveness across devices.',
+          hasSeparator: false,
+        },
+      ],
+      hasSeparator: false,
+    },
     blockquote:
       'Built a dynamic Weather/Theme System with layered parallax and ambient effects, driven by GSAP and Vue 3. Fixed a critical resize bug for seamless responsiveness across devices.',
   },
@@ -69,43 +89,63 @@ const studies = ref<CS[]>([
       text: 'AI Chat Interface',
       subHeader: 'Conversational intelligence with motion clarity.',
     },
-    expansionTopics: [
-      {
-        icon: 'dashboard',
-        label: 'Overview:',
-        text: 'AI interfaces often feel sterile — fast responses but no sense of pacing, emotion, or engagement. The goal was to build a frontend that feels human through subtle motion cues.',
-      },
-      {
-        icon: 'sports_mma',
-        label: 'Challenge:',
-        text: 'Most animation libraries break when Vue’s reactivity and lifecycle rebuilds occur (especially on resize or layout shift). Achieving <i>fluid, context-aware motion</i> without memory leaks or stale timelines required deep integration between GSAP context lifecycles and Vue composables.',
-      },
-    ],
-    listTopics: [
-      {
-        header: 'Solution:',
-        list: [
-          {
-            icon: 'light_mode',
-            text: 'Designed a GSAP timeline for message reveal, typing, and bounce effects.',
-          },
-          {
-            icon: 'smart_toy',
-            text: 'Integrated securely with an AI backend (OpenAI API + server proxy).',
-          },
-          {
-            icon: 'layers',
-            text: 'Responsive and keyboard-optimized layout with light/dark modes.',
-          },
-        ],
-      },
-    ],
-    defaultTopics: [
-      {
-        header: 'Result:',
-        text: 'A chat experience that feels alive, expressive, and emotionally timed — showing how animation enhances usability and presence in AI-driven apps.',
-      },
-    ],
+    expansionTopics: {
+      topics: [
+        {
+          id: uuidv4(),
+          icon: 'dashboard',
+          label: 'Overview:',
+          text: 'AI interfaces often feel sterile — fast responses but no sense of pacing, emotion, or engagement. The goal was to build a frontend that feels human through subtle motion cues.',
+          hasSeparator: false,
+        },
+        {
+          id: uuidv4(),
+          icon: 'sports_mma',
+          label: 'Challenge:',
+          text: 'Most animation libraries break when Vue’s reactivity and lifecycle rebuilds occur (especially on resize or layout shift). Achieving <i>fluid, context-aware motion</i> without memory leaks or stale timelines required deep integration between GSAP context lifecycles and Vue composables.',
+          hasSeparator: false,
+        },
+      ],
+      hasSeparator: true,
+    },
+    listTopics: {
+      topics: [
+        {
+          id: uuidv4(),
+          header: 'Solution:',
+          list: [
+            {
+              id: uuidv4(),
+              icon: 'light_mode',
+              text: 'Designed a GSAP timeline for message reveal, typing, and bounce effects.',
+            },
+            {
+              id: uuidv4(),
+              icon: 'smart_toy',
+              text: 'Integrated securely with an AI backend (OpenAI API + server proxy).',
+            },
+            {
+              id: uuidv4(),
+              icon: 'layers',
+              text: 'Responsive and keyboard-optimized layout with light/dark modes.',
+            },
+          ],
+          hasSeparator: true,
+        },
+      ],
+      hasSeparator: false,
+    },
+    defaultTopics: {
+      topics: [
+        {
+          id: uuidv4(),
+          header: 'Result:',
+          text: 'A chat experience that feels alive, expressive, and emotionally timed — showing how animation enhances usability and presence in AI-driven apps.',
+          hasSeparator: false,
+        },
+      ],
+      hasSeparator: false,
+    },
     blockquote: '',
   },
   {
@@ -116,43 +156,63 @@ const studies = ref<CS[]>([
       text: 'StorytAIm Waveform Visualizer',
       subHeader: 'Turning AI narration into living motion.',
     },
-    expansionTopics: [
-      {
-        icon: 'dashboard',
-        label: 'Overview:',
-        text: 'A waveform visualizer built for the StorytAIm project — animating live audio output from AI narration.',
-      },
-      {
-        icon: 'sports_mma',
-        label: 'Challenge:',
-        text: 'Voice synthesis creates continuous audio streams, but standard waveform tools are static or laggy. The task was to create a real-time visualization that reacts perfectly in sync with generated speech.',
-      },
-    ],
-    listTopics: [
-      {
-        header: 'Solution:',
-        list: [
-          {
-            icon: 'graphic_eq',
-            text: 'Implemented GSAP-driven bar animations synced to audio amplitude data.',
-          },
-          {
-            icon: 'animation',
-            text: 'Designed scalable SVG components for smooth motion on all breakpoints.',
-          },
-          {
-            icon: 'palette',
-            text: 'Added color theming per character or emotion tag (for StorytAIm use case).',
-          },
-        ],
-      },
-    ],
-    defaultTopics: [
-      {
-        header: 'Result:',
-        text: 'A dynamic, emotionally resonant audio interface — bridging the technical and the artistic. Demonstrates mastery of timing, motion, and audio-driven state updates.',
-      },
-    ],
+    expansionTopics: {
+      topics: [
+        {
+          id: uuidv4(),
+          icon: 'dashboard',
+          label: 'Overview:',
+          text: 'A waveform visualizer built for the StorytAIm project — animating live audio output from AI narration.',
+          hasSeparator: false,
+        },
+        {
+          id: uuidv4(),
+          icon: 'sports_mma',
+          label: 'Challenge:',
+          text: 'Voice synthesis creates continuous audio streams, but standard waveform tools are static or laggy. The task was to create a real-time visualization that reacts perfectly in sync with generated speech.',
+          hasSeparator: false,
+        },
+      ],
+      hasSeparator: true,
+    },
+    listTopics: {
+      topics: [
+        {
+          id: uuidv4(),
+          header: 'Solution:',
+          list: [
+            {
+              id: uuidv4(),
+              icon: 'graphic_eq',
+              text: 'Implemented GSAP-driven bar animations synced to audio amplitude data.',
+            },
+            {
+              id: uuidv4(),
+              icon: 'animation',
+              text: 'Designed scalable SVG components for smooth motion on all breakpoints.',
+            },
+            {
+              id: uuidv4(),
+              icon: 'palette',
+              text: 'Added color theming per character or emotion tag (for StorytAIm use case).',
+            },
+          ],
+          hasSeparator: true,
+        },
+      ],
+      hasSeparator: false,
+    },
+    defaultTopics: {
+      topics: [
+        {
+          id: uuidv4(),
+          header: 'Result:',
+          text: 'A dynamic, emotionally resonant audio interface — bridging the technical and the artistic. Demonstrates mastery of timing, motion, and audio-driven state updates.',
+          hasSeparator: true,
+        },
+      ],
+      hasSeparator: false,
+    },
     blockquote: '',
   },
   {
@@ -164,36 +224,49 @@ const studies = ref<CS[]>([
       subHeader:
         'Each of these builds highlights one core idea: interactivity as emotion. They aren’t just technically solid — they’re experiences that invite curiosity and delight.',
     },
-    listTopics: [
-      {
-        header: 'Together, they show:',
-        list: [
-          {
-            icon: 'sync_problem',
-            text: 'Advanced GSAP–Vue lifecycle mastery',
-          },
-          {
-            icon: 'smart_toy',
-            text: 'Real AI integrations in production-ready UIs',
-          },
-          {
-            icon: 'timeline',
-            text: 'Responsive, data-driven motion systems',
-          },
-          {
-            icon: 'auto_awesome',
-            text: 'Design and engineering unified through storytelling',
-          },
-        ],
-      },
-    ],
-    defaultTopics: [
-      {
-        header: 'Result:',
-        text: 'A dynamic, emotionally resonant audio interface — bridging the technical and the artistic. Demonstrates mastery of timing, motion, and audio-driven state updates.',
-      },
-    ],
-    expansionTopics: [],
+    listTopics: {
+      topics: [
+        {
+          id: uuidv4(),
+          header: 'Together, they show:',
+          list: [
+            {
+              icon: 'sync_problem',
+              text: 'Advanced GSAP–Vue lifecycle mastery',
+              id: uuidv4(),
+            },
+            {
+              icon: 'smart_toy',
+              text: 'Real AI integrations in production-ready UIs',
+              id: uuidv4(),
+            },
+            {
+              icon: 'timeline',
+              text: 'Responsive, data-driven motion systems',
+              id: uuidv4(),
+            },
+            {
+              icon: 'auto_awesome',
+              text: 'Design and engineering unified through storytelling',
+              id: uuidv4(),
+            },
+          ],
+          hasSeparator: true,
+        },
+      ],
+      hasSeparator: true,
+    },
+    defaultTopics: {
+      topics: [
+        {
+          header: 'Result:',
+          text: 'A dynamic, emotionally resonant audio interface — bridging the technical and the artistic. Demonstrates mastery of timing, motion, and audio-driven state updates.',
+          hasSeparator: true,
+          id: uuidv4(),
+        },
+      ],
+      hasSeparator: false,
+    },
     blockquote: '',
   },
 ]);
@@ -238,11 +311,11 @@ const tab = ref('weather-and-theme');
           )
         "
       >
-        Case Studies
+        Case caseStudies
       </h1>
       <q-separator color="dark" class="q-mb-md" />
       <p
-        class="case-studies-description text-bold text-body-1 text-center primary-font"
+        class="case-caseStudies-description text-bold text-body-1 text-center primary-font"
         :class="
           setSeasonClasses(
             {
@@ -285,18 +358,18 @@ const tab = ref('weather-and-theme');
       </p>
     </q-card>
     <span
-      v-for="(study, index) in studies"
+      v-for="(study, index) in caseStudies"
       :key="index"
       :class="{
         'q-mt-md': index !== 0,
-        'q-mb-sm': index === studies.length - 1,
+        'q-mb-sm': index === caseStudies.length - 1,
       }"
     >
       <CaseStudy
         :header="study.header"
-        :expansionTopics="study.expansionTopics ?? []"
-        :listTopics="study.listTopics ?? []"
-        :defaultTopics="study.defaultTopics ?? []"
+        :expansionTopics="study.expansionTopics"
+        :listTopics="study.listTopics"
+        :defaultTopics="study.defaultTopics"
         :blockquote="study.blockquote"
       ></CaseStudy
     ></span>
@@ -340,10 +413,10 @@ const tab = ref('weather-and-theme');
           )
         "
       >
-        Case Studies
+        Case caseStudies
       </h1>
       <p
-        class="case-studies-description text-body-1 text-bold text-center primary-font"
+        class="case-caseStudies-description text-body-1 text-bold text-center primary-font"
         :class="
           setSeasonClasses(
             {
@@ -395,7 +468,7 @@ const tab = ref('weather-and-theme');
       indicator-color="accent"
     >
       <q-tab
-        v-for="study in studies"
+        v-for="study in caseStudies"
         :key="study.id"
         :name="study.name"
         :label="study.label"
@@ -404,12 +477,17 @@ const tab = ref('weather-and-theme');
     </q-tabs>
 
     <q-tab-panels v-model="tab" animated transition-prev="fade" transition-next="fade" keep-alive>
-      <q-tab-panel v-for="study in studies" :key="study.id" :name="study.name" class="no-scroll">
+      <q-tab-panel
+        v-for="study in caseStudies"
+        :key="study.id"
+        :name="study.name"
+        class="no-scroll"
+      >
         <CaseStudy
           :header="study.header"
-          :expansionTopics="study.expansionTopics ?? []"
-          :listTopics="study.listTopics ?? []"
-          :defaultTopics="study.defaultTopics ?? []"
+          :expansionTopics="study.expansionTopics"
+          :listTopics="study.listTopics"
+          :defaultTopics="study.defaultTopics"
           :blockquote="study.blockquote"
         ></CaseStudy>
       </q-tab-panel>

@@ -8,9 +8,9 @@ import { Theme } from 'src/shared/constants/theme';
 import { type PropType } from 'vue';
 import type {
   CaseStudyHeader,
-  CaseStudyExpansionTopic,
-  CaseStudyListTopic,
-  CaseStudyDefaultTopic,
+  CaseStudyListTopicGroup,
+  CaseStudyExpansionTopicGroup,
+  CaseStudyDefaultTopicGroup,
 } from '../shared/types/caseStudy';
 
 const mainStore = useMainStore();
@@ -25,15 +25,20 @@ const props = defineProps({
     required: true,
   },
   expansionTopics: {
-    type: Object as PropType<CaseStudyExpansionTopic[]>,
+    type: Object as PropType<CaseStudyExpansionTopicGroup | undefined>,
+    required: false,
   },
   listTopics: {
-    type: Object as PropType<CaseStudyListTopic[]>,
+    type: Object as PropType<CaseStudyListTopicGroup | undefined>,
+    required: false,
   },
   defaultTopics: {
-    type: Object as PropType<CaseStudyDefaultTopic[]>,
+    type: Object as PropType<CaseStudyDefaultTopicGroup | undefined>,
+    required: false,
   },
   blockquote: {
+    // accept undefined explicitly
+    type: String as PropType<string | undefined>,
     default: '',
   },
 });
@@ -89,11 +94,11 @@ const cardBackgrounds = {
       <span v-if="expansionTopics" class="full-width">
         <q-intersection transition="slide-up" transition-duration="500" once>
           <q-card-section class="row q-pt-none q-pb-none">
-            <span class="full-width" v-for="(topic, index) in expansionTopics" :key="index">
+            <span class="full-width" v-for="(topic, index) in expansionTopics.topics" :key="index">
               <q-expansion-item
                 class="shadow-1 overflow-hidden q-mt-md"
                 :class="{
-                  'q-mb-md': index + 1 === expansionTopics.length,
+                  'q-mb-md': index + 1 === expansionTopics.topics.length,
                 }"
                 style="border-radius: 5px"
                 :icon="topic.icon"
@@ -109,14 +114,15 @@ const cardBackgrounds = {
                   </q-card-section>
                 </q-card>
               </q-expansion-item>
+              <q-separator v-if="topic.hasSeparator"></q-separator>
             </span>
           </q-card-section>
         </q-intersection>
 
-        <q-separator></q-separator
+        <q-separator v-if="expansionTopics.hasSeparator"></q-separator
       ></span>
       <span v-if="listTopics" class="full-width">
-        <div v-for="(topic, index) in listTopics" :key="index" clas="full-width">
+        <div v-for="(topic, index) in listTopics.topics" :key="index" clas="full-width">
           <q-intersection transition="jump-right" transition-duration="500" once>
             <q-card-section>
               <h3 class="text-h3 q-mt-none q-mb-md secondary-font">{{ topic.header }}</h3>
@@ -148,10 +154,10 @@ const cardBackgrounds = {
             </q-card-section>
           </q-intersection>
         </div>
-        <q-separator></q-separator>
+        <q-separator v-if="listTopics.hasSeparator"></q-separator>
       </span>
       <span v-if="defaultTopics">
-        <div v-for="(topic, index) in defaultTopics" :key="index" clas="full-width">
+        <div v-for="(topic, index) in defaultTopics.topics" :key="index" clas="full-width">
           <q-card-section>
             <h3 class="text-h3 q-mt-none q-mb-md secondary-font">{{ topic.header }}</h3>
             <p>{{ topic.subHeader }}</p>
@@ -215,11 +221,11 @@ const cardBackgrounds = {
       <span v-if="expansionTopics" class="full-width">
         <q-intersection transition="slide-up" transition-duration="500" :once="true">
           <q-card-section class="row q-pt-none q-pb-none items-center full-width">
-            <span v-for="(topic, index) in expansionTopics" :key="index" class="full-width">
+            <span v-for="(topic, index) in expansionTopics.topics" :key="index" class="full-width">
               <q-expansion-item
                 class="shadow-1 overflow-hidden indent-expansion-item q-mt-md"
                 :class="{
-                  'q-mb-md': index + 1 === expansionTopics.length,
+                  'q-mb-md': index + 1 === expansionTopics.topics.length,
                 }"
                 style="border-radius: 5px"
                 :icon="topic.icon"
@@ -241,12 +247,12 @@ const cardBackgrounds = {
         <q-separator></q-separator>
       </span>
       <span v-if="listTopics" class="full-width">
-        <div class="full-width" v-for="(topic, index) in listTopics" :key="index">
+        <div class="full-width" v-for="(t, index) in listTopics.topics" :key="index">
           <q-card-section>
-            <h3 class="text-h3 q-mt-none q-mb-md secondary-font">{{ topic.header }}</h3>
+            <h3 class="text-h3 q-mt-none q-mb-md secondary-font">{{ t.header }}</h3>
             <q-intersection transition="jump-right" transition-duration="1000" once>
               <q-list class="q-mb-sm bg-primary" bordered separator>
-                <span v-for="(bullet, index) in topic.list" :key="index" class="full-width">
+                <span v-for="bullet in t.list" :key="bullet.id" class="full-width">
                   <q-item>
                     <q-item-section avatar>
                       <q-icon
@@ -276,7 +282,7 @@ const cardBackgrounds = {
         <q-separator></q-separator>
       </span>
       <span v-if="defaultTopics" class="full-width">
-        <div v-for="(topic, index) in defaultTopics" :key="index" class="full-width">
+        <div v-for="(topic, index) in defaultTopics.topics" :key="index" class="full-width">
           <q-card-section>
             <h3 class="text-h3 q-mt-none q-mb-md secondary-font">{{ topic.header }}</h3>
             <p>{{ topic.subHeader }}</p>
@@ -284,7 +290,7 @@ const cardBackgrounds = {
               {{ topic.text }}
             </p>
           </q-card-section>
-          <span class="full-width"><q-separator></q-separator></span>
+          <q-separator></q-separator>
         </div>
       </span>
       <span v-if="blockquote">
