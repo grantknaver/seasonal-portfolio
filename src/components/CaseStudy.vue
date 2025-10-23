@@ -94,7 +94,11 @@ const cardBackgrounds = {
       <span v-if="expansionTopics" class="full-width">
         <q-intersection transition="slide-up" transition-duration="500" once>
           <q-card-section class="row q-pt-none q-pb-none">
-            <span class="full-width" v-for="(topic, index) in expansionTopics.topics" :key="index">
+            <span
+              class="full-width"
+              v-for="(topic, index) in expansionTopics.topics"
+              :key="topic.id"
+            >
               <q-expansion-item
                 class="shadow-1 overflow-hidden q-mt-md"
                 :class="{
@@ -122,12 +126,12 @@ const cardBackgrounds = {
         <q-separator v-if="expansionTopics.hasSeparator"></q-separator
       ></span>
       <span v-if="listTopics" class="full-width">
-        <div v-for="(topic, index) in listTopics.topics" :key="index" clas="full-width">
+        <div v-for="topic in listTopics.topics" :key="topic.id" clas="full-width">
           <q-intersection transition="jump-right" transition-duration="500" once>
             <q-card-section>
               <h3 class="text-h3 q-mt-none q-mb-md secondary-font">{{ topic.header }}</h3>
               <q-list class="q-mb-sm bg-primary" bordered separator>
-                <span v-for="(bullet, index) in topic.list" :key="index" class="full-width">
+                <span v-for="bullet in topic.list" :key="bullet.id" class="full-width">
                   <q-item>
                     <q-item-section avatar>
                       <q-icon
@@ -157,7 +161,7 @@ const cardBackgrounds = {
         <q-separator v-if="listTopics.hasSeparator"></q-separator>
       </span>
       <span v-if="defaultTopics">
-        <div v-for="(topic, index) in defaultTopics.topics" :key="index" clas="full-width">
+        <div v-for="topic in defaultTopics.topics" :key="topic.id" clas="full-width">
           <q-card-section>
             <h3 class="text-h3 q-mt-none q-mb-md secondary-font">{{ topic.header }}</h3>
             <p>{{ topic.subHeader }}</p>
@@ -221,7 +225,11 @@ const cardBackgrounds = {
       <span v-if="expansionTopics" class="full-width">
         <q-intersection transition="slide-up" transition-duration="500" :once="true">
           <q-card-section class="row q-pt-none q-pb-none items-center full-width">
-            <span v-for="(topic, index) in expansionTopics.topics" :key="index" class="full-width">
+            <span
+              v-for="(topic, index) in expansionTopics.topics"
+              :key="topic.id"
+              class="full-width"
+            >
               <q-expansion-item
                 class="shadow-1 overflow-hidden indent-expansion-item q-mt-md"
                 :class="{
@@ -241,13 +249,13 @@ const cardBackgrounds = {
                   </q-card-section>
                 </q-card>
               </q-expansion-item>
-            </span>
-          </q-card-section></q-intersection
-        >
-        <q-separator></q-separator>
+              <q-separator v-if="topic.hasSeparator"></q-separator>
+            </span> </q-card-section
+        ></q-intersection>
+        <q-separator v-if="expansionTopics.hasSeparator"></q-separator>
       </span>
       <span v-if="listTopics" class="full-width">
-        <div class="full-width" v-for="(t, index) in listTopics.topics" :key="index">
+        <div class="full-width" v-for="t in listTopics.topics" :key="t.id">
           <q-card-section>
             <h3 class="text-h3 q-mt-none q-mb-md secondary-font">{{ t.header }}</h3>
             <q-intersection transition="jump-right" transition-duration="1000" once>
@@ -279,10 +287,10 @@ const cardBackgrounds = {
             >
           </q-card-section>
         </div>
-        <q-separator></q-separator>
+        <q-separator v-if="listTopics.hasSeparator"></q-separator>
       </span>
       <span v-if="defaultTopics" class="full-width">
-        <div v-for="(topic, index) in defaultTopics.topics" :key="index" class="full-width">
+        <div v-for="topic in defaultTopics.topics" :key="topic.id" class="full-width">
           <q-card-section>
             <h3 class="text-h3 q-mt-none q-mb-md secondary-font">{{ topic.header }}</h3>
             <p>{{ topic.subHeader }}</p>
@@ -290,8 +298,9 @@ const cardBackgrounds = {
               {{ topic.text }}
             </p>
           </q-card-section>
-          <q-separator></q-separator>
+          <q-separator v-if="topic.hasSeparator"></q-separator>
         </div>
+        <q-separator v-if="defaultTopics.hasSeparator"></q-separator>
       </span>
       <span v-if="blockquote">
         <q-card-section class="blockquote-section q-pa-md">

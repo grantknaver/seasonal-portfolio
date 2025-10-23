@@ -65,7 +65,7 @@ const caseStudies = ref<CS[]>([
           hasSeparator: true,
         },
       ],
-      hasSeparator: false,
+      hasSeparator: true,
     },
     defaultTopics: {
       topics: [
@@ -133,7 +133,7 @@ const caseStudies = ref<CS[]>([
           hasSeparator: true,
         },
       ],
-      hasSeparator: false,
+      hasSeparator: true,
     },
     defaultTopics: {
       topics: [
@@ -200,7 +200,7 @@ const caseStudies = ref<CS[]>([
           hasSeparator: true,
         },
       ],
-      hasSeparator: false,
+      hasSeparator: true,
     },
     defaultTopics: {
       topics: [

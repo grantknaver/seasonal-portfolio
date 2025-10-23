@@ -1,14 +1,14 @@
-import type { CSSProperties } from 'vue';
+// import type { CSSProperties } from 'vue';
 
-export interface Img {
-  src: string;
-  styles: CSSProperties;
-}
+// export interface Img {
+//   src: string;
+//   styles: CSSProperties;
+// }
 
 export interface CaseStudyHeader {
   text: string;
   subHeader?: string;
-  images?: Img[];
+  // images?: Img[];
 }
 
 export interface CaseStudyExpansionTopic {
@@ -16,7 +16,7 @@ export interface CaseStudyExpansionTopic {
   icon?: string;
   label?: string;
   text?: string;
-  images?: Img[];
+  // images?: Img[];
   hasSeparator: boolean;
 }
 
@@ -47,7 +47,7 @@ export interface CaseStudyDefaultTopic {
   header: string;
   subHeader?: string;
   text?: string;
-  images?: Img[];
+  // images?: Img[];
   hasSeparator: boolean;
 }
 
