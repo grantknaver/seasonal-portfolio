@@ -289,7 +289,7 @@ const cardBackgrounds = {
       </span>
       <span v-if="blockquote">
         <q-card-section class="blockquote-section q-pa-md">
-          <q-intersection transition="scale" transition-duration="1250">
+          <q-intersection transition="scale" transition-duration="1250" :once="true">
             <div class="row items-start">
               <blockquote class="primary-font row text-dark q-pl-md">
                 <i class="q-mb-md">

@@ -284,7 +284,14 @@ const tab = ref('weather-and-theme');
         scope, fair pricing, and fast turnaround.
       </p>
     </q-card>
-    <span v-for="(study, index) in studies" :key="index">
+    <span
+      v-for="(study, index) in studies"
+      :key="index"
+      :class="{
+        'q-mt-md': index !== 0,
+        'q-mb-sm': index === studies.length - 1,
+      }"
+    >
       <CaseStudy
         :header="study.header"
         :expansionTopics="study.expansionTopics ?? []"
