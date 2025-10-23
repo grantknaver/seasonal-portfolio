@@ -6,7 +6,7 @@ import { useMainStore } from '../stores/main';
 import { storeToRefs } from 'pinia';
 import CaseStudy from './CaseStudy.vue';
 import { type CaseStudy as CS } from 'src/shared/types/caseStudy';
-
+import { v4 as uuidv4 } from 'uuid';
 const mainStore = useMainStore();
 const { activeTheme } = storeToRefs(mainStore);
 const { lgBreakpoint, width } = useViewport();
@@ -14,6 +14,9 @@ const isResponsive = computed(() => width.value < lgBreakpoint);
 const isBelowLgBreakpoint = computed(() => useViewport().width.value < useViewport().lgBreakpoint);
 const studies = ref<CS[]>([
   {
+    id: uuidv4(),
+    name: 'weather-and-theme',
+    label: 'Weather',
     header: {
       text: 'GSAP Weather & Theme System',
       subHeader: 'Dynamic seasonal motion meets engineering precision.',
@@ -59,6 +62,9 @@ const studies = ref<CS[]>([
       'Built a dynamic Weather/Theme System with layered parallax and ambient effects, driven by GSAP and Vue 3. Fixed a critical resize bug for seamless responsiveness across devices.',
   },
   {
+    id: uuidv4(),
+    name: 'ai-chat',
+    label: 'AI Chat',
     header: {
       text: 'AI Chat Interface',
       subHeader: 'Conversational intelligence with motion clarity.',
@@ -103,6 +109,9 @@ const studies = ref<CS[]>([
     blockquote: '',
   },
   {
+    id: uuidv4(),
+    name: 'waveform',
+    label: 'Waveform',
     header: {
       text: 'StorytAIm Waveform Visualizer',
       subHeader: 'Turning AI narration into living motion.',
@@ -147,6 +156,9 @@ const studies = ref<CS[]>([
     blockquote: '',
   },
   {
+    id: uuidv4(),
+    name: 'projects-prove',
+    label: 'So What',
     header: {
       text: 'What These Projects Prove',
       subHeader:
@@ -185,6 +197,7 @@ const studies = ref<CS[]>([
     blockquote: '',
   },
 ]);
+const tab = ref('weather-and-theme');
 </script>
 <template>
   <!-- Mobile -->
@@ -366,15 +379,34 @@ const studies = ref<CS[]>([
         scope, fair pricing, and fast turnaround.
       </p>
     </div>
-    <span v-for="(study, index) in studies" :key="index">
-      <CaseStudy
-        :header="study.header"
-        :expansionTopics="study.expansionTopics"
-        :listTopics="study.listTopics"
-        :defaultTopics="study.defaultTopics"
-        :blockquote="study.blockquote"
-      ></CaseStudy
-    ></span>
+    <q-tabs
+      v-model="tab"
+      align="justify"
+      dense
+      class="bg-primary text-dark q-pa-sm rounded-borders q-mb-md"
+      active-color="dark"
+      indicator-color="accent"
+    >
+      <q-tab
+        v-for="study in studies"
+        :key="study.id"
+        :name="study.name"
+        :label="study.label"
+        class="text-weight-medium"
+      />
+    </q-tabs>
+
+    <q-tab-panels v-model="tab" animated transition-prev="fade" transition-next="fade" keep-alive>
+      <q-tab-panel v-for="study in studies" :key="study.id" :name="study.name" class="no-scroll">
+        <CaseStudy
+          :header="study.header"
+          :expansionTopics="study.expansionTopics ?? []"
+          :listTopics="study.listTopics ?? []"
+          :defaultTopics="study.defaultTopics ?? []"
+          :blockquote="study.blockquote"
+        ></CaseStudy>
+      </q-tab-panel>
+    </q-tab-panels>
   </div>
 </template>
 <style scoped lang="scss">

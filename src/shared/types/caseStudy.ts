@@ -26,6 +26,9 @@ export interface CaseStudyDefaultTopic {
 }
 
 export interface CaseStudy {
+  id: string;
+  name: string;
+  label: string;
   header: CaseStudyHeader;
   expansionTopics: CaseStudyExpansionTopic[];
   listTopics: CaseStudyListTopic[];

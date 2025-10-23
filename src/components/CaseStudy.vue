@@ -207,7 +207,7 @@ const cardBackgrounds = {
         >
           {{ props.header.text }}
         </h2>
-        <p class="text-body-1 text-center text-dark primary-font">
+        <p class="text-body-1 text-center q-mt-md text-dark primary-font">
           {{ props.header.subHeader }}
         </p>
       </q-card-section>
@@ -350,7 +350,7 @@ const cardBackgrounds = {
   .topic {
     .header-section {
       p {
-        font-size: 1.2rem;
+        font-size: 1rem;
         background-color: transparent;
       }
     }
