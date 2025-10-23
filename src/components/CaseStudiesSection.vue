@@ -5,8 +5,11 @@ import { computed, ref } from 'vue';
 import { useMainStore } from '../stores/main';
 import { storeToRefs } from 'pinia';
 import CaseStudy from './CaseStudy.vue';
-import { type CaseStudy as CS } from 'src/shared/types/caseStudy';
+import { type CaseStudy as CS } from '../shared/types/caseStudy';
 import { v4 as uuidv4 } from 'uuid';
+import AIAssitant from './AIAssitant.vue';
+import { Theme } from '../shared/constants/theme';
+
 const mainStore = useMainStore();
 const { activeTheme } = storeToRefs(mainStore);
 const { lgBreakpoint, width } = useViewport();
@@ -78,6 +81,7 @@ const caseStudies = ref<CS[]>([
           header: 'Result:',
           text: 'Built a dynamic Weather/Theme System with layered parallax and ambient effects, driven by GSAP and Vue 3. Fixed a critical resize bug for seamless responsiveness across devices.',
           hasSeparator: false,
+          // Loom video
         },
       ],
       hasSeparator: false,
@@ -148,7 +152,7 @@ const caseStudies = ref<CS[]>([
           id: uuidv4(),
           name: 'ai-chat-result',
           header: 'Result:',
-          text: 'A chat experience that feels alive, expressive, and emotionally timed — showing how animation enhances usability and presence in AI-driven apps.',
+          text: 'This AI chat interface evolves with time and mood. Its visual theme follows a timed seasonal cycle — shifting color palette to mirror nature’s rhythm. Each transition brings a subtle change in background hues, accent tones.',
           hasSeparator: false,
         },
       ],
@@ -285,6 +289,21 @@ const caseStudies = ref<CS[]>([
   },
 ]);
 const tab = ref('weather-and-theme');
+
+const backgroundUrl = computed(() => {
+  if (activeTheme.value === Theme.Fall) {
+    return new URL('../assets/ai-bcg-fall.png', import.meta.url).href;
+  } else if (activeTheme.value === Theme.Winter) {
+    return new URL('../assets/ai-bcg-winter.png', import.meta.url).href;
+  } else if (activeTheme.value === Theme.Spring) {
+    return new URL('../assets/ai-bcg-spring.png', import.meta.url).href;
+  } else if (activeTheme.value === Theme.Summer) {
+    return new URL('../assets/ai-bcg-summer.png', import.meta.url).href;
+  } else {
+    // fallback image
+    return new URL('../assets/ai-bcg-winter.png', import.meta.url).href;
+  }
+});
 </script>
 <template>
   <!-- Mobile -->
@@ -385,8 +404,14 @@ const tab = ref('weather-and-theme');
         :listTopics="study.listTopics"
         :defaultTopics="study.defaultTopics"
         :blockquote="study.blockquote"
-      ></CaseStudy
-    ></span>
+      >
+        <template #ai-chat-result>
+          <div class="width-full bg-red">
+            <p>Responsive view</p>
+          </div>
+        </template>
+      </CaseStudy></span
+    >
   </div>
 
   <!-- Desktop -->
@@ -504,8 +529,39 @@ const tab = ref('weather-and-theme');
           :defaultTopics="study.defaultTopics"
           :blockquote="study.blockquote"
         >
-          <template #header>
-            <h1>Header Content</h1>
+          <template #ai-chat-result>
+            <div
+              class="ai-chat-container q-pt-md q-pl-md q-pb-none q-pr-md"
+              :style="{
+                backgroundImage: `url(${backgroundUrl})`,
+                backgroundSize: 'cover',
+                backgroundPosition: 'center',
+              }"
+            >
+              <p class="description first-description q-mt-none q-mb-md q-pa-md text-dark bg-white">
+                The <b>AI’s conversational tone</b> AI’s conversational tone is dynamically
+                randomized within those seasons. One response might echo the calm focus of winter,
+                another the optimism of spring, or the playfulness of summer.
+              </p>
+
+              <div class="q-mb-lg row justify-center ful-width"><AIAssitant /></div>
+              <q-separator></q-separator>
+              <div class="q-mt-md column justify-center full-width">
+                <p class="description q-pa-md text-dark text-body-2 bg-white">
+                  The pairing of timed visual rhythm and randomized personality creates a system
+                  that feels organic — structured, yet spontaneous.
+                </p>
+                <i class="quote description text-body-1 text-accent q-pa-md bg-white text-center"
+                  >"By blending predictable visual cycles with unpredictable tone shifts, the
+                  experience becomes quietly human: familiar in pattern, but never identical.""</i
+                >
+                <p class="description q-mt-md bg-white q-pa-md bg-white">
+                  The result blurs the line between UI design and emotional storytelling. Color
+                  becomes context; timing becomes mood. Users don’t just read messages — they feel
+                  the passing of digital seasons.
+                </p>
+              </div>
+            </div>
           </template>
         </CaseStudy>
       </q-tab-panel>
@@ -572,6 +628,20 @@ const tab = ref('weather-and-theme');
           font-family: $cursive-stack;
         }
       }
+    }
+  }
+
+  .ai-chat-container {
+    height: 800px;
+    border-radius: 10px;
+    overflow: scroll;
+    border-top: solid 2px var(--q-dark);
+
+    .first-description {
+      font-size: 1.2rem;
+    }
+    .description {
+      border-radius: 10px;
     }
   }
 }

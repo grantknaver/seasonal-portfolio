@@ -37,7 +37,6 @@ const props = defineProps({
     required: false,
   },
   blockquote: {
-    // accept undefined explicitly
     type: String as PropType<string | undefined>,
     default: '',
   },
@@ -91,18 +90,18 @@ const cardBackgrounds = {
         </div>
       </q-card-section>
       <q-separator></q-separator>
-      <span v-if="expansionTopics" class="full-width">
+      <span v-if="props.expansionTopics" class="full-width">
         <q-intersection transition="slide-up" transition-duration="500" once>
           <q-card-section class="row q-pt-none q-pb-none">
             <span
               class="full-width"
-              v-for="(topic, index) in expansionTopics.topics"
+              v-for="(topic, index) in props.expansionTopics.topics"
               :key="topic.id"
             >
               <q-expansion-item
                 class="shadow-1 overflow-hidden q-mt-md"
                 :class="{
-                  'q-mb-md': index + 1 === expansionTopics.topics.length,
+                  'q-mb-md': index + 1 === props.expansionTopics.topics.length,
                 }"
                 style="border-radius: 5px"
                 :icon="topic.icon"
@@ -124,10 +123,10 @@ const cardBackgrounds = {
           </q-card-section>
         </q-intersection>
 
-        <q-separator v-if="expansionTopics.hasSeparator"></q-separator
+        <q-separator v-if="props.expansionTopics.hasSeparator"></q-separator
       ></span>
-      <span v-if="listTopics" class="full-width">
-        <div v-for="topic in listTopics.topics" :key="topic.id" clas="full-width">
+      <span v-if="props.listTopics" class="full-width">
+        <div v-for="topic in props.listTopics.topics" :key="topic.id" clas="full-width">
           <q-intersection transition="jump-right" transition-duration="500" once>
             <q-card-section>
               <h3 class="text-h3 q-mt-none q-mb-md secondary-font">{{ topic.header }}</h3>
@@ -160,10 +159,10 @@ const cardBackgrounds = {
           </q-intersection>
           <slot :name="topic.name"></slot>
         </div>
-        <q-separator v-if="listTopics.hasSeparator"></q-separator>
+        <q-separator v-if="props.listTopics.hasSeparator"></q-separator>
       </span>
-      <span v-if="defaultTopics">
-        <div v-for="topic in defaultTopics.topics" :key="topic.id" clas="full-width">
+      <span v-if="props.defaultTopics">
+        <div v-for="topic in props.defaultTopics.topics" :key="topic.id" clas="full-width">
           <q-card-section>
             <h3 class="text-h3 q-mt-none q-mb-md secondary-font">{{ topic.header }}</h3>
             <p>{{ topic.subHeader }}</p>
@@ -175,7 +174,7 @@ const cardBackgrounds = {
           <slot :name="topic.name"></slot>
         </div>
       </span>
-      <span v-if="blockquote">
+      <span v-if="props.blockquote">
         <q-intersection transition="scale" transition-duration="500" once>
           <q-card-section class="blockquote-section bg-primary q-pa-md">
             <div class="row items-start">
@@ -225,18 +224,18 @@ const cardBackgrounds = {
         </p>
       </q-card-section>
       <q-separator></q-separator>
-      <span v-if="expansionTopics" class="full-width">
+      <span v-if="props.expansionTopics" class="full-width">
         <q-intersection transition="slide-up" transition-duration="500" :once="true">
           <q-card-section class="row q-pt-none q-pb-none items-center full-width">
             <span
-              v-for="(topic, index) in expansionTopics.topics"
+              v-for="(topic, index) in props.expansionTopics.topics"
               :key="topic.id"
               class="full-width"
             >
               <q-expansion-item
                 class="shadow-1 overflow-hidden indent-expansion-item q-mt-md"
                 :class="{
-                  'q-mb-md': index + 1 === expansionTopics.topics.length,
+                  'q-mb-md': index + 1 === props.expansionTopics.topics.length,
                 }"
                 style="border-radius: 5px"
                 :icon="topic.icon"
@@ -252,13 +251,14 @@ const cardBackgrounds = {
                   </q-card-section>
                 </q-card>
               </q-expansion-item>
+              <slot :name="topic.name"></slot>
               <q-separator v-if="topic.hasSeparator"></q-separator>
             </span> </q-card-section
         ></q-intersection>
-        <q-separator v-if="expansionTopics.hasSeparator"></q-separator>
+        <q-separator v-if="props.expansionTopics.hasSeparator"></q-separator>
       </span>
-      <span v-if="listTopics" class="full-width">
-        <div class="full-width" v-for="t in listTopics.topics" :key="t.id">
+      <span v-if="props.listTopics" class="full-width">
+        <div class="full-width" v-for="t in props.listTopics.topics" :key="t.id">
           <q-card-section>
             <h3 class="text-h3 q-mt-none q-mb-md secondary-font">{{ t.header }}</h3>
             <q-intersection transition="jump-right" transition-duration="1000" once>
@@ -289,11 +289,12 @@ const cardBackgrounds = {
               </q-list></q-intersection
             >
           </q-card-section>
+          <slot :name="t.name"></slot>
         </div>
-        <q-separator v-if="listTopics.hasSeparator"></q-separator>
+        <q-separator v-if="props.listTopics.hasSeparator"></q-separator>
       </span>
-      <span v-if="defaultTopics" class="full-width">
-        <div v-for="topic in defaultTopics.topics" :key="topic.id" class="full-width">
+      <span v-if="props.defaultTopics" class="full-width">
+        <div v-for="topic in props.defaultTopics.topics" :key="topic.id" class="full-width">
           <q-card-section>
             <h3 class="text-h3 q-mt-none q-mb-md secondary-font">{{ topic.header }}</h3>
             <p>{{ topic.subHeader }}</p>
@@ -301,11 +302,12 @@ const cardBackgrounds = {
               {{ topic.text }}
             </p>
           </q-card-section>
+          <slot :name="topic.name"></slot>
           <q-separator v-if="topic.hasSeparator"></q-separator>
         </div>
-        <q-separator v-if="defaultTopics.hasSeparator"></q-separator>
+        <q-separator v-if="props.defaultTopics.hasSeparator"></q-separator>
       </span>
-      <span v-if="blockquote">
+      <span v-if="props.blockquote">
         <q-card-section class="blockquote-section q-pa-md">
           <q-intersection transition="scale" transition-duration="1250" :once="true">
             <div class="row items-start">

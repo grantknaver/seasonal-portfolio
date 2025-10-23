@@ -2,7 +2,7 @@
 import { ref, nextTick, watch } from 'vue';
 import { useMainStore } from '../stores/main';
 import { storeToRefs } from 'pinia';
-import { TopicName } from '../shared/constants/topicName';
+// import { TopicName } from '../shared/constants/topicName';
 import { QScrollArea, debounce } from 'quasar';
 import { Theme } from '../shared/constants/theme';
 import RecaptchaWidget from '../components/RecaptchaWidget.vue';
@@ -10,8 +10,9 @@ import { OARole } from 'src/shared/types/oaRole';
 import type OALog from 'src/shared/types/oaLog';
 
 const mainStore = useMainStore();
-const { activeAiAssistLogo, activeTopic, chatLog, activeTheme, isHuman, oaLogs, isLoading } =
-  storeToRefs(mainStore);
+// const { activeAiAssistLogo, activeTopic, chatLog, activeTheme, isHuman, oaLogs, isLoading } =
+//   storeToRefs(mainStore);
+const { chatLog, activeTheme, isHuman, oaLogs, isLoading } = storeToRefs(mainStore);
 const isChatting = ref(false);
 const text = ref('');
 const chatScroll = ref<QScrollArea>();
@@ -61,7 +62,8 @@ watch(oaLogs, async () => {
 
 <template>
   <div class="container font-primary">
-    <div v-if="isChatting" class="assistant-chat full-width q-pa-lg">
+    <!-- Removed isChatting conditional -->
+    <div class="assistant-chat full-width q-pa-lg">
       <q-scroll-area ref="chatScroll" class="chat-feed q-pa-md" :visible="false" v-if="isHuman">
         <q-chat-message
           v-for="message in chatLog"
@@ -105,7 +107,7 @@ watch(oaLogs, async () => {
         <RecaptchaWidget></RecaptchaWidget>
       </div>
     </div>
-    <q-btn
+    <!-- <q-btn
       @click="isChatting = !isChatting"
       class="chat-button"
       round
@@ -114,7 +116,7 @@ watch(oaLogs, async () => {
     >
       <q-tooltip anchor="center middle" self="top left">Chat</q-tooltip>
       <q-avatar><img :src="activeAiAssistLogo" /></q-avatar>
-    </q-btn>
+    </q-btn> -->
   </div>
 </template>
 
