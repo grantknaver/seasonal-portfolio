@@ -6,40 +6,18 @@ import { useMainStore } from '../stores/main';
 import { storeToRefs } from 'pinia';
 import { Theme } from 'src/shared/constants/theme';
 import { type PropType } from 'vue';
+import type {
+  CaseStudyHeader,
+  CaseStudyExpansionTopic,
+  CaseStudyListTopic,
+  CaseStudyDefaultTopic,
+} from '../shared/types/caseStudy';
 
 const mainStore = useMainStore();
 const { activeTheme } = storeToRefs(mainStore);
 const { lgBreakpoint, width } = useViewport();
 const isResponsive = computed(() => width.value < lgBreakpoint);
 const isBelowLgBreakpoint = computed(() => useViewport().width.value < useViewport().lgBreakpoint);
-
-interface CaseStudyHeader {
-  text?: string;
-  subHeader?: string;
-}
-
-interface CaseStudyExpansionTopic {
-  icon?: string;
-  label?: string;
-  text?: string;
-}
-
-interface CaseStudyListItem {
-  icon?: string;
-  text?: string;
-}
-
-interface CaseStudyListTopic {
-  header?: string;
-  list?: CaseStudyListItem[];
-}
-
-interface CaseStudyDefaultTopic {
-  header: string;
-  subHeader?: string;
-  text?: string;
-  hasSeparator?: boolean;
-}
 
 const props = defineProps({
   header: {
@@ -55,7 +33,9 @@ const props = defineProps({
   defaultTopics: {
     type: Object as PropType<CaseStudyDefaultTopic[]>,
   },
-  blockquote: String,
+  blockquote: {
+    default: '',
+  },
 });
 
 const cardBackgrounds = {
@@ -137,7 +117,7 @@ const cardBackgrounds = {
       ></span>
       <span v-if="listTopics" class="full-width">
         <div v-for="(topic, index) in listTopics" :key="index" clas="full-width">
-          <q-intersection transition="slide-up" transition-duration="500" once>
+          <q-intersection transition="jump-right" transition-duration="500" once>
             <q-card-section>
               <h3 class="text-h3 q-mt-none q-mb-md secondary-font">{{ topic.header }}</h3>
               <q-list class="q-mb-sm bg-primary" bordered separator>
@@ -175,10 +155,10 @@ const cardBackgrounds = {
           <q-card-section>
             <h3 class="text-h3 q-mt-none q-mb-md secondary-font">{{ topic.header }}</h3>
             <p>{{ topic.subHeader }}</p>
-            <p class="text-body-2 q-mb-sm q-pl-md primary-font">
+            <p class="text-body-2 q-mb-sm primary-font">
               {{ topic.text }}
             </p>
-            <span v-if="topic.hasSeparator"></span>
+            <span></span>
           </q-card-section>
         </div>
       </span>
@@ -264,7 +244,7 @@ const cardBackgrounds = {
         <div class="full-width" v-for="(topic, index) in listTopics" :key="index">
           <q-card-section>
             <h3 class="text-h3 q-mt-none q-mb-md secondary-font">{{ topic.header }}</h3>
-            <q-intersection transition="slide-up" transition-duration="1000" once>
+            <q-intersection transition="jump-right" transition-duration="1000" once>
               <q-list class="q-mb-sm bg-primary" bordered separator>
                 <span v-for="(bullet, index) in topic.list" :key="index" class="full-width">
                   <q-item>
@@ -300,11 +280,11 @@ const cardBackgrounds = {
           <q-card-section>
             <h3 class="text-h3 q-mt-none q-mb-md secondary-font">{{ topic.header }}</h3>
             <p>{{ topic.subHeader }}</p>
-            <p class="text-body-2 q-ml-md q-mb-sm primary-font">
+            <p class="text-body-2 q-mb-sm primary-font">
               {{ topic.text }}
             </p>
           </q-card-section>
-          <span v-if="topic.hasSeparator" class="full-width"><q-separator></q-separator></span>
+          <span class="full-width"><q-separator></q-separator></span>
         </div>
       </span>
       <span v-if="blockquote">
