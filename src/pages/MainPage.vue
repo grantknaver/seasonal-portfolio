@@ -80,6 +80,7 @@ const simonRef = ref<HTMLElement | null>(null);
 const titleRef = ref<HTMLElement | null>(null);
 const sepRef = ref<HTMLElement | null>(null);
 const servRef = ref<HTMLElement | null>(null);
+const homeContainerRef = ref<HTMLElement | null>(null);
 
 onMounted(async () => {
   await nextTick();
@@ -116,10 +117,33 @@ watch(mobileScrollTarget, (newTopic) => {
   expandedPanel.value = newTopic;
 });
 
-watch(activeTopic, (newTopic: TopicName | null) => {
-  if (!newTopic) return;
-  expandedPanel.value = newTopic;
-});
+watch(
+  activeTopic,
+  async (newTopic: TopicName | null) => {
+    await nextTick();
+    const el = homeContainerRef.value;
+    if (!el) return;
+
+    if (!newTopic) {
+      gsap.to(el, {
+        scale: 1,
+        duration: 0.6,
+        ease: 'power2.out',
+        overwrite: 'auto',
+      });
+      return;
+    }
+
+    gsap.to(el, {
+      scale: 0.8,
+      duration: 0.8,
+      ease: 'power2.out',
+      overwrite: 'auto',
+    });
+    expandedPanel.value = newTopic;
+  },
+  { immediate: true },
+);
 
 watch(slide, (newVal) => mainStore.SET_ACTIVE_THEME(newVal));
 
@@ -131,7 +155,6 @@ const buildAnimations = (mode: ViewType) => {
   const desktopEls = [nameRef.value, simonRef.value, titleRef.value, sepRef.value, servRef.value];
   if (mode === ViewType.Responsive) {
     if (!flattenElements(responsiveEls)) return () => {};
-    console.log('responsiveEls', responsiveEls);
     gsap.killTweensOf(responsiveEls);
     gsap.set(responsiveEls, { clearProps: 'all' });
 
@@ -275,7 +298,7 @@ const scrollToFooter = () => {
       />
       <span class="logo-text"
         ><span class="text-secondary">glk</span
-        ><span class="text-primary-font">Freelance</span></span
+        ><span class="text-primary-font text-white">Freelance</span></span
       >
     </div>
     <div ref="root" class="sub-container column items-center">
@@ -422,8 +445,9 @@ const scrollToFooter = () => {
         key="desktop"
         class="desktop-view row justify-end items-center full-width"
       >
-        <div class="home-container q-pl-xl q-pr-xl column">
+        <div ref="homeContainerRef" class="home-container q-pl-xl q-pr-xl column">
           <p
+            v-if="!activeTopic"
             ref="nameRef"
             class="name q-mb-lg text-body-1 text-left text-white"
             :class="
@@ -442,7 +466,10 @@ const scrollToFooter = () => {
           </p>
           <div class="row no-wrap">
             <div ref="simonRef" class="simon"><SimonMenu></SimonMenu></div>
-            <div class="title-container column justify-center items-center q-pa-md">
+            <div
+              v-if="!activeTopic"
+              class="title-container column justify-center items-center q-pa-md"
+            >
               <div class="clip-container relative-position overflow-hidden">
                 <p
                   ref="titleRef"
@@ -546,6 +573,7 @@ const scrollToFooter = () => {
 
           <div
             ref="servRef"
+            v-if="!activeTopic"
             class="services-description accent-text-outline black-text-glow start-animation row q-mt-md q-pa-md text-bold wrap justify-center text-white"
             :class="
               setSeasonClasses(
