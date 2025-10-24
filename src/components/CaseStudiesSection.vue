@@ -23,6 +23,7 @@ const caseStudies = ref<CS[]>([
     header: {
       text: 'GSAP Weather & Theme System',
       subHeader: 'Dynamic seasonal motion meets engineering precision.',
+      icon: 'motion_photos_on',
     },
     expansionTopics: {
       topics: [
@@ -96,6 +97,7 @@ const caseStudies = ref<CS[]>([
     header: {
       text: 'AI Chat Interface',
       subHeader: 'Conversational intelligence with motion clarity.',
+      icon: 'psychology_alt',
     },
     expansionTopics: {
       topics: [
@@ -167,6 +169,7 @@ const caseStudies = ref<CS[]>([
     header: {
       text: 'StorytAIm Waveform Visualizer',
       subHeader: 'Turning AI narration into living motion.',
+      icon: 'timeline',
     },
     expansionTopics: {
       topics: [
@@ -239,6 +242,7 @@ const caseStudies = ref<CS[]>([
       text: 'What These Projects Prove',
       subHeader:
         'Each of these builds highlights one core idea: interactivity as emotion. They aren’t just technically solid — they’re experiences that invite curiosity and delight.',
+      icon: 'emoji_events',
     },
     listTopics: {
       topics: [
@@ -309,7 +313,7 @@ const backgroundUrl = computed(() => {
   <!-- Mobile -->
   <div v-if="isResponsive" class="responsive-view full-width column">
     <q-card
-      class="first-card full-width q-mb-md q-pa-md bg-accent"
+      class="first-card full-width q-mb-sm q-pa-md bg-accent"
       :class="
         setSeasonClasses(
           {
@@ -390,28 +394,66 @@ const backgroundUrl = computed(() => {
         scope, fair pricing, and fast turnaround.
       </p>
     </q-card>
-    <span
-      v-for="(study, index) in caseStudies"
-      :key="index"
-      :class="{
-        'q-mt-md': index !== 0,
-        'q-mb-sm': index === caseStudies.length - 1,
-      }"
-    >
-      <CaseStudy
-        :header="study.header"
-        :expansionTopics="study.expansionTopics"
-        :listTopics="study.listTopics"
-        :defaultTopics="study.defaultTopics"
-        :blockquote="study.blockquote"
-      >
-        <template #ai-chat-result>
-          <div class="width-full bg-red">
-            <p>Responsive view</p>
-          </div>
-        </template>
-      </CaseStudy></span
-    >
+    <q-list class="q-ml-sm q-mr-sm">
+      <template v-for="(study, index) in caseStudies" :key="study.id">
+        <CaseStudy
+          class="full-width"
+          :class="{
+            'q-mb-sm': index + 1 == caseStudies.length,
+          }"
+          :header="study.header"
+          :expansionTopics="study.expansionTopics"
+          :listTopics="study.listTopics"
+          :defaultTopics="study.defaultTopics"
+          :blockquote="study.blockquote"
+        >
+          <template #ai-chat-result>
+            <div class="q-mb-lg row justify-center full-width">
+              <AIAssitant />
+            </div>
+
+            <div
+              class="ai-chat-container q-pt-md q-pl-md q-pb-none q-pr-md full-width"
+              :style="{
+                backgroundImage: `url(${backgroundUrl})`,
+                backgroundSize: 'cover',
+                backgroundPosition: 'center',
+              }"
+            >
+              <p class="description first-description q-mt-none q-mb-md q-pa-md text-dark bg-white">
+                The <b>AI’s conversational tone</b> AI’s conversational tone is dynamically
+                randomized within those seasons. One response might echo the calm focus of winter,
+                another the optimism of spring, or the playfulness of summer.
+              </p>
+
+              <q-separator />
+
+              <div class="q-mt-md column justify-center full-width">
+                <p class="description q-pa-md text-dark text-body-2 bg-white">
+                  The pairing of timed visual rhythm and randomized personality creates a system
+                  that feels organic — structured, yet spontaneous.
+                </p>
+
+                <i class="quote text-body-1 text-accent q-pa-md bg-white text-center">
+                  "By blending predictable visual cycles with unpredictable tone shifts, the
+                  experience becomes quietly human: familiar in pattern, but never identical."
+                </i>
+
+                <p class="description q-mt-md bg-white q-pa-md">
+                  The result blurs the line between UI design and emotional storytelling. Color
+                  becomes context; timing becomes mood. Users don’t just read messages — they feel
+                  the passing of digital seasons.
+                </p>
+              </div>
+            </div>
+          </template>
+        </CaseStudy>
+
+        <!-- Optional: visual separation between CaseStudy blocks -->
+        <q-separator v-if="index < caseStudies.length - 1" />
+      </template>
+      <q-separator class="full-width bg-primary"></q-separator>
+    </q-list>
   </div>
 
   <!-- Desktop -->
@@ -543,7 +585,6 @@ const backgroundUrl = computed(() => {
                 randomized within those seasons. One response might echo the calm focus of winter,
                 another the optimism of spring, or the playfulness of summer.
               </p>
-
               <div class="q-mb-lg row justify-center ful-width"><AIAssitant /></div>
               <q-separator></q-separator>
               <div class="q-mt-md column justify-center full-width">
@@ -551,7 +592,7 @@ const backgroundUrl = computed(() => {
                   The pairing of timed visual rhythm and randomized personality creates a system
                   that feels organic — structured, yet spontaneous.
                 </p>
-                <i class="quote description text-body-1 text-accent q-pa-md bg-white text-center"
+                <i class="quote text-body-1 text-accent q-pa-md bg-white text-center"
                   >"By blending predictable visual cycles with unpredictable tone shifts, the
                   experience becomes quietly human: familiar in pattern, but never identical.""</i
                 >
@@ -596,6 +637,24 @@ const backgroundUrl = computed(() => {
 
   .weather-theme-border {
     border: solid 1rem var(--q-secondary);
+  }
+
+  .ai-chat-container {
+    height: 900px;
+    border-radius: 10px;
+    border-top: solid 2px var(--q-dark);
+    padding-left: 0;
+    padding-right: 0;
+
+    .first-description {
+      font-size: 1.2rem;
+    }
+    .description {
+      border-radius: 10px;
+      font-size: 1.2rem;
+      margin-left: 1rem;
+      margin-right: 1rem;
+    }
   }
 }
 

@@ -23,6 +23,12 @@ import { flattenElements } from '../shared/utils/flattenElements';
 
 const mainStore = useMainStore();
 const mobileTopics: Topic[] = [
+  {
+    id: uuidv4(),
+    name: TopicName.CaseStudies,
+    icon: 'menu_book',
+    label: TopicName.CaseStudies,
+  },
   { id: uuidv4(), name: TopicName.Packages, icon: 'local_shipping', label: 'Packages' },
   {
     id: uuidv4(),
@@ -30,17 +36,12 @@ const mobileTopics: Topic[] = [
     icon: 'info',
     label: TopicName.About,
   },
+
   {
     id: uuidv4(),
     name: TopicName.Contact,
     icon: 'contact_mail',
     label: TopicName.Contact,
-  },
-  {
-    id: uuidv4(),
-    name: TopicName.CaseStudies,
-    icon: 'menu_book',
-    label: TopicName.CaseStudies,
   },
 ];
 const slides = ref<Slide[]>([
@@ -68,7 +69,7 @@ const slides = ref<Slide[]>([
 const { getScrollTarget, setVerticalScrollPosition } = scroll;
 const slide = ref<Theme>(Theme.Fall);
 const { activeTheme, activeTopic, mobileScrollTarget } = storeToRefs(mainStore);
-const expandedPanel = ref<TopicName | null>(null);
+const expandedPanel = ref<TopicName | null>(TopicName.CaseStudies);
 const root = ref<HTMLElement | null>(null);
 const showFooter = ref<boolean>(false);
 const io = ref<IntersectionObserver | null>(null);
@@ -172,9 +173,7 @@ const buildAnimations = (mode: ViewType) => {
   }
   // Only animate desktop in this block
   if (mode === ViewType.Desktop) {
-    console.log('desktop entered');
     if (!flattenElements(desktopEls)) return () => {};
-    console.log('cleared areEleemnts');
     gsap.killTweensOf(desktopEls);
     gsap.set(desktopEls, { clearProps: 'all' });
 
@@ -396,7 +395,7 @@ const scrollToFooter = () => {
         </div>
         <q-list class="full-width font-primary">
           <q-item
-            v-for="topic in mobileTopics.filter((topic) => topic.name !== TopicName.Contact)"
+            v-for="topic in mobileTopics"
             :key="topic.id"
             :name="topic.name"
             v-model="expandedPanel"
@@ -433,12 +432,14 @@ const scrollToFooter = () => {
                   <AboutSection />
                 </div>
               </template>
+              <template v-if="topic.name === TopicName.Contact">
+                <div :id="topic.name" class="full-width">
+                  <ContactSection />
+                </div>
+              </template>
             </q-expansion-item>
           </q-item>
         </q-list>
-        <div class="full-width font-primary" :id="TopicName.Contact">
-          <ContactSection />
-        </div>
       </section>
       <section
         v-if="!isResponsive"

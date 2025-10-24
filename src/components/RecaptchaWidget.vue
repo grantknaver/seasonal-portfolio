@@ -13,12 +13,11 @@ const recaptchaEl = ref<HTMLElement | null>(null);
 const waitForGrecaptcha = () =>
   new Promise<void>((resolve) => {
     const tick = () =>
-      typeof window !== 'undefined' && window.grecaptcha?.ready ? resolve() : setTimeout(tick, 50);
+      typeof window !== 'undefined' && window.grecaptcha?.ready ? resolve() : setTimeout(tick, 100);
     tick();
   });
 
-// ensure element is visible before rendering (not display:none)
-function waitUntilVisible(el: HTMLElement): Promise<void> {
+const waitUntilVisible = (el: HTMLElement): Promise<void> => {
   return new Promise((resolve) => {
     const isVisible = () => {
       const style = getComputedStyle(el);
@@ -41,17 +40,15 @@ function waitUntilVisible(el: HTMLElement): Promise<void> {
       }
     }, 100);
   });
-}
+};
 
-async function init() {
+const init = async () => {
   if (!recaptchaEl.value) return;
-
   // ✅ guard: if we already have a widget id (0,1,2...) don't render again
   if (Number.isInteger(recaptchaWidgetId.value as number)) return;
 
   await waitForGrecaptcha();
   await waitUntilVisible(recaptchaEl.value); // avoid rendering while hidden
-
   grecaptcha.ready(() => {
     // ✅ render into the element, not the string id
     const id = grecaptcha.render(recaptchaEl.value!, {
@@ -74,14 +71,14 @@ async function init() {
     });
     mainStore.SET_RECAPTCHA_WIDGET_ID(id); // id might be 0 → valid
   });
-}
+};
 
 watch(
   recaptchaEl,
   async (el) => {
     if (el) await init();
   },
-  { flush: 'post', immediate: true },
+  { flush: 'post' },
 );
 
 // if this component gets destroyed (e.g., view switch), clear id so you can re-init later

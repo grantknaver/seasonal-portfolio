@@ -1,6 +1,7 @@
 export interface CaseStudyHeader {
   text: string;
   subHeader?: string;
+  icon?: string;
 }
 
 export interface CaseStudyExpansionTopic {
