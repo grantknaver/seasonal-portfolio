@@ -1,5 +1,5 @@
 <script lang="ts" setup>
-import { ref, nextTick, watch, computed } from 'vue';
+import { ref, nextTick, watch, computed, onMounted } from 'vue';
 import { useMainStore } from '../stores/main';
 import { storeToRefs } from 'pinia';
 // import { TopicName } from '../shared/constants/topicName';
@@ -44,6 +44,11 @@ watch(isChatting, async (newChattingStatus) => {
   await mainStore.VERIFY_HUMANITY();
   if (isHuman.value) {
     if (newChattingStatus && chatLog.value.length === 0) {
+      const logItem: OALog = {
+        role: OARole.User,
+        content: [{ type: 'output_text', text: 'Please introduce yourself' }],
+      };
+      mainStore.SET_OALOG([logItem]);
       await mainStore.SEND_OALOGS();
     }
   }
@@ -61,6 +66,8 @@ watch(oaLogs, async () => {
   await nextTick();
   chatScroll.value?.setScrollPosition('vertical', 99999, 300);
 });
+
+onMounted(() => {});
 </script>
 
 <template>
@@ -77,7 +84,7 @@ watch(oaLogs, async () => {
               :text="message.text"
               :sent="message.sent"
               :stamp="message.stamp"
-              :text-color="message.sent && activeTheme === Theme.Summer ? 'black' : 'primary'"
+              text-color="primary"
               :bg-color="message.sent ? 'accent' : 'dark'"
             />
             <q-chat-message

@@ -97,6 +97,10 @@ watch(
     } catch (e) {
       console.log(e);
     }
+    if (!activeTopic.value) {
+      expandedPanel.value = TopicName.CaseStudies;
+    }
+    expandedPanel.value = activeTopic.value;
     await nextTick();
     await waitForLayout(root.value);
     dispose.value = buildAnimations(viewNow ? ViewType.Responsive : ViewType.Desktop);
