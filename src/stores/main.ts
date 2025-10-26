@@ -13,6 +13,7 @@ import { fetchRetry } from '../shared/utils/fetchRetry';
 import { safeJson } from '../shared/composables/useSafeJson';
 import { HttpError } from '../shared/errors/HttpError';
 import { useErrorNotifier } from '../shared/composables/useErrorNotifier';
+import { CaseStudies } from 'src/shared/constants/caseStudies';
 
 export const useMainStore = defineStore('main', () => {
   const activeTopic = ref<TopicName | null>(null);
@@ -44,6 +45,7 @@ export const useMainStore = defineStore('main', () => {
   const { notifyHttp, notifyGeneric } = useErrorNotifier();
   const recaptchaWidgetId = ref<number | null>();
   const containsScrollbar = ref<boolean>(false);
+  const caseStudyActiveTab = ref<CaseStudies>(CaseStudies.WeatherAndTheme);
 
   const SET_MOBILE_SCROLL_TARGET = (topicName: TopicName | null): void => {
     mobileScrollTarget.value = topicName;
@@ -75,6 +77,10 @@ export const useMainStore = defineStore('main', () => {
   };
   const SET_OALOG = (logItems: OALog[]) => {
     oaLogs.value = [...oaLogs.value, ...logItems];
+  };
+
+  const SET_CASE_STUDY_ACTIVE_TAB = (tab: CaseStudies) => {
+    caseStudyActiveTab.value = tab;
   };
   const SEND_OALOGS = async () => {
     isLoading.value = true;
@@ -185,12 +191,11 @@ export const useMainStore = defineStore('main', () => {
       clearTimeout(t);
     }
   };
-
   const HAS_SCROLLBAR = (status: boolean) => {
     containsScrollbar.value = status;
   };
-
   const SET_RECAPTCHA_WIDGET_ID = (id: number | null) => (recaptchaWidgetId.value = id);
+
   return {
     activeTopic,
     activeTheme,
@@ -205,6 +210,7 @@ export const useMainStore = defineStore('main', () => {
     recaptchaWidgetId,
     activeRecaptchaBackground,
     containsScrollbar,
+    caseStudyActiveTab,
     SET_RECAPTCHA_WIDGET_ID,
     SET_ACTIVE_TOPIC,
     SET_ACTIVE_THEME,
@@ -215,5 +221,6 @@ export const useMainStore = defineStore('main', () => {
     VERIFY_HUMANITY,
     SET_OALOG,
     HAS_SCROLLBAR,
+    SET_CASE_STUDY_ACTIVE_TAB,
   };
 });

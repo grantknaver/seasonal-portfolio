@@ -2,7 +2,6 @@
 import { ref, nextTick, watch, computed, onMounted } from 'vue';
 import { useMainStore } from '../stores/main';
 import { storeToRefs } from 'pinia';
-// import { TopicName } from '../shared/constants/topicName';
 import { QScrollArea, debounce } from 'quasar';
 import { Theme } from '../shared/constants/theme';
 import RecaptchaWidget from '../components/RecaptchaWidget.vue';
@@ -28,6 +27,7 @@ const flushLogs = debounce(async () => {
 const addToLog = async (): Promise<void | undefined> => {
   await mainStore.VERIFY_HUMANITY();
   if (isHuman.value) {
+    isChatting.value = true;
     const t = text.value.trim();
     if (!t) return;
     const logItem: OALog = {
@@ -40,89 +40,74 @@ const addToLog = async (): Promise<void | undefined> => {
   }
 };
 
-watch(isChatting, async (newChattingStatus) => {
-  await mainStore.VERIFY_HUMANITY();
-  if (isHuman.value) {
-    if (newChattingStatus && chatLog.value.length === 0) {
-      const logItem: OALog = {
-        role: OARole.User,
-        content: [{ type: 'output_text', text: 'Please introduce yourself' }],
-      };
-      mainStore.SET_OALOG([logItem]);
-      await mainStore.SEND_OALOGS();
-    }
-  }
-});
-
-watch(isHuman, async (newHumanStatus) => {
-  if (newHumanStatus) {
-    if (isChatting.value && chatLog.value.length === 0) {
-      await mainStore.SEND_OALOGS();
-    }
-  }
-});
+// watch(isHuman, async (newHumanStatus) => {
+//   if (newHumanStatus) {
+//     if (chatLog.value.length === 0) {
+//       await mainStore.SEND_OALOGS();
+//     }
+//   }
+// });
 
 watch(oaLogs, async () => {
   await nextTick();
   chatScroll.value?.setScrollPosition('vertical', 99999, 300);
 });
 
-onMounted(() => {});
+onMounted(() => console.log('onMounted', isResponsive.value));
 </script>
 
 <template>
   <div v-if="isResponsive" class="responsive-view">
-    <q-dialog v-model="dialog" backdrop-filter="contrast(40%)">
-      <q-card class="ai-chat-dialog">
-        <q-card-section class="q-pb-none">
-          <q-scroll-area ref="chatScroll" class="chat-feed q-pa-md" :visible="false" v-if="isHuman">
-            <q-chat-message
-              v-for="message in chatLog"
-              :key="message.id"
-              :name="message.name"
-              :avatar="message.sent ? '/silhouette-avatar.svg' : '/robot-avatar.svg'"
-              :text="message.text"
-              :sent="message.sent"
-              :stamp="message.stamp"
-              text-color="primary"
-              :bg-color="message.sent ? 'accent' : 'dark'"
-            />
-            <q-chat-message
-              v-if="isLoading && isHuman"
-              bg-color="secondary"
-              avatar="/robot-avatar.svg"
-            >
-              <q-spinner-dots size="2rem" />
-            </q-chat-message>
+    <q-dialog
+      v-model="dialog"
+      :maximized="isResponsive"
+      transition-show="jump-up"
+      transition-hide="jump-down"
+    >
+      <q-card class="ai-chat-dialog column no-wrap no-overflow" style="width: 100%; height: 80svh">
+        <q-card-section
+          class="q-pb-none column no-wrap no-overflow"
+          style="flex: 1 1 auto; min-height: 0"
+        >
+          <q-scroll-area
+            ref="chatScroll"
+            class="chat-feed q-pa-md"
+            :visible="false"
+            style="flex: 1 1 auto; min-height: 0; width: 100%"
+          >
           </q-scroll-area>
+
           <q-img
-            v-else
-            :style="{
-              opacity: isHuman ? 1 : 0.4,
-            }"
             src="../assets/4-season-not-authorized.png"
-          ></q-img>
-          <hr />
+            fit="cover"
+            class="no-overflow"
+            style="flex: 1 1 auto; min-height: 0; width: 100%; height: 100%"
+          />
+
+          <q-separator style="flex: 0 0 auto" />
+
           <q-input
             v-if="dialog && isHuman"
             color="dark"
-            :dark="false"
             bg-color="white"
             filled
             v-model="text"
             label="What is up?"
-            :borderless="false"
             outlined
             class="custom-input"
+            style="flex: 0 0 auto; width: 100%"
             @keypress.enter.prevent="addToLog"
           >
             <template #prepend><q-icon name="chat" /></template>
           </q-input>
-          <div v-else class="recaptcha-container q-mt-sm">
-            <span class="full-width"> <RecaptchaWidget></RecaptchaWidget></span>
+
+          <div v-else class="recaptcha-container q-mt-sm" style="flex: 0 0 auto; width: 100%">
+            <span class="full-width"><RecaptchaWidget /></span>
           </div>
         </q-card-section>
-        <q-card-actions class="q-pt-none" align="right">
+
+        <!-- Action row pinned at bottom -->
+        <q-card-actions class="q-pt-none" align="right" style="flex: 0 0 auto">
           <q-btn
             label="Close"
             color="dark"
@@ -136,7 +121,6 @@ onMounted(() => {});
     </q-dialog>
 
     <q-separator class="full-width"></q-separator>
-    <!-- <b class="q-mb-md text-center">Chat Bot:</b> -->
     <q-btn @click="dialog = !dialog" class="chat-button q-mt-md" style="background-color: #f7f8f5">
       <q-tooltip
         anchor="center middle"
@@ -150,8 +134,9 @@ onMounted(() => {});
   </div>
 
   <div v-if="!isResponsive" class="desktop-view">
-    <div class="assistant-chat full-width q-pa-lg">
-      <q-scroll-area ref="chatScroll" class="chat-feed q-pa-md" :visible="false" v-if="isHuman">
+    <div class="assistant-chat column no-wrap q-pa-lg bg-white">
+      <!-- The ONLY scrollable area -->
+      <q-scroll-area v-if="isHuman" ref="chatScroll" class="chat-feed q-pa-md">
         <q-chat-message
           v-for="message in chatLog"
           :key="message.id"
@@ -167,14 +152,16 @@ onMounted(() => {});
           <q-spinner-dots size="2rem" />
         </q-chat-message>
       </q-scroll-area>
+
       <q-img
         v-else
-        :style="{
-          opacity: isHuman ? 1 : 0.4,
-        }"
-        src="../assets/4-season-not-authorized.png"
-      ></q-img>
-      <hr />
+        src="../assets/4-season-not-authorized-2.png"
+        fit="cover"
+        class="no-overflow q-mb-sm"
+      />
+
+      <q-separator />
+
       <q-input
         v-if="isHuman"
         color="dark"
@@ -190,8 +177,9 @@ onMounted(() => {});
       >
         <template #prepend><q-icon name="chat" /></template>
       </q-input>
+
       <div v-else class="recaptcha-container q-mt-sm">
-        <RecaptchaWidget></RecaptchaWidget>
+        <RecaptchaWidget />
       </div>
     </div>
   </div>
@@ -202,57 +190,66 @@ onMounted(() => {});
 
 .responsive-view {
   .ai-chat-dialog {
-    display: none;
-    width: 100vw;
-    height: auto;
-    max-width: 400px;
-
-    .chat-button {
-      align-self: self-end;
-      margin-top: 1rem;
+    .chat-feed {
+      min-height: 0;
+      background-color: white;
+      border-radius: 5px;
+      border: 1px solid var(--q-secondary);
     }
 
     .custom-input {
       border: 1px solid var(--q-secondary);
       border-radius: 5px;
     }
+
+    .chat-button {
+      align-self: self-end;
+      margin-top: 1rem;
+    }
   }
 }
 
 .desktop-view {
   display: flex;
+  align-items: center; /* center horizontally */
+  justify-content: center; /* center vertically (optional) */
+  width: 100%;
+  padding: 16px;
+}
+
+.assistant-chat {
+  width: 100%;
+  max-width: 420px; /* pick one max width */
+  display: flex;
   flex-direction: column;
-  align-items: center;
-  width: 90%;
-  max-width: 400px;
-  max-height: 100%;
+  gap: 8px;
+  overflow: hidden; /* parents never scroll */
+  border-radius: 5px;
+  box-shadow: 5px 5px 10px var(--q-dark);
+  border: solid 1px var(--q-dark);
 
-  .assistant-chat {
-    z-index: 100;
-    background-color: var(--q-primary);
-    border: 4px solid var(--q-accent);
-    border-radius: 1rem;
-    box-shadow: 5px 5px 10px black;
-    max-height: 100%;
-    right: 8px;
-
-    .chat-feed {
-      height: 300px;
-      max-height: 300px;
-      background-color: white;
-      border-radius: 5px;
-      border: 1px solid var(--q-secondary);
-    }
-  }
-
-  .chat-button {
-    align-self: self-end;
-    margin-top: 1rem;
-  }
-
-  .custom-input {
+  /* Only this region grows and can scroll */
+  .chat-feed {
+    flex: 1 1 auto;
+    min-height: 0; /* crucial for internal scroll */
+    background: #fff;
     border: 1px solid var(--q-secondary);
-    border-radius: 5px;
+    border-radius: 10px;
+  }
+
+  /* non-scroll, fills space when not human */
+  .img-fill {
+    flex: 1 1 auto;
+    min-height: 0;
+    width: 100%;
+  }
+
+  /* footer pieces are fixed height, never scroll */
+  .custom-input,
+  .recaptcha-container {
+    flex: 0 0 auto;
+    width: 100%;
+    overflow: hidden;
   }
 }
 </style>

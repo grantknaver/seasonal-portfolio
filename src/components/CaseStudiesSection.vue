@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { setSeasonClasses } from '../shared/utils/setSeasonColors';
 import { useViewport } from '../shared/utils/viewWidth';
-import { computed, ref } from 'vue';
+import { computed, ref, watch } from 'vue';
 import { useMainStore } from '../stores/main';
 import { storeToRefs } from 'pinia';
 import CaseStudy from './CaseStudy.vue';
@@ -9,6 +9,7 @@ import { type CaseStudy as CS } from '../shared/types/caseStudy';
 import { v4 as uuidv4 } from 'uuid';
 import AIAssitant from './AIAssitant.vue';
 import { Theme } from '../shared/constants/theme';
+import { CaseStudies } from 'src/shared/constants/caseStudies';
 
 const mainStore = useMainStore();
 const { activeTheme } = storeToRefs(mainStore);
@@ -18,7 +19,7 @@ const isBelowLgBreakpoint = computed(() => useViewport().width.value < useViewpo
 const caseStudies = ref<CS[]>([
   {
     id: uuidv4(),
-    name: 'weather-and-theme',
+    name: CaseStudies.WeatherAndTheme,
     label: 'Weather',
     header: {
       text: 'GSAP Weather & Theme System',
@@ -92,7 +93,7 @@ const caseStudies = ref<CS[]>([
   },
   {
     id: uuidv4(),
-    name: 'ai-chat',
+    name: CaseStudies.AiChat,
     label: 'AI Chat',
     header: {
       text: 'AI Chat Interface',
@@ -164,7 +165,7 @@ const caseStudies = ref<CS[]>([
   },
   {
     id: uuidv4(),
-    name: 'waveform',
+    name: CaseStudies.Waveform,
     label: 'Waveform',
     header: {
       text: 'StorytAIm Waveform Visualizer',
@@ -236,7 +237,7 @@ const caseStudies = ref<CS[]>([
   },
   {
     id: uuidv4(),
-    name: 'proof',
+    name: CaseStudies.Proof,
     label: 'Proof',
     header: {
       text: 'What These Projects Prove',
@@ -292,7 +293,10 @@ const caseStudies = ref<CS[]>([
     blockquote: '',
   },
 ]);
-const tab = ref('weather-and-theme');
+const tab = ref(CaseStudies.WeatherAndTheme);
+watch(tab, (newTab) => {
+  mainStore.SET_CASE_STUDY_ACTIVE_TAB(newTab);
+});
 
 const backgroundUrl = computed(() => {
   if (activeTheme.value === Theme.Fall) {
