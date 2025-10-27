@@ -13,7 +13,7 @@ import { fetchRetry } from '../shared/utils/fetchRetry';
 import { safeJson } from '../shared/composables/useSafeJson';
 import { HttpError } from '../shared/errors/HttpError';
 import { useErrorNotifier } from '../shared/composables/useErrorNotifier';
-import { CaseStudies } from 'src/shared/constants/caseStudies';
+import { CaseStudies } from '../shared/constants/caseStudies';
 
 export const useMainStore = defineStore('main', () => {
   const activeTopic = ref<TopicName | null>(null);
@@ -170,7 +170,7 @@ export const useMainStore = defineStore('main', () => {
       clearTimeout(t);
     }
   };
-  const VERIFY_HUMANITY = async () => {
+  const VERIFY_IS_HUMAN = async () => {
     const url = new URL(`${import.meta.env.VITE_BASE_URL}/api/auth/verify-status`).toString();
     const controller = new AbortController();
     const t = setTimeout(() => controller.abort(), 6000);
@@ -184,7 +184,7 @@ export const useMainStore = defineStore('main', () => {
       const data = await res.json();
       isHuman.value = data.isHuman;
     } catch (err) {
-      console.error('[VERIFY_HUMANITY] error:', err);
+      console.error('[VERIFY_IS_HUMAN] error:', err);
       $q.notify({ type: 'negative', message: `500 - Server Error` });
       return;
     } finally {
@@ -218,7 +218,7 @@ export const useMainStore = defineStore('main', () => {
     SET_MOBILE_SCROLL_TARGET,
     SEND_OALOGS,
     VERIFY_RECAPTCHA,
-    VERIFY_HUMANITY,
+    VERIFY_IS_HUMAN,
     SET_OALOG,
     HAS_SCROLLBAR,
     SET_CASE_STUDY_ACTIVE_TAB,

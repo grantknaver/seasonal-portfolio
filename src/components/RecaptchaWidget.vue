@@ -59,7 +59,7 @@ const init = async () => {
         mainStore
           .VERIFY_RECAPTCHA(token)
           .then(async () => {
-            await mainStore.VERIFY_HUMANITY();
+            await mainStore.VERIFY_IS_HUMAN();
           })
           .catch((err) => console.error(err))
           .finally(() => {

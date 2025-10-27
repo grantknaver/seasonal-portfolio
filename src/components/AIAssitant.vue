@@ -1,5 +1,5 @@
 <script lang="ts" setup>
-import { ref, nextTick, watch, computed, onMounted } from 'vue';
+import { ref, nextTick, watch, computed } from 'vue';
 import { useMainStore } from '../stores/main';
 import { storeToRefs } from 'pinia';
 import { QScrollArea, debounce } from 'quasar';
@@ -25,7 +25,7 @@ const flushLogs = debounce(async () => {
 }, 2000);
 
 const addToLog = async (): Promise<void | undefined> => {
-  await mainStore.VERIFY_HUMANITY();
+  await mainStore.VERIFY_IS_HUMAN();
   if (isHuman.value) {
     isChatting.value = true;
     const t = text.value.trim();
@@ -52,8 +52,6 @@ watch(oaLogs, async () => {
   await nextTick();
   chatScroll.value?.setScrollPosition('vertical', 99999, 300);
 });
-
-onMounted(() => console.log('onMounted', isResponsive.value));
 </script>
 
 <template>
@@ -70,6 +68,7 @@ onMounted(() => console.log('onMounted', isResponsive.value));
           style="flex: 1 1 auto; min-height: 0"
         >
           <q-scroll-area
+            v-if="dialog && isHuman"
             ref="chatScroll"
             class="chat-feed q-pa-md"
             :visible="false"
@@ -78,6 +77,7 @@ onMounted(() => console.log('onMounted', isResponsive.value));
           </q-scroll-area>
 
           <q-img
+            v-else
             src="../assets/4-season-not-authorized.png"
             fit="cover"
             class="no-overflow"

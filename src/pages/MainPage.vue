@@ -68,7 +68,7 @@ const slides = ref<Slide[]>([
 ]);
 const { getScrollTarget, setVerticalScrollPosition } = scroll;
 const slide = ref<Theme>(Theme.Fall);
-const { activeTheme, activeTopic, mobileScrollTarget } = storeToRefs(mainStore);
+const { activeTheme, activeTopic, mobileScrollTarget, isHuman } = storeToRefs(mainStore);
 const expandedPanel = ref<TopicName | null>(TopicName.CaseStudies);
 const root = ref<HTMLElement | null>(null);
 const showFooter = ref<boolean>(false);
@@ -87,6 +87,8 @@ onMounted(async () => {
   await nextTick();
   await waitForLayout(root.value);
   dispose.value = buildAnimations(isResponsive.value ? ViewType.Responsive : ViewType.Desktop);
+  await mainStore.VERIFY_IS_HUMAN();
+  console.log('MainPage isHuman', isHuman.value);
 });
 
 watch(
