@@ -2,14 +2,6 @@
 @import 'base/typography';
 @import './quasar.variables.scss';
 
-// .q-item__section--side > .q-icon {
-//   color: var(--q-accent);
-// }
-
-// .q-item__label {
-//   color: var(--q-dark);
-// }
-
 .message textarea {
   min-height: 200px !important;
 }
@@ -17,15 +9,4 @@
 .desktop-drawer .q-scrollarea,
 .desktop-drawer .scroll-area {
   padding-right: 1.7rem;
-}
-
-.ai-chat-dialog {
-  width: 100vw;
-  height: auto;
-  max-width: 400px;
-
-  .custom-input {
-    border: 1px solid var(--q-secondary);
-    border-radius: 5px;
-  }
 }

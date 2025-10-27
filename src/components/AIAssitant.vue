@@ -62,18 +62,44 @@ watch(oaLogs, async () => {
       transition-show="jump-up"
       transition-hide="jump-down"
     >
-      <q-card class="ai-chat-dialog column no-wrap no-overflow" style="width: 100%; height: 80svh">
+      <q-card
+        class="responsive-ai-chat-dialog column no-wrap no-overflow"
+        style="width: 100%; height: 80svh; border-radius: 5px; max-width: 400px"
+      >
         <q-card-section
-          class="q-pb-none column no-wrap no-overflow"
+          class="q-pb-none column no-wrap no-overflow q-gutter-y-md"
           style="flex: 1 1 auto; min-height: 0"
         >
           <q-scroll-area
             v-if="dialog && isHuman"
             ref="chatScroll"
-            class="chat-feed q-pa-md"
-            :visible="false"
-            style="flex: 1 1 auto; min-height: 0; width: 100%"
+            class="chat-feed"
+            style="
+              flex: 1 1 auto;
+              min-height: 0;
+              width: 100%;
+              border: solid 1px var(--q-secondary);
+              border-radius: 5px;
+            "
           >
+            <q-chat-message
+              v-for="message in chatLog"
+              :key="message.id"
+              :name="message.name"
+              :avatar="message.sent ? '/silhouette-avatar.svg' : '/robot-avatar.svg'"
+              :text="message.text"
+              :sent="message.sent"
+              :stamp="message.stamp"
+              :text-color="message.sent && activeTheme === Theme.Summer ? 'black' : 'primary'"
+              :bg-color="message.sent ? 'accent' : 'dark'"
+            />
+            <q-chat-message
+              v-if="isLoading && isHuman"
+              bg-color="secondary"
+              avatar="/robot-avatar.svg"
+            >
+              <q-spinner-dots size="2rem" />
+            </q-chat-message>
           </q-scroll-area>
 
           <q-img
@@ -94,20 +120,24 @@ watch(oaLogs, async () => {
             v-model="text"
             label="What is up?"
             outlined
-            class="custom-input"
-            style="flex: 0 0 auto; width: 100%"
+            style="
+              flex: 0 0 auto;
+              width: 100%;
+              border: 1px solid var(--q-secondary);
+              border-radius: 5px;
+            "
             @keypress.enter.prevent="addToLog"
           >
             <template #prepend><q-icon name="chat" /></template>
           </q-input>
 
-          <div v-else class="recaptcha-container q-mt-sm" style="flex: 0 0 auto; width: 100%">
+          <div v-else class="recaptcha-container" style="flex: 0 0 auto; width: 100%">
             <span class="full-width"><RecaptchaWidget /></span>
           </div>
         </q-card-section>
 
         <!-- Action row pinned at bottom -->
-        <q-card-actions class="q-pt-none" align="right" style="flex: 0 0 auto">
+        <q-card-actions class="q-pt-md" align="right" style="flex: 0 0 auto">
           <q-btn
             label="Close"
             color="dark"
@@ -121,7 +151,10 @@ watch(oaLogs, async () => {
     </q-dialog>
 
     <q-separator class="full-width"></q-separator>
-    <q-btn @click="dialog = !dialog" class="chat-button q-mt-md" style="background-color: #f7f8f5">
+    <q-btn
+      @click="dialog = !dialog"
+      style="background-color: #f7f8f5; align-self: self-end; margin-top: 1rem"
+    >
       <q-tooltip
         anchor="center middle"
         self="top left"
@@ -188,25 +221,8 @@ watch(oaLogs, async () => {
 <style scoped lang="scss">
 @import '../css/main.scss';
 
-.responsive-view {
-  .ai-chat-dialog {
-    .chat-feed {
-      min-height: 0;
-      background-color: white;
-      border-radius: 5px;
-      border: 1px solid var(--q-secondary);
-    }
-
-    .custom-input {
-      border: 1px solid var(--q-secondary);
-      border-radius: 5px;
-    }
-
-    .chat-button {
-      align-self: self-end;
-      margin-top: 1rem;
-    }
-  }
+.responsive-ai-chat-dialog {
+  border-radius: 5px !important;
 }
 
 .desktop-view {
@@ -215,41 +231,41 @@ watch(oaLogs, async () => {
   justify-content: center; /* center vertically (optional) */
   width: 100%;
   padding: 16px;
-}
 
-.assistant-chat {
-  width: 100%;
-  max-width: 420px; /* pick one max width */
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
-  overflow: hidden; /* parents never scroll */
-  border-radius: 5px;
-  box-shadow: 5px 5px 10px var(--q-dark);
-  border: solid 1px var(--q-dark);
-
-  /* Only this region grows and can scroll */
-  .chat-feed {
-    flex: 1 1 auto;
-    min-height: 0; /* crucial for internal scroll */
-    background: #fff;
-    border: 1px solid var(--q-secondary);
-    border-radius: 10px;
-  }
-
-  /* non-scroll, fills space when not human */
-  .img-fill {
-    flex: 1 1 auto;
-    min-height: 0;
+  .assistant-chat {
     width: 100%;
-  }
+    max-width: 420px; /* pick one max width */
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    overflow: hidden; /* parents never scroll */
+    border-radius: 5px;
+    box-shadow: 5px 5px 10px var(--q-dark);
+    border: solid 1px var(--q-dark);
 
-  /* footer pieces are fixed height, never scroll */
-  .custom-input,
-  .recaptcha-container {
-    flex: 0 0 auto;
-    width: 100%;
-    overflow: hidden;
+    /* Only this region grows and can scroll */
+    .chat-feed {
+      flex: 1 1 auto;
+      min-height: 0; /* crucial for internal scroll */
+      background: #fff;
+      border: 1px solid var(--q-secondary);
+      border-radius: 10px;
+    }
+
+    /* non-scroll, fills space when not human */
+    .img-fill {
+      flex: 1 1 auto;
+      min-height: 0;
+      width: 100%;
+    }
+
+    /* footer pieces are fixed height, never scroll */
+    .custom-input,
+    .recaptcha-container {
+      flex: 0 0 auto;
+      width: 100%;
+      overflow: hidden;
+    }
   }
 }
 </style>
