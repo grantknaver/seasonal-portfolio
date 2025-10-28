@@ -40,13 +40,13 @@ const addToLog = async (): Promise<void | undefined> => {
   }
 };
 
-// watch(isHuman, async (newHumanStatus) => {
-//   if (newHumanStatus) {
-//     if (chatLog.value.length === 0) {
-//       await mainStore.SEND_OALOGS();
-//     }
-//   }
-// });
+watch(isHuman, async (newHumanStatus) => {
+  if (newHumanStatus) {
+    if (chatLog.value.length === 0) {
+      await mainStore.SEND_OALOGS();
+    }
+  }
+});
 
 watch(oaLogs, async () => {
   await nextTick();
@@ -63,7 +63,7 @@ watch(oaLogs, async () => {
       transition-hide="jump-down"
     >
       <q-card
-        class="responsive-ai-chat-dialog column no-wrap no-overflow"
+        class="rv-ai-chat-dialog column no-wrap no-overflow"
         style="width: 100%; height: 80svh; border-radius: 5px; max-width: 400px"
       >
         <q-card-section
@@ -73,7 +73,6 @@ watch(oaLogs, async () => {
           <q-scroll-area
             v-if="dialog && isHuman"
             ref="chatScroll"
-            class="chat-feed"
             style="
               flex: 1 1 auto;
               min-height: 0;
@@ -131,12 +130,11 @@ watch(oaLogs, async () => {
             <template #prepend><q-icon name="chat" /></template>
           </q-input>
 
-          <div v-else class="recaptcha-container" style="flex: 0 0 auto; width: 100%">
+          <div v-else style="flex: 0 0 auto; width: 100%">
             <span class="full-width"><RecaptchaWidget /></span>
           </div>
         </q-card-section>
 
-        <!-- Action row pinned at bottom -->
         <q-card-actions class="q-pt-md" align="right" style="flex: 0 0 auto">
           <q-btn
             label="Close"
@@ -167,9 +165,9 @@ watch(oaLogs, async () => {
   </div>
 
   <div v-if="!isResponsive" class="desktop-view">
-    <div class="assistant-chat column no-wrap q-pa-lg bg-white">
+    <div class="dv-ai-assistant-chat column no-wrap q-pa-lg bg-white">
       <!-- The ONLY scrollable area -->
-      <q-scroll-area v-if="isHuman" ref="chatScroll" class="chat-feed q-pa-md">
+      <q-scroll-area v-if="isHuman" ref="chatScroll" class="dv-chat-feed">
         <q-chat-message
           v-for="message in chatLog"
           :key="message.id"
@@ -185,16 +183,13 @@ watch(oaLogs, async () => {
           <q-spinner-dots size="2rem" />
         </q-chat-message>
       </q-scroll-area>
-
       <q-img
         v-else
         src="../assets/4-season-not-authorized-2.png"
         fit="cover"
-        class="no-overflow q-mb-sm"
+        class="dv-img-fill no-overflow q-mb-sm"
       />
-
       <q-separator />
-
       <q-input
         v-if="isHuman"
         color="dark"
@@ -205,13 +200,12 @@ watch(oaLogs, async () => {
         label="What is up?"
         :borderless="false"
         outlined
-        class="custom-input"
+        class="dv-input"
         @keypress.enter.prevent="addToLog"
       >
         <template #prepend><q-icon name="chat" /></template>
       </q-input>
-
-      <div v-else class="recaptcha-container q-mt-sm">
+      <div v-else class="q-mt-sm">
         <RecaptchaWidget />
       </div>
     </div>
@@ -221,7 +215,7 @@ watch(oaLogs, async () => {
 <style scoped lang="scss">
 @import '../css/main.scss';
 
-.responsive-ai-chat-dialog {
+.rv-ai-chat-dialog {
   border-radius: 5px !important;
 }
 
@@ -232,9 +226,10 @@ watch(oaLogs, async () => {
   width: 100%;
   padding: 16px;
 
-  .assistant-chat {
+  .dv-ai-assistant-chat {
     width: 100%;
-    max-width: 420px; /* pick one max width */
+    height: 500px;
+    max-width: 400px; /* pick one max width */
     display: flex;
     flex-direction: column;
     gap: 8px;
@@ -244,7 +239,7 @@ watch(oaLogs, async () => {
     border: solid 1px var(--q-dark);
 
     /* Only this region grows and can scroll */
-    .chat-feed {
+    .dv-chat-feed {
       flex: 1 1 auto;
       min-height: 0; /* crucial for internal scroll */
       background: #fff;
@@ -253,15 +248,14 @@ watch(oaLogs, async () => {
     }
 
     /* non-scroll, fills space when not human */
-    .img-fill {
+    .dv-img-fill {
       flex: 1 1 auto;
       min-height: 0;
       width: 100%;
     }
 
     /* footer pieces are fixed height, never scroll */
-    .custom-input,
-    .recaptcha-container {
+    .dv-input {
       flex: 0 0 auto;
       width: 100%;
       overflow: hidden;
