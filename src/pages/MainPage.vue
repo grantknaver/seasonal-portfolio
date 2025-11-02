@@ -44,31 +44,37 @@ const mobileTopics: Topic[] = [
     label: TopicName.Contact,
   },
 ];
+
+import autumn from 'src/assets/autumn-forestry.jpg?w=800;1280;2000&format=avif;webp;jpg&as=picture';
+import winter from 'src/assets/snowy-winter-landscape.jpg?w=800;1280;2000&format=avif;webp;jpg&as=picture';
+import spring from 'src/assets/beautiful-forest-spring-season.jpg?w=800;1280;2000&format=avif;webp;jpg&as=picture';
+import summer from 'src/assets/beach.jpg?w=800;1280;2000&format=avif;webp;jpg&as=picture';
+
 const slides = ref<Slide[]>([
   {
     id: uuidv4(),
-    src: new URL('../assets/autumn-forestry.jpg', import.meta.url).href,
+    img: autumn,
     theme: Theme.Fall,
   },
   {
     id: uuidv4(),
-    src: new URL('../assets/snowy-winter-landscape.jpg', import.meta.url).href,
+    img: winter,
     theme: Theme.Winter,
   },
   {
     id: uuidv4(),
-    src: new URL('../assets/beautiful-forest-spring-season.jpg', import.meta.url).href,
+    img: spring,
     theme: Theme.Spring,
   },
   {
     id: uuidv4(),
-    src: new URL('../assets/beach.jpg', import.meta.url).href,
+    img: summer,
     theme: Theme.Summer,
   },
 ]);
 const { getScrollTarget, setVerticalScrollPosition } = scroll;
 const slide = ref<Theme>(Theme.Fall);
-const { activeTheme, activeTopic, mobileScrollTarget, isHuman } = storeToRefs(mainStore);
+const { activeTheme, activeTopic, mobileScrollTarget } = storeToRefs(mainStore);
 const expandedPanel = ref<TopicName | null>(TopicName.CaseStudies);
 const root = ref<HTMLElement | null>(null);
 const showFooter = ref<boolean>(false);
@@ -88,7 +94,6 @@ onMounted(async () => {
   await waitForLayout(root.value);
   dispose.value = buildAnimations(isResponsive.value ? ViewType.Responsive : ViewType.Desktop);
   await mainStore.VERIFY_IS_HUMAN();
-  console.log('MainPage isHuman', isHuman.value);
 });
 
 watch(
@@ -288,7 +293,32 @@ const scrollToFooter = () => {
         class="carousel-absolute bg-dark"
         :transition-duration="2500"
       >
-        <q-carousel-slide v-for="s in slides" :key="s.id" :name="s.theme" :img-src="s.src" />
+        <q-carousel-slide
+          v-for="(s, i) in slides"
+          :key="s.id"
+          :name="s.theme"
+          class="relative-position"
+        >
+          <!-- Your custom background layer -->
+          <div class="slide-bg">
+            <picture>
+              <source
+                v-for="src in s.img.sources"
+                :key="src.type"
+                :srcset="src.srcset"
+                :type="src.type"
+              />
+              <img
+                :src="s.img.img.src"
+                :srcset="s.img.img.srcset"
+                sizes="100vw"
+                :loading="i === 0 ? 'eager' : 'lazy'"
+                decoding="async"
+                alt=""
+              />
+            </picture>
+          </div>
+        </q-carousel-slide>
       </q-carousel>
     </div>
     <div class="weather-layer">
@@ -298,7 +328,7 @@ const scrollToFooter = () => {
       <img
         class="q-pt-sm"
         style="max-width: 65px"
-        src="../assets/glkfreelance-logo.png"
+        src="../assets/glkfreelance-logo.avif"
         alt="logo"
       />
       <span class="logo-text"
@@ -634,6 +664,19 @@ const scrollToFooter = () => {
     width: 100%;
     pointer-events: none;
     overflow: hidden;
+
+    .slide-bg {
+      position: absolute;
+      inset: 0;
+      z-index: 0;
+      pointer-events: none;
+    }
+    .slide-bg img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      display: block;
+    }
   }
 
   .weather-layer {

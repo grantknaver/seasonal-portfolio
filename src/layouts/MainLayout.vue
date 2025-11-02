@@ -55,7 +55,7 @@ onBeforeUnmount(() => window.removeEventListener('resize', updateWidths));
             <img
               class="q-pt-sm"
               style="max-width: 65px"
-              src="../assets/glkfreelance-logo.png"
+              src="../assets/glkfreelance-logo.avif"
               alt="logo"
             />
             <span class="logo-text">

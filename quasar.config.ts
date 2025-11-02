@@ -2,6 +2,8 @@
 // https://v2.quasar.dev/quasar-cli-vite/quasar-config-file
 
 import { defineConfig } from '#q-app/wrappers';
+import { fileURLToPath } from 'url';
+import { imagetools } from 'vite-imagetools';
 
 export default defineConfig(() => {
   return {
@@ -84,7 +86,13 @@ export default defineConfig(() => {
           },
           { server: false },
         ],
+        imagetools(),
       ],
+
+      // alias: {
+      //   src: fileURLToPath(new URL('./src', import.meta.url)),
+      //   '@': fileURLToPath(new URL('./src', import.meta.url)),
+      // },
     },
     // Full list of options: https://v2.quasar.dev/quasar-cli-vite/quasar-config-file#devserver
     devServer: {
