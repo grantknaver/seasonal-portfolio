@@ -85,7 +85,7 @@ onMounted(() => {
       <q-card class="full-width">
         <q-card-section class="section-container q-pa-lg">
           <h1
-            class="text-h1 q-mt-none q-mb-md bg-dark text-center font-secondary"
+            class="text-h1 q-mt-none q-mb-md q-pt-md q-pb-md bg-dark text-center font-secondary"
             :class="
               setSeasonClasses(
                 {
@@ -332,7 +332,7 @@ onMounted(() => {
       <q-card class="full-width q-pa-sm">
         <q-card-section class="section-container q-pa-lg">
           <h1
-            class="text-h1 q-mt-none text-center border-black font-secondary"
+            class="text-h1 q-mt-none q-pt-md q-pb-md text-center border-black font-secondary"
             :class="
               setSeasonClasses(
                 {

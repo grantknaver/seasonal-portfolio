@@ -348,7 +348,7 @@ const backgroundUrl = computed(() => {
       "
     >
       <h1
-        class="text-h1 q-mt-none q-mb-md q-mt-md q-mb-md text-center secondary-font"
+        class="text-h1 q-mt-none q-mb-md q-pt-md q-pb-md text-center secondary-font"
         :class="
           setSeasonClasses(
             {
@@ -369,7 +369,7 @@ const backgroundUrl = computed(() => {
           )
         "
       >
-        Case caseStudies
+        Case Studies
       </h1>
       <q-separator color="dark" class="q-mb-md" />
       <p
@@ -494,7 +494,7 @@ const backgroundUrl = computed(() => {
       "
     >
       <h1
-        class="text-h1 q-mt-none q-mb-md text-center secondary-font"
+        class="text-h1 q-mt-none q-mb-md q-pt-md q-pb-md text-center secondary-font"
         :class="
           setSeasonClasses(
             {
@@ -515,7 +515,7 @@ const backgroundUrl = computed(() => {
           )
         "
       >
-        Case caseStudies
+        Case Studies
       </h1>
       <p
         class="case-caseStudies-description text-body-1 text-bold text-center primary-font"

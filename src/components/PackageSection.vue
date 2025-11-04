@@ -184,7 +184,7 @@ onMounted(() => {
           "
         >
           <h1
-            class="text-h1 q-mt-none q-mb-md q-mt-md q-mb-md bg-dark text-center"
+            class="text-h1 q-mt-none q-mb-md q-mb-md q-pt-md q-pb-md bg-dark text-center"
             :class="
               setSeasonClasses(
                 {
@@ -379,7 +379,7 @@ onMounted(() => {
         "
       >
         <h1
-          class="text-h1 q-mt-none text-center"
+          class="text-h1 q-mt-none q-pt-md q-pb-md text-center"
           :class="
             setSeasonClasses(
               {
