@@ -1,5 +1,5 @@
 <script lang="ts" setup>
-import { computed, ref, watch } from 'vue';
+import { computed, ref, watch, onMounted } from 'vue';
 import { v4 as uuidv4 } from 'uuid';
 import { useMainStore } from '../stores/main';
 import { storeToRefs } from 'pinia';
@@ -28,6 +28,7 @@ import growthSummer from 'src/assets/growth-summer.png?w=300;500;900&format=avif
 import premiumSummer from 'src/assets/premium-summer.png?w=300;500;900&format=avif;webp;png&as=picture';
 
 import { mdiCheckboxBlankCircle } from '@quasar/extras/mdi-v7';
+import { debounce } from 'quasar';
 
 const mainStore = useMainStore();
 const { activeTheme } = storeToRefs(mainStore);
@@ -137,13 +138,12 @@ const packages = ref<PackageDetails[]>([
 const { lgBreakpoint, width } = useViewport();
 const isResponsive = computed(() => width.value < lgBreakpoint);
 
-watch(activeTheme, (newTheme) => {
+const setActiveAssets = (newTheme: Theme) => {
   const activeThemePackageImages = getPackageImages(newTheme);
   const theme = newTheme.toLowerCase();
   const updatedPackages = packages.value.map((p) => {
     const name = p.name.toLowerCase().replace(' ', '').replace('package', '') as PackageType;
     const img = activeThemePackageImages[name];
-    console.log('img', img);
     return {
       ...p,
       src: new URL(`../assets/${name}-${theme}.png`, import.meta.url).href,
@@ -151,6 +151,16 @@ watch(activeTheme, (newTheme) => {
     };
   });
   packages.value = updatedPackages;
+};
+
+watch(activeTheme, (newTheme) => setActiveAssets(newTheme));
+
+onMounted(() => {
+  const onResize = debounce(() => {
+    setActiveAssets(activeTheme.value);
+  }, 500);
+
+  window.addEventListener('resize', onResize);
 });
 </script>
 
