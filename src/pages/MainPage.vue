@@ -20,27 +20,35 @@ import { ViewType } from '../shared/constants/viewType';
 import { useViewport } from '../shared/utils/viewWidth';
 import { waitForLayout } from 'src/shared/utils/waitForLayout';
 import { flattenElements } from '../shared/utils/flattenElements';
+import {
+  mdiChevronUp,
+  mdiBookOpenPageVariant,
+  mdiTruckDelivery,
+  mdiInformationOutline,
+  mdiEmailBox,
+} from '@quasar/extras/mdi-v7';
+import { mdiChevronDown } from '@quasar/extras/mdi-v7';
 
 const mainStore = useMainStore();
 const mobileTopics: Topic[] = [
   {
     id: uuidv4(),
     name: TopicName.CaseStudies,
-    icon: 'menu_book',
+    icon: mdiBookOpenPageVariant,
     label: TopicName.CaseStudies,
   },
-  { id: uuidv4(), name: TopicName.Packages, icon: 'local_shipping', label: 'Packages' },
+  { id: uuidv4(), name: TopicName.Packages, icon: mdiTruckDelivery, label: 'Packages' },
   {
     id: uuidv4(),
     name: TopicName.About,
-    icon: 'info',
+    icon: mdiInformationOutline,
     label: TopicName.About,
   },
 
   {
     id: uuidv4(),
     name: TopicName.Contact,
-    icon: 'contact_mail',
+    icon: mdiEmailBox,
     label: TopicName.Contact,
   },
 ];
@@ -634,7 +642,7 @@ const scrollToFooter = () => {
           id="showFooterBtn"
           round
           color="accent"
-          :icon="!showFooter ? 'south' : 'north'"
+          :icon="!showFooter ? mdiChevronUp : mdiChevronDown"
           class="q-px-sm"
           @click="scrollToFooter"
           aria-label="Scroll to footer"
@@ -726,6 +734,7 @@ const scrollToFooter = () => {
     }
 
     /* ---------- Mobile / NotDesktop ---------- */
+
     .responsive-view {
       height: auto;
       max-width: 800px;

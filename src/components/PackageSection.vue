@@ -7,14 +7,72 @@ import { setSeasonClasses } from '../shared/utils/setSeasonColors';
 import { Packages } from '../shared/constants/packages';
 import { type PackageDetails } from '../shared/types/packageDetails';
 import { useViewport } from '../shared/utils/viewWidth';
+import { Theme } from 'src/shared/constants/theme';
+import { type ThemePackageImages } from 'src/shared/types/themePackageImages';
+import type { PackageType } from 'src/shared/types/packageType';
+
+import starterFall from 'src/assets/starter-fall.png?w=300;600;900&format=avif;webp;png&as=picture';
+import growthFall from 'src/assets/growth-fall.png?w=300;500;900&format=avif;webp;png&as=picture';
+import premiumFall from 'src/assets/premium-fall.png?w=300;500;900&format=avif;webp;png&as=picture';
+
+import starterWinter from 'src/assets/starter-winter.png?w=300;500;900&format=avif;webp;png&as=picture';
+import growthWinter from 'src/assets/growth-winter.png?w=300;500;900&format=avif;webp;png&as=picture';
+import premiumWinter from 'src/assets/premium-winter.png?w=300;500;900&format=avif;webp;png&as=picture';
+
+import starterSpring from 'src/assets/starter-spring.png?w=300;500;900&format=avif;webp;png&as=picture';
+import growthSpring from 'src/assets/growth-spring.png?w=300;500;900&format=avif;webp;png&as=picture';
+import premiumSpring from 'src/assets/premium-spring.png?w=300;500;900&format=avif;webp;png&as=picture';
+
+import starterSummer from 'src/assets/starter-summer.png?w=300;500;900&format=avif;webp;png&as=picture';
+import growthSummer from 'src/assets/growth-summer.png?w=300;500;900&format=avif;webp;png&as=picture';
+import premiumSummer from 'src/assets/premium-summer.png?w=300;500;900&format=avif;webp;png&as=picture';
+
+import { mdiCheckboxBlankCircle } from '@quasar/extras/mdi-v7';
 
 const mainStore = useMainStore();
 const { activeTheme } = storeToRefs(mainStore);
+
+const getPackageImages = (theme: Theme): ThemePackageImages => {
+  switch (theme) {
+    case Theme.Fall:
+      return {
+        starter: starterFall,
+        growth: growthFall,
+        premium: premiumFall,
+      };
+    case Theme.Winter:
+      return {
+        starter: starterWinter,
+        growth: growthWinter,
+        premium: premiumWinter,
+      };
+    case Theme.Spring:
+      return {
+        starter: starterSpring,
+        growth: growthSpring,
+        premium: premiumSpring,
+      };
+    case Theme.Summer:
+      return {
+        starter: starterSummer,
+        growth: growthSummer,
+        premium: premiumSummer,
+      };
+
+    default:
+      return {
+        starter: starterFall,
+        growth: growthFall,
+        premium: premiumFall,
+      };
+  }
+};
+
 const packages = ref<PackageDetails[]>([
   {
     name: Packages.StarterPackage,
     id: uuidv4(),
-    src: new URL('../assets/starter-fall.png', import.meta.url).href,
+    img: starterFall,
     alt: Packages.StarterPackage,
     featuresHeader: 'For new ideas ready to break ground.',
     features: [
@@ -35,7 +93,7 @@ const packages = ref<PackageDetails[]>([
   {
     name: Packages.GrowthPackage,
     id: uuidv4(),
-    src: new URL('../assets/growth-fall.png', import.meta.url).href,
+    img: growthFall,
     alt: Packages.GrowthPackage,
     featuresHeader: 'For projects ready to scale and stand out.',
     features: [
@@ -56,7 +114,7 @@ const packages = ref<PackageDetails[]>([
   {
     name: Packages.PremiumPackage,
     id: uuidv4(),
-    src: new URL('../assets/premium-fall.png', import.meta.url).href,
+    img: premiumFall,
     alt: Packages.PremiumPackage,
     featuresHeader: 'For full bloom launches that need maximum impact.',
     features: [
@@ -78,14 +136,18 @@ const packages = ref<PackageDetails[]>([
 ]);
 const { lgBreakpoint, width } = useViewport();
 const isResponsive = computed(() => width.value < lgBreakpoint);
-// const isBelowLgBreakpoint = computed(() => useViewport().width.value < useViewport().lgBreakpoint);
+
 watch(activeTheme, (newTheme) => {
+  const activeThemePackageImages = getPackageImages(newTheme);
   const theme = newTheme.toLowerCase();
   const updatedPackages = packages.value.map((p) => {
-    const name = p.name.toLowerCase().replace(' ', '').replace('package', '');
+    const name = p.name.toLowerCase().replace(' ', '').replace('package', '') as PackageType;
+    const img = activeThemePackageImages[name];
+    console.log('img', img);
     return {
       ...p,
       src: new URL(`../assets/${name}-${theme}.png`, import.meta.url).href,
+      img,
     };
   });
   packages.value = updatedPackages;
@@ -112,7 +174,7 @@ watch(activeTheme, (newTheme) => {
           "
         >
           <h1
-            class="text-h1-alt q-mt-none q-mb-md bg-dark text-center"
+            class="text-h1 q-mt-none q-mb-md q-mt-md q-mb-md bg-dark text-center"
             :class="
               setSeasonClasses(
                 {
@@ -168,7 +230,7 @@ watch(activeTheme, (newTheme) => {
             :separator="true"
             class="package-tile full-width q-pa-md bg-white q-mb-none no-border"
           >
-            <div class="h2-container row justify-center q-mb-lg text-center bg-accent text-white">
+            <div class="h2-container row justify-center q-mb-md text-center bg-accent text-white">
               <h2 class="text-h2">{{ packages[0]?.name }}</h2>
             </div>
 
@@ -179,7 +241,29 @@ watch(activeTheme, (newTheme) => {
             </div>
             <div class="cta-container column">
               <div class="img-container column full-width items-center bg-primary">
-                <img class="full-width q-pa-lg" :src="packages[0]?.src" />
+                <picture
+                  :class="{
+                    'responsive-fall-img': activeTheme === Theme.Fall,
+                    'responsive-winter-img': activeTheme === Theme.Winter,
+                    'responsive-spring-img': activeTheme === Theme.Spring,
+                    'responsive-summer-img': activeTheme === Theme.Summer,
+                  }"
+                >
+                  <source
+                    :type="packages[0]?.img.sources[0]?.type"
+                    :srcset="packages[0]?.img.sources[0]?.srcset"
+                  />
+                  <img
+                    :src="packages[0]?.img.img.src"
+                    :srcset="packages[0]?.img.img.srcset"
+                    :width="packages[0]?.img.img.width"
+                    :height="packages[0]?.img.img.height"
+                    :alt="packages[0]?.name"
+                    loading="eager"
+                    decoding="async"
+                  />
+                </picture>
+                <!-- <img class="full-width q-pa-lg" :src="packages[0]?.src" /> -->
               </div>
               <br />
               <q-btn size="lg" color="accent" class="q-mb-md">Consultation</q-btn>
@@ -187,7 +271,7 @@ watch(activeTheme, (newTheme) => {
             <q-item v-for="(f, index) in packages[0]?.features" :key="index">
               <span class="row full-width q-pa-none">
                 <q-item-section side>
-                  <q-icon name="circle" size=".5rem" class="text-dark" />
+                  <q-icon :name="mdiCheckboxBlankCircle" size=".5rem" class="text-dark" />
                 </q-item-section>
                 <q-item-section class="package-feature text-body-2 text-black">
                   {{ f.text }}
@@ -210,7 +294,7 @@ watch(activeTheme, (newTheme) => {
             <div
               class="package-tile full-width q-pa-md bg-white q-mb-none no-border rounded-borders"
             >
-              <div class="h2-container row justify-center q-mb-lg text-center bg-accent text-white">
+              <div class="h2-container row justify-center q-mb-md text-center bg-accent text-white">
                 <h2 class="text-h2">{{ p.name }}</h2>
               </div>
 
@@ -222,7 +306,23 @@ watch(activeTheme, (newTheme) => {
 
               <div class="cta-container column">
                 <div class="img-container column full-width items-center bg-primary">
-                  <img class="full-width q-pa-lg" :src="p.src" />
+                  <picture>
+                    <source
+                      v-for="(s, si) in p.img.sources"
+                      :key="si"
+                      :type="s.type"
+                      :srcset="s.srcset"
+                    />
+                    <img
+                      :src="p?.img.img.src"
+                      :srcset="p?.img.img.srcset"
+                      :width="p?.img.img.width"
+                      :height="p?.img.img.height"
+                      :alt="p?.name"
+                      loading="eager"
+                      decoding="async"
+                    />
+                  </picture>
                 </div>
                 <br />
                 <q-btn size="lg" color="accent" class="q-mb-md">Consultation</q-btn>
@@ -231,7 +331,7 @@ watch(activeTheme, (newTheme) => {
                 <q-item v-for="(f, index) in p.features" :key="index">
                   <span class="row full-width q-pa-none">
                     <q-item-section side>
-                      <q-icon name="circle" size=".5rem" class="text-dark" />
+                      <q-icon :name="mdiCheckboxBlankCircle" size=".5rem" class="text-dark" />
                     </q-item-section>
                     <q-item-section class="package-feature text-body-2 text-black">
                       {{ f.text }}
@@ -342,14 +442,35 @@ watch(activeTheme, (newTheme) => {
                   >
                     <q-card class="header-content full-width bg-dark">
                       <q-card-section class="text-primary">
-                        {{ p.tagline }} - {{ packages.length }}
+                        {{ p.tagline }}
                       </q-card-section>
                     </q-card>
                   </q-expansion-item>
 
                   <div class="column no-wrap items-center q-mb-none q-pa-md border rounded-borders">
                     <div class="img-container column justify-center items-center bg-primary">
-                      <img class="full-width q-pa-lg" :src="p.src" />
+                      <picture
+                        :class="{
+                          'desktop-fall-img': activeTheme === Theme.Fall,
+                          'desktop-winter-img': activeTheme === Theme.Winter,
+                          'desktop-spring-img': activeTheme === Theme.Spring,
+                          'desktop-summer-img': activeTheme === Theme.Summer,
+                        }"
+                      >
+                        <source
+                          v-for="(s, si) in p.img.sources"
+                          :key="si"
+                          :type="s.type"
+                          :srcset="s.srcset"
+                        />
+                        <img
+                          :src="p?.img.img.src"
+                          :srcset="p?.img.img.srcset"
+                          :alt="p?.name"
+                          :loading="index === 0 ? 'eager' : 'lazy'"
+                          decoding="async"
+                        />
+                      </picture>
                     </div>
                     <q-btn color="accent" class="q-mt-md full-width">Consultation</q-btn>
                   </div>
@@ -363,7 +484,7 @@ watch(activeTheme, (newTheme) => {
                   <q-item v-for="(f, index) in p.features" :key="index">
                     <span class="row full-width q-pa-none">
                       <q-item-section side>
-                        <q-icon name="circle" size=".5rem" class="text-dark" />
+                        <q-icon :name="mdiCheckboxBlankCircle" size="8px" class="text-dark" />
                       </q-item-section>
                       <q-item-section class="text-body-2 text-dark">
                         {{ f.text }}
@@ -508,16 +629,71 @@ watch(activeTheme, (newTheme) => {
               width: auto; /* don’t force 100% width */
               height: auto; /* preserve aspect ratio */
               object-fit: contain; /* fit entirely within the box */
-              border: 2px solid var(--q-accent);
-            }
-
-            .q-btn {
-              border-top: 5px solid white;
             }
           }
         }
       }
     }
+  }
+}
+
+.responsive-fall-img {
+  width: 90%;
+  max-width: 450px;
+  @media (min-width: $breakpoint-md) {
+    max-width: 600px;
+  }
+}
+
+.responsive-winter-img {
+  width: 90%;
+  max-width: 450px;
+  @media (min-width: $breakpoint-md) {
+    max-width: 600px;
+  }
+}
+
+.responsive-spring-img {
+  width: 90%;
+  max-width: 450px;
+  @media (min-width: $breakpoint-md) {
+    max-width: 600px;
+  }
+}
+
+.responsive-summer-img {
+  width: 90%;
+  max-width: 450px;
+  @media (min-width: $breakpoint-md) {
+    max-width: 600px;
+  }
+}
+// ------------------------------
+.desktop-fall-img {
+  max-width: 200px;
+  @media (min-width: $breakpoint-xl) {
+    max-width: 250px;
+  }
+}
+
+.desktop-winter-img {
+  max-width: 150px;
+  @media (min-width: $breakpoint-xl) {
+    background-color: transparent;
+  }
+}
+
+.desktop-spring-img {
+  max-width: 150px;
+  @media (min-width: $breakpoint-xl) {
+    background-color: transparent;
+  }
+}
+
+.desktop-summer-img {
+  max-width: 200px;
+  @media (min-width: $breakpoint-xl) {
+    background-color: transparent;
   }
 }
 </style>

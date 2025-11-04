@@ -8,6 +8,7 @@ import RecaptchaWidget from '../components/RecaptchaWidget.vue';
 import { OARole } from 'src/shared/types/oaRole';
 import type OALog from 'src/shared/types/oaLog';
 import { useViewport } from 'src/shared/utils/viewWidth';
+import { mdiChat } from '@quasar/extras/mdi-v7';
 
 const mainStore = useMainStore();
 const { activeAiAssistLogo, chatLog, activeTheme, isHuman, oaLogs, isLoading } =
@@ -127,7 +128,7 @@ watch(oaLogs, async () => {
             "
             @keypress.enter.prevent="addToLog"
           >
-            <template #prepend><q-icon name="chat" /></template>
+            <template #prepend><q-icon :name="mdiChat" /></template>
           </q-input>
 
           <div v-else style="flex: 0 0 auto; width: 100%">
@@ -185,7 +186,7 @@ watch(oaLogs, async () => {
       </q-scroll-area>
       <q-img
         v-else
-        src="../assets/4-season-not-authorized-2.png"
+        src="../assets/4-season-not-authorized-2.avif"
         fit="cover"
         class="dv-img-fill no-overflow q-mb-sm"
       />
@@ -203,7 +204,7 @@ watch(oaLogs, async () => {
         class="dv-input"
         @keypress.enter.prevent="addToLog"
       >
-        <template #prepend><q-icon name="chat" /></template>
+        <template #prepend><q-icon :name="mdiChat" /></template>
       </q-input>
       <div v-else class="q-mt-sm">
         <RecaptchaWidget />

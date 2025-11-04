@@ -3,6 +3,7 @@ import { ref, onMounted } from 'vue';
 import { useMainStore } from '../stores/main';
 import RecaptchaWidget from './RecaptchaWidget.vue';
 import { storeToRefs } from 'pinia';
+import { mdiAccount, mdiEmailOutline } from '@quasar/extras/mdi-v7';
 
 // const FORMSPREE_ENDPOINT = 'https://formspree.io/f/your_form_id'; // <-- replace with your actual Formspree endpoint (e.g., https://formspree.io/f/abcd1234)
 // If you're actually using Formsubmit instead, use:
@@ -173,7 +174,7 @@ const sendEmail = async () => {
         required
         :disable="!isHuman"
       >
-        <template #prepend><q-icon name="person" /></template>
+        <template #prepend><q-icon :name="mdiAccount" /></template>
       </q-input>
 
       <q-input
@@ -186,7 +187,7 @@ const sendEmail = async () => {
         required
         :disable="!isHuman"
       >
-        <template #prepend><q-icon name="email" /></template>
+        <template #prepend><q-icon :name="mdiEmailOutline" /></template>
       </q-input>
 
       <q-input

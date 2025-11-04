@@ -5,6 +5,12 @@ import { useMainStore } from '../stores/main';
 import { type Topic } from '../shared/types/topic';
 import { v4 as uuidv4 } from 'uuid';
 import { storeToRefs } from 'pinia';
+import {
+  mdiPackageVariantClosed,
+  mdiInformation,
+  mdiEmailOutline,
+  mdiBookOpenPageVariant,
+} from '@quasar/extras/mdi-v7';
 
 const mainStore = useMainStore();
 const { activeTopic } = storeToRefs(mainStore);
@@ -12,25 +18,25 @@ const topics: Topic[] = [
   {
     id: uuidv4(),
     name: TopicName.Packages,
-    icon: 'inventory',
+    icon: mdiPackageVariantClosed,
     label: 'Packages',
   },
   {
     id: uuidv4(),
     name: TopicName.About,
-    icon: 'info',
+    icon: mdiInformation,
     label: TopicName.About,
   },
   {
     id: uuidv4(),
     name: TopicName.Contact,
-    icon: 'mail',
+    icon: mdiEmailOutline,
     label: TopicName.Contact,
   },
   {
     id: uuidv4(),
     name: TopicName.CaseStudies.replace(' ', '') as TopicName,
-    icon: 'menu_book',
+    icon: mdiBookOpenPageVariant,
     label: TopicName.CaseStudies,
   },
 ];

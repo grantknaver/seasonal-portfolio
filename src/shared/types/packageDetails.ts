@@ -1,9 +1,10 @@
 import { type Packages } from '../constants/packages';
+import { type PictureData } from './pictureData';
 
 export interface PackageDetails {
   name: Packages;
   id: string;
-  src: string;
+  img: PictureData;
   alt: Packages;
   featuresHeader: string;
   features: FeatureIcon[];

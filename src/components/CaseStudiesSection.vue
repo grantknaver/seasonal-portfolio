@@ -10,6 +10,23 @@ import { v4 as uuidv4 } from 'uuid';
 import AIAssitant from './AIAssitant.vue';
 import { Theme } from '../shared/constants/theme';
 import { CaseStudies } from 'src/shared/constants/caseStudies';
+import {
+  mdiMotionPlay,
+  mdiViewDashboard,
+  mdiBoxingGlove,
+  mdiWeatherSunny,
+  mdiAnimation,
+  mdiLayers,
+  mdiBrain,
+  mdiWhiteBalanceSunny,
+  mdiRobotOutline,
+  mdiTimeline,
+  mdiChartAreaspline,
+  mdiPalette,
+  mdiTrophy,
+  mdiSyncAlert,
+  mdiAutoFix,
+} from '@quasar/extras/mdi-v7';
 
 const mainStore = useMainStore();
 const { activeTheme } = storeToRefs(mainStore);
@@ -24,14 +41,14 @@ const caseStudies = ref<CS[]>([
     header: {
       text: 'GSAP Weather & Theme System',
       subHeader: 'Dynamic seasonal motion meets engineering precision.',
-      icon: 'motion_photos_on',
+      icon: mdiMotionPlay,
     },
     expansionTopics: {
       topics: [
         {
           id: uuidv4(),
           name: 'weather-and-theme-overview',
-          icon: 'dashboard',
+          icon: mdiViewDashboard,
           label: 'Overview',
           text: 'A custom GSAP + Vue 3 system that dynamically shifts backgrounds, colors, and animation sequences based on real-time weather or time-of-day conditions.',
           hasSeparator: false,
@@ -39,7 +56,7 @@ const caseStudies = ref<CS[]>([
         {
           id: uuidv4(),
           name: 'weather-and-theme-challenge',
-          icon: 'sports_mma',
+          icon: mdiBoxingGlove,
           label: 'Challenge',
           text: 'Most animation libraries break when Vue’s reactivity and lifecycle rebuilds occur (especially on resize or layout shift). Ac',
           hasSeparator: false,
@@ -56,17 +73,17 @@ const caseStudies = ref<CS[]>([
           list: [
             {
               id: uuidv4(),
-              icon: 'wb_sunny',
+              icon: mdiWeatherSunny,
               text: 'Engineered a responsive GSAP orchestration system using context() and matchMedia() for adaptive breakpoints.',
             },
             {
               id: uuidv4(),
-              icon: 'animation',
+              icon: mdiAnimation,
               text: 'Automated animation rebuilds on viewport resize.',
             },
             {
               id: uuidv4(),
-              icon: 'layers',
+              icon: mdiLayers,
               text: 'Layered parallax + ambient effects tied to weather and theme data.',
             },
           ],
@@ -98,14 +115,14 @@ const caseStudies = ref<CS[]>([
     header: {
       text: 'AI Chat Interface',
       subHeader: 'Conversational intelligence with motion clarity.',
-      icon: 'psychology_alt',
+      icon: mdiBrain,
     },
     expansionTopics: {
       topics: [
         {
           id: uuidv4(),
           name: 'ai-chat-overview',
-          icon: 'dashboard',
+          icon: mdiViewDashboard,
           label: 'Overview:',
           text: 'AI interfaces often feel sterile — fast responses but no sense of pacing, emotion, or engagement. The goal was to build a frontend that feels human through subtle motion cues.',
           hasSeparator: false,
@@ -113,7 +130,7 @@ const caseStudies = ref<CS[]>([
         {
           id: uuidv4(),
           name: 'ai-chat-challenge',
-          icon: 'sports_mma',
+          icon: mdiBoxingGlove,
           label: 'Challenge:',
           text: 'Most animation libraries break when Vue’s reactivity and lifecycle rebuilds occur (especially on resize or layout shift). Achieving <i>fluid, context-aware motion</i> without memory leaks or stale timelines required deep integration between GSAP context lifecycles and Vue composables.',
           hasSeparator: false,
@@ -130,17 +147,17 @@ const caseStudies = ref<CS[]>([
           list: [
             {
               id: uuidv4(),
-              icon: 'light_mode',
+              icon: mdiWhiteBalanceSunny,
               text: 'Designed a GSAP timeline for message reveal, typing, and bounce effects.',
             },
             {
               id: uuidv4(),
-              icon: 'smart_toy',
+              icon: mdiRobotOutline,
               text: 'Integrated securely with an AI backend (OpenAI API + server proxy).',
             },
             {
               id: uuidv4(),
-              icon: 'layers',
+              icon: mdiLayers,
               text: 'Responsive and keyboard-optimized layout with light/dark modes.',
             },
           ],
@@ -170,14 +187,14 @@ const caseStudies = ref<CS[]>([
     header: {
       text: 'StorytAIm Waveform Visualizer',
       subHeader: 'Turning AI narration into living motion.',
-      icon: 'timeline',
+      icon: mdiTimeline,
     },
     expansionTopics: {
       topics: [
         {
           id: uuidv4(),
           name: 'waveform-overview',
-          icon: 'dashboard',
+          icon: mdiViewDashboard,
           label: 'Overview:',
           text: 'A waveform visualizer built for the StorytAIm project — animating live audio output from AI narration.',
           hasSeparator: false,
@@ -185,7 +202,7 @@ const caseStudies = ref<CS[]>([
         {
           id: uuidv4(),
           name: 'waveform-challenge',
-          icon: 'sports_mma',
+          icon: mdiBoxingGlove,
           label: 'Challenge:',
           text: 'Voice synthesis creates continuous audio streams, but standard waveform tools are static or laggy. The task was to create a real-time visualization that reacts perfectly in sync with generated speech.',
           hasSeparator: false,
@@ -202,17 +219,17 @@ const caseStudies = ref<CS[]>([
           list: [
             {
               id: uuidv4(),
-              icon: 'graphic_eq',
+              icon: mdiChartAreaspline,
               text: 'Implemented GSAP-driven bar animations synced to audio amplitude data.',
             },
             {
               id: uuidv4(),
-              icon: 'animation',
+              icon: mdiAnimation,
               text: 'Designed scalable SVG components for smooth motion on all breakpoints.',
             },
             {
               id: uuidv4(),
-              icon: 'palette',
+              icon: mdiPalette,
               text: 'Added color theming per character or emotion tag (for StorytAIm use case).',
             },
           ],
@@ -243,7 +260,7 @@ const caseStudies = ref<CS[]>([
       text: 'What These Projects Prove',
       subHeader:
         'Each of these builds highlights one core idea: interactivity as emotion. They aren’t just technically solid — they’re experiences that invite curiosity and delight.',
-      icon: 'emoji_events',
+      icon: mdiTrophy,
     },
     listTopics: {
       topics: [
@@ -253,22 +270,22 @@ const caseStudies = ref<CS[]>([
           header: 'Together, they show:',
           list: [
             {
-              icon: 'sync_problem',
+              icon: mdiSyncAlert,
               text: 'Advanced GSAP–Vue lifecycle mastery',
               id: uuidv4(),
             },
             {
-              icon: 'smart_toy',
+              icon: mdiRobotOutline,
               text: 'Real AI integrations in production-ready UIs',
               id: uuidv4(),
             },
             {
-              icon: 'timeline',
+              icon: mdiTimeline,
               text: 'Responsive, data-driven motion systems',
               id: uuidv4(),
             },
             {
-              icon: 'auto_awesome',
+              icon: mdiAutoFix,
               text: 'Design and engineering unified through storytelling',
               id: uuidv4(),
             },
@@ -331,7 +348,7 @@ const backgroundUrl = computed(() => {
       "
     >
       <h1
-        class="text-h1 q-mt-none q-mb-md text-center secondary-font"
+        class="text-h1 q-mt-none q-mb-md q-mt-md q-mb-md text-center secondary-font"
         :class="
           setSeasonClasses(
             {

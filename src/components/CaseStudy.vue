@@ -44,10 +44,10 @@ const props = defineProps({
 });
 
 const cardBackgrounds = {
-  [Theme.Fall]: new URL('../assets/case-study-fall-bcg.png', import.meta.url).href,
-  [Theme.Winter]: new URL('../assets/case-study-winter-bcg.png', import.meta.url).href,
-  [Theme.Spring]: new URL('../assets/case-study-spring-bcg.png', import.meta.url).href,
-  [Theme.Summer]: new URL('../assets/case-study-summer-bcg.png', import.meta.url).href,
+  [Theme.Fall]: new URL('../assets/case-study-fall-bcg.avif', import.meta.url).href,
+  [Theme.Winter]: new URL('../assets/case-study-winter-bcg.avif', import.meta.url).href,
+  [Theme.Spring]: new URL('../assets/case-study-spring-bcg.avif', import.meta.url).href,
+  [Theme.Summer]: new URL('../assets/case-study-summer-bcg.avif', import.meta.url).href,
 };
 </script>
 

@@ -2,7 +2,6 @@
 // https://v2.quasar.dev/quasar-cli-vite/quasar-config-file
 
 import { defineConfig } from '#q-app/wrappers';
-import { fileURLToPath } from 'url';
 import { imagetools } from 'vite-imagetools';
 
 export default defineConfig(() => {
@@ -25,13 +24,13 @@ export default defineConfig(() => {
     extras: [
       // 'ionicons-v4',
       // 'mdi-v7',
-      'fontawesome-v6',
+      // 'fontawesome-v6',
       // 'eva-icons',
       // 'themify',
       // 'line-awesome',
       // 'roboto-font-latin-ext', // this or either 'roboto-font', NEVER both!
-      'roboto-font', // optional, you are not bound to it
-      'material-icons', // optional, you are not bound to it
+      // 'roboto-font', // optional, you are not bound to it
+      // 'material-icons', // optional, you are not bound to it
     ],
     // Full list of options: https://v2.quasar.dev/quasar-cli-vite/quasar-config-file#build
     build: {
@@ -142,9 +141,9 @@ export default defineConfig(() => {
       //
       // components: [],
       // directives: [],
-      iconSet: 'fontawesome-v6', // 👈 Put inside framework
       // Quasar plugins
       plugins: ['Notify'],
+      iconSet: 'svg-mdi-v7',
     },
 
     // animations: 'all', // --- includes all animations
