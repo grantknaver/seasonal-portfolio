@@ -5,21 +5,26 @@ import { type Topic } from '../shared/types/topic';
 import { v4 as uuidv4 } from 'uuid';
 import { storeToRefs } from 'pinia';
 import { TopicName } from '../shared/constants/topicName';
-import AboutSection from '../components/AboutSection.vue';
-import ContactSection from '../components/ContactSection.vue';
-import PackageSection from '../components/PackageSection.vue';
 import { setSeasonClasses } from '../shared/utils/setSeasonColors';
 import SimonMenu from '../components/SimonMenu.vue';
-import CaseStudiesSection from '../components/CaseStudiesSection.vue';
 import { type Slide } from '../shared/types/slide';
 import { QCarousel, scroll } from 'quasar';
 import { Theme } from '../shared/constants/theme';
-import WeatherBackground from '../components/WeatherBackground.vue';
 import gsap from 'gsap';
 import { ViewType } from '../shared/constants/viewType';
 import { useViewport } from '../shared/utils/viewWidth';
 import { waitForLayout } from 'src/shared/utils/waitForLayout';
 import { flattenElements } from '../shared/utils/flattenElements';
+
+import { defineAsyncComponent } from 'vue';
+
+const AboutSection = defineAsyncComponent(() => import('../components/AboutSection.vue'));
+const ContactSection = defineAsyncComponent(() => import('../components/ContactSection.vue'));
+const PackageSection = defineAsyncComponent(() => import('../components/PackageSection.vue'));
+const CaseStudiesSection = defineAsyncComponent(
+  () => import('../components/CaseStudiesSection.vue'),
+);
+const WeatherBackground = defineAsyncComponent(() => import('../components/WeatherBackground.vue'));
 import {
   mdiChevronUp,
   mdiBookOpenPageVariant,

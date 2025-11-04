@@ -4,7 +4,10 @@ import { useViewport } from '../shared/utils/viewWidth';
 import { computed, ref, watch } from 'vue';
 import { useMainStore } from '../stores/main';
 import { storeToRefs } from 'pinia';
-import CaseStudy from './CaseStudy.vue';
+
+import { defineAsyncComponent } from 'vue';
+
+const CaseStudy = defineAsyncComponent(() => import('../components/CaseStudy.vue'));
 import { type CaseStudy as CS } from '../shared/types/caseStudy';
 import { v4 as uuidv4 } from 'uuid';
 import AIAssitant from './AIAssitant.vue';
