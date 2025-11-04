@@ -136,14 +136,14 @@ onMounted(() => {
             What sets me apart isn’t just the code I write, but the experiences I design:
           </p>
           <br />
-          <q-list bordered class="bg-primary">
+          <q-list class="bg-primary">
             <div
               v-for="bullet in generalBullets"
               :key="bullet.id"
               :name="bullet.id"
               expand-separator
               :label="bullet.label"
-              class="font-primary"
+              class="font-primary about-bullet"
             >
               <q-expansion-item group="aboutMe" header-class="bg-primary">
                 <template v-slot:header>
@@ -162,7 +162,6 @@ onMounted(() => {
                   </q-card-section>
                 </q-card>
               </q-expansion-item>
-              <q-separator />
             </div>
           </q-list>
 
@@ -227,8 +226,13 @@ onMounted(() => {
           </p>
           <br />
           <q-separator></q-separator>
-          <q-list bordered>
-            <div v-for="bullet in myApproachBullets" :key="bullet.id" :name="bullet.id">
+          <q-list>
+            <div
+              v-for="bullet in myApproachBullets"
+              :key="bullet.id"
+              :name="bullet.id"
+              class="about-bullet"
+            >
               <q-expansion-item
                 expand-separator
                 :label="bullet.label"
@@ -251,7 +255,6 @@ onMounted(() => {
                   </q-card-section>
                 </q-card>
               </q-expansion-item>
-              <q-separator></q-separator>
             </div>
           </q-list>
         </q-card-section>
@@ -260,7 +263,7 @@ onMounted(() => {
         <q-card-section class="section-container q-pa-lg">
           <div class="h2-container row justify-center q-mb-lg text-center bg-dark text-white">
             <h2
-              class="bg-dark text-h2-alt font-secondary"
+              class="bg-dark text-h2 font-secondary"
               :class="
                 setSeasonClasses(
                   {
@@ -297,32 +300,36 @@ onMounted(() => {
           </p>
           <br />
           <q-separator></q-separator>
-          <q-list bordered>
-            <q-expansion-item
+          <q-list>
+            <div
               v-for="bullet in whyClientsBullets"
               :key="bullet.id"
               :name="bullet.id"
-              expand-separator
-              :label="bullet.label"
-              group="whyClientsWorkWithMe"
-              header-class="bg-primary font-primary"
+              class="full-width about-bullet"
             >
-              <template v-slot:header>
-                <q-item-section avatar>
-                  <q-avatar>
-                    <img :src="bullet.src" />
-                  </q-avatar>
-                </q-item-section>
+              <q-expansion-item
+                expand-separator
+                :label="bullet.label"
+                group="whyClientsWorkWithMe"
+                header-class="bg-primary font-primary about-bullet"
+              >
+                <template v-slot:header>
+                  <q-item-section avatar>
+                    <q-avatar>
+                      <img :src="bullet.src" />
+                    </q-avatar>
+                  </q-item-section>
 
-                <q-item-section> {{ bullet.label }} </q-item-section>
-              </template>
+                  <q-item-section> {{ bullet.label }} </q-item-section>
+                </template>
 
-              <q-card class="bg-dark">
-                <q-card-section class="text-primary">
-                  {{ bullet.text }}
-                </q-card-section>
-              </q-card>
-            </q-expansion-item>
+                <q-card class="bg-dark">
+                  <q-card-section class="text-primary">
+                    {{ bullet.text }}
+                  </q-card-section>
+                </q-card>
+              </q-expansion-item>
+            </div>
           </q-list>
         </q-card-section>
       </q-card>
@@ -338,7 +345,7 @@ onMounted(() => {
                 {
                   Fall: 'bg-dark text-secondary',
                   Winter: 'bg-dark text-secondary',
-                  Spring: 'bg-accent text-secondary',
+                  Spring: 'bg-dark text-secondary',
                   Summer: 'bg-dark text-secondary',
                 },
                 activeTheme,
@@ -384,14 +391,14 @@ onMounted(() => {
           </p>
           <br />
           <q-separator></q-separator>
-          <q-list bordered>
+          <q-list>
             <div
               v-for="bullet in generalBullets"
               :key="bullet.id"
               :name="bullet.id"
               expand-separator
               :label="bullet.label"
-              class="font-primary"
+              class="font-primary about-bullet"
             >
               <q-expansion-item group="aboutMe" header-class="bg-primary text-dark">
                 <template v-slot:header>
@@ -410,7 +417,6 @@ onMounted(() => {
                   </q-card-section>
                 </q-card>
               </q-expansion-item>
-              <q-separator />
             </div>
           </q-list>
           <br />
@@ -471,8 +477,13 @@ onMounted(() => {
           </p>
           <br />
           <q-separator></q-separator>
-          <q-list bordered>
-            <div v-for="bullet in myApproachBullets" :key="bullet.id" :name="bullet.id">
+          <q-list separator>
+            <div
+              v-for="bullet in myApproachBullets"
+              :key="bullet.id"
+              :name="bullet.id"
+              class="about-bullet"
+            >
               <q-expansion-item
                 expand-separator
                 :label="bullet.label"
@@ -495,7 +506,6 @@ onMounted(() => {
                   </q-card-section>
                 </q-card>
               </q-expansion-item>
-              <q-separator></q-separator>
             </div>
           </q-list>
         </q-card-section>
@@ -537,8 +547,13 @@ onMounted(() => {
           </p>
           <br />
           <q-separator></q-separator>
-          <q-list bordered>
-            <div v-for="bullet in whyClientsBullets" :key="bullet.id" :name="bullet.id">
+          <q-list>
+            <div
+              v-for="bullet in whyClientsBullets"
+              :key="bullet.id"
+              :name="bullet.id"
+              class="about-bullet"
+            >
               <q-expansion-item
                 expand-separator
                 :label="bullet.label"
@@ -561,7 +576,6 @@ onMounted(() => {
                   </q-card-section>
                 </q-card>
               </q-expansion-item>
-              <q-separator></q-separator>
             </div>
           </q-list>
         </q-card-section>
@@ -658,5 +672,9 @@ $winter-mobile-background: map-get($winter-theme, primary);
 
 .drawer-content-offset {
   display: none;
+}
+
+.about-bullet {
+  border-bottom: 1px solid var(--q-dark) !important;
 }
 </style>
