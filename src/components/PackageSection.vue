@@ -223,7 +223,7 @@ watch(activeTheme, (newTheme) => {
           </p>
         </q-card-section>
 
-        <q-card-section class="section-container column">
+        <q-card-section class="section-container full-width column">
           <div
             bordered
             padding

@@ -7,23 +7,25 @@ import { storeToRefs } from 'pinia';
 import { type AboutBulletPoints } from 'src/shared/types/aboutBulletPoints';
 import { hasScrollbar } from 'src/shared/utils/hasScrollbar';
 
+const getImg = (file: string) => new URL(`../assets/${file}`, import.meta.url).href;
+
 const mainStore = useMainStore();
 const { activeTheme } = storeToRefs(mainStore);
 const generalBullets = ref<AboutBulletPoints[]>([
   {
-    src: 'src/assets/gsap-animations.png',
+    src: getImg('gsap-animation.avif'),
     label: 'GSAP animations',
     id: uuidv4(),
     text: 'I use GSAP to build smooth, modern animations that give your site personality. Motion guides the user’s eye, makes interactions feel natural, and adds that “alive” quality your competitors won’t have.',
   },
   {
-    src: 'src/assets/interactive-data-visualization.png',
+    src: getImg('interactive-data-visualization.avif'),
     label: 'Interactive data visualizations',
     id: uuidv4(),
     text: 'With D3 and Highcharts, I transform raw data into visuals that actually tell a story. Whether it’s a dashboard or a product demo, I design charts that are both insightful and engaging.',
   },
   {
-    src: 'src/assets/ai-integration.png',
+    src: getImg('ai-integration.avif'),
     label: 'AI integrations',
     id: uuidv4(),
     text: 'From chatbots to voice narration, I integrate AI tools that make your app more intuitive and useful. It’s about creating smarter experiences that save time and keep users engaged.',
@@ -31,19 +33,19 @@ const generalBullets = ref<AboutBulletPoints[]>([
 ]);
 const myApproachBullets = ref<AboutBulletPoints[]>([
   {
-    src: 'src/assets/creative-engineering.png',
+    src: getImg('creative-engineering.avif'),
     label: 'Creative engineering',
     id: uuidv4(),
     text: 'I combine strong frontend skills (Vue, Angular, GSAP) with a designer’s eye (Figma) to build experiences that look as good as they perform.',
   },
   {
-    src: 'src/assets/future-proof-thinking.png',
+    src: getImg('future-proof-thinking.avif'),
     label: 'Future-proof thinking',
     id: uuidv4(),
     text: 'I don’t just build for today. I integrate AI tools and best practices that keep your product relevant, scalable, and ahead of the curve.',
   },
   {
-    src: 'src/assets/collaborative-mindset.png',
+    src: getImg('collaborative-mindset.avif'),
     label: 'Collaborative mindset',
     id: uuidv4(),
     text: 'I work as a partner, not just a coder. That means clear communication, shared problem solving, and building solutions that fit your vision.',
@@ -51,19 +53,19 @@ const myApproachBullets = ref<AboutBulletPoints[]>([
 ]);
 const whyClientsBullets = ref<AboutBulletPoints[]>([
   {
-    src: 'src/assets/fast-results.png',
+    src: getImg('fast-results.avif'),
     label: 'Fast results',
     id: uuidv4(),
     text: 'I turn concepts into polished demos quickly, helping you test ideas and capture attention without long wait times.',
   },
   {
-    src: 'src/assets/scalable-systems.png',
+    src: getImg('scalable-systems.avif'),
     label: 'Scalable systems',
     id: uuidv4(),
     text: 'I architect projects with growth in mind, so the work we do today can expand seamlessly as your product or business evolves.',
   },
   {
-    src: 'src/assets/memorable-experiences.png',
+    src: getImg('memorable-experiences.avif'),
     label: 'Memorable experiences',
     id: uuidv4(),
     text: 'I focus on the “wow” factor — animations, interactions, and storytelling that make your product stand out and leave a lasting impression.',
