@@ -287,10 +287,10 @@ watch(activeTheme, (newTheme) => {
         transition="slide-up"
         transition-duration="1500"
         :once="true"
-        class="q-card-container"
+        class="q-card-container full-width"
       >
         <q-card class="full-width column items-center bg-secondary">
-          <q-card-section class="section-container column">
+          <q-card-section class="section-container full-width column">
             <div
               class="package-tile full-width q-pa-md bg-white q-mb-none no-border rounded-borders"
             >
@@ -306,7 +306,14 @@ watch(activeTheme, (newTheme) => {
 
               <div class="cta-container column">
                 <div class="img-container column full-width items-center bg-primary">
-                  <picture>
+                  <picture
+                    :class="{
+                      'responsive-fall-img': activeTheme === Theme.Fall,
+                      'responsive-winter-img': activeTheme === Theme.Winter,
+                      'responsive-spring-img': activeTheme === Theme.Spring,
+                      'responsive-summer-img': activeTheme === Theme.Summer,
+                    }"
+                  >
                     <source
                       v-for="(s, si) in p.img.sources"
                       :key="si"
@@ -639,7 +646,7 @@ watch(activeTheme, (newTheme) => {
 
 .responsive-fall-img {
   width: 90%;
-  max-width: 450px;
+  max-width: 350px;
   @media (min-width: $breakpoint-md) {
     max-width: 600px;
   }
@@ -647,25 +654,25 @@ watch(activeTheme, (newTheme) => {
 
 .responsive-winter-img {
   width: 90%;
-  max-width: 450px;
+  max-width: 250px;
   @media (min-width: $breakpoint-md) {
-    max-width: 600px;
+    max-width: 425px;
   }
 }
 
 .responsive-spring-img {
   width: 90%;
-  max-width: 450px;
+  max-width: 250px;
   @media (min-width: $breakpoint-md) {
-    max-width: 600px;
+    max-width: 400px;
   }
 }
 
 .responsive-summer-img {
   width: 90%;
-  max-width: 450px;
+  max-width: 400px;
   @media (min-width: $breakpoint-md) {
-    max-width: 600px;
+    max-width: 550px;
   }
 }
 // ------------------------------

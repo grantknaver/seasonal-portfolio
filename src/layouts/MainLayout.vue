@@ -11,6 +11,7 @@ import AboutSection from '../components/AboutSection.vue';
 import ContactSection from '../components/ContactSection.vue';
 import PackageSection from 'src/components/PackageSection.vue';
 import CaseStudiesSection from '../components/CaseStudiesSection.vue';
+import { mdiMenu } from '@quasar/extras/mdi-v7';
 
 const mainStore = useMainStore();
 const { activeTheme, activeTopic } = storeToRefs(mainStore);
@@ -70,7 +71,7 @@ onBeforeUnmount(() => window.removeEventListener('resize', updateWidths));
           flat
           dense
           round
-          icon="menu"
+          :icon="mdiMenu"
           @click="mobileMenu = !mobileMenu"
           aria-label="Open menu"
         />

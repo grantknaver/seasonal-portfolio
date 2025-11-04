@@ -7,10 +7,9 @@ import { storeToRefs } from 'pinia';
 import { type AboutBulletPoints } from 'src/shared/types/aboutBulletPoints';
 import { hasScrollbar } from 'src/shared/utils/hasScrollbar';
 
-const getImg = (file: string) => new URL(`../assets/${file}`, import.meta.url).href;
-
 const mainStore = useMainStore();
 const { activeTheme } = storeToRefs(mainStore);
+const getImg = (file: string) => new URL(`../assets/${file}`, import.meta.url).href;
 const generalBullets = ref<AboutBulletPoints[]>([
   {
     src: getImg('gsap-animation.avif'),

@@ -737,10 +737,10 @@ const scrollToFooter = () => {
 
     .responsive-view {
       height: auto;
-      max-width: 800px;
+      max-width: 600px;
 
       @media (min-width: $breakpoint-md) {
-        max-width: 1000px;
+        max-width: 800px;
       }
 
       .name {
