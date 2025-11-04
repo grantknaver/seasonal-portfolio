@@ -1,7 +1,6 @@
 <script setup lang="ts">
-import { ref, onMounted } from 'vue';
+import { ref, onMounted, defineAsyncComponent } from 'vue';
 import { useMainStore } from '../stores/main';
-import RecaptchaWidget from './RecaptchaWidget.vue';
 import { storeToRefs } from 'pinia';
 import { mdiAccount, mdiEmailOutline } from '@quasar/extras/mdi-v7';
 
@@ -15,7 +14,7 @@ const form = ref({
   // simple honeypot field
   _honey: '',
 });
-
+const RecaptchaWidget = defineAsyncComponent(() => import('./RecaptchaWidget.vue'));
 const sending = ref(false);
 const success = ref(false);
 const error = ref(false);
@@ -79,7 +78,7 @@ const sendEmail = async () => {
 </script>
 
 <template>
-  <div id="contact" ref="contactRef" class="responsive-view full-width">
+  <section id="contact" ref="contactRef" class="contactSection responsive-view full-width">
     <q-form
       @submit.prevent="sendEmail"
       class="full-width bg-accent q-pt-md q-pr-xl q-pb-xl q-pl-xl"
@@ -147,9 +146,11 @@ const sendEmail = async () => {
         ❌ Failed to send. {{ errorMsg || 'Please try again.' }}
       </q-banner>
     </q-form>
-  </div>
+  </section>
 
-  <div class="desktop-view full-width full-height column justify-center items-center">
+  <section
+    class="contactSection desktop-view full-width full-height column justify-center items-center"
+  >
     <q-form
       @submit.prevent="sendEmail"
       class="full-width q-gutter-y-sm q-pt-md q-pr-xl q-pb-xl q-pl-xl"
@@ -221,10 +222,10 @@ const sendEmail = async () => {
         ❌ Failed to send. {{ errorMsg || 'Please try again.' }}
       </q-banner>
     </q-form>
-  </div>
+  </section>
 </template>
 
-<style lang="scss" scoped>
+<style scoped lang="scss">
 @import '../css/main.scss';
 
 .responsive-view {

@@ -10,3 +10,11 @@
 .desktop-drawer .scroll-area {
   padding-right: 1.7rem;
 }
+
+.caseStudiesSection,
+.contactSection,
+.aboutSection,
+.packageSection {
+  content-visibility: auto;
+  contain-intrinsic-size: 1200px 2000px; /* tune per section */
+}

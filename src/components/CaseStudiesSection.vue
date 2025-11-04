@@ -35,7 +35,6 @@ const mainStore = useMainStore();
 const { activeTheme } = storeToRefs(mainStore);
 const { lgBreakpoint, width } = useViewport();
 const isResponsive = computed(() => width.value < lgBreakpoint);
-const isBelowLgBreakpoint = computed(() => useViewport().width.value < useViewport().lgBreakpoint);
 const caseStudies = ref<CS[]>([
   {
     id: uuidv4(),
@@ -318,33 +317,27 @@ watch(tab, (newTab) => {
   mainStore.SET_CASE_STUDY_ACTIVE_TAB(newTab);
 });
 
-const backgroundUrl = computed(() => {
-  if (activeTheme.value === Theme.Fall) {
-    return new URL('../assets/ai-bcg-fall.png', import.meta.url).href;
-  } else if (activeTheme.value === Theme.Winter) {
-    return new URL('../assets/ai-bcg-winter.png', import.meta.url).href;
-  } else if (activeTheme.value === Theme.Spring) {
-    return new URL('../assets/ai-bcg-spring.png', import.meta.url).href;
-  } else if (activeTheme.value === Theme.Summer) {
-    return new URL('../assets/ai-bcg-summer.png', import.meta.url).href;
-  } else {
-    // fallback image
-    return new URL('../assets/ai-bcg-winter.png', import.meta.url).href;
-  }
-});
+const BG_BY_THEME: Record<Theme, string> = {
+  [Theme.Fall]: new URL('../assets/ai-bcg-fall.png', import.meta.url).href,
+  [Theme.Winter]: new URL('../assets/ai-bcg-winter.png', import.meta.url).href,
+  [Theme.Spring]: new URL('../assets/ai-bcg-spring.png', import.meta.url).href,
+  [Theme.Summer]: new URL('../assets/ai-bcg-summer.png', import.meta.url).href,
+};
+
+const backgroundUrl = computed(() => BG_BY_THEME[activeTheme.value] ?? BG_BY_THEME[Theme.Winter]);
 </script>
 <template>
   <!-- Mobile -->
-  <div v-if="isResponsive" class="responsive-view full-width column">
+  <section v-if="isResponsive" class="caseStudiesSection responsive-view full-width column">
     <q-card
       class="first-card full-width q-mb-sm q-pa-md bg-accent"
       :class="
         setSeasonClasses(
           {
-            Fall: isBelowLgBreakpoint ? 'bg-primary ' : 'bg-transparent',
-            Winter: isBelowLgBreakpoint ? 'bg-primary ' : 'bg-transparent',
-            Spring: isBelowLgBreakpoint ? 'bg-primary ' : 'bg-transparent',
-            Summer: isBelowLgBreakpoint ? 'bg-accent ' : 'bg-transparent',
+            Fall: isResponsive ? 'bg-primary ' : 'bg-transparent',
+            Winter: isResponsive ? 'bg-primary ' : 'bg-transparent',
+            Spring: isResponsive ? 'bg-primary ' : 'bg-transparent',
+            Summer: isResponsive ? 'bg-accent ' : 'bg-transparent',
           },
           activeTheme,
         )
@@ -355,16 +348,14 @@ const backgroundUrl = computed(() => {
         :class="
           setSeasonClasses(
             {
-              Fall: isBelowLgBreakpoint
+              Fall: isResponsive ? 'bg-dark text-secondary' : 'bg-dark text-secondary border-black',
+              Winter: isResponsive
                 ? 'bg-dark text-secondary'
                 : 'bg-dark text-secondary border-black',
-              Winter: isBelowLgBreakpoint
-                ? 'bg-dark text-secondary'
-                : 'bg-dark text-secondary border-black',
-              Spring: isBelowLgBreakpoint
+              Spring: isResponsive
                 ? 'bg-dark text-secondary'
                 : 'bg-accent text-secondary border-black',
-              Summer: isBelowLgBreakpoint
+              Summer: isResponsive
                 ? 'bg-dark text-secondary'
                 : 'bg-dark text-secondary border-black',
             },
@@ -380,16 +371,16 @@ const backgroundUrl = computed(() => {
         :class="
           setSeasonClasses(
             {
-              Fall: isBelowLgBreakpoint
+              Fall: isResponsive
                 ? 'text-white bg-dark q-pa-md'
                 : 'text-secondary black-text-outline',
-              Winter: isBelowLgBreakpoint
+              Winter: isResponsive
                 ? 'text-white bg-dark q-pa-md'
                 : 'text-secondary black-text-outline',
-              Spring: isBelowLgBreakpoint
+              Spring: isResponsive
                 ? 'text-white bg-dark q-pa-md'
                 : 'text-secondary black-text-outline',
-              Summer: isBelowLgBreakpoint
+              Summer: isResponsive
                 ? 'text-white bg-dark q-pa-md'
                 : 'text-secondary black-text-outline',
             },
@@ -404,10 +395,10 @@ const backgroundUrl = computed(() => {
         :class="
           setSeasonClasses(
             {
-              Fall: isBelowLgBreakpoint ? 'text-center text-primary' : 'text-primary',
-              Winter: isBelowLgBreakpoint ? 'text-center text-primary' : 'text-primary',
-              Spring: isBelowLgBreakpoint ? 'text-center text-primary' : 'text-primary',
-              Summer: isBelowLgBreakpoint ? 'text-center text-primary' : 'text-white',
+              Fall: isResponsive ? 'text-center text-primary' : 'text-primary',
+              Winter: isResponsive ? 'text-center text-primary' : 'text-primary',
+              Spring: isResponsive ? 'text-center text-primary' : 'text-primary',
+              Summer: isResponsive ? 'text-center text-primary' : 'text-white',
             },
             activeTheme,
           )
@@ -478,19 +469,19 @@ const backgroundUrl = computed(() => {
       </template>
       <q-separator class="full-width bg-primary"></q-separator>
     </q-list>
-  </div>
+  </section>
 
   <!-- Desktop -->
-  <div v-if="!isResponsive" class="desktop-view full-width column">
+  <section v-if="!isResponsive" class="caseStudiesSection desktop-view full-width column">
     <div
       class="full-width q-pa-md"
       :class="
         setSeasonClasses(
           {
-            Fall: isBelowLgBreakpoint ? 'bg-primary ' : 'bg-transparent',
-            Winter: isBelowLgBreakpoint ? 'bg-primary ' : 'bg-transparent',
-            Spring: isBelowLgBreakpoint ? 'bg-primary ' : 'bg-transparent',
-            Summer: isBelowLgBreakpoint ? 'bg-white ' : 'bg-transparent',
+            Fall: isResponsive ? 'bg-primary ' : 'bg-transparent',
+            Winter: isResponsive ? 'bg-primary ' : 'bg-transparent',
+            Spring: isResponsive ? 'bg-primary ' : 'bg-transparent',
+            Summer: isResponsive ? 'bg-white ' : 'bg-transparent',
           },
           activeTheme,
         )
@@ -501,16 +492,14 @@ const backgroundUrl = computed(() => {
         :class="
           setSeasonClasses(
             {
-              Fall: isBelowLgBreakpoint
+              Fall: isResponsive ? 'bg-dark text-secondary' : 'bg-dark text-secondary border-black',
+              Winter: isResponsive
                 ? 'bg-dark text-secondary'
                 : 'bg-dark text-secondary border-black',
-              Winter: isBelowLgBreakpoint
-                ? 'bg-dark text-secondary'
-                : 'bg-dark text-secondary border-black',
-              Spring: isBelowLgBreakpoint
+              Spring: isResponsive
                 ? 'bg-dark text-secondary'
                 : 'bg-accent text-secondary border-black',
-              Summer: isBelowLgBreakpoint
+              Summer: isResponsive
                 ? 'bg-dark text-secondary'
                 : 'bg-dark text-secondary border-black',
             },
@@ -525,18 +514,10 @@ const backgroundUrl = computed(() => {
         :class="
           setSeasonClasses(
             {
-              Fall: isBelowLgBreakpoint
-                ? 'bg-dark text-secondary'
-                : 'text-secondary black-text-outline',
-              Winter: isBelowLgBreakpoint
-                ? 'bg-dark text-secondary'
-                : 'text-secondary black-text-outline',
-              Spring: isBelowLgBreakpoint
-                ? 'bg-dark text-secondary'
-                : 'text-secondary black-text-outline',
-              Summer: isBelowLgBreakpoint
-                ? 'bg-dark text-secondary'
-                : 'text-secondary black-text-outline',
+              Fall: isResponsive ? 'bg-dark text-secondary' : 'text-secondary black-text-outline',
+              Winter: isResponsive ? 'bg-dark text-secondary' : 'text-secondary black-text-outline',
+              Spring: isResponsive ? 'bg-dark text-secondary' : 'text-secondary black-text-outline',
+              Summer: isResponsive ? 'bg-dark text-secondary' : 'text-secondary black-text-outline',
             },
             activeTheme,
           )
@@ -550,10 +531,10 @@ const backgroundUrl = computed(() => {
         :class="
           setSeasonClasses(
             {
-              Fall: isBelowLgBreakpoint ? 'text-center text-dark' : 'text-primary',
-              Winter: isBelowLgBreakpoint ? 'text-center text-dark' : 'text-primary',
-              Spring: isBelowLgBreakpoint ? 'text-center text-dark' : 'text-primary',
-              Summer: isBelowLgBreakpoint ? 'text-center text-dark' : 'text-white',
+              Fall: isResponsive ? 'text-center text-dark' : 'text-primary',
+              Winter: isResponsive ? 'text-center text-dark' : 'text-primary',
+              Spring: isResponsive ? 'text-center text-dark' : 'text-primary',
+              Summer: isResponsive ? 'text-center text-dark' : 'text-white',
             },
             activeTheme,
           )
@@ -631,7 +612,7 @@ const backgroundUrl = computed(() => {
         </CaseStudy>
       </q-tab-panel>
     </q-tab-panels>
-  </div>
+  </section>
 </template>
 <style scoped lang="scss">
 @import '../css/main.scss';

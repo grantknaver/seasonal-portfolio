@@ -689,13 +689,13 @@ watch(activeTheme, async () => {
   pointer-events: none;
   overflow: hidden;
   z-index: 1;
-}
 
-.weather-artifact {
-  position: absolute;
-  opacity: 1;
-  user-select: none;
-  will-change: transform;
-  color: white;
+  .weather-artifact {
+    position: absolute;
+    opacity: 1;
+    user-select: none;
+    will-change: transform;
+    color: white;
+  }
 }
 </style>

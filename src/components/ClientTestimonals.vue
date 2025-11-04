@@ -44,7 +44,7 @@ const testimonials = [
   </q-carousel>
 </template>
 
-<style lang="scss" scoped>
+<style lang="scss">
 .q-carousel {
   max-width: 600px;
   box-shadow: 5px 10px 20px var(--q-dark);

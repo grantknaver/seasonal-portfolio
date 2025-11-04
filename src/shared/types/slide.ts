@@ -5,4 +5,5 @@ export interface Slide {
   id: string;
   img: PictureData;
   theme: Theme;
+  name: string;
 }

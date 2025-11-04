@@ -2,23 +2,26 @@
 import { ref, nextTick, watch, computed } from 'vue';
 import { useMainStore } from '../stores/main';
 import { storeToRefs } from 'pinia';
-import { QScrollArea, debounce } from 'quasar';
+import { debounce } from 'quasar';
 import { Theme } from '../shared/constants/theme';
-import RecaptchaWidget from '../components/RecaptchaWidget.vue';
 import { OARole } from 'src/shared/types/oaRole';
 import type OALog from 'src/shared/types/oaLog';
 import { useViewport } from 'src/shared/utils/viewWidth';
 import { mdiChat } from '@quasar/extras/mdi-v7';
+import { defineAsyncComponent } from 'vue';
 
 const mainStore = useMainStore();
 const { activeAiAssistLogo, chatLog, activeTheme, isHuman, oaLogs, isLoading } =
   storeToRefs(mainStore);
 const isChatting = ref(false);
 const text = ref('');
-const chatScroll = ref<QScrollArea>();
+const QScrollArea = defineAsyncComponent(() => import('quasar'));
+
+const chatScroll = ref();
 const { lgBreakpoint, width } = useViewport();
 const isResponsive = computed(() => width.value < lgBreakpoint);
 const dialog = ref(false);
+const RecaptchaWidget = defineAsyncComponent(() => import('../components/RecaptchaWidget.vue'));
 
 const flushLogs = debounce(async () => {
   await mainStore.SEND_OALOGS();

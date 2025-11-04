@@ -25,6 +25,7 @@ const CaseStudiesSection = defineAsyncComponent(
   () => import('../components/CaseStudiesSection.vue'),
 );
 const WeatherBackground = defineAsyncComponent(() => import('../components/WeatherBackground.vue'));
+
 import {
   mdiChevronUp,
   mdiBookOpenPageVariant,
@@ -68,21 +69,25 @@ const slides = ref<Slide[]>([
     id: uuidv4(),
     img: autumn,
     theme: Theme.Fall,
+    name: 'Fall Background',
   },
   {
     id: uuidv4(),
     img: winter,
     theme: Theme.Winter,
+    name: 'Winter Background',
   },
   {
     id: uuidv4(),
     img: spring,
     theme: Theme.Spring,
+    name: 'Spring Background',
   },
   {
     id: uuidv4(),
     img: summer,
     theme: Theme.Summer,
+    name: 'Summer Background',
   },
 ]);
 const { getScrollTarget, setVerticalScrollPosition } = scroll;
@@ -307,27 +312,29 @@ const scrollToFooter = () => {
         :transition-duration="2500"
       >
         <q-carousel-slide
-          v-for="(s, i) in slides"
-          :key="s.id"
-          :name="s.theme"
+          v-for="(slide, index) in slides"
+          :key="slide.id"
+          :name="slide.theme"
           class="relative-position"
         >
           <!-- Your custom background layer -->
           <div class="slide-bg">
             <picture>
               <source
-                v-for="src in s.img.sources"
-                :key="src.type"
+                v-for="(src, srcIndex) in slide.img.sources"
+                :key="srcIndex"
                 :srcset="src.srcset"
                 :type="src.type"
               />
               <img
-                :src="s.img.img.src"
-                :srcset="s.img.img.srcset"
-                sizes="100vw"
-                :loading="i === 0 ? 'eager' : 'lazy'"
+                :src="slide.img.img.src"
+                :srcset="slide.img.img.srcset"
+                :width="slide.img.img.width"
+                :height="slide.img.img.height"
+                fetchpriority="high"
+                :loading="index === 0 ? 'eager' : 'lazy'"
                 decoding="async"
-                alt=""
+                :alt="slide.name"
               />
             </picture>
           </div>
@@ -721,7 +728,6 @@ const scrollToFooter = () => {
 
   .sub-container {
     flex: 1 1 0%;
-    z-index: 2;
 
     @media (min-width: $breakpoint-lg) {
       position: relative;

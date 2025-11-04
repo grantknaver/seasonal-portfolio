@@ -165,236 +165,35 @@ onMounted(() => {
 </script>
 
 <template>
-  <section>
-    <!-- Mobile -->
-    <div v-if="isResponsive" class="responsive-view full-width column items-center q-gutter-y-md">
-      <q-card class="first-card full-width column items-center bg-secondary">
-        <q-card-section
-          class="package-header-section full-width q-pa-lg text-primary"
-          :class="
-            setSeasonClasses(
-              {
-                Fall: 'bg-accent ',
-                Winter: 'bg-accent',
-                Spring: 'bg-accent ',
-                Summer: 'bg-accent ',
-              },
-              activeTheme,
-            )
-          "
-        >
-          <h1
-            class="text-h1 q-mt-none q-mb-md q-mb-md q-pt-md q-pb-md bg-dark text-center"
-            :class="
-              setSeasonClasses(
-                {
-                  Fall: 'text-secondary',
-                  Winter: 'text-secondary',
-                  Spring: 'text-secondary',
-                  Summer: 'text-secondary',
-                },
-                activeTheme,
-              )
-            "
-          >
-            Packages
-          </h1>
-          <q-separator
-            :color="
-              setSeasonClasses(
-                {
-                  Fall: 'primary',
-                  Winter: 'primary',
-                  Spring: 'primary',
-                  Summer: 'primary',
-                },
-                activeTheme,
-              )
-            "
-            class="q-mb-md"
-          />
-          <p
-            class="text-body-1 text-center"
-            :class="
-              setSeasonClasses(
-                {
-                  Fall: 'text-primary',
-                  Winter: 'text-primary',
-                  Spring: 'text-primary',
-                  Summer: 'text-white',
-                },
-                activeTheme,
-              )
-            "
-          >
-            Each project below demonstrates how design, animation, and intelligence combine to make
-            interfaces <i>feel alive</i>. From motion systems to AI-integrated tools, these builds
-            show how creative engineering turns complexity into clarity.
-          </p>
-        </q-card-section>
-
-        <q-card-section class="section-container full-width column">
-          <div
-            bordered
-            padding
-            :separator="true"
-            class="package-tile full-width q-pa-md bg-white q-mb-none no-border"
-          >
-            <div class="h2-container row justify-center q-mb-md text-center bg-accent text-white">
-              <h2 class="text-h2">{{ packages[0]?.name }}</h2>
-            </div>
-
-            <div class="tagline-container bg-dark q-pa-lg">
-              <p class="text-body-2 text-center text-primary q-ma-none">
-                {{ packages[0]?.tagline }}
-              </p>
-            </div>
-            <div class="cta-container column">
-              <div class="img-container column full-width items-center bg-primary">
-                <picture
-                  :class="{
-                    'responsive-fall-img': activeTheme === Theme.Fall,
-                    'responsive-winter-img': activeTheme === Theme.Winter,
-                    'responsive-spring-img': activeTheme === Theme.Spring,
-                    'responsive-summer-img': activeTheme === Theme.Summer,
-                  }"
-                >
-                  <source
-                    :type="packages[0]?.img.sources[0]?.type"
-                    :srcset="packages[0]?.img.sources[0]?.srcset"
-                  />
-                  <img
-                    :src="packages[0]?.img.img.src"
-                    :srcset="packages[0]?.img.img.srcset"
-                    :width="packages[0]?.img.img.width"
-                    :height="packages[0]?.img.img.height"
-                    :alt="packages[0]?.name"
-                    loading="eager"
-                    decoding="async"
-                  />
-                </picture>
-                <!-- <img class="full-width q-pa-lg" :src="packages[0]?.src" /> -->
-              </div>
-              <br />
-              <q-btn size="lg" color="accent" class="q-mb-md">Consultation</q-btn>
-            </div>
-            <q-item v-for="(f, index) in packages[0]?.features" :key="index">
-              <span class="row full-width q-pa-none">
-                <q-item-section side>
-                  <q-icon :name="mdiCheckboxBlankCircle" size=".5rem" class="text-dark" />
-                </q-item-section>
-                <q-item-section class="package-feature text-body-2 text-black">
-                  {{ f.text }}
-                </q-item-section>
-              </span>
-            </q-item>
-          </div>
-        </q-card-section>
-      </q-card>
-      <q-intersection
-        v-for="p in packages.slice(1)"
-        :key="p.id"
-        transition="slide-up"
-        transition-duration="1500"
-        :once="true"
-        class="q-card-container full-width"
-      >
-        <q-card class="full-width column items-center bg-secondary">
-          <q-card-section class="section-container full-width column">
-            <div
-              class="package-tile full-width q-pa-md bg-white q-mb-none no-border rounded-borders"
-            >
-              <div class="h2-container row justify-center q-mb-md text-center bg-accent text-white">
-                <h2 class="text-h2">{{ p.name }}</h2>
-              </div>
-
-              <div class="tagline-container bg-dark q-pa-lg">
-                <p class="text-body-2 text-center text-primary q-ma-none">
-                  {{ p.tagline }}
-                </p>
-              </div>
-
-              <div class="cta-container column">
-                <div class="img-container column full-width items-center bg-primary">
-                  <picture
-                    :class="{
-                      'responsive-fall-img': activeTheme === Theme.Fall,
-                      'responsive-winter-img': activeTheme === Theme.Winter,
-                      'responsive-spring-img': activeTheme === Theme.Spring,
-                      'responsive-summer-img': activeTheme === Theme.Summer,
-                    }"
-                  >
-                    <source
-                      v-for="(s, si) in p.img.sources"
-                      :key="si"
-                      :type="s.type"
-                      :srcset="s.srcset"
-                    />
-                    <img
-                      :src="p?.img.img.src"
-                      :srcset="p?.img.img.srcset"
-                      :width="p?.img.img.width"
-                      :height="p?.img.img.height"
-                      :alt="p?.name"
-                      loading="eager"
-                      decoding="async"
-                    />
-                  </picture>
-                </div>
-                <br />
-                <q-btn size="lg" color="accent" class="q-mb-md">Consultation</q-btn>
-              </div>
-              <q-list>
-                <q-item v-for="(f, index) in p.features" :key="index">
-                  <span class="row full-width q-pa-none">
-                    <q-item-section side>
-                      <q-icon :name="mdiCheckboxBlankCircle" size=".5rem" class="text-dark" />
-                    </q-item-section>
-                    <q-item-section class="package-feature text-body-2 text-black">
-                      {{ f.text }}
-                    </q-item-section>
-                  </span>
-                </q-item>
-              </q-list>
-            </div>
-          </q-card-section>
-        </q-card></q-intersection
-      >
-    </div>
-
-    <!-- Desktop -->
-    <div v-if="!isResponsive" class="desktop-view full-width column">
-      <div
-        class="intro-container full-width q-pa-md"
+  <!-- Mobile -->
+  <section
+    v-if="isResponsive"
+    class="packageSection responsive-view full-width column items-center q-gutter-y-md"
+  >
+    <q-card class="first-card full-width column items-center bg-secondary">
+      <q-card-section
+        class="package-header-section full-width q-pa-lg text-primary"
         :class="
           setSeasonClasses(
             {
-              Fall: isResponsive ? 'bg-primary ' : 'bg-transparent',
-              Winter: isResponsive ? 'bg-primary ' : 'bg-transparent',
-              Spring: isResponsive ? 'bg-primary ' : 'bg-transparent',
-              Summer: isResponsive ? 'bg-white ' : 'bg-transparent',
+              Fall: 'bg-accent ',
+              Winter: 'bg-accent',
+              Spring: 'bg-accent ',
+              Summer: 'bg-accent ',
             },
             activeTheme,
           )
         "
       >
         <h1
-          class="text-h1 q-mt-none q-pt-md q-pb-md text-center"
+          class="text-h1 q-mt-none q-mb-md q-mb-md q-pt-md q-pb-md bg-dark text-center"
           :class="
             setSeasonClasses(
               {
-                Fall: isResponsive
-                  ? 'bg-dark text-secondary'
-                  : 'bg-dark text-secondary border-black',
-                Winter: isResponsive
-                  ? 'bg-dark text-secondary'
-                  : 'bg-dark text-secondary border-black',
-                Spring: isResponsive
-                  ? 'bg-dark text-secondary'
-                  : 'bg-accent text-secondary border-black',
-                Summer: isResponsive
-                  ? 'bg-dark text-secondary'
-                  : 'bg-dark text-secondary border-black',
+                Fall: 'text-secondary',
+                Winter: 'text-secondary',
+                Spring: 'text-secondary',
+                Summer: 'text-secondary',
               },
               activeTheme,
             )
@@ -406,10 +205,10 @@ onMounted(() => {
           :color="
             setSeasonClasses(
               {
-                Fall: isResponsive ? 'accent' : 'secondary',
-                Winter: isResponsive ? 'accent' : 'primary',
-                Spring: isResponsive ? 'accent ' : 'primary',
-                Summer: isResponsive ? 'accent ' : 'secondary',
+                Fall: 'primary',
+                Winter: 'primary',
+                Spring: 'primary',
+                Summer: 'primary',
               },
               activeTheme,
             )
@@ -417,103 +216,304 @@ onMounted(() => {
           class="q-mb-md"
         />
         <p
+          class="text-body-1 text-center"
           :class="
             setSeasonClasses(
               {
-                Fall: isResponsive ? 'text-center text-dark' : 'text-primary',
-                Winter: isResponsive ? 'text-center text-dark' : 'text-primary',
-                Spring: isResponsive ? 'text-center text-dark' : 'text-primary',
-                Summer: isResponsive ? 'text-center text-dark' : 'text-white',
+                Fall: 'text-primary',
+                Winter: 'text-primary',
+                Spring: 'text-primary',
+                Summer: 'text-white',
               },
               activeTheme,
             )
           "
         >
-          Whether you need one polished animation, a full motion + AI upgrade, or a launch-ready
-          experience, I’ve got you covered. These packages make it simple to get started — clear
-          scope, fair pricing, and fast turnaround.
+          Each project below demonstrates how design, animation, and intelligence combine to make
+          interfaces <i>feel alive</i>. From motion systems to AI-integrated tools, these builds
+          show how creative engineering turns complexity into clarity.
         </p>
-      </div>
-      <div class="cards-container column justify-end full-width q-pa-md">
-        <q-intersection
-          v-for="(p, index) in packages"
-          :key="p.id"
-          transition="slide-up"
-          transition-duration="1500"
-          :once="true"
-          class="q-card-container full-width"
-        >
-          <q-card
-            class="bg-secondary"
-            :class="{
-              'q-mb-md': index !== packages.length - 1,
-            }"
-          >
-            <q-card-section class="section-container">
-              <div class="package-tile row bg-white">
-                <div class="col-6">
-                  <q-expansion-item
-                    header-class="expandable-header"
-                    class="full-width q-mb-md"
-                    :label="p.name"
-                  >
-                    <q-card class="header-content full-width bg-dark">
-                      <q-card-section class="text-primary">
-                        {{ p.tagline }}
-                      </q-card-section>
-                    </q-card>
-                  </q-expansion-item>
+      </q-card-section>
 
-                  <div class="column no-wrap items-center q-mb-none q-pa-md border rounded-borders">
-                    <div class="img-container column justify-center items-center bg-primary">
-                      <picture
-                        :class="{
-                          'desktop-fall-img': activeTheme === Theme.Fall,
-                          'desktop-winter-img': activeTheme === Theme.Winter,
-                          'desktop-spring-img': activeTheme === Theme.Spring,
-                          'desktop-summer-img': activeTheme === Theme.Summer,
-                        }"
-                      >
-                        <source
-                          v-for="(s, si) in p.img.sources"
-                          :key="si"
-                          :type="s.type"
-                          :srcset="s.srcset"
-                        />
-                        <img
-                          :src="p?.img.img.src"
-                          :srcset="p?.img.img.srcset"
-                          :alt="p?.name"
-                          :loading="index === 0 ? 'eager' : 'lazy'"
-                          decoding="async"
-                        />
-                      </picture>
-                    </div>
-                    <q-btn color="accent" class="q-mt-md full-width">Consultation</q-btn>
-                  </div>
-                </div>
-                <q-list
-                  bordered
-                  padding
-                  :separator="true"
-                  class="col-6 q-mb-none no-border rounded-borders bg-primary"
+      <q-card-section class="section-container full-width column">
+        <div
+          bordered
+          padding
+          :separator="true"
+          class="package-tile full-width q-pa-md bg-white q-mb-none no-border"
+        >
+          <div class="h2-container row justify-center q-mb-md text-center bg-accent text-white">
+            <h2 class="text-h2">{{ packages[0]?.name }}</h2>
+          </div>
+
+          <div class="tagline-container bg-dark q-pa-lg">
+            <p class="text-body-2 text-center text-primary q-ma-none">
+              {{ packages[0]?.tagline }}
+            </p>
+          </div>
+          <div class="cta-container column">
+            <div class="img-container column full-width items-center bg-primary">
+              <picture
+                :class="{
+                  'responsive-fall-img': activeTheme === Theme.Fall,
+                  'responsive-winter-img': activeTheme === Theme.Winter,
+                  'responsive-spring-img': activeTheme === Theme.Spring,
+                  'responsive-summer-img': activeTheme === Theme.Summer,
+                }"
+              >
+                <source
+                  :type="packages[0]?.img.sources[0]?.type"
+                  :srcset="packages[0]?.img.sources[0]?.srcset"
+                />
+                <img
+                  :src="packages[0]?.img.img.src"
+                  :srcset="packages[0]?.img.img.srcset"
+                  :width="packages[0]?.img.img.width"
+                  :height="packages[0]?.img.img.height"
+                  :alt="packages[0]?.name"
+                  loading="eager"
+                  fetchpriority="high"
+                  decoding="async"
+                />
+              </picture>
+              <!-- <img class="full-width q-pa-lg" :src="packages[0]?.src" /> -->
+            </div>
+            <br />
+            <q-btn size="lg" color="accent" class="q-mb-md">Consultation</q-btn>
+          </div>
+          <q-item v-for="(f, index) in packages[0]?.features" :key="index">
+            <span class="row full-width q-pa-none">
+              <q-item-section side>
+                <q-icon :name="mdiCheckboxBlankCircle" size=".5rem" class="text-dark" />
+              </q-item-section>
+              <q-item-section class="package-feature text-body-2 text-black">
+                {{ f.text }}
+              </q-item-section>
+            </span>
+          </q-item>
+        </div>
+      </q-card-section>
+    </q-card>
+    <q-intersection
+      v-for="(p, index) in packages.slice(1)"
+      :key="p.id"
+      transition="slide-up"
+      transition-duration="1500"
+      :once="true"
+      class="q-card-container full-width"
+    >
+      <q-card class="full-width column items-center bg-secondary">
+        <q-card-section class="section-container full-width column">
+          <div class="package-tile full-width q-pa-md bg-white q-mb-none no-border rounded-borders">
+            <div class="h2-container row justify-center q-mb-md text-center bg-accent text-white">
+              <h2 class="text-h2">{{ p.name }}</h2>
+            </div>
+
+            <div class="tagline-container bg-dark q-pa-lg">
+              <p class="text-body-2 text-center text-primary q-ma-none">
+                {{ p.tagline }}
+              </p>
+            </div>
+
+            <div class="cta-container column">
+              <div class="img-container column full-width items-center bg-primary">
+                <picture
+                  :class="{
+                    'responsive-fall-img': activeTheme === Theme.Fall,
+                    'responsive-winter-img': activeTheme === Theme.Winter,
+                    'responsive-spring-img': activeTheme === Theme.Spring,
+                    'responsive-summer-img': activeTheme === Theme.Summer,
+                  }"
                 >
-                  <q-item v-for="(f, index) in p.features" :key="index">
-                    <span class="row full-width q-pa-none">
-                      <q-item-section side>
-                        <q-icon :name="mdiCheckboxBlankCircle" size="8px" class="text-dark" />
-                      </q-item-section>
-                      <q-item-section class="text-body-2 text-dark">
-                        {{ f.text }}
-                      </q-item-section>
-                    </span>
-                  </q-item>
-                </q-list>
+                  <source
+                    v-for="(s, srcIndex) in p.img.sources"
+                    :key="srcIndex"
+                    :type="s.type"
+                    :srcset="s.srcset"
+                  />
+                  <img
+                    :src="p?.img.img.src"
+                    :srcset="p?.img.img.srcset"
+                    :width="p?.img.img.width"
+                    :height="p?.img.img.height"
+                    :alt="p?.name"
+                    :loading="index === 0 ? 'eager' : 'lazy'"
+                    :fetchpriority="index === 0 ? 'high' : 'auto'"
+                    decoding="async"
+                  />
+                </picture>
               </div>
-            </q-card-section>
-          </q-card>
-        </q-intersection>
-      </div>
+              <br />
+              <q-btn size="lg" color="accent" class="q-mb-md">Consultation</q-btn>
+            </div>
+            <q-list>
+              <q-item v-for="(f, index) in p.features" :key="index">
+                <span class="row full-width q-pa-none">
+                  <q-item-section side>
+                    <q-icon :name="mdiCheckboxBlankCircle" size=".5rem" class="text-dark" />
+                  </q-item-section>
+                  <q-item-section class="package-feature text-body-2 text-black">
+                    {{ f.text }}
+                  </q-item-section>
+                </span>
+              </q-item>
+            </q-list>
+          </div>
+        </q-card-section>
+      </q-card></q-intersection
+    >
+  </section>
+
+  <!-- Desktop -->
+  <section v-if="!isResponsive" class="packageSection desktop-view full-width column">
+    <div
+      class="intro-container full-width q-pa-md"
+      :class="
+        setSeasonClasses(
+          {
+            Fall: isResponsive ? 'bg-primary ' : 'bg-transparent',
+            Winter: isResponsive ? 'bg-primary ' : 'bg-transparent',
+            Spring: isResponsive ? 'bg-primary ' : 'bg-transparent',
+            Summer: isResponsive ? 'bg-white ' : 'bg-transparent',
+          },
+          activeTheme,
+        )
+      "
+    >
+      <h1
+        class="text-h1 q-mt-none q-pt-md q-pb-md text-center"
+        :class="
+          setSeasonClasses(
+            {
+              Fall: isResponsive ? 'bg-dark text-secondary' : 'bg-dark text-secondary border-black',
+              Winter: isResponsive
+                ? 'bg-dark text-secondary'
+                : 'bg-dark text-secondary border-black',
+              Spring: isResponsive
+                ? 'bg-dark text-secondary'
+                : 'bg-accent text-secondary border-black',
+              Summer: isResponsive
+                ? 'bg-dark text-secondary'
+                : 'bg-dark text-secondary border-black',
+            },
+            activeTheme,
+          )
+        "
+      >
+        Packages
+      </h1>
+      <q-separator
+        :color="
+          setSeasonClasses(
+            {
+              Fall: isResponsive ? 'accent' : 'secondary',
+              Winter: isResponsive ? 'accent' : 'primary',
+              Spring: isResponsive ? 'accent ' : 'primary',
+              Summer: isResponsive ? 'accent ' : 'secondary',
+            },
+            activeTheme,
+          )
+        "
+        class="q-mb-md"
+      />
+      <p
+        :class="
+          setSeasonClasses(
+            {
+              Fall: isResponsive ? 'text-center text-dark' : 'text-primary',
+              Winter: isResponsive ? 'text-center text-dark' : 'text-primary',
+              Spring: isResponsive ? 'text-center text-dark' : 'text-primary',
+              Summer: isResponsive ? 'text-center text-dark' : 'text-white',
+            },
+            activeTheme,
+          )
+        "
+      >
+        Whether you need one polished animation, a full motion + AI upgrade, or a launch-ready
+        experience, I’ve got you covered. These packages make it simple to get started — clear
+        scope, fair pricing, and fast turnaround.
+      </p>
+    </div>
+    <div class="cards-container column justify-end full-width q-pa-md">
+      <q-intersection
+        v-for="(p, index) in packages"
+        :key="p.id"
+        transition="slide-up"
+        transition-duration="1500"
+        :once="true"
+        class="q-card-container full-width"
+      >
+        <q-card
+          class="bg-secondary"
+          :class="{
+            'q-mb-md': index !== packages.length - 1,
+          }"
+        >
+          <q-card-section class="section-container">
+            <div class="package-tile row bg-white">
+              <div class="col-6">
+                <q-expansion-item
+                  header-class="expandable-header"
+                  class="full-width q-mb-md"
+                  :label="p.name"
+                >
+                  <q-card class="header-content full-width bg-dark">
+                    <q-card-section class="text-primary">
+                      {{ p.tagline }}
+                    </q-card-section>
+                  </q-card>
+                </q-expansion-item>
+
+                <div class="column no-wrap items-center q-mb-none q-pa-md border rounded-borders">
+                  <div class="img-container column justify-center items-center bg-primary">
+                    <picture
+                      :class="{
+                        'desktop-fall-img': activeTheme === Theme.Fall,
+                        'desktop-winter-img': activeTheme === Theme.Winter,
+                        'desktop-spring-img': activeTheme === Theme.Spring,
+                        'desktop-summer-img': activeTheme === Theme.Summer,
+                      }"
+                    >
+                      <source
+                        v-for="(s, srcIndex) in p.img.sources"
+                        :key="srcIndex"
+                        :type="s.type"
+                        :srcset="s.srcset"
+                      />
+                      <img
+                        :src="p?.img.img.src"
+                        :srcset="p?.img.img.srcset"
+                        :alt="p?.name"
+                        :loading="index === 0 ? 'eager' : 'lazy'"
+                        :fetchpriority="index === 0 ? 'high' : 'auto'"
+                        decoding="async"
+                      />
+                    </picture>
+                  </div>
+                  <q-btn color="accent" class="q-mt-md full-width">Consultation</q-btn>
+                </div>
+              </div>
+              <q-list
+                bordered
+                padding
+                :separator="true"
+                class="col-6 q-mb-none no-border rounded-borders bg-primary"
+              >
+                <q-item v-for="(f, index) in p.features" :key="index">
+                  <span class="row full-width q-pa-none">
+                    <q-item-section side>
+                      <q-icon :name="mdiCheckboxBlankCircle" size="8px" class="text-dark" />
+                    </q-item-section>
+                    <q-item-section class="text-body-2 text-dark">
+                      {{ f.text }}
+                    </q-item-section>
+                  </span>
+                </q-item>
+              </q-list>
+            </div>
+          </q-card-section>
+        </q-card>
+      </q-intersection>
     </div>
   </section>
 </template>
