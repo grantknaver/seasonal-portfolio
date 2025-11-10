@@ -173,10 +173,10 @@ const projects = ref<ProjectDetails[]>([
 </template>
 
 <style scoped lang="scss">
-@import '../css/main.scss';
+@use '/src/css/_tokens.scss' as tokens;
 
 .responsive-view {
-  @media (min-width: $breakpoint-md) {
+  @media (min-width: tokens.$breakpoint-md) {
     display: none;
   }
 
@@ -198,7 +198,7 @@ const projects = ref<ProjectDetails[]>([
           width: 100%;
           max-width: 80%;
 
-          @media (min-width: $breakpoint-sm) {
+          @media (min-width: tokens.$breakpoint-sm) {
             max-width: 300px;
           }
           img {
@@ -257,7 +257,7 @@ const projects = ref<ProjectDetails[]>([
             .under-construction-text {
               font-size: 1.5rem;
               text-shadow: 2px 2px black;
-              @media (min-width: $breakpoint-sm) {
+              @media (min-width: tokens.$breakpoint-sm) {
                 font-size: 2rem;
               }
             }
@@ -281,7 +281,7 @@ const projects = ref<ProjectDetails[]>([
 .desktop-view {
   display: none;
 
-  @media (min-width: $breakpoint-md) {
+  @media (min-width: tokens.$breakpoint-md) {
     display: flex;
   }
 
@@ -302,7 +302,7 @@ const projects = ref<ProjectDetails[]>([
     }
 
     .project-container {
-      @media (min-width: $breakpoint-xl) {
+      @media (min-width: tokens.$breakpoint-xl) {
         justify-content: center;
       }
 
@@ -313,17 +313,13 @@ const projects = ref<ProjectDetails[]>([
           transition: transform 0.3s ease;
         }
 
-        @media (min-width: $breakpoint-sm) {
+        @media (min-width: tokens.$breakpoint-sm) {
           max-width: 200px;
         }
 
-        @media (min-width: $breakpoint-md) {
+        @media (min-width: tokens.$breakpoint-md) {
           max-width: 250px;
         }
-
-        // @media (min-width: $breakpoint-lg) {
-        //   max-width: 300px;
-        // }
       }
 
       .finished-projects {

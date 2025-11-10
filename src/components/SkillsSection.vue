@@ -426,10 +426,10 @@ onMounted(async () => {
 </template>
 
 <style scoped lang="scss">
-@import '../css/main.scss';
+@use '/src/css/_tokens.scss' as tokens;
 
 .responsive-view {
-  @media (min-width: $breakpoint-md) {
+  @media (min-width: tokens.$breakpoint-md) {
     display: none;
   }
 
@@ -480,7 +480,7 @@ onMounted(async () => {
   width: 100%;
   min-height: 100%;
 
-  @media (min-width: $breakpoint-md) {
+  @media (min-width: tokens.$breakpoint-md) {
     display: flex;
   }
 

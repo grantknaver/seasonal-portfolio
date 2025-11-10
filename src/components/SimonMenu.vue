@@ -17,12 +17,6 @@ const { activeTopic } = storeToRefs(mainStore);
 const topics: Topic[] = [
   {
     id: uuidv4(),
-    name: TopicName.Packages,
-    icon: mdiPackageVariantClosed,
-    label: 'Packages',
-  },
-  {
-    id: uuidv4(),
     name: TopicName.About,
     icon: mdiInformation,
     label: TopicName.About,
@@ -35,7 +29,13 @@ const topics: Topic[] = [
   },
   {
     id: uuidv4(),
-    name: TopicName.CaseStudies.replace(' ', '') as TopicName,
+    name: TopicName.Packages,
+    icon: mdiPackageVariantClosed,
+    label: 'Packages',
+  },
+  {
+    id: uuidv4(),
+    name: 'Case Studies' as TopicName,
     icon: mdiBookOpenPageVariant,
     label: TopicName.CaseStudies,
   },
@@ -64,9 +64,7 @@ const simonRef = ref();
     >
       <a class="simon-link">
         <q-icon :name="topic.icon" size="32px" />
-        <q-tooltip anchor="center middle" self="top left">
-          {{ topic.label }}
-        </q-tooltip>
+        <q-tooltip anchor="center middle" self="top left"> {{ topic.label }} </q-tooltip>
       </a>
     </div>
   </div>
@@ -117,12 +115,12 @@ const simonRef = ref();
 
   &.Packages {
     top: 0;
-    left: 0;
+    right: 0;
   }
 
   &.CaseStudies {
     top: 0;
-    right: 0;
+    left: 0;
   }
 
   &.About {

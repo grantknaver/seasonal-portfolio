@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref, watch, nextTick, onBeforeUnmount, computed, onMounted } from 'vue';
+import { ref, watch, nextTick, onBeforeUnmount, computed, onMounted, onUnmounted } from 'vue';
 import { useMainStore } from '../stores/main';
 import { type Topic } from '../shared/types/topic';
 import { v4 as uuidv4 } from 'uuid';
@@ -7,25 +7,14 @@ import { storeToRefs } from 'pinia';
 import { TopicName } from '../shared/constants/topicName';
 import { setSeasonClasses } from '../shared/utils/setSeasonColors';
 import SimonMenu from '../components/SimonMenu.vue';
-import { type Slide } from '../shared/types/slide';
-import { QCarousel, scroll } from 'quasar';
+import type { Slide } from '../shared/types/slide';
+import { scroll } from 'quasar';
 import { Theme } from '../shared/constants/theme';
 import gsap from 'gsap';
 import { ViewType } from '../shared/constants/viewType';
 import { useViewport } from '../shared/utils/viewWidth';
-import { waitForLayout } from 'src/shared/utils/waitForLayout';
 import { flattenElements } from '../shared/utils/flattenElements';
-
 import { defineAsyncComponent } from 'vue';
-
-const AboutSection = defineAsyncComponent(() => import('../components/AboutSection.vue'));
-const ContactSection = defineAsyncComponent(() => import('../components/ContactSection.vue'));
-const PackageSection = defineAsyncComponent(() => import('../components/PackageSection.vue'));
-const CaseStudiesSection = defineAsyncComponent(
-  () => import('../components/CaseStudiesSection.vue'),
-);
-const WeatherBackground = defineAsyncComponent(() => import('../components/WeatherBackground.vue'));
-
 import {
   mdiChevronUp,
   mdiBookOpenPageVariant,
@@ -34,21 +23,37 @@ import {
   mdiEmailBox,
 } from '@quasar/extras/mdi-v7';
 import { mdiChevronDown } from '@quasar/extras/mdi-v7';
+import type { ImageData } from '../shared/types/imageData';
+import autumn from 'src/assets/autumn-forestry.jpg?w=768;1280;1600&format=avif;webp;jpeg&quality=40&withoutEnlargement=true&as=picture';
+import winter from 'src/assets/snowy-winter-landscape.jpg?w=768;1280;1600&format=avif;webp;jpeg&quality=40&withoutEnlargement=true&as=picture';
+import spring from 'src/assets/beautiful-forest-spring-season.jpg?w=768;1280;1600&format=avif;webp;jpeg&quality=40&withoutEnlargement=true&as=picture';
+import summer from 'src/assets/beach.jpg?w=768;1280;1600&format=avif;webp;jpeg&quality=40&withoutEnlargement=true&as=picture';
+import { CacheEntry } from 'src/shared/constants/cacheEntry';
+import { useCacheStore } from 'src/stores/component-cache';
 
 const mainStore = useMainStore();
+const cacheStore = useCacheStore();
 const mobileTopics: Topic[] = [
   {
     id: uuidv4(),
     name: TopicName.CaseStudies,
     icon: mdiBookOpenPageVariant,
     label: TopicName.CaseStudies,
+    cachedName: CacheEntry.CaseStudiesSection,
   },
-  { id: uuidv4(), name: TopicName.Packages, icon: mdiTruckDelivery, label: 'Packages' },
+  {
+    id: uuidv4(),
+    name: TopicName.Packages,
+    icon: mdiTruckDelivery,
+    label: 'Packages',
+    cachedName: CacheEntry.PackageSection,
+  },
   {
     id: uuidv4(),
     name: TopicName.About,
     icon: mdiInformationOutline,
     label: TopicName.About,
+    cachedName: CacheEntry.AboutSection,
   },
 
   {
@@ -56,44 +61,41 @@ const mobileTopics: Topic[] = [
     name: TopicName.Contact,
     icon: mdiEmailBox,
     label: TopicName.Contact,
+    cachedName: CacheEntry.ContactSection,
   },
 ];
-
-import autumn from 'src/assets/autumn-forestry.jpg?w=800;1280;2000&format=avif;webp;jpg&as=picture';
-import winter from 'src/assets/snowy-winter-landscape.jpg?w=800;1280;2000&format=avif;webp;jpg&as=picture';
-import spring from 'src/assets/beautiful-forest-spring-season.jpg?w=800;1280;2000&format=avif;webp;jpg&as=picture';
-import summer from 'src/assets/beach.jpg?w=800;1280;2000&format=avif;webp;jpg&as=picture';
-
+const { catalog } = storeToRefs(cacheStore);
 const slides = ref<Slide[]>([
   {
     id: uuidv4(),
-    img: autumn,
+    picture: autumn as ImageData,
     theme: Theme.Fall,
     name: 'Fall Background',
   },
   {
     id: uuidv4(),
-    img: winter,
+    picture: winter as ImageData,
     theme: Theme.Winter,
     name: 'Winter Background',
   },
   {
     id: uuidv4(),
-    img: spring,
+    picture: spring as ImageData,
     theme: Theme.Spring,
     name: 'Spring Background',
   },
   {
     id: uuidv4(),
-    img: summer,
+    picture: summer as ImageData,
     theme: Theme.Summer,
     name: 'Summer Background',
   },
 ]);
+
+const expandedPanel = ref<TopicName | null>();
 const { getScrollTarget, setVerticalScrollPosition } = scroll;
 const slide = ref<Theme>(Theme.Fall);
 const { activeTheme, activeTopic, mobileScrollTarget } = storeToRefs(mainStore);
-const expandedPanel = ref<TopicName | null>(TopicName.CaseStudies);
 const root = ref<HTMLElement | null>(null);
 const showFooter = ref<boolean>(false);
 const io = ref<IntersectionObserver | null>(null);
@@ -106,12 +108,51 @@ const titleRef = ref<HTMLElement | null>(null);
 const sepRef = ref<HTMLElement | null>(null);
 const servRef = ref<HTMLElement | null>(null);
 const homeContainerRef = ref<HTMLElement | null>(null);
+const showCarousel = ref<boolean>(false);
 
+const loadComponent = (topicName: TopicName) => {
+  switch (topicName) {
+    case TopicName.CaseStudies:
+      cacheStore.CACHE_COMPONENT(CacheEntry.CaseStudiesSection);
+      break;
+    case TopicName.Packages:
+      cacheStore.CACHE_COMPONENT(CacheEntry.PackageSection);
+      break;
+    case TopicName.About:
+      cacheStore.CACHE_COMPONENT(CacheEntry.AboutSection);
+      break;
+    case TopicName.Contact:
+      cacheStore.CACHE_COMPONENT(CacheEntry.ContactSection);
+      break;
+  }
+};
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+let WeatherBackground: any = null;
 onMounted(async () => {
   await nextTick();
   await waitForLayout(root.value);
-  dispose.value = buildAnimations(isResponsive.value ? ViewType.Responsive : ViewType.Desktop);
+  showCarousel.value = true;
+  if (isResponsive.value) {
+    WeatherBackground = defineAsyncComponent(() => import('../components/WeatherBackground.vue'));
+    try {
+      dispose.value = buildAnimations(ViewType.Responsive);
+    } catch (e) {
+      console.log('Responsive main page animations error: ', e);
+    }
+    if (activeTopic.value) loadComponent(activeTopic.value);
+  } else {
+    try {
+      dispose.value = buildAnimations(ViewType.Desktop);
+    } catch (e) {
+      console.log('Desktop main page animations error: ', e);
+    }
+  }
+
   await mainStore.VERIFY_IS_HUMAN();
+});
+
+onUnmounted(() => {
+  cacheStore.CLEAR_CACHE();
 });
 
 watch(
@@ -119,13 +160,9 @@ watch(
   async (viewNow) => {
     try {
       dispose.value();
-    } catch (e) {
-      console.log(e);
+    } catch (err) {
+      console.log('view switch error: ', err);
     }
-    if (!activeTopic.value) {
-      expandedPanel.value = TopicName.CaseStudies;
-    }
-    expandedPanel.value = activeTopic.value;
     await nextTick();
     await waitForLayout(root.value);
     dispose.value = buildAnimations(viewNow ? ViewType.Responsive : ViewType.Desktop);
@@ -150,6 +187,7 @@ watch(mobileScrollTarget, (newTopic) => {
 watch(
   activeTopic,
   async (newTopic: TopicName | null) => {
+    if (newTopic) loadComponent(newTopic);
     await nextTick();
     const el = homeContainerRef.value;
     if (!el) return;
@@ -176,6 +214,19 @@ watch(
 );
 
 watch(slide, (newVal) => mainStore.SET_ACTIVE_THEME(newVal));
+
+const waitForLayout = async (el: HTMLElement | null, frames = 8): Promise<boolean> => {
+  if (!el) return false;
+  for (let i = 0; i < frames; i++) {
+    await new Promise(requestAnimationFrame);
+    if (el.offsetParent !== null && el.offsetHeight > 0 && el.offsetWidth > 0) {
+      mainStore.SET_PAINTED_STATUS(true);
+      return true;
+    }
+  }
+  mainStore.SET_PAINTED_STATUS(false);
+  return false;
+};
 
 const buildAnimations = (mode: ViewType) => {
   const el = root.value;
@@ -299,7 +350,7 @@ const scrollToFooter = () => {
 
 <template>
   <q-page class="page-container column">
-    <div class="carousel-background">
+    <div class="carousel-background" v-if="showCarousel">
       <q-carousel
         v-model="slide"
         transition-prev="fade"
@@ -317,21 +368,23 @@ const scrollToFooter = () => {
           :name="slide.theme"
           class="relative-position"
         >
-          <!-- Your custom background layer -->
           <div class="slide-bg">
             <picture>
               <source
-                v-for="(src, srcIndex) in slide.img.sources"
-                :key="srcIndex"
-                :srcset="src.srcset"
-                :type="src.type"
+                v-for="(pic, key) in slide.picture.sources"
+                :key="key"
+                :srcset="pic"
+                :type="`image/${key}`"
               />
               <img
-                :src="slide.img.img.src"
-                :srcset="slide.img.img.srcset"
-                :width="slide.img.img.width"
-                :height="slide.img.img.height"
-                fetchpriority="high"
+                :src="slide.picture.img.src"
+                :width="slide.picture.img.w"
+                :height="slide.picture.img.h"
+                sizes="(min-width: 1440px) 1600px,
+        (min-width: 1024px) 1280px,
+        (min-width: 600px)  768px,
+        100vw"
+                :fetchpriority="index === 0 ? 'high' : 'low'"
                 :loading="index === 0 ? 'eager' : 'lazy'"
                 decoding="async"
                 :alt="slide.name"
@@ -341,7 +394,7 @@ const scrollToFooter = () => {
         </q-carousel-slide>
       </q-carousel>
     </div>
-    <div class="weather-layer">
+    <div v-if="!isResponsive" class="weather-layer">
       <WeatherBackground />
     </div>
     <div class="logo">
@@ -449,50 +502,50 @@ const scrollToFooter = () => {
             </p>
           </span>
         </div>
+
         <q-list class="full-width font-primary">
           <q-item
             v-for="topic in mobileTopics"
             :key="topic.id"
-            :name="topic.name"
-            v-model="expandedPanel"
             class="full-width bg-transparent q-pa-none q-mb-sm"
           >
             <q-expansion-item
+              group="responsive-main-menu"
               :icon="topic.icon"
               :label="topic.label"
               :model-value="expandedPanel === topic.name"
-              @update:model-value="
-                (val) => {
-                  expandedPanel = val
-                    ? topic.name
-                    : expandedPanel === topic.name
-                      ? null
-                      : expandedPanel;
+              @show="
+                () => {
+                  expandedPanel = topic.name;
+                  mainStore.SET_ACTIVE_TOPIC(topic.name);
+                }
+              "
+              @hide="
+                () => {
+                  if (expandedPanel === topic.name) {
+                    expandedPanel = null;
+                    mainStore.SET_ACTIVE_TOPIC(null);
+                  }
                 }
               "
               :header-class="['text-dark', 'bg-secondary']"
               class="expansion-item full-width"
+              switch-toggle-side
             >
-              <template v-if="topic.name === TopicName.Packages">
-                <div :id="topic.name" class="full-width">
-                  <PackageSection />
-                </div>
-              </template>
-              <template v-if="topic.name === TopicName.CaseStudies">
-                <div :id="topic.name" class="anchor full-width">
-                  <CaseStudiesSection />
-                </div>
-              </template>
-              <template v-if="topic.name === TopicName.About">
-                <div :id="topic.name" class="full-width">
-                  <AboutSection />
-                </div>
-              </template>
-              <template v-if="topic.name === TopicName.Contact">
-                <div :id="topic.name" class="full-width">
-                  <ContactSection />
-                </div>
-              </template>
+              <div v-if="expandedPanel === topic.name" :id="topic.name" class="anchor full-width">
+                <!-- First open: skeleton while chunk mounts -->
+
+                <!-- After first open -->
+                <Suspense>
+                  <template #default>
+                    <component :is="catalog[topic.cachedName as CacheEntry]" :key="topic.name" />
+                  </template>
+
+                  <template #fallback>
+                    <q-skeleton type="rect" height="200px" />
+                  </template>
+                </Suspense>
+              </div>
             </q-expansion-item>
           </q-item>
         </q-list>
@@ -665,13 +718,13 @@ const scrollToFooter = () => {
 </template>
 
 <style scoped lang="scss">
-@import '../css/main.scss';
+@use '/src/css/_tokens.scss' as tokens;
 
 .page-container {
   background-color: rgba($color: white, $alpha: 0.7);
   position: relative;
 
-  @media (min-width: $breakpoint-md) {
+  @media (min-width: tokens.$breakpoint-md) {
     background-color: initial;
   }
 
@@ -714,7 +767,7 @@ const scrollToFooter = () => {
     left: 3%;
     z-index: 2;
 
-    @media (min-width: $breakpoint-lg) {
+    @media (min-width: tokens.$breakpoint-lg) {
       display: flex !important;
       align-items: center;
       z-index: 2;
@@ -729,7 +782,7 @@ const scrollToFooter = () => {
   .sub-container {
     flex: 1 1 0%;
 
-    @media (min-width: $breakpoint-lg) {
+    @media (min-width: tokens.$breakpoint-lg) {
       position: relative;
       padding: initial;
     }
@@ -750,7 +803,7 @@ const scrollToFooter = () => {
       height: auto;
       max-width: 600px;
 
-      @media (min-width: $breakpoint-md) {
+      @media (min-width: tokens.$breakpoint-md) {
         max-width: 800px;
       }
 
@@ -763,6 +816,7 @@ const scrollToFooter = () => {
     }
 
     /* ---------- Desktop ---------- */
+
     .desktop-view {
       display: flex;
       justify-content: center;
@@ -821,5 +875,10 @@ const scrollToFooter = () => {
       }
     }
   }
+}
+
+.panel-skeleton {
+  /* match the typical height of your section so there's no CLS */
+  height: clamp(320px, 60vh, 720px);
 }
 </style>

@@ -582,12 +582,17 @@ onMounted(() => {
   </section>
 </template>
 
-<style scoped lang="scss">
-@import '../css/main.scss';
-$winter-mobile-background: map-get($winter-theme, primary);
+<style lang="scss">
+@use '/src/css/_tokens.scss' as tokens;
+$winter-mobile-background: map-get(tokens.$winter-theme, primary);
+
+.aboutSection {
+  content-visibility: auto;
+  contain-intrinsic-size: 800px 1000px;
+}
 
 .responsive-view {
-  @media (min-width: $breakpoint-lg) {
+  @media (min-width: tokens.$breakpoint-lg) {
     display: none;
   }
 
@@ -640,7 +645,7 @@ $winter-mobile-background: map-get($winter-theme, primary);
 .desktop-view {
   display: none;
 
-  @media (min-width: $breakpoint-lg) {
+  @media (min-width: tokens.$breakpoint-lg) {
     display: flex;
   }
 
@@ -663,7 +668,7 @@ $winter-mobile-background: map-get($winter-theme, primary);
 .winter-mobile-background {
   background-color: rgba($winter-mobile-background, $alpha: 0.8);
 
-  @media (min-width: $breakpoint-md) {
+  @media (min-width: tokens.$breakpoint-md) {
     background-color: initial;
   }
 }

@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref, watch, onBeforeUnmount } from 'vue';
+import { ref, watch, onBeforeUnmount, onMounted } from 'vue';
 import { useMainStore } from 'src/stores/main';
 import { storeToRefs } from 'pinia';
 
@@ -81,6 +81,10 @@ watch(
   { flush: 'post' },
 );
 
+onMounted(() => {
+  console.log('mount recaptcha');
+});
+
 // if this component gets destroyed (e.g., view switch), clear id so you can re-init later
 onBeforeUnmount(() => mainStore.SET_RECAPTCHA_WIDGET_ID(null));
 </script>
@@ -90,15 +94,14 @@ onBeforeUnmount(() => mainStore.SET_RECAPTCHA_WIDGET_ID(null));
 </template>
 
 <style scoped lang="scss">
-@import '../css/main.scss';
-
+@use '/src/css/_tokens.scss' as tokens;
 .g-recaptcha {
   width: 175px;
   max-width: 175px;
   transform: scale(0.75); /* Scales to 70% */
   transform-origin: 0 0; /* Aligns to top-left */
 
-  @media (min-width: $breakpoint-lg) {
+  @media (min-width: tokens.$breakpoint-lg) {
     width: auto;
     max-width: none;
     transform: none;

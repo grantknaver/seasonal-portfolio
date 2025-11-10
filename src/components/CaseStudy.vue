@@ -104,6 +104,7 @@ const cardBackgrounds = {
                 class="full-width"
               >
                 <q-expansion-item
+                  :group="topic + 'list'"
                   class="shadow-1 overflow-hidden q-mt-md full-width"
                   :class="{ 'q-mb-md': index + 1 === props.expansionTopics.topics.length }"
                   style="border-radius: 5px"
@@ -122,12 +123,12 @@ const cardBackgrounds = {
                 </q-expansion-item>
 
                 <slot :name="topic.name" />
-                <q-separator v-if="topic.hasSeparator" />
+                <q-separator v-show="topic.hasSeparator" />
               </div>
             </q-card-section>
           </q-intersection>
 
-          <q-separator v-if="props.expansionTopics.hasSeparator" />
+          <q-separator v-show="props.expansionTopics.hasSeparator" />
         </div>
 
         <!-- List topics -->
@@ -354,8 +355,7 @@ const cardBackgrounds = {
 </template>
 
 <style scoped lang="scss">
-@import '../css/main.scss';
-
+@use '/src/css/_tokens.scss' as tokens;
 .responsive-view {
   .first-card {
     border-top-left-radius: 0;
@@ -427,7 +427,7 @@ const cardBackgrounds = {
 
         p {
           line-height: 1.5;
-          font-family: $cursive-stack;
+          font-family: tokens.$cursive-stack;
         }
       }
     }

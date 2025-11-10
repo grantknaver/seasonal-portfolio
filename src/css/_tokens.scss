@@ -1,0 +1,62 @@
+// ----------------------------
+// Breakpoints
+// ----------------------------
+$breakpoint-xs: 0px;
+$breakpoint-sm: 600px;
+$breakpoint-md: 1024px;
+$breakpoint-lg: 1440px;
+$breakpoint-xl: 1920px;
+
+// ----------------------------
+// Font stacks
+// ----------------------------
+// $cursive-stack: 'Dancing Script', cursive;
+// $secondary-font: 'Manrope', 'Avenir Next', 'Helvetica Neue', Arial, sans-serif;
+// $primary-font: 'Raleway', 'Helvetica Neue', Helvetica, Arial, sans-serif;
+
+$cursive-stack: cursive;
+$secondary-font: 'Avenir Next', 'Helvetica Neue', Arial, sans-serif;
+$primary-font: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+
+// ----------------------------
+// Seasonal Color Themes
+// ----------------------------
+$fall-theme: (
+  primary: #f7eddc,
+  // cream
+  secondary: #eac08c,
+  // squash
+  accent: #8d3a1e,
+  // rust (AA/AAA on light)
+  dark: #3b2718, // warm charcoal (AAA on light)
+);
+
+$winter-theme: (
+  primary: #e3f2fd,
+  // ice
+  secondary: #bbdefb,
+  // pale sky
+  accent: #0d47a1,
+  // deep cold blue (AAA on white)
+  dark: #0b1f3b, // navy-charcoal (AAA on light)
+);
+
+$spring-theme: (
+  primary: #e8f5e9,
+  // mint
+  secondary: #c8e6c9,
+  // soft leaf
+  accent: #00796b,
+  // leafy teal (AA on white; AAA on pastels)
+  dark: #233129, // greenish charcoal (AAA on light)
+);
+
+$summer-theme: (
+  primary: #fff9c4,
+  // sand 1 (bg only)
+  secondary: #ffe082,
+  // sand 2 (cards/stripes)
+  accent: #006064,
+  // ocean teal (AAA on white)
+  dark: #0d3b66, // nautical navy (AAA on white)
+);

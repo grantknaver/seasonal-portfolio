@@ -1,4 +1,5 @@
-@import './mixins/export-css-vars.scss';
+@use './tokens' as tokens; // <-- brings in $fall-theme, breakpoints, fonts, etc.
+// @use './mixins' as mix;
 // Quasar SCSS (& Sass) Variables
 // --------------------------------------------------
 // To customize the look and feel of this app, you can override
@@ -9,72 +10,14 @@
 // It's highly recommended to change the default colors
 // to match your app's branding.
 // Tip: Use the "Theme Builder" on Quasar's documentation website.
-$primary: #f4e7e1;
-$secondary: #ff9b45;
-$accent: #d5451b;
 
-$dark: #521c0d;
-$dark-page: #121212;
+// === Default Theme (Fall)
+$primary: map-get(tokens.$fall-theme, primary);
+$secondary: map-get(tokens.$fall-theme, secondary);
+$accent: map-get(tokens.$fall-theme, accent);
+$dark: map-get(tokens.$fall-theme, dark);
 
 $positive: #21ba45;
 $negative: #c10015;
 $info: #31ccec;
 $warning: #f2c037;
-
-// === Base Theme Maps ===
-$fall-theme: (
-  primary: #f7eddc,
-  // cream
-  secondary: #eac08c,
-  // squash
-  accent: #8d3a1e,
-  // rust (AA/AAA on light)
-  dark: #3b2718, // warm charcoal (AAA on light)
-);
-
-$winter-theme: (
-  primary: #e3f2fd,
-  // ice
-  secondary: #bbdefb,
-  // pale sky
-  accent: #0d47a1,
-  // deep cold blue (AAA on white)
-  dark: #0b1f3b, // navy-charcoal (AAA on light)
-);
-
-$spring-theme: (
-  primary: #e8f5e9,
-  // mint
-  secondary: #c8e6c9,
-  // soft leaf
-  accent: #00796b,
-  // leafy teal (AA on white; AAA on pastels)
-  dark: #233129, // greenish charcoal (AAA on light)
-);
-
-$summer-theme: (
-  primary: #fff9c4,
-  // sand 1 (bg only)
-  secondary: #ffe082,
-  // sand 2 (cards/stripes)
-  accent: #006064,
-  // ocean teal (AAA on white)
-  dark: #0d3b66, // nautical navy (AAA on white)
-);
-
-// === Default Theme (Fall)
-$primary: map-get($fall-theme, primary);
-$secondary: map-get($fall-theme, secondary);
-$accent: map-get($fall-theme, accent);
-$dark: map-get($fall-theme, dark);
-
-$themeColors: (
-  'primary': $primary,
-  'secondary': $secondary,
-  'accent': $accent,
-  'dark': $dark,
-);
-
-:root {
-  @include export-css-vars($themeColors);
-}

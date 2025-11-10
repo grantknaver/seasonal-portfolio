@@ -1,12 +1,4 @@
-@import 'variables';
-@import '../quasar.variables';
-
-// ----------------------------
-// Font stacks
-// ----------------------------
-$cursive-stack: 'Dancing Script', cursive;
-$secondary-font: 'Manrope', 'Avenir Next', 'Helvetica Neue', Arial, sans-serif;
-$primary-font: 'Raleway', 'Helvetica Neue', Helvetica, Arial, sans-serif;
+@use './tokens' as tokens;
 
 // ----------------------------
 // Text sizes (per breakpoint)
@@ -51,7 +43,7 @@ $text-sizes: (
 );
 
 // ----------------------------
-// Sensible line-heights
+// Text Line Heights (per breakpoint)
 // ----------------------------
 $text-leading: (
   'h1': 1.2,
@@ -70,15 +62,15 @@ $text-leading: (
     font-size: nth($sizes, 1);
     line-height: map-get($text-leading, $class);
 
-    @media (min-width: $breakpoint-sm) {
+    @media (min-width: tokens.$breakpoint-sm) {
       font-size: nth($sizes, 2);
     }
 
-    @media (min-width: $breakpoint-md) {
+    @media (min-width: tokens.$breakpoint-md) {
       font-size: nth($sizes, 3);
     }
 
-    @media (min-width: $breakpoint-lg) {
+    @media (min-width: tokens.$breakpoint-lg) {
       font-size: nth($sizes, 4);
     }
   }
@@ -149,18 +141,18 @@ $text-glows: (
 // Font family helpers
 // ----------------------------
 .primary-font {
-  font-family: $primary-font;
+  font-family: tokens.$primary-font;
 }
 
 .secondary-font {
-  font-family: $secondary-font;
+  font-family: tokens.$secondary-font;
 }
 
 // ----------------------------
 // Optional: adjust body text
 // on very large screens
 // ----------------------------
-@media (min-width: $breakpoint-lg) {
+@media (min-width: tokens.$breakpoint-lg) {
   .text-body-1 {
     line-height: 1.65;
   }

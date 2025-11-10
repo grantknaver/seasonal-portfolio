@@ -1,16 +1,12 @@
 <script setup lang="ts">
 import { setSeasonClasses } from '../shared/utils/setSeasonColors';
 import { useViewport } from '../shared/utils/viewWidth';
-import { computed, ref, watch } from 'vue';
+import { computed, onMounted, ref, watch } from 'vue';
 import { useMainStore } from '../stores/main';
 import { storeToRefs } from 'pinia';
-
 import { defineAsyncComponent } from 'vue';
-
-const CaseStudy = defineAsyncComponent(() => import('../components/CaseStudy.vue'));
 import { type CaseStudy as CS } from '../shared/types/caseStudy';
 import { v4 as uuidv4 } from 'uuid';
-import AIAssitant from './AIAssitant.vue';
 import { Theme } from '../shared/constants/theme';
 import { CaseStudies } from 'src/shared/constants/caseStudies';
 import {
@@ -31,6 +27,8 @@ import {
   mdiAutoFix,
 } from '@quasar/extras/mdi-v7';
 
+const CaseStudy = defineAsyncComponent(() => import('../components/CaseStudy.vue'));
+const AIAssitant = defineAsyncComponent(() => import('../components/AIAssitant.vue'));
 const mainStore = useMainStore();
 const { activeTheme } = storeToRefs(mainStore);
 const { lgBreakpoint, width } = useViewport();
@@ -313,15 +311,21 @@ const caseStudies = ref<CS[]>([
   },
 ]);
 const tab = ref(CaseStudies.WeatherAndTheme);
+
+onMounted(() => {
+  // [ComponentsCatelog.CaseStudy, ComponentsCatelog.AIAssitant].forEach((c) => {
+  //   cacheStore.CACHE_COMPONENT(c);
+  // });
+});
 watch(tab, (newTab) => {
   mainStore.SET_CASE_STUDY_ACTIVE_TAB(newTab);
 });
 
 const BG_BY_THEME: Record<Theme, string> = {
-  [Theme.Fall]: new URL('../assets/ai-bcg-fall.png', import.meta.url).href,
-  [Theme.Winter]: new URL('../assets/ai-bcg-winter.png', import.meta.url).href,
-  [Theme.Spring]: new URL('../assets/ai-bcg-spring.png', import.meta.url).href,
-  [Theme.Summer]: new URL('../assets/ai-bcg-summer.png', import.meta.url).href,
+  [Theme.Fall]: new URL('../assets/ai-bcg-fall.avif', import.meta.url).href,
+  [Theme.Winter]: new URL('../assets/ai-bcg-winter.avif', import.meta.url).href,
+  [Theme.Spring]: new URL('../assets/ai-bcg-spring.avif', import.meta.url).href,
+  [Theme.Summer]: new URL('../assets/ai-bcg-summer.avif', import.meta.url).href,
 };
 
 const backgroundUrl = computed(() => BG_BY_THEME[activeTheme.value] ?? BG_BY_THEME[Theme.Winter]);
@@ -424,7 +428,15 @@ const backgroundUrl = computed(() => BG_BY_THEME[activeTheme.value] ?? BG_BY_THE
         >
           <template #ai-chat-result>
             <div class="q-mb-lg row justify-center full-width">
-              <AIAssitant />
+              <Suspense>
+                <template #default>
+                  <AIAssitant />
+                </template>
+
+                <template #fallback>
+                  <q-skeleton type="QAvatar" height="400px" />
+                </template>
+              </Suspense>
             </div>
 
             <div
@@ -615,7 +627,13 @@ const backgroundUrl = computed(() => BG_BY_THEME[activeTheme.value] ?? BG_BY_THE
   </section>
 </template>
 <style scoped lang="scss">
-@import '../css/main.scss';
+@use '/src/css/_tokens.scss' as tokens;
+
+.caseStudiesSection {
+  content-visibility: auto;
+  contain-intrinsic-size: 800px 1000px;
+}
+
 .responsive-view {
   .first-card {
     border-top-left-radius: 0;
@@ -672,7 +690,7 @@ const backgroundUrl = computed(() => BG_BY_THEME[activeTheme.value] ?? BG_BY_THE
     .weather-theme-header-section {
       p {
         line-height: 1.5;
-        font-family: $cursive-stack;
+        font-family: tokens.$cursive-stack;
         background-color: transparent;
       }
     }
@@ -689,7 +707,7 @@ const backgroundUrl = computed(() => BG_BY_THEME[activeTheme.value] ?? BG_BY_THE
 
         p {
           line-height: 1.5;
-          font-family: $cursive-stack;
+          font-family: tokens.$cursive-stack;
         }
       }
     }

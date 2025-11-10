@@ -1,3 +1,4 @@
+import { type CacheEntry } from '../constants/cacheEntry';
 import { type TopicName } from '../constants/topicName';
 
 export interface Topic {
@@ -5,4 +6,5 @@ export interface Topic {
   name: TopicName;
   icon?: string;
   label?: string;
+  cachedName?: CacheEntry;
 }

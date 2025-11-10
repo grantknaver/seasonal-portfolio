@@ -109,6 +109,7 @@ watch(oaLogs, async () => {
             v-else
             src="../assets/4-season-not-authorized.png"
             fit="cover"
+            fetchpriority="high"
             class="no-overflow"
             style="flex: 1 1 auto; min-height: 0; width: 100%; height: 100%"
           />
@@ -217,8 +218,6 @@ watch(oaLogs, async () => {
 </template>
 
 <style scoped lang="scss">
-@import '../css/main.scss';
-
 .rv-ai-chat-dialog {
   border-radius: 5px !important;
 }

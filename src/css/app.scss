@@ -1,13 +1,13 @@
-@import './main.scss';
+@use './mixins' as mix;
+@use './tokens' as tokens;
+@use './typography';
 
 html,
 body,
 #q-app {
   height: 100%;
   font-size: 16px;
-  font-display: swap;
 }
-
 html,
 body,
 #q-app,
@@ -19,11 +19,13 @@ body,
 }
 
 body {
-  font-family: $primary-font;
+  /* system stack is fine now that webfonts are gone */
+  font-family: tokens.$primary-font;
   line-height: 1.6;
   color: $dark;
 }
 
+/* keep scrollbars hidden if you really want, but they’re not perf-related */
 html,
 body {
   scrollbar-width: none;
@@ -33,4 +35,34 @@ html::-webkit-scrollbar,
 body::-webkit-scrollbar {
   width: 0;
   height: 0;
+}
+
+/* page-specific styles */
+.message textarea {
+  min-height: 200px !important;
+}
+
+/* layout adjustments */
+.desktop-drawer .q-scrollarea,
+.desktop-drawer .scroll-area {
+  padding-right: 1.7rem;
+}
+
+/* only the variables you truly need at startup */
+:root {
+  @include mix.export-css-vars(
+    (
+      'q-primary': map-get(tokens.$fall-theme, primary),
+      'q-secondary': map-get(tokens.$fall-theme, secondary),
+      'q-accent': map-get(tokens.$fall-theme, accent),
+      'q-dark': map-get(tokens.$fall-theme, dark),
+    )
+  );
+  @include mix.export-css-vars(
+    (
+      'breakpoint-sm': tokens.$breakpoint-sm,
+      'breakpoint-md': tokens.$breakpoint-md,
+      'breakpoint-lg': tokens.$breakpoint-lg,
+    )
+  );
 }

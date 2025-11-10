@@ -226,10 +226,15 @@ const sendEmail = async () => {
 </template>
 
 <style scoped lang="scss">
-@import '../css/main.scss';
+@use '/src/css/_tokens.scss' as tokens;
+
+.contactSection {
+  content-visibility: auto;
+  contain-intrinsic-size: 800px 1000px;
+}
 
 .responsive-view {
-  @media (min-width: $breakpoint-lg) {
+  @media (min-width: tokens.$breakpoint-lg) {
     display: none;
   }
 }
@@ -237,7 +242,7 @@ const sendEmail = async () => {
 .desktop-view {
   display: none;
 
-  @media (min-width: $breakpoint-lg) {
+  @media (min-width: tokens.$breakpoint-lg) {
     display: flex;
     flex-direction: column;
   }

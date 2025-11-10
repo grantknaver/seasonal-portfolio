@@ -1,5 +1,5 @@
 <script lang="ts" setup>
-import { computed, ref, onMounted, onBeforeUnmount } from 'vue';
+import { computed, ref, onMounted, onBeforeUnmount, defineAsyncComponent } from 'vue';
 import { useMainStore } from '../stores/main';
 import { storeToRefs } from 'pinia';
 import { Theme } from '../shared/constants/theme';
@@ -7,15 +7,12 @@ import { getCustomCssVar } from '../shared/utils/getCustomCssVar';
 import { TopicName } from '../shared/constants/topicName';
 import { type Topic } from '../shared/types/topic';
 import { v4 as uuidv4 } from 'uuid';
-import AboutSection from '../components/AboutSection.vue';
-import ContactSection from '../components/ContactSection.vue';
-import PackageSection from 'src/components/PackageSection.vue';
-import CaseStudiesSection from '../components/CaseStudiesSection.vue';
 import { mdiMenu } from '@quasar/extras/mdi-v7';
+import { useViewport } from '../shared/utils/viewWidth';
 
 const mainStore = useMainStore();
 const { activeTheme, activeTopic } = storeToRefs(mainStore);
-
+const { width, height } = useViewport();
 const windowWidth = ref(window.innerWidth);
 const desktopDrawerWidth = ref(window.innerWidth * 0.5);
 const showTopicBreakpoint = +`${getCustomCssVar('breakpoint-lg')}`.slice(0, -2);
@@ -33,11 +30,18 @@ const topics = ref<Topic[]>([
   { id: uuidv4(), name: TopicName.Contact, icon: 'contact_mail', label: TopicName.Contact },
   {
     id: uuidv4(),
-    name: TopicName.CaseStudies.replace(' ', '') as TopicName,
+    name: 'Case Studies' as TopicName,
     icon: 'menu_book',
     label: TopicName.CaseStudies,
   },
 ]);
+
+const SectionMap: Record<TopicName, ReturnType<typeof defineAsyncComponent>> = {
+  ['Case Studies']: defineAsyncComponent(() => import('../components/CaseStudiesSection.vue')),
+  [TopicName.Packages]: defineAsyncComponent(() => import('../components/PackageSection.vue')),
+  [TopicName.About]: defineAsyncComponent(() => import('../components/AboutSection.vue')),
+  [TopicName.Contact]: defineAsyncComponent(() => import('../components/ContactSection.vue')),
+};
 
 onMounted(() => {
   window.addEventListener('resize', updateWidths);
@@ -55,7 +59,9 @@ onBeforeUnmount(() => window.removeEventListener('resize', updateWidths));
           <div id="logo" class="logo row items-center">
             <img
               class="q-pt-sm"
-              style="max-width: 65px"
+              width="130"
+              height="130"
+              style="max-width: 65px; height: auto"
               src="../assets/glkfreelance-logo.avif"
               alt="logo"
             />
@@ -117,16 +123,6 @@ onBeforeUnmount(() => window.removeEventListener('resize', updateWidths));
             </q-item>
 
             <hr />
-
-            <q-item key="resume" clickable @click="mobileMenu = false">
-              <q-item-section class="text-bold text-secondary">
-                <a
-                  class="resume"
-                  href="https://firebasestorage.googleapis.com/v0/b/portfolio-4-seasons.firebasestorage.app/o/Resume.pdf?alt=media&token=2dbf1bfa-6d3f-44e4-a9b9-d6c6a53ea178"
-                  >Download Resume</a
-                >
-              </q-item-section>
-            </q-item>
           </q-list>
         </q-drawer>
       </q-toolbar>
@@ -196,32 +192,45 @@ onBeforeUnmount(() => window.removeEventListener('resize', updateWidths));
       content-class="column no-wrap"
     >
       <q-scroll-area
-        v-if="activeTopic !== TopicName.Contact"
         visible
         class="q-pa-md"
         :bar-style="{ backgroundColor: 'white', opacity: '1' }"
       >
-        <AboutSection v-if="activeTopic === TopicName.About" />
-        <CaseStudiesSection v-else-if="activeTopic === TopicName.CaseStudies.replace(' ', '')" />
-        <PackageSection v-else-if="activeTopic === TopicName.Packages" />
-      </q-scroll-area>
+        <div v-for="topic in topics" :key="topic.id">
+          <Suspense>
+            <template #default>
+              <component
+                v-if="activeTopic === topic.name && topic.name !== TopicName.Contact"
+                :is="SectionMap[topic.name]"
+                :key="topic.name"
+              />
+              <div
+                v-else-if="activeTopic === topic.name && topic.name === TopicName.Contact"
+                class="contact-card"
+              >
+                <component :is="SectionMap[TopicName.Contact]" :key="topics[3]?.id" />
+              </div>
+            </template>
 
-      <div v-else class="fit flex column justify-center items-center q-pa-md">
-        <ContactSection />
-      </div>
+            <template #fallback>
+              <q-skeleton type="rect" :width="width / 2 - 16 + 'px'" :height="height + 'px'" />
+            </template>
+          </Suspense>
+        </div>
+      </q-scroll-area>
     </q-drawer>
   </q-layout>
 </template>
 
 <style lang="scss">
-@import '../css/base/variables';
+@use '/src/css/_tokens.scss' as tokens;
 
 .q-header {
   background-color: rgba($color: black, $alpha: 0.5) !important;
   border-bottom: 2px solid var(--q-primary);
   background-color: pink;
 
-  @media (min-width: $breakpoint-lg) {
+  @media (min-width: tokens.$breakpoint-lg) {
     display: none;
   }
 
@@ -233,7 +242,7 @@ onBeforeUnmount(() => window.removeEventListener('resize', updateWidths));
 
 /* Need this for right-side transparent drawer */
 aside {
-  @media (min-width: $breakpoint-sm) {
+  @media (min-width: tokens.$breakpoint-sm) {
     background-color: transparent !important;
   }
 }
@@ -281,5 +290,14 @@ aside {
 .activeTopic {
   color: var(--q-accent);
   font-weight: bold;
+}
+
+.contact-tab {
+  width: 100%;
+  height: 100%;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  padding: 1rem;
 }
 </style>

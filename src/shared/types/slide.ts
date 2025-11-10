@@ -1,9 +1,9 @@
 import { type Theme } from '../constants/theme';
-import { type PictureData } from './pictureData';
+import { type ImageData } from './imageData';
 
 export interface Slide {
   id: string;
-  img: PictureData;
+  picture: ImageData;
   theme: Theme;
   name: string;
 }

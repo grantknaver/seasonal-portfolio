@@ -29,6 +29,7 @@ import premiumSummer from 'src/assets/premium-summer.png?w=300;500;900&format=av
 
 import { mdiCheckboxBlankCircle } from '@quasar/extras/mdi-v7';
 import { debounce } from 'quasar';
+import { type ImageData } from 'src/shared/types/imageData';
 
 const mainStore = useMainStore();
 const { activeTheme } = storeToRefs(mainStore);
@@ -37,34 +38,34 @@ const getPackageImages = (theme: Theme): ThemePackageImages => {
   switch (theme) {
     case Theme.Fall:
       return {
-        starter: starterFall,
-        growth: growthFall,
-        premium: premiumFall,
+        starter: starterFall as ImageData,
+        growth: growthFall as ImageData,
+        premium: premiumFall as ImageData,
       };
     case Theme.Winter:
       return {
-        starter: starterWinter,
-        growth: growthWinter,
-        premium: premiumWinter,
+        starter: starterWinter as ImageData,
+        growth: growthWinter as ImageData,
+        premium: premiumWinter as ImageData,
       };
     case Theme.Spring:
       return {
-        starter: starterSpring,
-        growth: growthSpring,
-        premium: premiumSpring,
+        starter: starterSpring as ImageData,
+        growth: growthSpring as ImageData,
+        premium: premiumSpring as ImageData,
       };
     case Theme.Summer:
       return {
-        starter: starterSummer,
-        growth: growthSummer,
-        premium: premiumSummer,
+        starter: starterSummer as ImageData,
+        growth: growthSummer as ImageData,
+        premium: premiumSummer as ImageData,
       };
 
     default:
       return {
-        starter: starterFall,
-        growth: growthFall,
-        premium: premiumFall,
+        starter: starterFall as ImageData,
+        growth: growthFall as ImageData,
+        premium: premiumFall as ImageData,
       };
   }
 };
@@ -73,7 +74,7 @@ const packages = ref<PackageDetails[]>([
   {
     name: Packages.StarterPackage,
     id: uuidv4(),
-    img: starterFall,
+    img: starterFall as ImageData,
     alt: Packages.StarterPackage,
     featuresHeader: 'For new ideas ready to break ground.',
     features: [
@@ -94,7 +95,7 @@ const packages = ref<PackageDetails[]>([
   {
     name: Packages.GrowthPackage,
     id: uuidv4(),
-    img: growthFall,
+    img: growthFall as ImageData,
     alt: Packages.GrowthPackage,
     featuresHeader: 'For projects ready to scale and stand out.',
     features: [
@@ -115,7 +116,7 @@ const packages = ref<PackageDetails[]>([
   {
     name: Packages.PremiumPackage,
     id: uuidv4(),
-    img: premiumFall,
+    img: premiumFall as ImageData,
     alt: Packages.PremiumPackage,
     featuresHeader: 'For full bloom launches that need maximum impact.',
     features: [
@@ -262,21 +263,20 @@ onMounted(() => {
                 }"
               >
                 <source
-                  :type="packages[0]?.img.sources[0]?.type"
-                  :srcset="packages[0]?.img.sources[0]?.srcset"
+                  v-for="(s, srcIndex) in packages[0]?.img.sources"
+                  :key="srcIndex"
+                  :srcset="s"
                 />
                 <img
                   :src="packages[0]?.img.img.src"
-                  :srcset="packages[0]?.img.img.srcset"
-                  :width="packages[0]?.img.img.width"
-                  :height="packages[0]?.img.img.height"
+                  :width="packages[0]?.img.img.w"
+                  :height="packages[0]?.img.img.h"
                   :alt="packages[0]?.name"
                   loading="eager"
                   fetchpriority="high"
                   decoding="async"
                 />
               </picture>
-              <!-- <img class="full-width q-pa-lg" :src="packages[0]?.src" /> -->
             </div>
             <br />
             <q-btn size="lg" color="accent" class="q-mb-md">Consultation</q-btn>
@@ -325,17 +325,11 @@ onMounted(() => {
                     'responsive-summer-img': activeTheme === Theme.Summer,
                   }"
                 >
-                  <source
-                    v-for="(s, srcIndex) in p.img.sources"
-                    :key="srcIndex"
-                    :type="s.type"
-                    :srcset="s.srcset"
-                  />
+                  <source v-for="(s, srcIndex) in p.img.sources" :key="srcIndex" :srcset="s" />
                   <img
                     :src="p?.img.img.src"
-                    :srcset="p?.img.img.srcset"
-                    :width="p?.img.img.width"
-                    :height="p?.img.img.height"
+                    :width="p?.img.img.w"
+                    :height="p?.img.img.h"
                     :alt="p?.name"
                     :loading="index === 0 ? 'eager' : 'lazy'"
                     :fetchpriority="index === 0 ? 'high' : 'auto'"
@@ -474,15 +468,9 @@ onMounted(() => {
                         'desktop-summer-img': activeTheme === Theme.Summer,
                       }"
                     >
-                      <source
-                        v-for="(s, srcIndex) in p.img.sources"
-                        :key="srcIndex"
-                        :type="s.type"
-                        :srcset="s.srcset"
-                      />
+                      <source v-for="(s, srcIndex) in p.img.sources" :key="srcIndex" :srcset="s" />
                       <img
                         :src="p?.img.img.src"
-                        :srcset="p?.img.img.srcset"
                         :alt="p?.name"
                         :loading="index === 0 ? 'eager' : 'lazy'"
                         :fetchpriority="index === 0 ? 'high' : 'auto'"
@@ -519,7 +507,12 @@ onMounted(() => {
 </template>
 
 <style scoped lang="scss">
-@import '../css/main.scss';
+@use '/src/css/_tokens.scss' as tokens;
+
+.packageSection {
+  content-visibility: auto;
+  contain-intrinsic-size: 800px 1000px;
+}
 
 .responsive-view {
   .first-card {
@@ -568,7 +561,7 @@ onMounted(() => {
   display: flex;
 
   .intro-container {
-    @media (max-width: $breakpoint-lg) {
+    @media (max-width: tokens.$breakpoint-lg) {
       background-color: var(--q-accent);
       border-bottom: solid 4px var(--q-secondary);
     }
@@ -579,21 +572,21 @@ onMounted(() => {
     p {
       font-weight: normal;
       font-size: 1rem;
-      @media (max-width: $breakpoint-md) {
+      @media (max-width: tokens.$breakpoint-md) {
         font-size: 1.2rem;
       }
     }
   }
 
   .cards-container {
-    @media (max-width: $breakpoint-lg) {
+    @media (max-width: tokens.$breakpoint-lg) {
       background-color: rgba(0, 0, 0, 0.5);
       border: solid 4px var(--q-white);
       border-top: none;
       border-bottom-left-radius: 10px;
       border-bottom-right-radius: 10px;
     }
-    @media (min-width: $breakpoint-lg) {
+    @media (min-width: tokens.$breakpoint-lg) {
       background-color: transparent;
     }
 
@@ -657,7 +650,7 @@ onMounted(() => {
 .responsive-fall-img {
   width: 90%;
   max-width: 350px;
-  @media (min-width: $breakpoint-md) {
+  @media (min-width: tokens.$breakpoint-md) {
     max-width: 600px;
   }
 }
@@ -665,7 +658,7 @@ onMounted(() => {
 .responsive-winter-img {
   width: 90%;
   max-width: 250px;
-  @media (min-width: $breakpoint-md) {
+  @media (min-width: tokens.$breakpoint-md) {
     max-width: 425px;
   }
 }
@@ -673,7 +666,7 @@ onMounted(() => {
 .responsive-spring-img {
   width: 90%;
   max-width: 250px;
-  @media (min-width: $breakpoint-md) {
+  @media (min-width: tokens.$breakpoint-md) {
     max-width: 400px;
   }
 }
@@ -681,35 +674,35 @@ onMounted(() => {
 .responsive-summer-img {
   width: 90%;
   max-width: 400px;
-  @media (min-width: $breakpoint-md) {
+  @media (min-width: tokens.$breakpoint-md) {
     max-width: 550px;
   }
 }
 // ------------------------------
 .desktop-fall-img {
   max-width: 200px;
-  @media (min-width: $breakpoint-xl) {
+  @media (min-width: tokens.$breakpoint-xl) {
     max-width: 250px;
   }
 }
 
 .desktop-winter-img {
   max-width: 150px;
-  @media (min-width: $breakpoint-xl) {
+  @media (min-width: tokens.$breakpoint-xl) {
     background-color: transparent;
   }
 }
 
 .desktop-spring-img {
   max-width: 150px;
-  @media (min-width: $breakpoint-xl) {
+  @media (min-width: tokens.$breakpoint-xl) {
     background-color: transparent;
   }
 }
 
 .desktop-summer-img {
   max-width: 200px;
-  @media (min-width: $breakpoint-xl) {
+  @media (min-width: tokens.$breakpoint-xl) {
     background-color: transparent;
   }
 }

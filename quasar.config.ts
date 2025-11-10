@@ -2,6 +2,7 @@
 // https://v2.quasar.dev/quasar-cli-vite/quasar-config-file
 
 import { defineConfig } from '#q-app/wrappers';
+import * as path from 'path'; // 👈 use namespace import
 import { imagetools } from 'vite-imagetools';
 
 export default defineConfig(() => {
@@ -38,7 +39,6 @@ export default defineConfig(() => {
         browser: ['es2022', 'firefox115', 'chrome115', 'safari14'],
         node: 'node20',
       },
-
       typescript: {
         strict: true,
         vueShim: true,
@@ -54,7 +54,17 @@ export default defineConfig(() => {
         },
       },
 
-      vueRouterMode: 'hash', // available values: 'hash', 'history'
+      alias: {
+        '@': path.resolve(__dirname, './src'),
+      },
+      minify: true,
+      extendViteConf(conf) {
+        conf.build = {
+          ...(conf.build || {}),
+          cssCodeSplit: true,
+        };
+      },
+      vueRouterMode: 'history', // available values: 'hash', 'history'
       // vueRouterBase,
       // vueDevtools,
       // vueOptionsAPI: false,
@@ -144,6 +154,35 @@ export default defineConfig(() => {
       // Quasar plugins
       plugins: ['Notify'],
       iconSet: 'svg-mdi-v7',
+      components: [
+        'QBtn',
+        'QCard',
+        'QCardActions',
+        'QTooltip',
+        'QInput',
+        'QImg',
+        'QList',
+        'QSeparator',
+        'QDialog',
+        'QExpansionItem',
+        'QCardSection',
+        'QIntersection',
+        'QItem',
+        'QItemSection',
+        'QIcon',
+        'QImg',
+        'QCarousel',
+        'QCarouselSlide',
+        'QBanner',
+        'QTooltip',
+        'QLayout',
+        'QHeader',
+        'QToolbar',
+        'QToolbarTitle',
+        'QPageContainer',
+        'QDrawer',
+        'QScrollArea',
+      ],
     },
 
     // animations: 'all', // --- includes all animations

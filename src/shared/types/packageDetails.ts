@@ -1,10 +1,10 @@
 import { type Packages } from '../constants/packages';
-import { type PictureData } from './pictureData';
+import { type ImageData } from './imageData';
 
 export interface PackageDetails {
   name: Packages;
   id: string;
-  img: PictureData;
+  img: ImageData;
   alt: Packages;
   featuresHeader: string;
   features: FeatureIcon[];

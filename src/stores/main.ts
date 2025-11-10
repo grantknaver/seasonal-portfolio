@@ -19,10 +19,10 @@ export const useMainStore = defineStore('main', () => {
   const activeTopic = ref<TopicName | null>(null);
   const activeTheme = ref<Theme>(Theme.Fall);
   const activeAiAssistLogo = ref<string>(
-    new URL('/src/assets/ai-chat_fall.png', import.meta.url).href,
+    new URL('/src/assets/ai-chat_fall.avif', import.meta.url).href,
   );
   const activeRecaptchaBackground = ref<string>(
-    new URL('/src/assets/recaptcha-fall.png', import.meta.url).href,
+    new URL('/src/assets/recaptcha-fall.avif', import.meta.url).href,
   );
   const $q = useQuasar();
   const contactSectionRef = ref<HTMLElement | null>(null);
@@ -46,6 +46,7 @@ export const useMainStore = defineStore('main', () => {
   const recaptchaWidgetId = ref<number | null>();
   const containsScrollbar = ref<boolean>(false);
   const caseStudyActiveTab = ref<CaseStudies>(CaseStudies.WeatherAndTheme);
+  const hasPainted = ref<boolean>(false);
 
   const SET_MOBILE_SCROLL_TARGET = (topicName: TopicName | null): void => {
     mobileScrollTarget.value = topicName;
@@ -55,16 +56,16 @@ export const useMainStore = defineStore('main', () => {
   };
   const SET_ACTIVE_THEME = (theme: Theme): void => {
     const recaptchaBackgrounds = {
-      [Theme.Fall]: new URL('/src/assets/recaptcha-fall.png', import.meta.url).href,
-      [Theme.Winter]: new URL('/src/assets/recaptcha-winter.png', import.meta.url).href,
-      [Theme.Spring]: new URL('/src/assets/recaptcha-spring.png', import.meta.url).href,
-      [Theme.Summer]: new URL('/src/assets/recaptcha-summer.png', import.meta.url).href,
+      [Theme.Fall]: new URL('/src/assets/recaptcha-fall.avif', import.meta.url).href,
+      [Theme.Winter]: new URL('/src/assets/recaptcha-winter.avif', import.meta.url).href,
+      [Theme.Spring]: new URL('/src/assets/recaptcha-spring.avif', import.meta.url).href,
+      [Theme.Summer]: new URL('/src/assets/recaptcha-summer.avif', import.meta.url).href,
     };
     const aiAssistLogos = {
-      [Theme.Fall]: new URL('/src/assets/ai-chat_fall.png', import.meta.url).href,
-      [Theme.Winter]: new URL('/src/assets/ai-chat_winter.png', import.meta.url).href,
-      [Theme.Spring]: new URL('/src/assets/ai-chat_spring.png', import.meta.url).href,
-      [Theme.Summer]: new URL('/src/assets/ai-chat_summer.png', import.meta.url).href,
+      [Theme.Fall]: new URL('/src/assets/ai-chat_fall.avif', import.meta.url).href,
+      [Theme.Winter]: new URL('/src/assets/ai-chat_winter.avif', import.meta.url).href,
+      [Theme.Spring]: new URL('/src/assets/ai-chat_spring.avif', import.meta.url).href,
+      [Theme.Summer]: new URL('/src/assets/ai-chat_summer.avif', import.meta.url).href,
     };
 
     activeTheme.value = theme;
@@ -196,6 +197,8 @@ export const useMainStore = defineStore('main', () => {
   };
   const SET_RECAPTCHA_WIDGET_ID = (id: number | null) => (recaptchaWidgetId.value = id);
 
+  const SET_PAINTED_STATUS = (status: boolean) => (hasPainted.value = status);
+
   return {
     activeTopic,
     activeTheme,
@@ -211,6 +214,7 @@ export const useMainStore = defineStore('main', () => {
     activeRecaptchaBackground,
     containsScrollbar,
     caseStudyActiveTab,
+    hasPainted,
     SET_RECAPTCHA_WIDGET_ID,
     SET_ACTIVE_TOPIC,
     SET_ACTIVE_THEME,
@@ -222,5 +226,6 @@ export const useMainStore = defineStore('main', () => {
     SET_OALOG,
     HAS_SCROLLBAR,
     SET_CASE_STUDY_ACTIVE_TAB,
+    SET_PAINTED_STATUS,
   };
 });
