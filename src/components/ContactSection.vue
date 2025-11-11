@@ -84,7 +84,12 @@ const sendEmail = async () => {
       class="full-width bg-accent q-pt-md q-pr-xl q-pb-xl q-pl-xl"
       :style="{ 'border-top': isHuman ? 'solid 2px white' : 'none' }"
     >
-      <h2 class="text-h2 text-primary q-mt-md q-ml-none text-center">Contact Me</h2>
+      <h1 class="text-h1 text-white q-mt-md q-ml-none text-center">Contact Me</h1>
+      <q-separator class="q-mb-md" color="primary" />
+      <p class="text-white text-center">
+        Want something interactive, fast, and intelligent? Let’s talk about what we can build.
+      </p>
+
       <!-- Honeypot (hidden) -->
       <input
         v-model="form._honey"
@@ -126,6 +131,7 @@ const sendEmail = async () => {
         autogrow
         :disable="!isHuman"
       />
+
       <RecaptchaWidget v-show="!isHuman" class="full-width q-mt-md"></RecaptchaWidget>
       <q-btn
         v-show="isHuman"
@@ -145,6 +151,8 @@ const sendEmail = async () => {
       <q-banner v-if="error" class="bg-red-2 text-black q-mt-sm">
         ❌ Failed to send. {{ errorMsg || 'Please try again.' }}
       </q-banner>
+      <p class="q-mb-none text-white text-center">Phone: (541) 288-3502</p>
+      <p class="q-mt-none q-mb-sm text-white text-center">Address: OR United States</p>
     </q-form>
   </section>
 
@@ -153,9 +161,13 @@ const sendEmail = async () => {
   >
     <q-form
       @submit.prevent="sendEmail"
-      class="full-width q-gutter-y-sm q-pt-md q-pr-xl q-pb-xl q-pl-xl"
+      class="full-width q-gutter-y-sm q-pt-md q-pr-xl q-pb-lg q-pl-xl"
     >
-      <h2 class="text-h2 text-primary q-ml-none">Contact Me</h2>
+      <h1 class="text-h1 text-white q-ml-none">Contact Me</h1>
+      <q-separator color="primary" />
+      <p class="text-white text-body-2 q-mt-md">
+        Want something interactive, fast, and intelligent? Let’s talk about what we can build.
+      </p>
 
       <!-- Honeypot (hidden) -->
       <input
@@ -165,7 +177,6 @@ const sendEmail = async () => {
         tabindex="-1"
         style="display: none"
       />
-
       <q-input
         color="dark"
         bg-color="primary"
@@ -202,6 +213,7 @@ const sendEmail = async () => {
         autogrow
         :disable="!isHuman"
       />
+
       <RecaptchaWidget v-show="!isHuman" class="q-mt-md"></RecaptchaWidget>
       <q-btn
         v-show="isHuman"
@@ -222,6 +234,8 @@ const sendEmail = async () => {
         ❌ Failed to send. {{ errorMsg || 'Please try again.' }}
       </q-banner>
     </q-form>
+    <p class="q-mb-none text-white">Phone: (541) 288-3502</p>
+    <p class="q-mt-none q-mb-sm text-white">Address: OR United States</p>
   </section>
 </template>
 

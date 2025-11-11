@@ -662,8 +662,8 @@ const scrollToFooter = () => {
                   >
                 </p>
               </div>
-              <div ref="sepRef" class="separator bg-accent text-secondary">
-                <q-separator></q-separator>
+              <div ref="sepRef" class="separator">
+                <q-separator color="primary"></q-separator>
               </div>
               <div ref="ctaBtnRef">
                 <q-btn class="q-mt-md" color="accent" size="lg" glossy>
