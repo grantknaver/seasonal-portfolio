@@ -1,5 +1,5 @@
 <script lang="ts" setup>
-import { ref, onMounted } from 'vue';
+import { ref, onMounted, computed } from 'vue';
 import { v4 as uuidv4 } from 'uuid';
 import { setSeasonClasses } from 'src/shared/utils/setSeasonColors';
 import { useMainStore } from '../stores/main';
@@ -71,11 +71,14 @@ const whyClientsBullets = ref<AboutBulletPoints[]>([
     text: 'I focus on the “wow” factor — animations, interactions, and storytelling that make your product stand out and leave a lasting impression.',
   },
 ]);
+const { lgBreakpoint, width } = useViewport();
+const isResponsive = computed(() => width.value < lgBreakpoint);
 
 import labcorp from 'src/assets/labcorp.jpg?w=800;1280;1600&format=avif;jpg&as=picture';
 import ornl from 'src/assets/ornl.jpg?w=800;1280;1600&format=avif;jpg&as=picture';
 import amtrak from 'src/assets/amtrak.jpg?w=800;1280;1600&format=avif;jpg&as=picture';
 import lockheedMartin from 'src/assets/lockheed-martin.png?w=800;1280;1600&format=avif;png&as=picture';
+import { useViewport } from 'src/shared/utils/viewWidth';
 
 const pastClients = ref<PastClient[]>([
   {
@@ -113,7 +116,7 @@ onMounted(() => {
 </script>
 
 <template>
-  <section class="aboutSection responsive-view column q-gutter-y-md">
+  <section v-if="isResponsive" class="responsive-view column q-gutter-y-md">
     <q-card class="full-width">
       <q-card-section class="section-container q-pa-lg">
         <h1
@@ -506,9 +509,9 @@ onMounted(() => {
     >
   </section>
 
-  <section class="desktop-view full-width">
-    <q-card class="flex column full-width q-pa-sm">
-      <q-card-section class="section-container q-pa-lg">
+  <section v-if="!isResponsive" class="desktop-view full-width column">
+    <q-card class="flex column full-width q-pa-none">
+      <q-card-section class="section-container">
         <h1
           class="text-h1 q-mt-none q-pt-md q-pb-md text-center border-black font-secondary"
           :class="
@@ -619,7 +622,7 @@ onMounted(() => {
           <span class="text-body-1">Let’s Connect </span>
         </q-btn>
       </q-card-section>
-      <q-card-section class="section-container q-pa-lg">
+      <q-card-section class="section-container">
         <h2
           class="text-h2 font-secondary q-mt-none q-pt-md q-pb-md text-secondary text-center bg-dark border-black"
           :class="
@@ -691,7 +694,7 @@ onMounted(() => {
           </q-list></q-intersection
         >
       </q-card-section>
-      <q-card-section class="section-container q-pa-lg">
+      <q-card-section class="section-container">
         <h2
           class="font-secondary text-h2 q-mt-none q-pt-md q-pb-md text-secondary text-center bg-dark border-black"
           :class="
@@ -763,7 +766,7 @@ onMounted(() => {
           </q-list></q-intersection
         >
       </q-card-section>
-      <q-card-section class="section-container q-pa-lg">
+      <q-card-section class="section-container">
         <h2
           class="past-clients-header font-secondary q-mt-none q-pb-md text-white text-center"
           :class="
@@ -829,7 +832,7 @@ onMounted(() => {
           </div>
         </q-intersection>
       </q-card-section>
-      <q-card-section class="section-container q-pa-lg">
+      <q-card-section class="section-container">
         <h2
           class="font-secondary text-h2 q-mt-none q-pt-md q-pb-md text-secondary text-center bg-dark border-black"
           :class="

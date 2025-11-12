@@ -166,10 +166,7 @@ onMounted(() => {
 
 <template>
   <!-- Mobile -->
-  <section
-    v-if="isResponsive"
-    class="packageSection responsive-view full-width column items-center q-gutter-y-md"
-  >
+  <section v-if="isResponsive" class="responsive-view full-width column items-center q-gutter-y-md">
     <q-card class="first-card full-width column items-center bg-secondary">
       <q-card-section
         class="package-header-section full-width q-pa-lg text-primary"
@@ -365,9 +362,9 @@ onMounted(() => {
   </section>
 
   <!-- Desktop -->
-  <section v-if="!isResponsive" class="packageSection desktop-view full-width column">
+  <section v-if="!isResponsive" class="desktop-view full-width column">
     <div
-      class="intro-container full-width q-pa-md"
+      class="intro-container full-width q-pt-md q-pr-md q-pb-none q-pl-md"
       :class="
         setSeasonClasses(
           {
