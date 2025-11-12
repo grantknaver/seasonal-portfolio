@@ -156,6 +156,7 @@ const onResize = debounce(() => {
 }, 500);
 
 const requestConsultation = (packageName?: Package) => {
+  console.log('package', packageName);
   if (!packageName) return;
   emit('requestConsult', packageName);
   if (!isResponsive.value) {

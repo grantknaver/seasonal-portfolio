@@ -31,12 +31,6 @@ import { CacheEntry } from 'src/shared/constants/cacheEntry';
 import { useCacheStore } from 'src/stores/component-cache';
 import type { Package } from 'src/shared/constants/packages';
 
-const AboutSection = defineAsyncComponent(() => import('../components/AboutSection.vue'));
-const ContactSection = defineAsyncComponent(() => import('../components/ContactSection.vue'));
-const PackageSection = defineAsyncComponent(() => import('../components/PackageSection.vue'));
-const CaseStudiesSection = defineAsyncComponent(
-  () => import('../components/CaseStudiesSection.vue'),
-);
 const WeatherBackground = defineAsyncComponent(() => import('../components/WeatherBackground.vue'));
 const mainStore = useMainStore();
 const cacheStore = useCacheStore();
@@ -174,9 +168,9 @@ onBeforeUnmount(() => {
 });
 
 const requestInformation = (packageName?: Package) => {
-  console.log('requestInformation', packageName);
   if (!packageName) return;
   packageOfInterest.value = packageName;
+  console.log('packageOfInterest', packageOfInterest.value);
   toContact();
 };
 
@@ -598,7 +592,11 @@ const scrollToFooter = () => {
                 <!-- After first open -->
                 <Suspense>
                   <template #default>
-                    <component :is="catalog[topic.cachedName as CacheEntry]" :key="topic.name" />
+                    <component
+                      :is="catalog[topic.cachedName as CacheEntry]"
+                      :key="topic.name"
+                      @requestConsult="requestInformation"
+                    />
                   </template>
 
                   <template #fallback>
@@ -606,7 +604,7 @@ const scrollToFooter = () => {
                   </template>
                 </Suspense>
               </div>
-              <template v-if="expandedPanel === TopicName.Packages">
+              <!-- <template v-if="expandedPanel === TopicName.Packages">
                 <div :id="topic.name" class="full-width">
                   <PackageSection @requestConsult="requestInformation" />
                 </div>
@@ -625,7 +623,7 @@ const scrollToFooter = () => {
                 <div :id="topic.name" class="full-width">
                   <ContactSection :topicOfInterest="packageOfInterest" />
                 </div>
-              </template>
+              </template> -->
             </q-expansion-item>
           </q-item>
         </q-list>

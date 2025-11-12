@@ -6,11 +6,6 @@ import { storeToRefs } from 'pinia';
 import { mdiAccount, mdiEmailOutline } from '@quasar/extras/mdi-v7';
 import { useViewport } from 'src/shared/utils/viewWidth';
 import { Package } from 'src/shared/constants/packages';
-// import type { LocationQueryValue } from 'vue-router';
-// import { useRoute } from 'vue-router';
-// import { Package } from 'src/shared/constants/packages';
-// import { Package } from 'src/shared/constants/packages';
-// import type { Package } from 'src/shared/constants/packages';
 
 // const FORMSPREE_ENDPOINT = 'https://formspree.io/f/your_form_id'; // <-- replace with your actual Formspree endpoint (e.g., https://formspree.io/f/abcd1234)
 // If you're actually using Formsubmit instead, use:
@@ -39,15 +34,9 @@ const props = defineProps({
   topicOfInterest: { type: String as PropType<Package | null>, required: true },
 });
 onMounted(() => {
-  console.log('onMounted Contact');
   mainStore.SET_CONTACT_SECTION_REF(contactRef.value);
   setSubject();
 });
-
-// watch(
-//   () => route.query.topic,
-//   (s) => setSubject(s),
-// );
 
 const setSubject = () => {
   switch (props.topicOfInterest as Package) {
