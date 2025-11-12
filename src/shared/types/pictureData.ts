@@ -1,15 +1,16 @@
 export interface ResponsiveImageSource {
-  type: string;
-  srcset: string;
+  avif?: string;
+  jpeg?: string;
+  webp?: string;
 }
+
 export interface ResponsiveImageData {
   src: string;
-  srcset: string;
-  width: number;
-  height: number;
-  format: string;
+  w: number; // width
+  h: number; // height
 }
+
 export interface PictureData {
-  sources: ResponsiveImageSource[];
   img: ResponsiveImageData;
+  sources: ResponsiveImageSource;
 }

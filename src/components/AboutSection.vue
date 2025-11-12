@@ -426,15 +426,14 @@ onMounted(() => {
               <a class="full-width" :href="client.url" target="_blank">
                 <picture class="full-width">
                   <source
-                    v-for="(src, srcIndex) in client.img.sources"
-                    :key="srcIndex"
-                    :srcset="src.srcset"
-                    :type="src.type"
+                    v-for="(src, k) in client.img.sources"
+                    :key="k"
+                    :srcset="src"
+                    :type="`image/${k}`"
                     sizes="(min-width: 1450px) 100%"
                   />
                   <img
                     :src="client.img.img.src"
-                    :srcset="client.img.img.srcset"
                     sizes="(min-width: 1024px) 25vw, 90vw"
                     fetchpriority="high"
                     :loading="index === 0 ? 'eager' : 'lazy'"
@@ -813,15 +812,14 @@ onMounted(() => {
             <a class="full-width" :href="client.url" target="_blank">
               <picture class="full-width">
                 <source
-                  v-for="(src, srcIndex) in client.img.sources"
-                  :key="srcIndex"
-                  :srcset="src.srcset"
-                  :type="src.type"
+                  v-for="(src, k) in client.img.sources"
+                  :key="k"
+                  :srcset="src"
+                  :type="`image/${k}`"
                   sizes="(min-width: 1450px) 100%"
                 />
                 <img
                   :src="client.img.img.src"
-                  :srcset="client.img.img.srcset"
                   sizes="(min-width: 1024px) 25vw, 90vw"
                   fetchpriority="high"
                   :loading="index === 0 ? 'eager' : 'lazy'"

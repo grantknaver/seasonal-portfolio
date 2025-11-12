@@ -57,7 +57,7 @@ const simonRef = ref();
       v-for="topic in topics"
       :key="topic.id"
       class="simon-quadrant"
-      :class="[topic.name, { 'active-topic': topic.name === activeTopic }]"
+      :class="[topic.name.replace(' ', ''), { 'active-topic': topic.name === activeTopic }]"
       tabindex="0"
       style="padding: 1rem"
       @click.stop="selectTopic(topic.name)"

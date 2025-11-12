@@ -403,10 +403,10 @@ const scrollToFooter = () => {
           <div class="slide-bg">
             <picture>
               <source
-                v-for="(pic, key) in slide.picture.sources"
-                :key="key"
-                :srcset="pic"
-                :type="`image/${key}`"
+                v-for="(src, k) in slide.picture.sources"
+                :key="k"
+                :srcset="src"
+                :type="`image/${k}`"
               />
               <img
                 :src="slide.picture.img.src"

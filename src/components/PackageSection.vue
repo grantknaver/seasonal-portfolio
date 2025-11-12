@@ -273,11 +273,7 @@ const setActiveAssets = (newTheme: Theme) => {
                   'responsive-summer-img': activeTheme === Theme.Summer,
                 }"
               >
-                <source
-                  v-for="(s, srcIndex) in packages[0]?.img.sources"
-                  :key="srcIndex"
-                  :srcset="s"
-                />
+                <source v-for="(src, k) in packages[0]?.img.sources" :key="k" :srcset="src" />
                 <img
                   :src="packages[0]?.img.img.src"
                   :width="packages[0]?.img.img.w"
