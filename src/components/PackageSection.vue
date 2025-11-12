@@ -4,7 +4,7 @@ import { v4 as uuidv4 } from 'uuid';
 import { useMainStore } from '../stores/main';
 import { storeToRefs } from 'pinia';
 import { setSeasonClasses } from '../shared/utils/setSeasonColors';
-import { Packages } from '../shared/constants/packages';
+import { Package } from '../shared/constants/packages';
 import { type PackageDetails } from '../shared/types/packageDetails';
 import { useViewport } from '../shared/utils/viewWidth';
 import { Theme } from 'src/shared/constants/theme';
@@ -29,53 +29,52 @@ import premiumSummer from 'src/assets/premium-summer.png?w=300;500;900&format=av
 
 import { mdiCheckboxBlankCircle } from '@quasar/extras/mdi-v7';
 import { debounce } from 'quasar';
-import { type ImageData } from 'src/shared/types/imageData';
+import { TopicName } from 'src/shared/constants/topicName';
 
 const mainStore = useMainStore();
 const { activeTheme } = storeToRefs(mainStore);
-
 const getPackageImages = (theme: Theme): ThemePackageImages => {
   switch (theme) {
     case Theme.Fall:
       return {
-        starter: starterFall as ImageData,
-        growth: growthFall as ImageData,
-        premium: premiumFall as ImageData,
+        starter: starterFall,
+        growth: growthFall,
+        premium: premiumFall,
       };
     case Theme.Winter:
       return {
-        starter: starterWinter as ImageData,
-        growth: growthWinter as ImageData,
-        premium: premiumWinter as ImageData,
+        starter: starterWinter,
+        growth: growthWinter,
+        premium: premiumWinter,
       };
     case Theme.Spring:
       return {
-        starter: starterSpring as ImageData,
-        growth: growthSpring as ImageData,
-        premium: premiumSpring as ImageData,
+        starter: starterSpring,
+        growth: growthSpring,
+        premium: premiumSpring,
       };
     case Theme.Summer:
       return {
-        starter: starterSummer as ImageData,
-        growth: growthSummer as ImageData,
-        premium: premiumSummer as ImageData,
+        starter: starterSummer,
+        growth: growthSummer,
+        premium: premiumSummer,
       };
 
     default:
       return {
-        starter: starterFall as ImageData,
-        growth: growthFall as ImageData,
-        premium: premiumFall as ImageData,
+        starter: starterFall,
+        growth: growthFall,
+        premium: premiumFall,
       };
   }
 };
-
+const emit = defineEmits(['requestConsult']);
 const packages = ref<PackageDetails[]>([
   {
-    name: Packages.StarterPackage,
+    name: Package.StarterPackage,
     id: uuidv4(),
-    img: starterFall as ImageData,
-    alt: Packages.StarterPackage,
+    img: starterFall,
+    alt: Package.StarterPackage,
     featuresHeader: 'For new ideas ready to break ground.',
     features: [
       {
@@ -93,10 +92,10 @@ const packages = ref<PackageDetails[]>([
     tagline: 'Your first step toward a more engaging, modern experience.',
   },
   {
-    name: Packages.GrowthPackage,
+    name: Package.GrowthPackage,
     id: uuidv4(),
-    img: growthFall as ImageData,
-    alt: Packages.GrowthPackage,
+    img: growthFall,
+    alt: Package.GrowthPackage,
     featuresHeader: 'For projects ready to scale and stand out.',
     features: [
       {
@@ -114,10 +113,10 @@ const packages = ref<PackageDetails[]>([
     tagline: 'Perfect for startups moving from MVP to a polished product launch.',
   },
   {
-    name: Packages.PremiumPackage,
+    name: Package.PremiumPackage,
     id: uuidv4(),
-    img: premiumFall as ImageData,
-    alt: Packages.PremiumPackage,
+    img: premiumFall,
+    alt: Package.PremiumPackage,
     featuresHeader: 'For full bloom launches that need maximum impact.',
     features: [
       {
@@ -139,6 +138,31 @@ const packages = ref<PackageDetails[]>([
 const { lgBreakpoint, width } = useViewport();
 const isResponsive = computed(() => width.value < lgBreakpoint);
 
+onMounted(() => {
+  setActiveAssets(activeTheme.value);
+  window.addEventListener('resize', onResize);
+});
+
+watch(
+  activeTheme,
+  (newTheme) => {
+    setActiveAssets(newTheme);
+  },
+  {},
+);
+
+const onResize = debounce(() => {
+  setActiveAssets(activeTheme.value);
+}, 500);
+
+const requestConsultation = (packageName?: Package) => {
+  if (!packageName) return;
+  emit('requestConsult', packageName);
+  if (!isResponsive.value) {
+    mainStore.SET_ACTIVE_TOPIC(TopicName.Contact);
+  }
+};
+
 const setActiveAssets = (newTheme: Theme) => {
   const activeThemePackageImages = getPackageImages(newTheme);
   const theme = newTheme.toLowerCase();
@@ -153,16 +177,6 @@ const setActiveAssets = (newTheme: Theme) => {
   });
   packages.value = updatedPackages;
 };
-
-watch(activeTheme, (newTheme) => setActiveAssets(newTheme));
-
-onMounted(() => {
-  const onResize = debounce(() => {
-    setActiveAssets(activeTheme.value);
-  }, 500);
-
-  window.addEventListener('resize', onResize);
-});
 </script>
 
 <template>
@@ -276,7 +290,13 @@ onMounted(() => {
               </picture>
             </div>
             <br />
-            <q-btn size="lg" color="accent" class="q-mb-md">Consultation</q-btn>
+            <q-btn
+              size="lg"
+              color="accent"
+              class="q-mb-md"
+              @click="requestConsultation(packages[0]?.name)"
+              >Consultation</q-btn
+            >
           </div>
           <q-item v-for="(f, index) in packages[0]?.features" :key="index">
             <span class="row full-width q-pa-none">
@@ -335,7 +355,9 @@ onMounted(() => {
                 </picture>
               </div>
               <br />
-              <q-btn size="lg" color="accent" class="q-mb-md">Consultation</q-btn>
+              <q-btn size="lg" color="accent" class="q-mb-md" @click="requestConsultation(p?.name)"
+                >Consultation</q-btn
+              >
             </div>
             <q-list>
               <q-item v-for="(f, index) in p.features" :key="index">
@@ -475,7 +497,12 @@ onMounted(() => {
                       />
                     </picture>
                   </div>
-                  <q-btn color="accent" class="q-mt-md full-width">Consultation</q-btn>
+                  <q-btn
+                    @click="requestConsultation(p?.name)"
+                    color="accent"
+                    class="q-mt-md full-width"
+                    >Consultation</q-btn
+                  >
                 </div>
               </div>
               <q-list
@@ -702,5 +729,14 @@ onMounted(() => {
   @media (min-width: tokens.$breakpoint-xl) {
     background-color: transparent;
   }
+}
+
+.fade-picture {
+  opacity: 1;
+  transition: opacity 0.4s ease;
+}
+
+.fade-picture.fading {
+  opacity: 0;
 }
 </style>

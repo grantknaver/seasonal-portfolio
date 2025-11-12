@@ -1,7 +1,7 @@
-import { type ImageData } from './imageData';
+import { type PictureData } from './pictureData';
 
 export interface ThemePackageImages {
-  starter: ImageData;
-  growth: ImageData;
-  premium: ImageData;
+  starter: PictureData;
+  growth: PictureData;
+  premium: PictureData;
 }

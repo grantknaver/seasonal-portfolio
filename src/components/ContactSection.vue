@@ -1,15 +1,24 @@
 <script setup lang="ts">
-import { ref, onMounted, defineAsyncComponent } from 'vue';
+import type { PropType } from 'vue';
+import { ref, onMounted, defineAsyncComponent, computed, reactive } from 'vue';
 import { useMainStore } from '../stores/main';
 import { storeToRefs } from 'pinia';
 import { mdiAccount, mdiEmailOutline } from '@quasar/extras/mdi-v7';
+import { useViewport } from 'src/shared/utils/viewWidth';
+import { Package } from 'src/shared/constants/packages';
+// import type { LocationQueryValue } from 'vue-router';
+// import { useRoute } from 'vue-router';
+// import { Package } from 'src/shared/constants/packages';
+// import { Package } from 'src/shared/constants/packages';
+// import type { Package } from 'src/shared/constants/packages';
 
 // const FORMSPREE_ENDPOINT = 'https://formspree.io/f/your_form_id'; // <-- replace with your actual Formspree endpoint (e.g., https://formspree.io/f/abcd1234)
 // If you're actually using Formsubmit instead, use:
 const FORMSPREE_ENDPOINT = 'https://formsubmit.co/glkfreelance@gmail.com';
-const form = ref({
+const form = reactive({
   name: '',
   email: '',
+  subject: '',
   message: '',
   // simple honeypot field
   _honey: '',
@@ -19,18 +28,45 @@ const sending = ref(false);
 const success = ref(false);
 const error = ref(false);
 const errorMsg = ref<string | null>(null);
-
 const contactRef = ref<HTMLElement | null>(null);
 const mainStore = useMainStore();
-
 const { isHuman } = storeToRefs(mainStore);
+const { lgBreakpoint, width } = useViewport();
+const isResponsive = computed(() => width.value < lgBreakpoint);
+// const route = useRoute();
 
+const props = defineProps({
+  topicOfInterest: { type: String as PropType<Package | null>, required: true },
+});
 onMounted(() => {
+  console.log('onMounted Contact');
   mainStore.SET_CONTACT_SECTION_REF(contactRef.value);
+  setSubject();
 });
 
+// watch(
+//   () => route.query.topic,
+//   (s) => setSubject(s),
+// );
+
+const setSubject = () => {
+  switch (props.topicOfInterest as Package) {
+    case Package.StarterPackage:
+      form.subject = 'Interested in Starter Package';
+      break;
+    case Package.GrowthPackage:
+      form.subject = 'Interested in Growth Package';
+      break;
+    case Package.PremiumPackage:
+      form.subject = 'Interested in Premium Package';
+      break;
+    default:
+      console.log('No package subject');
+  }
+};
+
 const sendEmail = async () => {
-  if (form.value._honey) return; // bot trap
+  if (form._honey) return; // bot trap
   sending.value = true;
   success.value = false;
   error.value = false;
@@ -38,13 +74,13 @@ const sendEmail = async () => {
 
   try {
     const fd = new FormData();
-    fd.append('name', form.value.name);
-    fd.append('email', form.value.email);
-    fd.append('message', form.value.message);
+    fd.append('name', form.name);
+    fd.append('email', form.email);
+    fd.append('message', form.message);
 
     // Optional extras supported by many form backends:
     // Subject for the email:
-    fd.append('_subject', `New portfolio message from ${form.value.name}`);
+    fd.append('_subject', `New portfolio message from ${form.name}`);
     // Where to redirect after success (comment out if you don't want redirect behavior):
     // fd.append('_next', 'https://yourdomain.com/thank-you');
 
@@ -56,7 +92,11 @@ const sendEmail = async () => {
 
     if (res.ok) {
       success.value = true;
-      form.value = { name: '', email: '', message: '', _honey: '' };
+      form.name = '';
+      form.email = '';
+      form.subject = '';
+      form.message = '';
+      form._honey = '';
     } else {
       error.value = true;
       // Try to parse Formspree JSON error for details
@@ -78,7 +118,7 @@ const sendEmail = async () => {
 </script>
 
 <template>
-  <section id="contact" ref="contactRef" class="contactSection responsive-view full-width">
+  <section v-if="isResponsive" id="contact" ref="contactRef" class="responsive-view full-width">
     <q-form
       @submit.prevent="sendEmail"
       class="full-width bg-accent q-pt-md q-pr-xl q-pb-xl q-pl-xl"
@@ -121,6 +161,15 @@ const sendEmail = async () => {
         :disable="!isHuman"
       />
       <q-input
+        v-model="form.subject"
+        type="text"
+        label="Subject"
+        bg-color="primary"
+        class="q-mb-sm"
+        outlined
+        required
+      />
+      <q-input
         v-model="form.message"
         type="textarea"
         label="Your Message"
@@ -157,7 +206,8 @@ const sendEmail = async () => {
   </section>
 
   <section
-    class="contactSection desktop-view full-width full-height column justify-center items-center"
+    v-if="!isResponsive"
+    class="desktop-view full-width full-height column justify-center items-center"
   >
     <q-form
       @submit.prevent="sendEmail"
@@ -200,6 +250,18 @@ const sendEmail = async () => {
         :disable="!isHuman"
       >
         <template #prepend><q-icon :name="mdiEmailOutline" /></template>
+      </q-input>
+      <br />
+      <q-input
+        color="dark"
+        bg-color="primary"
+        filled
+        v-model="form.subject"
+        label="Subject"
+        type="text"
+        required
+        :disable="!isHuman"
+      >
       </q-input>
 
       <q-input
@@ -247,22 +309,14 @@ const sendEmail = async () => {
   contain-intrinsic-size: 800px 1000px;
 }
 
-.responsive-view {
-  @media (min-width: tokens.$breakpoint-lg) {
-    display: none;
-  }
-}
-
 .desktop-view {
-  display: none;
-
-  @media (min-width: tokens.$breakpoint-lg) {
+  @media (min-width: $breakpoint-lg) {
     display: flex;
     flex-direction: column;
   }
 
   .q-form {
-    max-width: 550px;
+    max-width: 600px;
   }
 }
 </style>

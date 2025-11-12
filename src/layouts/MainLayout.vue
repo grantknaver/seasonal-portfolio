@@ -7,8 +7,9 @@ import { getCustomCssVar } from '../shared/utils/getCustomCssVar';
 import { TopicName } from '../shared/constants/topicName';
 import { type Topic } from '../shared/types/topic';
 import { v4 as uuidv4 } from 'uuid';
-import { mdiMenu } from '@quasar/extras/mdi-v7';
 import { useViewport } from '../shared/utils/viewWidth';
+import { mdiMenu, mdiHeart, mdiGithub, mdiLinkedin } from '@quasar/extras/mdi-v7';
+// import { type Package } from 'src/shared/constants/packages';
 
 const mainStore = useMainStore();
 const { activeTheme, activeTopic } = storeToRefs(mainStore);
@@ -35,6 +36,18 @@ const topics = ref<Topic[]>([
     label: TopicName.CaseStudies,
   },
 ]);
+// const packageOfInterest = ref<Package | null>(null);
+
+// const toContact = () => {
+//   mainStore.SET_ACTIVE_TOPIC(TopicName.Contact);
+// };
+
+// const requestInformation = (packageName?: Package) => {
+//   console.log('main layout requestInformation', packageName);
+//   if (!packageName) return;
+//   packageOfInterest.value = packageName;
+//   toContact();
+// };
 
 const SectionMap: Record<TopicName, ReturnType<typeof defineAsyncComponent>> = {
   ['Case Studies']: defineAsyncComponent(() => import('../components/CaseStudiesSection.vue')),
@@ -142,7 +155,7 @@ onBeforeUnmount(() => window.removeEventListener('resize', updateWidths));
             © {{ new Date().getFullYear() }} <span class="text-secondary">glk</span
             ><span class="text-primary">Freelance</span>
             | Crafted with
-            <q-icon name="favorite" color="accent" size="16px" />
+            <q-icon :name="mdiHeart" color="accent" size="16px" />
             using
             <a href="https://vuejs.org/" target="_blank" class="text-primary">Vue</a>,
             <a href="https://gsap.com/" target="_blank" class="text-primary">GSAP</a>,
@@ -160,7 +173,7 @@ onBeforeUnmount(() => window.removeEventListener('resize', updateWidths));
               <q-btn
                 flat
                 round
-                icon="fab fa-github"
+                :icon="mdiGithub"
                 target="_blank"
                 :class="activeTheme !== Theme.Summer ? 'text-primary' : 'text-secondary'"
                 aria-label="GitHub"
@@ -171,7 +184,7 @@ onBeforeUnmount(() => window.removeEventListener('resize', updateWidths));
               <q-btn
                 flat
                 round
-                icon="fab fa-linkedin"
+                :icon="mdiLinkedin"
                 target="_blank"
                 :class="activeTheme !== Theme.Summer ? 'text-primary' : 'text-secondary'"
                 aria-label="LinkedIn"

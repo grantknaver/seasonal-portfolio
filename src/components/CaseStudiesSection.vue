@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { setSeasonClasses } from '../shared/utils/setSeasonColors';
 import { useViewport } from '../shared/utils/viewWidth';
-import { computed, onMounted, ref, watch } from 'vue';
+import { computed, ref, watch } from 'vue';
 import { useMainStore } from '../stores/main';
 import { storeToRefs } from 'pinia';
 import { defineAsyncComponent } from 'vue';
@@ -26,6 +26,7 @@ import {
   mdiSyncAlert,
   mdiAutoFix,
 } from '@quasar/extras/mdi-v7';
+import { TopicName } from 'src/shared/constants/topicName';
 
 const CaseStudy = defineAsyncComponent(() => import('../components/CaseStudy.vue'));
 const AIAssitant = defineAsyncComponent(() => import('../components/AIAssitant.vue'));
@@ -311,11 +312,6 @@ const caseStudies = ref<CS[]>([
 ]);
 const tab = ref(CaseStudies.WeatherAndTheme);
 
-onMounted(() => {
-  // [ComponentsCatelog.CaseStudy, ComponentsCatelog.AIAssitant].forEach((c) => {
-  //   cacheStore.CACHE_COMPONENT(c);
-  // });
-});
 watch(tab, (newTab) => {
   mainStore.SET_CASE_STUDY_ACTIVE_TAB(newTab);
 });
@@ -326,8 +322,21 @@ const BG_BY_THEME: Record<Theme, string> = {
   [Theme.Spring]: new URL('../assets/ai-bcg-spring.avif', import.meta.url).href,
   [Theme.Summer]: new URL('../assets/ai-bcg-summer.avif', import.meta.url).href,
 };
+const emit = defineEmits(['toContact']);
+
+watch(tab, (newTab) => {
+  mainStore.SET_CASE_STUDY_ACTIVE_TAB(newTab);
+});
 
 const backgroundUrl = computed(() => BG_BY_THEME[activeTheme.value] ?? BG_BY_THEME[Theme.Winter]);
+
+const toContact = () => {
+  if (isResponsive.value) {
+    emit('toContact');
+  } else {
+    mainStore.SET_ACTIVE_TOPIC(TopicName.Contact);
+  }
+};
 </script>
 <template>
   <!-- Mobile -->
@@ -480,7 +489,7 @@ const backgroundUrl = computed(() => BG_BY_THEME[activeTheme.value] ?? BG_BY_THE
       </template>
       <q-separator color="dark" class="full-width"></q-separator>
     </q-list>
-    <q-btn class="q-mt-sm full-width" color="accent" size="lg" glossy square>
+    <q-btn @click="toContact" class="q-mt-sm full-width" color="accent" size="lg" glossy square>
       <span>Let’s Discuss Your Interactive Project</span>
     </q-btn>
   </section>
@@ -626,7 +635,7 @@ const backgroundUrl = computed(() => BG_BY_THEME[activeTheme.value] ?? BG_BY_THE
         </CaseStudy>
       </q-tab-panel>
     </q-tab-panels>
-    <q-btn class="q-mt-md full-width" color="accent" size="lg" glossy square>
+    <q-btn @click="toContact" class="q-mt-md full-width" color="accent" size="lg" glossy square>
       <span>Let’s Discuss Your Interactive Project</span>
     </q-btn>
   </section>

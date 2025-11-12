@@ -1,11 +1,11 @@
-import { type Packages } from '../constants/packages';
-import { type ImageData } from './imageData';
+import { type Package } from '../constants/packages';
+import { type PictureData } from './pictureData';
 
 export interface PackageDetails {
-  name: Packages;
+  name: Package;
   id: string;
-  img: ImageData;
-  alt: Packages;
+  img: PictureData;
+  alt: Package;
   featuresHeader: string;
   features: FeatureIcon[];
   tagline: string;

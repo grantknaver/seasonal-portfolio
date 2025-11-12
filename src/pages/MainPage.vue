@@ -23,14 +23,21 @@ import {
   mdiEmailBox,
 } from '@quasar/extras/mdi-v7';
 import { mdiChevronDown } from '@quasar/extras/mdi-v7';
-import type { ImageData } from '../shared/types/imageData';
 import autumn from 'src/assets/autumn-forestry.jpg?w=768;1280;1600&format=avif;webp;jpeg&quality=40&withoutEnlargement=true&as=picture';
 import winter from 'src/assets/snowy-winter-landscape.jpg?w=768;1280;1600&format=avif;webp;jpeg&quality=40&withoutEnlargement=true&as=picture';
 import spring from 'src/assets/beautiful-forest-spring-season.jpg?w=768;1280;1600&format=avif;webp;jpeg&quality=40&withoutEnlargement=true&as=picture';
 import summer from 'src/assets/beach.jpg?w=768;1280;1600&format=avif;webp;jpeg&quality=40&withoutEnlargement=true&as=picture';
 import { CacheEntry } from 'src/shared/constants/cacheEntry';
 import { useCacheStore } from 'src/stores/component-cache';
+import type { Package } from 'src/shared/constants/packages';
 
+const AboutSection = defineAsyncComponent(() => import('../components/AboutSection.vue'));
+const ContactSection = defineAsyncComponent(() => import('../components/ContactSection.vue'));
+const PackageSection = defineAsyncComponent(() => import('../components/PackageSection.vue'));
+const CaseStudiesSection = defineAsyncComponent(
+  () => import('../components/CaseStudiesSection.vue'),
+);
+const WeatherBackground = defineAsyncComponent(() => import('../components/WeatherBackground.vue'));
 const mainStore = useMainStore();
 const cacheStore = useCacheStore();
 const mobileTopics: Topic[] = [
@@ -68,25 +75,25 @@ const { catalog } = storeToRefs(cacheStore);
 const slides = ref<Slide[]>([
   {
     id: uuidv4(),
-    picture: autumn as ImageData,
+    picture: autumn,
     theme: Theme.Fall,
     name: 'Fall Background',
   },
   {
     id: uuidv4(),
-    picture: winter as ImageData,
+    picture: winter,
     theme: Theme.Winter,
     name: 'Winter Background',
   },
   {
     id: uuidv4(),
-    picture: spring as ImageData,
+    picture: spring,
     theme: Theme.Spring,
     name: 'Spring Background',
   },
   {
     id: uuidv4(),
-    picture: summer as ImageData,
+    picture: summer,
     theme: Theme.Summer,
     name: 'Summer Background',
   },
@@ -110,6 +117,7 @@ const servRef = ref<HTMLElement | null>(null);
 const ctaBtnRef = ref<HTMLElement | null>(null);
 const homeContainerRef = ref<HTMLElement | null>(null);
 const showCarousel = ref<boolean>(false);
+const packageOfInterest = ref<Package | null>(null);
 
 const loadComponent = (topicName: TopicName) => {
   switch (topicName) {
@@ -127,14 +135,14 @@ const loadComponent = (topicName: TopicName) => {
       break;
   }
 };
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-let WeatherBackground: any = null;
+
+// let WeatherBackground: any = null;
 onMounted(async () => {
   await nextTick();
   await waitForLayout(root.value);
   showCarousel.value = true;
   if (isResponsive.value) {
-    WeatherBackground = defineAsyncComponent(() => import('../components/WeatherBackground.vue'));
+    // WeatherBackground = defineAsyncComponent(() => import('../components/WeatherBackground.vue'));
     try {
       dispose.value = buildAnimations(ViewType.Responsive);
     } catch (e) {
@@ -156,6 +164,27 @@ onUnmounted(() => {
   cacheStore.CLEAR_CACHE();
 });
 
+onBeforeUnmount(() => {
+  io.value?.disconnect();
+  try {
+    dispose.value();
+  } catch (e) {
+    console.log('onBeforeUnmount dispose err', e);
+  }
+});
+
+const requestInformation = (packageName?: Package) => {
+  console.log('requestInformation', packageName);
+  if (!packageName) return;
+  packageOfInterest.value = packageName;
+  toContact();
+};
+
+const toContact = () => {
+  mainStore.SET_ACTIVE_TOPIC(TopicName.Contact);
+  expandedPanel.value = TopicName.Contact;
+};
+
 watch(
   isResponsive,
   async (viewNow) => {
@@ -170,15 +199,6 @@ watch(
   },
   { flush: 'post' },
 );
-
-onBeforeUnmount(() => {
-  io.value?.disconnect();
-  try {
-    dispose.value();
-  } catch (e) {
-    console.log('onBeforeUnmount dispose err', e);
-  }
-});
 
 watch(mobileScrollTarget, (newTopic) => {
   if (!newTopic) return;
@@ -252,7 +272,6 @@ const buildAnimations = (mode: ViewType) => {
       },
     );
   }
-  // Only animate desktop in this block
   if (mode === ViewType.Desktop) {
     if (!flattenElements(desktopEls)) return () => {};
     gsap.killTweensOf(desktopEls);
@@ -336,8 +355,6 @@ const buildAnimations = (mode: ViewType) => {
       },
     );
   }
-
-  // Cleanup
   return () => {
     gsap.killTweensOf([desktopEls]);
     gsap.set([desktopEls], { clearProps: 'all' });
@@ -351,12 +368,14 @@ const scrollToFooter = () => {
     const target = getScrollTarget(footerEl); // auto-detects the correct scrollable container
     const y = footerEl.offsetTop; // position inside that container
     setVerticalScrollPosition(target, y, 500); // smooth scroll (ms)
+    showFooter.value = true;
   } else {
     const logoEl = document.getElementById('logo');
     if (!logoEl) return;
     const target = getScrollTarget(logoEl); // auto-detects the correct scrollable container
     const y = logoEl.offsetHeight; // position inside that container
     setVerticalScrollPosition(target, y, 500); // smooth scroll (ms)
+    showFooter.value = false;
   }
 };
 </script>
@@ -587,6 +606,26 @@ const scrollToFooter = () => {
                   </template>
                 </Suspense>
               </div>
+              <template v-if="expandedPanel === TopicName.Packages">
+                <div :id="topic.name" class="full-width">
+                  <PackageSection @requestConsult="requestInformation" />
+                </div>
+              </template>
+              <template v-if="expandedPanel === TopicName.CaseStudies">
+                <div :id="topic.name" class="anchor full-width">
+                  <CaseStudiesSection @toContact="toContact" />
+                </div>
+              </template>
+              <template v-if="expandedPanel === TopicName.About">
+                <div :id="topic.name" class="full-width">
+                  <AboutSection />
+                </div>
+              </template>
+              <template v-if="expandedPanel === TopicName.Contact">
+                <div :id="topic.name" class="full-width">
+                  <ContactSection :topicOfInterest="packageOfInterest" />
+                </div>
+              </template>
             </q-expansion-item>
           </q-item>
         </q-list>
@@ -720,7 +759,7 @@ const scrollToFooter = () => {
                 <q-separator color="primary"></q-separator>
               </div>
               <div ref="ctaBtnRef">
-                <q-btn class="q-mt-md" color="accent" size="lg" glossy>
+                <q-btn @click="toContact" class="q-mt-md" color="accent" size="lg" glossy>
                   <span class="text-body-2">Hire Me for Your Next AI UI </span>
                 </q-btn>
               </div>
