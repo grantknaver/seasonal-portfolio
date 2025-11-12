@@ -107,6 +107,7 @@ const simonRef = ref<HTMLElement | null>(null);
 const titleRef = ref<HTMLElement | null>(null);
 const sepRef = ref<HTMLElement | null>(null);
 const servRef = ref<HTMLElement | null>(null);
+const ctaBtnRef = ref<HTMLElement | null>(null);
 const homeContainerRef = ref<HTMLElement | null>(null);
 const showCarousel = ref<boolean>(false);
 
@@ -322,6 +323,18 @@ const buildAnimations = (mode: ViewType) => {
         delay: 2,
       },
     );
+
+    gsap.fromTo(
+      ctaBtnRef.value,
+      { y: 50, autoAlpha: 0 },
+      {
+        keyframes: [{ y: 0, autoAlpha: 1 }],
+        ease: 'power2.out',
+        duration: 1,
+        overwrite: 'auto',
+        delay: 2.5,
+      },
+    );
   }
 
   // Cleanup
@@ -411,96 +424,124 @@ const scrollToFooter = () => {
     </div>
     <div ref="root" class="sub-container column items-center">
       <section v-if="isResponsive" key="mobile" class="responsive-view full-width q-pa-md">
-        <div class="home-container column text-primary-font bg-accent q-mb-sm q-pa-lg font-primary">
-          <span>
-            <p class="name home-content q-mb-none text-white">Grant Knaver</p>
-            <p class="title home-content text-secondary">
-              <span
-                class="frontend text-white"
-                :class="
-                  setSeasonClasses(
-                    {
-                      Fall: 'dark-text-outline',
-                      Winter: 'dark-text-outline',
-                      Spring: 'dark-text-outline',
-                      Summer: 'black-text-outline',
-                    },
-                    activeTheme,
-                  )
-                "
-                >Frontend Developer</span
-              >
-              <span
-                class="text-white"
-                :class="
-                  setSeasonClasses(
-                    {
-                      Fall: 'dark-text-outline',
-                      Winter: 'dark-text-outline',
-                      Spring: 'dark-text-outline',
-                      Summer: 'black-text-outline',
-                    },
-                    activeTheme,
-                  )
-                "
-              >
-                •
-              </span>
-              <span
-                class="gsap text-secondary"
-                :class="
-                  setSeasonClasses(
-                    {
-                      Fall: 'dark-text-outline',
-                      Winter: 'dark-text-outline',
-                      Spring: 'black-text-outline',
-                      Summer: 'black-text-outline',
-                    },
-                    activeTheme,
-                  )
-                "
-                >GSAP</span
-              >
-              <span
-                class="text-white"
-                :class="
-                  setSeasonClasses(
-                    {
-                      Fall: 'dark-text-outline',
-                      Winter: 'dark-text-outline',
-                      Spring: 'black-text-outline',
-                      Summer: 'black-text-outline',
-                    },
-                    activeTheme,
-                  )
-                "
-              >
-                &
-              </span>
-              <span
-                class="text-secondary"
-                :class="
-                  setSeasonClasses(
-                    {
-                      Fall: 'dark-text-outline',
-                      Winter: 'dark-text-outline',
-                      Spring: 'black-text-outline',
-                      Summer: 'black-text-outline',
-                    },
-                    activeTheme,
-                  )
-                "
-                >AI Integration</span
-              >
-            </p>
-            <q-separator></q-separator>
-            <p class="services-description home-content text-white q-mt-md q-mb-none text-body-2">
-              <i
-                >I design and build interactive, high-performance web experiences that blend motion,
-                data, and intelligence.</i
-              >
-            </p>
-          </span>
+        <div
+          class="home-container relative-position full-width column items-start text-primary-font q-mb-sm q-pa-lg font-primary"
+        >
+          <p
+            class="name home-content q-mb-none text-white"
+            :class="
+              setSeasonClasses(
+                {
+                  Fall: 'dark-text-outline',
+                  Winter: 'dark-text-outline',
+                  Spring: 'black-text-outline',
+                  Summer: 'black-text-outline',
+                },
+                activeTheme,
+              )
+            "
+          >
+            Grant Knaver
+          </p>
+          <p class="title home-content text-body-1 text-secondary q-mb-none black-text-glow">
+            <span
+              class="frontend text-white"
+              :class="
+                setSeasonClasses(
+                  {
+                    Fall: 'dark-text-outline',
+                    Winter: 'dark-text-outline',
+                    Spring: 'dark-text-outline',
+                    Summer: 'black-text-outline',
+                  },
+                  activeTheme,
+                )
+              "
+              >Frontend Developer</span
+            >
+            <span
+              class="text-white"
+              :class="
+                setSeasonClasses(
+                  {
+                    Fall: 'dark-text-outline',
+                    Winter: 'dark-text-outline',
+                    Spring: 'dark-text-outline',
+                    Summer: 'black-text-outline',
+                  },
+                  activeTheme,
+                )
+              "
+            >
+              •
+            </span>
+            <span
+              class="gsap text-secondary"
+              :class="
+                setSeasonClasses(
+                  {
+                    Fall: 'dark-text-outline',
+                    Winter: 'dark-text-outline',
+                    Spring: 'black-text-outline',
+                    Summer: 'black-text-outline',
+                  },
+                  activeTheme,
+                )
+              "
+              >GSAP</span
+            >
+            <span
+              class="text-white"
+              :class="
+                setSeasonClasses(
+                  {
+                    Fall: 'dark-text-outline',
+                    Winter: 'dark-text-outline',
+                    Spring: 'black-text-outline',
+                    Summer: 'black-text-outline',
+                  },
+                  activeTheme,
+                )
+              "
+            >
+              &
+            </span>
+            <span
+              class="text-secondary"
+              :class="
+                setSeasonClasses(
+                  {
+                    Fall: 'dark-text-outline',
+                    Winter: 'dark-text-outline',
+                    Spring: 'black-text-outline',
+                    Summer: 'black-text-outline',
+                  },
+                  activeTheme,
+                )
+              "
+              >AI Integration</span
+            >
+          </p>
+          <div ref="sepRef" class="home-content column full-width q-mt-md q-mb-md">
+            <q-separator class="font-bold" color="primary"></q-separator>
+          </div>
+          <p
+            class="services-description home-content text-white font-bold q-mt-sm q-mb-none text-center"
+            :class="
+              setSeasonClasses(
+                {
+                  Fall: 'dark-text-outline',
+                  Winter: 'dark-text-outline',
+                  Spring: 'black-text-outline',
+                  Summer: 'black-text-outline',
+                },
+                activeTheme,
+              )
+            "
+          >
+            I design and build interactive, high-performance web experiences that blend motion,
+            data, and intelligence.
+          </p>
         </div>
 
         <q-list class="full-width font-primary">
@@ -583,7 +624,7 @@ const scrollToFooter = () => {
               <div class="clip-container relative-position overflow-hidden">
                 <p
                   ref="titleRef"
-                  class="title full-width q-mb-lg q-pl-lg text-secondary text-left"
+                  class="title full-width text-body-2 text-center q-mb-lg q-pl-lg text-secondary"
                   :class="
                     setSeasonClasses(
                       {
@@ -628,7 +669,7 @@ const scrollToFooter = () => {
                     •
                   </span>
                   <span
-                    class="gsap text-secondary"
+                    class="text-secondary"
                     :class="
                       setSeasonClasses(
                         {
@@ -675,8 +716,13 @@ const scrollToFooter = () => {
                   >
                 </p>
               </div>
-              <div ref="sepRef" class="separator bg-accent text-secondary">
-                <q-separator></q-separator>
+              <div ref="sepRef" class="separator">
+                <q-separator color="primary"></q-separator>
+              </div>
+              <div ref="ctaBtnRef">
+                <q-btn class="q-mt-md" color="accent" size="lg" glossy>
+                  <span class="text-body-2">Hire Me for Your Next AI UI </span>
+                </q-btn>
               </div>
             </div>
           </div>
@@ -684,13 +730,13 @@ const scrollToFooter = () => {
           <div
             ref="servRef"
             v-if="!activeTopic"
-            class="services-description accent-text-outline black-text-glow start-animation row q-mt-md q-pa-md text-bold wrap justify-center text-white"
+            class="services-description row q-mt-md q-pa-md wrap justify-center start-animation text-white text-bold"
             :class="
               setSeasonClasses(
                 {
-                  Fall: 'primary-font black-text-outline',
-                  Winter: 'primary-font black-text-outline',
-                  Spring: 'primary-font black-text-outline',
+                  Fall: 'primary-font dark-text-outline',
+                  Winter: 'primary-font dark-text-outline',
+                  Spring: 'primary-font dark-text-outline',
                   Summer: 'primary-font text-white black-text-outline',
                 },
                 activeTheme,
@@ -793,9 +839,9 @@ const scrollToFooter = () => {
       text-transform: uppercase;
     }
 
-    p:nth-of-type(2) {
-      font-size: 1rem;
-    }
+    // p:nth-of-type(2) {
+    //   font-size: 1rem;
+    // }
 
     /* ---------- Mobile / NotDesktop ---------- */
 
@@ -807,11 +853,20 @@ const scrollToFooter = () => {
         max-width: 800px;
       }
 
-      .name {
-        font-size: 1.5rem;
-      }
-      .title {
-        font-size: 1rem;
+      .home-container {
+        background: color-mix(in srgb, black 30%, transparent);
+        border-radius: 0.5rem;
+        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
+        padding: 1.5rem;
+
+        .name {
+          font-size: 1.5rem;
+        }
+
+        .services-description {
+          font-size: 1.3rem;
+          line-height: 2rem;
+        }
       }
     }
 
@@ -842,10 +897,6 @@ const scrollToFooter = () => {
 
         .title-container {
           width: 60%;
-
-          .title {
-            font-size: 1.3rem;
-          }
 
           .separator {
             width: 75%; /* GSAP handles opacity/transform */

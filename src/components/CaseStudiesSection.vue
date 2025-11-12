@@ -100,7 +100,6 @@ const caseStudies = ref<CS[]>([
           header: 'Result:',
           text: 'Built a dynamic Weather/Theme System with layered parallax and ambient effects, driven by GSAP and Vue 3. Fixed a critical resize bug for seamless responsiveness across devices.',
           hasSeparator: false,
-          // Loom video
         },
       ],
       hasSeparator: false,
@@ -479,8 +478,11 @@ const backgroundUrl = computed(() => BG_BY_THEME[activeTheme.value] ?? BG_BY_THE
         <!-- Optional: visual separation between CaseStudy blocks -->
         <q-separator v-if="index < caseStudies.length - 1" />
       </template>
-      <q-separator class="full-width bg-primary"></q-separator>
+      <q-separator color="dark" class="full-width"></q-separator>
     </q-list>
+    <q-btn class="q-mt-sm full-width" color="accent" size="lg" glossy square>
+      <span>Let’s Discuss Your Interactive Project</span>
+    </q-btn>
   </section>
 
   <!-- Desktop -->
@@ -624,6 +626,9 @@ const backgroundUrl = computed(() => BG_BY_THEME[activeTheme.value] ?? BG_BY_THE
         </CaseStudy>
       </q-tab-panel>
     </q-tab-panels>
+    <q-btn class="q-mt-md full-width" color="accent" size="lg" glossy square>
+      <span>Let’s Discuss Your Interactive Project</span>
+    </q-btn>
   </section>
 </template>
 <style scoped lang="scss">

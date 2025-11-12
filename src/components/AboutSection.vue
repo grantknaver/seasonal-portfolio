@@ -182,6 +182,9 @@ onMounted(() => {
           learned that whether you’re a startup founder or a creative team, you need more than just
           a functioning app. You need an experience that stands out.
         </p>
+        <q-btn class="q-mt-md full-width" color="dark" size="lg" glossy>
+          <span class="text-body-1">Let’s Connect </span>
+        </q-btn>
       </q-card-section>
     </q-card>
     <q-card class="full-width">
@@ -353,6 +356,9 @@ onMounted(() => {
         >
           About Me
         </h1>
+        <p class="text-primary text-center text-body-2">
+          If you’re working on something creative or ambitious, I’d love to hear about it.
+        </p>
         <q-separator color="primary" class="q-mb-md" />
         <p
           class="text-body-2 text-primary q-mb-none font-primary"
@@ -372,6 +378,7 @@ onMounted(() => {
           worked at the intersection of design, code, and storytelling — helping companies and
           creators bring their ideas to life on the web.
         </p>
+
         <p
           class="q-pt-lg text-body-2 q-mb-none font-primary"
           :class="
@@ -437,6 +444,9 @@ onMounted(() => {
           learned that whether you’re a startup founder or a creative team, you need more than just
           a functioning app. You need an experience that stands out.
         </p>
+        <q-btn class="q-mt-md full-width" color="accent" size="lg" glossy>
+          <span class="text-body-1">Let’s Connect </span>
+        </q-btn>
       </q-card-section>
       <q-card-section class="section-container q-pa-lg">
         <h2
