@@ -220,238 +220,290 @@ onMounted(() => {
         </q-btn>
       </q-card-section>
     </q-card>
-    <q-card class="full-width">
-      <q-card-section class="section-container q-pa-lg">
-        <div class="h2-container row justify-center q-mb-lg text-center bg-dark text-white">
-          <h2
-            class="bg-dark text-h2 font-secondary"
+    <q-intersection transition="slide-up" transition-duration="1000" :once="true">
+      <q-card class="full-width">
+        <q-card-section class="section-container q-pa-lg">
+          <div class="h2-container row justify-center q-mb-lg text-center bg-dark text-white">
+            <h2
+              class="bg-dark text-h2 font-secondary"
+              :class="
+                setSeasonClasses(
+                  {
+                    Fall: 'text-secondary',
+                    Winter: 'text-secondary',
+                    Spring: 'text-secondary',
+                    Summer: 'text-secondary',
+                  },
+                  activeTheme,
+                )
+              "
+            >
+              My Approach
+            </h2>
+          </div>
+          <q-separator color="primary" class="q-mb-md" />
+          <p
+            class="q-mb-none text-body-1 font-primary"
             :class="
               setSeasonClasses(
                 {
-                  Fall: 'text-secondary',
-                  Winter: 'text-secondary',
-                  Spring: 'text-secondary',
-                  Summer: 'text-secondary',
+                  Fall: 'text-primary',
+                  Winter: 'text-primary',
+                  Spring: 'text-primary',
+                  Summer: 'text-primary',
                 },
                 activeTheme,
               )
             "
           >
-            My Approach
-          </h2>
-        </div>
-        <q-separator color="primary" class="q-mb-md" />
-        <p
-          class="q-mb-none text-body-1 font-primary"
-          :class="
-            setSeasonClasses(
-              {
-                Fall: 'text-primary',
-                Winter: 'text-primary',
-                Spring: 'text-primary',
-                Summer: 'text-primary',
-              },
-              activeTheme,
-            )
-          "
-        >
-          Before I dive into code, I focus on understanding the vision behind the project. Every
-          product has a story, and my role is to translate that story into an interface that feels
-          intuitive, engaging, and alive.
-        </p>
-        <br />
-        <q-separator></q-separator>
-        <q-list>
-          <div
-            v-for="bullet in myApproachBullets"
-            :key="bullet.id"
-            :name="bullet.id"
-            class="about-bullet"
-          >
-            <q-expansion-item
-              expand-separator
-              :label="bullet.label"
-              group="myApproach"
-              header-class="bg-primary font-primary"
+            Before I dive into code, I focus on understanding the vision behind the project. Every
+            product has a story, and my role is to translate that story into an interface that feels
+            intuitive, engaging, and alive.
+          </p>
+          <br />
+          <q-separator></q-separator>
+          <q-list>
+            <div
+              v-for="bullet in myApproachBullets"
+              :key="bullet.id"
+              :name="bullet.id"
+              class="about-bullet"
             >
-              <template v-slot:header>
-                <q-item-section avatar>
-                  <q-avatar>
-                    <img :src="bullet.src" />
-                  </q-avatar>
-                </q-item-section>
+              <q-expansion-item
+                expand-separator
+                :label="bullet.label"
+                group="myApproach"
+                header-class="bg-primary font-primary"
+              >
+                <template v-slot:header>
+                  <q-item-section avatar>
+                    <q-avatar>
+                      <img :src="bullet.src" />
+                    </q-avatar>
+                  </q-item-section>
 
-                <q-item-section> {{ bullet.label }} </q-item-section>
-              </template>
+                  <q-item-section> {{ bullet.label }} </q-item-section>
+                </template>
 
-              <q-card class="bg-dark">
-                <q-card-section class="text-primary">
-                  {{ bullet.text }}
-                </q-card-section>
-              </q-card>
-            </q-expansion-item>
+                <q-card class="bg-dark">
+                  <q-card-section class="text-primary">
+                    {{ bullet.text }}
+                  </q-card-section>
+                </q-card>
+              </q-expansion-item>
+            </div>
+          </q-list>
+        </q-card-section>
+      </q-card></q-intersection
+    >
+    <q-intersection transition="slide-up" transition-duration="1000" :once="true">
+      <q-card class="full-width">
+        <q-card-section class="section-container q-pa-lg">
+          <div class="h2-container row justify-center q-mb-lg text-center bg-dark text-white">
+            <h2
+              class="bg-dark text-h2 font-secondary"
+              :class="
+                setSeasonClasses(
+                  {
+                    Fall: 'text-secondary',
+                    Winter: 'text-secondary',
+                    Spring: 'text-secondary',
+                    Summer: 'text-secondary',
+                  },
+                  activeTheme,
+                )
+              "
+            >
+              Why Clients Work With Me
+            </h2>
           </div>
-        </q-list>
-      </q-card-section>
-    </q-card>
-    <q-card class="full-width">
-      <q-card-section class="section-container q-pa-lg">
-        <div class="h2-container row justify-center q-mb-lg text-center bg-dark text-white">
-          <h2
-            class="bg-dark text-h2 font-secondary"
+          <q-separator color="primary" class="q-mb-md" />
+          <p
+            class="q-mb-none text-body-1 font-primary"
             :class="
               setSeasonClasses(
                 {
-                  Fall: 'text-secondary',
-                  Winter: 'text-secondary',
-                  Spring: 'text-secondary',
-                  Summer: 'text-secondary',
+                  Fall: 'text-primary',
+                  Winter: 'text-primary',
+                  Spring: 'text-primary',
+                  Summer: 'text-primary',
                 },
                 activeTheme,
               )
             "
           >
-            Why Clients Work With Me
-          </h2>
-        </div>
-        <q-separator color="primary" class="q-mb-md" />
-        <p
-          class="q-mb-none text-body-1 font-primary"
-          :class="
-            setSeasonClasses(
-              {
-                Fall: 'text-primary',
-                Winter: 'text-primary',
-                Spring: 'text-primary',
-                Summer: 'text-primary',
-              },
-              activeTheme,
-            )
-          "
-        >
-          I know you’re not just looking for code — you’re looking for results. My clients come to
-          me when they want their projects to stand out, attract attention, and deliver value
-          quickly.
-        </p>
-        <br />
-        <q-separator></q-separator>
-        <q-list>
-          <div
-            v-for="bullet in whyClientsBullets"
-            :key="bullet.id"
-            :name="bullet.id"
-            class="full-width about-bullet"
-          >
-            <q-expansion-item
-              expand-separator
-              :label="bullet.label"
-              group="whyClientsWorkWithMe"
-              header-class="bg-primary font-primary about-bullet"
+            I know you’re not just looking for code — you’re looking for results. My clients come to
+            me when they want their projects to stand out, attract attention, and deliver value
+            quickly.
+          </p>
+          <br />
+          <q-separator></q-separator>
+          <q-list>
+            <div
+              v-for="bullet in whyClientsBullets"
+              :key="bullet.id"
+              :name="bullet.id"
+              class="full-width about-bullet"
             >
-              <template v-slot:header>
-                <q-item-section avatar>
-                  <q-avatar>
-                    <img :src="bullet.src" />
-                  </q-avatar>
-                </q-item-section>
+              <q-expansion-item
+                expand-separator
+                :label="bullet.label"
+                group="whyClientsWorkWithMe"
+                header-class="bg-primary font-primary about-bullet"
+              >
+                <template v-slot:header>
+                  <q-item-section avatar>
+                    <q-avatar>
+                      <img :src="bullet.src" />
+                    </q-avatar>
+                  </q-item-section>
 
-                <q-item-section> {{ bullet.label }} </q-item-section>
-              </template>
+                  <q-item-section> {{ bullet.label }} </q-item-section>
+                </template>
 
-              <q-card class="bg-dark">
-                <q-card-section class="text-primary">
-                  {{ bullet.text }}
-                </q-card-section>
-              </q-card>
-            </q-expansion-item>
+                <q-card class="bg-dark">
+                  <q-card-section class="text-primary">
+                    {{ bullet.text }}
+                  </q-card-section>
+                </q-card>
+              </q-expansion-item>
+            </div>
+          </q-list>
+        </q-card-section>
+      </q-card></q-intersection
+    >
+    <q-intersection transition="slide-up" transition-duration="1000" :once="true">
+      <q-card class="full-width">
+        <q-card-section class="section-container q-pa-lg text-primary">
+          <div class="h2-container row justify-center q-mb-lg text-center bg-dark text-white">
+            <h2
+              class="bg-dark text-h2 font-secondary"
+              :class="
+                setSeasonClasses(
+                  {
+                    Fall: 'text-secondary',
+                    Winter: 'text-secondary',
+                    Spring: 'text-secondary',
+                    Summer: 'text-secondary',
+                  },
+                  activeTheme,
+                )
+              "
+            >
+              Past Clients
+            </h2>
           </div>
-        </q-list>
-      </q-card-section>
-    </q-card>
-    <q-card class="full-width">
-      <q-card-section
-        class="section-container q-pa-lg text-primary"
-        :class="
-          setSeasonClasses(
-            {
-              Fall: 'bg-accent',
-              Winter: 'bg-accent',
-              Spring: 'bg-accent',
-              Summer: 'bg-dark',
-            },
-            activeTheme,
-          )
-        "
-      >
-        <h1 class="q-mt-none">About Me</h1>
-        <q-separator color="primary" class="q-mb-md" />
-        <p>
-          Hi, I'm
-          <strong class="name">Grant Knaver</strong>
-          — a full-stack JavaScript developer with seven and half years of professional experience,
-          currently based in Eugene, Oregon. I specialize in modern frameworks like Angular and Vue,
-          with a strong command of state management libraries (NgRx, Pinia), RESTful APIs,
-          responsive UI, and building apps that solve real-world problems.
-        </p>
-        <p class="text-primary">
-          I've built high-performance web apps and streamlining complex systems. I’ve worked in
-          environments ranging from government labs to startups, with recent experience converting
-          legacy systems, integrating Epic OAuth for medical software, and building scalable
-          monorepos.
-        </p>
-      </q-card-section>
+          <q-separator color="primary" />
+          <p
+            class="q-mt-md q-mb-none font-primary text-body-1 font-bold text-center"
+            :class="
+              setSeasonClasses(
+                {
+                  Fall: 'text-primary',
+                  Winter: 'text-primary',
+                  Spring: 'text-primary',
+                  Summer: 'text-white',
+                },
+                activeTheme,
+              )
+            "
+          >
+            I know you’re not just looking for code — you’re looking for results. My clients come to
+            me when they want their projects to stand out, attract attention, and deliver value
+            quickly.
+          </p>
+          <q-intersection
+            v-for="(client, index) in pastClients"
+            :key="client.id"
+            transition="slide-up"
+            transition-duration="1000"
+            :once="true"
+          >
+            <div ref="client" class="client bg-white full-width q-pa-xl q-mt-md">
+              <a class="full-width" :href="client.url" target="_blank">
+                <picture class="full-width">
+                  <source
+                    v-for="(src, srcIndex) in client.img.sources"
+                    :key="srcIndex"
+                    :srcset="src.srcset"
+                    :type="src.type"
+                    sizes="(min-width: 1450px) 100%"
+                  />
+                  <img
+                    :src="client.img.img.src"
+                    :srcset="client.img.img.srcset"
+                    sizes="(min-width: 1024px) 25vw, 90vw"
+                    fetchpriority="high"
+                    :loading="index === 0 ? 'eager' : 'lazy'"
+                    decoding="async"
+                    :alt="client.name"
+                  /> </picture
+              ></a>
+            </div>
+          </q-intersection>
+        </q-card-section> </q-card
+    ></q-intersection>
 
-      <q-separator color="primary q-mt-sm q-mb-sm"></q-separator>
-
-      <q-card-section class="section-container bg-transparent text-primary q-pa-sm">
-        <h2 class="q-ma-none q-mt-lg q-mb-md text-center text-primary">
-          Projects Under Development
-        </h2>
-        <div class="full-width column col justify-center items-center">
-          <ul class="q-pl-none q-pt-sm q-pb-md">
-            <a href="https://www.draindata.org/" target="_blank" class="project column">
-              <li
-                class="column items-center q-pa-lg text-center full-width bg-primary"
-                :class="
-                  setSeasonClasses(
-                    {
-                      Fall: 'text-accent',
-                      Winter: 'text-accent',
-                      Spring: 'text-dark',
-                      Summer: 'text-dark',
-                    },
-                    activeTheme,
-                  )
-                "
-              >
-                <img class="q-pb-md" src="../assets/logo-drainData.png" alt="Draindata logo" />
-                A surgery drain tracking tool aimed at improving patient recovery through better
-                data.
-              </li>
-            </a>
-            <br />
-            <a href="#" class="project column">
-              <li
-                class="storytaim column full-width items-center justify-between text-primary text-center bg-accent q-pa-md"
-              >
-                <div class="under-construction">
-                  <img src="../assets/under-construction.png" alt="under-construction" />
-                  <span class="under-construction-text text-primary">Under Construction</span>
+    <q-intersection transition="slide-up" transition-duration="1000" :once="true">
+      <q-card class="full-width last-card">
+        <q-card-section class="section-container q-pa-lg">
+          <div class="h2-container row justify-center q-mb-lg text-center bg-dark text-white">
+            <h2
+              class="bg-dark text-h2 font-secondary"
+              :class="
+                setSeasonClasses(
+                  {
+                    Fall: 'text-secondary',
+                    Winter: 'text-secondary',
+                    Spring: 'text-secondary',
+                    Summer: 'text-secondary',
+                  },
+                  activeTheme,
+                )
+              "
+            >
+              Projects Under Development
+            </h2>
+          </div>
+          <q-separator color="primary" class="q-mb-md" />
+          <q-intersection transition="scale" transition-duration="1000" :once="true">
+            <div class="project full-width bg-white q-pa-xl">
+              <a href="https://www.draindata.org/" class="column q-mb-xl">
+                <div
+                  class="col column items-center justify-center"
+                  :class="
+                    setSeasonClasses(
+                      {
+                        Fall: 'text-accent',
+                        Winter: 'text-accent',
+                        Spring: 'text-dark',
+                        Summer: 'text-dark',
+                      },
+                      activeTheme,
+                    )
+                  "
+                >
+                  <img
+                    class="q-ma-none q-pa-none"
+                    src="../assets/logo-drainData.png"
+                    alt="Draindata logo"
+                  />
                 </div>
-
-                <img class="q-pb-md" src="../assets/logo-storytAIm.png" alt="StorytAIm logo" />
-                <span class="q-pa-md">
-                  An AI-powered narration toolkit designed for authors, complete with voice emotion
-                  control and audio stitching.
-                </span>
-              </li></a
-            >
-          </ul>
-        </div>
-      </q-card-section>
-
-      <hr class="separator full-width" />
-    </q-card>
+              </a>
+              <q-separator color="dark" />
+              <p class="project-text text-dark q-mt-md q-mb-none text-center">
+                Unlock the benefits of accurate surgical drain tracking and maximize your recovery
+                experience with a patient-centered tool designed specifically for real post-surgical
+                care. Built to support JP drain monitoring and overall surgical recovery, our app
+                reduces stress, improves accuracy in recording drain output, and makes it easier for
+                patients and healthcare teams to stay connected and informed throughout the healing
+                process.
+              </p>
+            </div></q-intersection
+          >
+        </q-card-section>
+      </q-card></q-intersection
+    >
   </section>
 
   <section class="desktop-view full-width">
@@ -794,41 +846,42 @@ onMounted(() => {
         >
           Projects Under Development
         </h2>
-        <q-intersection transition="slide-up" transition-duration="1000" :once="true">
-          <div class="project full-width bg-white q-pa-xl">
-            <a href="https://www.draindata.org/" class="column q-mb-xl">
-              <div
-                class="col column items-center justify-center"
-                :class="
-                  setSeasonClasses(
-                    {
-                      Fall: 'text-accent',
-                      Winter: 'text-accent',
-                      Spring: 'text-dark',
-                      Summer: 'text-dark',
-                    },
-                    activeTheme,
-                  )
-                "
-              >
-                <img
-                  class="q-ma-none q-pa-none"
-                  src="../assets/logo-drainData.png"
-                  alt="Draindata logo"
-                />
-              </div>
-            </a>
-            <q-separator color="dark" />
-            <p class="project-text text-dark q-mt-md q-mb-none text-center">
-              Unlock the benefits of accurate surgical drain tracking and maximize your recovery
-              experience with a patient-centered tool designed specifically for real post-surgical
-              care. Built to support JP drain monitoring and overall surgical recovery, our app
-              reduces stress, improves accuracy in recording drain output, and makes it easier for
-              patients and healthcare teams to stay connected and informed throughout the healing
-              process.
-            </p>
-          </div></q-intersection
-        >
+        <!-- <q-intersection transition="slide-up" transition-duration="1000" :once="true"> -->
+        <div class="project full-width bg-white q-pa-xl">
+          <a href="https://www.draindata.org/" class="column q-mb-xl">
+            <div
+              class="col column items-center justify-center"
+              :class="
+                setSeasonClasses(
+                  {
+                    Fall: 'text-accent',
+                    Winter: 'text-accent',
+                    Spring: 'text-dark',
+                    Summer: 'text-dark',
+                  },
+                  activeTheme,
+                )
+              "
+            >
+              <img
+                class="q-ma-none q-pa-none"
+                src="../assets/logo-drainData.png"
+                alt="Draindata logo"
+              />
+            </div>
+          </a>
+          <q-separator color="dark" />
+          <p class="project-text text-dark q-mt-md q-mb-none text-center">
+            Unlock the benefits of accurate surgical drain tracking and maximize your recovery
+            experience with a patient-centered tool designed specifically for real post-surgical
+            care. Built to support JP drain monitoring and overall surgical recovery, our app
+            reduces stress, improves accuracy in recording drain output, and makes it easier for
+            patients and healthcare teams to stay connected and informed throughout the healing
+            process.
+          </p>
+        </div>
+        <!-- </q-intersection
+        > -->
       </q-card-section>
     </q-card>
   </section>
@@ -861,30 +914,57 @@ $winter-mobile-background: map-get($winter-theme, primary);
         border: solid 2px var(--q-dark);
       }
 
-      p {
-        line-height: 1.4rem;
+      .client {
+        border-radius: 10px;
+        transition: transform border 200ms ease;
+        border: solid 0.5rem var(--q-secondary);
+        cursor: pointer;
 
-        .name {
-          font-size: 1.2rem;
+        picture {
+          display: block;
+
+          img {
+            height: auto;
+            max-width: 100%;
+            object-fit: cover;
+          }
+        }
+      }
+
+      .client:hover {
+        transform: scale(1.04);
+      }
+
+      .project {
+        border-radius: 10px;
+        font-size: 1rem;
+        cursor: pointer;
+
+        img {
+          transition: transform 200ms ease;
         }
 
-        .years {
-          font-size: 1.2rem;
+        p {
+          transform: translateY(0px);
+          transition: transform 200ms ease;
+        }
+      }
+
+      .project:hover {
+        border: solid 0.5rem var(--q-secondary);
+        img {
+          transform: scale(1.05);
         }
 
-        .most-recently {
-          text-shadow: 2px 2px 2px var(--q-dark);
-          font-size: 1.3rem;
+        p {
+          transform: scale(1.05);
+          transform: translateY(0.5rem);
         }
       }
     }
 
     .section-container:nth-child(1) {
       border: solid 4px var(--q-primary);
-    }
-
-    hr.separator {
-      border: 1px solid var(--q-secondary);
     }
   }
 }
