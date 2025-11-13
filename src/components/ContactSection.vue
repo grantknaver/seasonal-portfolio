@@ -194,14 +194,14 @@ const sendEmail = async () => {
     <q-card class="flex column full-width q-pa-none">
       <q-card-section>
         <h1
-          class="full-width text-h1 q-mt-none q-mb-md q-pt-md q-pb-md text-center border-black font-secondary"
+          class="full-width text-h1 text-white q-mt-none q-mb-md q-pt-md q-pb-md text-center border-black font-secondary"
           :class="
             setSeasonClasses(
               {
-                Fall: 'bg-dark text-secondary',
-                Winter: 'bg-dark text-secondary',
-                Spring: 'bg-dark text-secondary',
-                Summer: 'bg-dark text-white',
+                Fall: 'bg-dark ',
+                Winter: 'bg-dark',
+                Spring: 'bg-accent',
+                Summer: 'bg-dark',
               },
               activeTheme,
             )

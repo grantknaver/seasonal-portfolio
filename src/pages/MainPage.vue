@@ -218,9 +218,9 @@ watch(slide, (newVal) => mainStore.SET_ACTIVE_THEME(newVal));
 
 watch(expandedPanel, (panel) => {
   if (!panel) return;
-  setTimeout(() => {
+  requestAnimationFrame(() => {
     scrollToElement(panel);
-  }, 1000);
+  });
 });
 
 const waitForLayout = async (el: HTMLElement | null, frames = 8): Promise<boolean> => {

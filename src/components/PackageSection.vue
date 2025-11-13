@@ -178,8 +178,8 @@ const setActiveAssets = (newTheme: Theme) => {
 
 <template>
   <!-- Mobile -->
-  <section v-if="isResponsive" class="responsive-view full-width column items-center q-gutter-y-md">
-    <q-card class="first-card full-width column items-center bg-secondary">
+  <section v-if="isResponsive" class="responsive-view column q-gutter-y-md">
+    <q-card class="full-width column items-center bg-secondary">
       <q-card-section
         class="package-header-section full-width q-pa-lg text-primary"
         :class="
@@ -195,18 +195,7 @@ const setActiveAssets = (newTheme: Theme) => {
         "
       >
         <h1
-          class="text-h1 q-mt-none q-mb-md q-mb-md q-pt-md q-pb-md bg-dark text-center"
-          :class="
-            setSeasonClasses(
-              {
-                Fall: 'text-secondary',
-                Winter: 'text-secondary',
-                Spring: 'text-secondary',
-                Summer: 'text-secondary',
-              },
-              activeTheme,
-            )
-          "
+          class="text-h1 text-white q-mt-none q-mb-md q-mb-md q-pt-md q-pb-md bg-dark text-center"
         >
           Packages
         </h1>
@@ -387,20 +376,14 @@ const setActiveAssets = (newTheme: Theme) => {
       "
     >
       <h1
-        class="text-h1 q-mt-none q-pt-md q-pb-md text-center"
+        class="text-h1 text-white q-mt-none q-pt-md q-pb-md text-center"
         :class="
           setSeasonClasses(
             {
-              Fall: isResponsive ? 'bg-dark text-secondary' : 'bg-dark text-secondary border-black',
-              Winter: isResponsive
-                ? 'bg-dark text-secondary'
-                : 'bg-dark text-secondary border-black',
-              Spring: isResponsive
-                ? 'bg-dark text-secondary'
-                : 'bg-accent text-secondary border-black',
-              Summer: isResponsive
-                ? 'bg-dark text-secondary'
-                : 'bg-dark text-secondary border-black',
+              Fall: isResponsive ? 'bg-dark' : 'bg-dark  border-black',
+              Winter: isResponsive ? 'bg-dark ' : 'bg-dark  border-black',
+              Spring: isResponsive ? 'bg-dark ' : 'bg-accent border-black',
+              Summer: isResponsive ? 'bg-dark ' : 'bg-dark  border-black',
             },
             activeTheme,
           )
@@ -420,9 +403,9 @@ const setActiveAssets = (newTheme: Theme) => {
             activeTheme,
           )
         "
-        class="q-mb-md"
       />
       <p
+        class="q-mt-lg"
         :class="
           setSeasonClasses(
             {

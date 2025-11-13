@@ -120,18 +120,7 @@ onMounted(() => {
     <q-card class="full-width">
       <q-card-section class="section-container q-pa-lg">
         <h1
-          class="text-h1 q-mt-none q-mb-md q-pt-md q-pb-md bg-dark text-center font-secondary"
-          :class="
-            setSeasonClasses(
-              {
-                Fall: 'text-secondary',
-                Winter: 'text-secondary',
-                Spring: 'text-secondary',
-                Summer: 'text-secondary',
-              },
-              activeTheme,
-            )
-          "
+          class="text-h1 text-white q-mt-none q-mb-md q-pt-md q-pb-md bg-dark text-center font-secondary"
         >
           About Me
         </h1>
@@ -144,7 +133,7 @@ onMounted(() => {
                 Fall: 'text-primary',
                 Winter: 'text-primary',
                 Spring: 'text-primary',
-                Summer: 'text-primary',
+                Summer: 'text-white',
               },
               activeTheme,
             )
@@ -512,14 +501,14 @@ onMounted(() => {
     <q-card class="flex column full-width q-pa-none">
       <q-card-section class="section-container">
         <h1
-          class="text-h1 q-mt-none q-pt-md q-pb-md text-center border-black font-secondary"
+          class="text-h1 text-white q-mt-none q-mb-md q-pt-md q-pb-md text-center border-black font-secondary"
           :class="
             setSeasonClasses(
               {
-                Fall: 'bg-dark text-secondary',
-                Winter: 'bg-dark text-secondary',
-                Spring: 'bg-dark text-secondary',
-                Summer: 'bg-dark text-secondary',
+                Fall: 'bg-dark',
+                Winter: 'bg-dark',
+                Spring: 'bg-accent',
+                Summer: 'bg-dark',
               },
               activeTheme,
             )

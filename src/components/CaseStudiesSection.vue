@@ -356,20 +356,14 @@ const toContact = () => {
       "
     >
       <h1
-        class="text-h1 q-mt-none q-mb-md q-pt-md q-pb-md text-center secondary-font"
+        class="text-h1 text-white q-mt-none q-mb-md q-pt-md q-pb-md text-center secondary-font"
         :class="
           setSeasonClasses(
             {
               Fall: isResponsive ? 'bg-dark text-secondary' : 'bg-dark text-secondary border-black',
-              Winter: isResponsive
-                ? 'bg-dark text-secondary'
-                : 'bg-dark text-secondary border-black',
-              Spring: isResponsive
-                ? 'bg-dark text-secondary'
-                : 'bg-accent text-secondary border-black',
-              Summer: isResponsive
-                ? 'bg-dark text-secondary'
-                : 'bg-dark text-secondary border-black',
+              Winter: isResponsive ? 'bg-dark' : 'bg-dark  border-black',
+              Spring: isResponsive ? 'bg-dark ' : 'bg-accent  border-black',
+              Summer: isResponsive ? 'bg-dark ' : 'bg-dark border-black',
             },
             activeTheme,
           )
@@ -511,20 +505,14 @@ const toContact = () => {
       "
     >
       <h1
-        class="text-h1 q-mt-none q-mb-md q-pt-md q-pb-md text-center secondary-font"
+        class="text-h1 text-white q-mt-none q-mb-md q-pt-md q-pb-md text-center secondary-font"
         :class="
           setSeasonClasses(
             {
-              Fall: isResponsive ? 'bg-dark text-secondary' : 'bg-dark text-secondary border-black',
-              Winter: isResponsive
-                ? 'bg-dark text-secondary'
-                : 'bg-dark text-secondary border-black',
-              Spring: isResponsive
-                ? 'bg-dark text-secondary'
-                : 'bg-accent text-secondary border-black',
-              Summer: isResponsive
-                ? 'bg-dark text-secondary'
-                : 'bg-dark text-secondary border-black',
+              Fall: isResponsive ? 'bg-dark' : 'bg-dark border-black',
+              Winter: isResponsive ? 'bg-dark ' : 'bg-dark border-black',
+              Spring: isResponsive ? 'bg-dark' : 'bg-accent border-black',
+              Summer: isResponsive ? 'bg-dark' : 'bg-dark border-black',
             },
             activeTheme,
           )
