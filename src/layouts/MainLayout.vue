@@ -9,7 +9,7 @@ import { type Topic } from '../shared/types/topic';
 import { v4 as uuidv4 } from 'uuid';
 import { useViewport } from '../shared/utils/viewWidth';
 import { mdiMenu, mdiHeart, mdiGithub, mdiLinkedin } from '@quasar/extras/mdi-v7';
-// import { type Package } from 'src/shared/constants/packages';
+import { scrollToElement } from 'src/shared/utils/scrollToElement';
 
 const mainStore = useMainStore();
 const { activeTheme, activeTopic } = storeToRefs(mainStore);
@@ -26,15 +26,15 @@ const updateWidths = () => {
 };
 const mobileMenu = ref(false);
 const topics = ref<Topic[]>([
-  { id: uuidv4(), name: TopicName.Packages, icon: 'local_shipping', label: TopicName.Packages },
-  { id: uuidv4(), name: TopicName.About, icon: 'info', label: TopicName.About },
-  { id: uuidv4(), name: TopicName.Contact, icon: 'contact_mail', label: TopicName.Contact },
   {
     id: uuidv4(),
     name: 'Case Studies' as TopicName,
     icon: 'menu_book',
     label: TopicName.CaseStudies,
   },
+  { id: uuidv4(), name: TopicName.Packages, icon: 'local_shipping', label: TopicName.Packages },
+  { id: uuidv4(), name: TopicName.About, icon: 'info', label: TopicName.About },
+  { id: uuidv4(), name: TopicName.Contact, icon: 'contact_mail', label: TopicName.Contact },
 ]);
 const SectionMap: Record<TopicName, ReturnType<typeof defineAsyncComponent>> = {
   ['Case Studies']: defineAsyncComponent(() => import('../components/CaseStudiesSection.vue')),
@@ -48,6 +48,15 @@ onMounted(() => {
 });
 
 onBeforeUnmount(() => window.removeEventListener('resize', updateWidths));
+
+const test = (topicName: TopicName) => {
+  mainStore.SET_ACTIVE_TOPIC(topicName);
+  // mainStore.SET_MOBILE_SCROLL_TARGET(topic.name);
+  setTimeout(() => {
+    scrollToElement(topicName);
+    mobileMenu.value = false;
+  }, 1000);
+};
 </script>
 
 <template>
@@ -93,37 +102,15 @@ onBeforeUnmount(() => window.removeEventListener('resize', updateWidths));
         >
           <q-list>
             <q-item
-              v-for="topic in topics.filter((topic) => topic.name !== TopicName.Contact)"
+              v-for="topic in topics"
               :key="topic.id"
               class="menu-item text-dark"
               clickable
-              @click="
-                {
-                  mainStore.SET_ACTIVE_TOPIC(topic.name);
-                  console.log('activeTopic', activeTopic);
-                  mobileMenu = false;
-                }
-              "
+              @click="test(topic.name)"
               :class="{ activeTopic: topic.name === activeTopic }"
             >
               <q-item-section>{{ topic.label }}</q-item-section>
             </q-item>
-
-            <q-item
-              class="menu-item text-dark"
-              clickable
-              :class="{ activeTopic: TopicName.Contact === activeTopic }"
-              @click="
-                {
-                  mainStore.SET_MOBILE_SCROLL_TARGET(TopicName.Contact);
-                  mobileMenu = false;
-                }
-              "
-            >
-              <q-item-section>{{ TopicName.Contact }}</q-item-section>
-            </q-item>
-
-            <hr />
           </q-list>
         </q-drawer>
       </q-toolbar>

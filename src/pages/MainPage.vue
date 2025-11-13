@@ -129,13 +129,11 @@ const loadComponent = (topicName: TopicName) => {
   }
 };
 
-// let WeatherBackground: any = null;
 onMounted(async () => {
   await nextTick();
   await waitForLayout(root.value);
   showCarousel.value = true;
   if (isResponsive.value) {
-    // WeatherBackground = defineAsyncComponent(() => import('../components/WeatherBackground.vue'));
     try {
       dispose.value = buildAnimations(ViewType.Responsive);
     } catch (e) {
@@ -554,6 +552,7 @@ const scrollToFooter = () => {
           <q-item
             v-for="topic in mobileTopics"
             :key="topic.id"
+            :id="topic.name"
             class="full-width bg-transparent q-pa-none q-mb-sm"
           >
             <q-expansion-item
@@ -586,9 +585,16 @@ const scrollToFooter = () => {
                 <Suspense>
                   <template #default>
                     <component
-                      @requestConsultation="toContact"
+                      v-if="topic.name === TopicName.Packages"
                       :is="catalog[topic.cachedName as CacheEntry]"
                       :key="topic.name"
+                      @requestConsultation="toContact"
+                    />
+
+                    <component
+                      v-else
+                      :is="catalog[topic.cachedName as CacheEntry]"
+                      :key="topic.id"
                     />
                   </template>
 

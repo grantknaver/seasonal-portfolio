@@ -1,9 +1,9 @@
 import { scroll } from 'quasar';
-import { type TopicName } from '../constants/topicName';
 
 const { getScrollTarget, setVerticalScrollPosition } = scroll;
 
-export const scrollToElement = (elementId: TopicName): void => {
+export const scrollToElement = (elementId: string): void => {
+  console.log('elementId', elementId);
   const el = document.getElementById(elementId);
   if (!el) {
     console.warn(`Element with id "${elementId}" not found.`);
@@ -12,7 +12,7 @@ export const scrollToElement = (elementId: TopicName): void => {
 
   const container = getScrollTarget(el);
 
-  // positions in viewport
+  // how far the element (or container) is from the top of the viewport
   const elTop = el.getBoundingClientRect().top;
   const containerTop =
     container === window ? 0 : (container as Element).getBoundingClientRect().top;
@@ -31,7 +31,6 @@ export const scrollToElement = (elementId: TopicName): void => {
     setVerticalScrollPosition(container, target, 500);
   } catch (err) {
     console.warn('Failed scroll attempt', err);
-    // works great if you added .anchor { scroll-margin-top: 72px }
     el.scrollIntoView({ behavior: 'smooth', block: 'start' });
   }
 
