@@ -9,7 +9,6 @@ import { type Topic } from '../shared/types/topic';
 import { v4 as uuidv4 } from 'uuid';
 import { useViewport } from '../shared/utils/viewWidth';
 import { mdiMenu, mdiHeart, mdiGithub, mdiLinkedin } from '@quasar/extras/mdi-v7';
-import { scrollToElement } from 'src/shared/utils/scrollToElement';
 
 const mainStore = useMainStore();
 const { activeTheme, activeTopic } = storeToRefs(mainStore);
@@ -46,17 +45,7 @@ const SectionMap: Record<TopicName, ReturnType<typeof defineAsyncComponent>> = {
 onMounted(() => {
   window.addEventListener('resize', updateWidths);
 });
-
 onBeforeUnmount(() => window.removeEventListener('resize', updateWidths));
-
-const test = (topicName: TopicName) => {
-  mainStore.SET_ACTIVE_TOPIC(topicName);
-  // mainStore.SET_MOBILE_SCROLL_TARGET(topic.name);
-  setTimeout(() => {
-    scrollToElement(topicName);
-    mobileMenu.value = false;
-  }, 1000);
-};
 </script>
 
 <template>
@@ -106,7 +95,12 @@ const test = (topicName: TopicName) => {
               :key="topic.id"
               class="menu-item text-dark"
               clickable
-              @click="test(topic.name)"
+              @click="
+                () => {
+                  mainStore.SET_ACTIVE_TOPIC(topic.name);
+                  mobileMenu = false;
+                }
+              "
               :class="{ activeTopic: topic.name === activeTopic }"
             >
               <q-item-section>{{ topic.label }}</q-item-section>

@@ -30,6 +30,7 @@ import summer from 'src/assets/beach.jpg?w=768;1280;1600&format=avif;webp;jpeg&q
 import { CacheEntry } from 'src/shared/constants/cacheEntry';
 import { useCacheStore } from 'src/stores/component-cache';
 import type { Package } from 'src/shared/constants/packages';
+import { scrollToElement } from 'src/shared/utils/scrollToElement';
 
 const WeatherBackground = defineAsyncComponent(() => import('../components/WeatherBackground.vue'));
 const mainStore = useMainStore();
@@ -164,12 +165,6 @@ onBeforeUnmount(() => {
   }
 });
 
-const toContact = (p: Package | null) => {
-  mainStore.SET_PACKAGE_OF_INTEREST(p);
-  mainStore.SET_ACTIVE_TOPIC(TopicName.Contact);
-  expandedPanel.value = TopicName.Contact;
-};
-
 watch(
   isResponsive,
   async (viewNow) => {
@@ -220,6 +215,13 @@ watch(
 );
 
 watch(slide, (newVal) => mainStore.SET_ACTIVE_THEME(newVal));
+
+watch(expandedPanel, (panel) => {
+  if (!panel) return;
+  setTimeout(() => {
+    scrollToElement(panel);
+  }, 1000);
+});
 
 const waitForLayout = async (el: HTMLElement | null, frames = 8): Promise<boolean> => {
   if (!el) return false;
@@ -362,6 +364,12 @@ const scrollToFooter = () => {
     setVerticalScrollPosition(target, y, 500); // smooth scroll (ms)
     showFooter.value = false;
   }
+};
+
+const toContact = (p: Package | null) => {
+  mainStore.SET_PACKAGE_OF_INTEREST(p);
+  mainStore.SET_ACTIVE_TOPIC(TopicName.Contact);
+  expandedPanel.value = TopicName.Contact;
 };
 </script>
 
@@ -578,10 +586,7 @@ const scrollToFooter = () => {
               class="expansion-item full-width"
               switch-toggle-side
             >
-              <div v-if="expandedPanel === topic.name" :id="topic.name" class="anchor full-width">
-                <!-- First open: skeleton while chunk mounts -->
-
-                <!-- After first open -->
+              <div v-if="expandedPanel === topic.name" class="anchor full-width">
                 <Suspense>
                   <template #default>
                     <component
