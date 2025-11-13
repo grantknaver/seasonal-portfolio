@@ -371,7 +371,7 @@ const toContact = () => {
       >
         Case Studies
       </h1>
-      <q-separator color="dark" class="q-mb-md" />
+      <q-separator color="primary" class="q-mb-md" />
       <p
         class="case-caseStudies-description text-bold text-body-1 text-center primary-font"
         :class="

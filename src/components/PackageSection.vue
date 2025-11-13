@@ -233,13 +233,8 @@ const setActiveAssets = (newTheme: Theme) => {
         </p>
       </q-card-section>
 
-      <q-card-section class="section-container full-width column">
-        <div
-          bordered
-          padding
-          :separator="true"
-          class="package-tile full-width q-pa-md bg-white q-mb-none no-border"
-        >
+      <q-card-section class="section-container first-section full-width column">
+        <div class="package-tile section-container full-width q-pa-md bg-white q-mb-none no-border">
           <div class="h2-container row justify-center q-mb-md text-center bg-accent text-white">
             <h2 class="text-h2">{{ packages[0]?.name }}</h2>
           </div>
@@ -515,9 +510,13 @@ const setActiveAssets = (newTheme: Theme) => {
 }
 
 .responsive-view {
-  .first-card {
+  .first-section {
     border-top-left-radius: 0;
     border-top-right-radius: 0;
+
+    .section-container {
+      border-radius: 5px;
+    }
   }
 
   .package-header-section {
