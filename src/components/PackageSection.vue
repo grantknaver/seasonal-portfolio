@@ -33,6 +33,7 @@ import { TopicName } from 'src/shared/constants/topicName';
 
 const mainStore = useMainStore();
 const { activeTheme } = storeToRefs(mainStore);
+const emit = defineEmits(['requestConsultation']);
 const getPackageImages = (theme: Theme): ThemePackageImages => {
   switch (theme) {
     case Theme.Fall:
@@ -68,7 +69,6 @@ const getPackageImages = (theme: Theme): ThemePackageImages => {
       };
   }
 };
-const emit = defineEmits(['requestConsult']);
 const packages = ref<PackageDetails[]>([
   {
     name: Package.StarterPackage,
@@ -155,15 +155,11 @@ const onResize = debounce(() => {
   setActiveAssets(activeTheme.value);
 }, 500);
 
-const requestConsultation = (packageName?: Package) => {
-  console.log('package', packageName);
-  if (!packageName) return;
-  emit('requestConsult', packageName);
-  if (!isResponsive.value) {
-    mainStore.SET_ACTIVE_TOPIC(TopicName.Contact);
-  }
+const toContact = (p: Package | null) => {
+  emit('requestConsultation', p);
+  mainStore.SET_PACKAGE_OF_INTEREST(p);
+  mainStore.SET_ACTIVE_TOPIC(TopicName.Contact);
 };
-
 const setActiveAssets = (newTheme: Theme) => {
   const activeThemePackageImages = getPackageImages(newTheme);
   const theme = newTheme.toLowerCase();
@@ -291,7 +287,7 @@ const setActiveAssets = (newTheme: Theme) => {
               size="lg"
               color="accent"
               class="q-mb-md"
-              @click="requestConsultation(packages[0]?.name)"
+              @click="toContact(packages[0]?.name ?? null)"
               >Consultation</q-btn
             >
           </div>
@@ -352,7 +348,7 @@ const setActiveAssets = (newTheme: Theme) => {
                 </picture>
               </div>
               <br />
-              <q-btn size="lg" color="accent" class="q-mb-md" @click="requestConsultation(p?.name)"
+              <q-btn size="lg" color="accent" class="q-mb-md" @click="toContact(p?.name ?? null)"
                 >Consultation</q-btn
               >
             </div>
@@ -495,7 +491,7 @@ const setActiveAssets = (newTheme: Theme) => {
                     </picture>
                   </div>
                   <q-btn
-                    @click="requestConsultation(p?.name)"
+                    @click="toContact(p?.name ?? null)"
                     color="accent"
                     class="q-mt-md full-width"
                     >Consultation</q-btn

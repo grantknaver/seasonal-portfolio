@@ -36,19 +36,6 @@ const topics = ref<Topic[]>([
     label: TopicName.CaseStudies,
   },
 ]);
-// const packageOfInterest = ref<Package | null>(null);
-
-// const toContact = () => {
-//   mainStore.SET_ACTIVE_TOPIC(TopicName.Contact);
-// };
-
-// const requestInformation = (packageName?: Package) => {
-//   console.log('main layout requestInformation', packageName);
-//   if (!packageName) return;
-//   packageOfInterest.value = packageName;
-//   toContact();
-// };
-
 const SectionMap: Record<TopicName, ReturnType<typeof defineAsyncComponent>> = {
   ['Case Studies']: defineAsyncComponent(() => import('../components/CaseStudiesSection.vue')),
   [TopicName.Packages]: defineAsyncComponent(() => import('../components/PackageSection.vue')),

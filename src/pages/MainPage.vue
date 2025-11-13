@@ -111,7 +111,6 @@ const servRef = ref<HTMLElement | null>(null);
 const ctaBtnRef = ref<HTMLElement | null>(null);
 const homeContainerRef = ref<HTMLElement | null>(null);
 const showCarousel = ref<boolean>(false);
-const packageOfInterest = ref<Package | null>(null);
 
 const loadComponent = (topicName: TopicName) => {
   switch (topicName) {
@@ -167,14 +166,8 @@ onBeforeUnmount(() => {
   }
 });
 
-const requestInformation = (packageName?: Package) => {
-  if (!packageName) return;
-  packageOfInterest.value = packageName;
-  console.log('packageOfInterest', packageOfInterest.value);
-  toContact();
-};
-
-const toContact = () => {
+const toContact = (p: Package | null) => {
+  mainStore.SET_PACKAGE_OF_INTEREST(p);
   mainStore.SET_ACTIVE_TOPIC(TopicName.Contact);
   expandedPanel.value = TopicName.Contact;
 };
@@ -593,9 +586,9 @@ const scrollToFooter = () => {
                 <Suspense>
                   <template #default>
                     <component
+                      @requestConsultation="toContact"
                       :is="catalog[topic.cachedName as CacheEntry]"
                       :key="topic.name"
-                      @requestConsult="requestInformation"
                     />
                   </template>
 
@@ -604,26 +597,6 @@ const scrollToFooter = () => {
                   </template>
                 </Suspense>
               </div>
-              <!-- <template v-if="expandedPanel === TopicName.Packages">
-                <div :id="topic.name" class="full-width">
-                  <PackageSection @requestConsult="requestInformation" />
-                </div>
-              </template>
-              <template v-if="expandedPanel === TopicName.CaseStudies">
-                <div :id="topic.name" class="anchor full-width">
-                  <CaseStudiesSection @toContact="toContact" />
-                </div>
-              </template>
-              <template v-if="expandedPanel === TopicName.About">
-                <div :id="topic.name" class="full-width">
-                  <AboutSection />
-                </div>
-              </template>
-              <template v-if="expandedPanel === TopicName.Contact">
-                <div :id="topic.name" class="full-width">
-                  <ContactSection :topicOfInterest="packageOfInterest" />
-                </div>
-              </template> -->
             </q-expansion-item>
           </q-item>
         </q-list>
@@ -757,7 +730,7 @@ const scrollToFooter = () => {
                 <q-separator color="primary"></q-separator>
               </div>
               <div ref="ctaBtnRef">
-                <q-btn @click="toContact" class="q-mt-md" color="accent" size="lg" glossy>
+                <q-btn @click="toContact(null)" class="q-mt-md" color="accent" size="lg" glossy>
                   <span class="text-body-2">Hire Me for Your Next AI UI </span>
                 </q-btn>
               </div>

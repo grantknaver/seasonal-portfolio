@@ -1,5 +1,4 @@
 <script setup lang="ts">
-import type { PropType } from 'vue';
 import { ref, onMounted, defineAsyncComponent, computed, reactive } from 'vue';
 import { useMainStore } from '../stores/main';
 import { storeToRefs } from 'pinia';
@@ -25,21 +24,18 @@ const error = ref(false);
 const errorMsg = ref<string | null>(null);
 const contactRef = ref<HTMLElement | null>(null);
 const mainStore = useMainStore();
-const { isHuman } = storeToRefs(mainStore);
+const { isHuman, packageOfInterest } = storeToRefs(mainStore);
 const { lgBreakpoint, width } = useViewport();
 const isResponsive = computed(() => width.value < lgBreakpoint);
-// const route = useRoute();
 
-const props = defineProps({
-  topicOfInterest: { type: String as PropType<Package | null>, required: true },
-});
 onMounted(() => {
   mainStore.SET_CONTACT_SECTION_REF(contactRef.value);
-  setSubject();
+  if (!packageOfInterest.value) return;
+  setSubject(packageOfInterest.value);
 });
 
-const setSubject = () => {
-  switch (props.topicOfInterest as Package) {
+const setSubject = (packageName: Package) => {
+  switch (packageName) {
     case Package.StarterPackage:
       form.subject = 'Interested in Starter Package';
       break;
@@ -50,7 +46,7 @@ const setSubject = () => {
       form.subject = 'Interested in Premium Package';
       break;
     default:
-      console.log('No package subject');
+      form.subject = '';
   }
 };
 
@@ -157,6 +153,7 @@ const sendEmail = async () => {
         class="q-mb-sm"
         outlined
         required
+        :disable="!isHuman"
       />
       <q-input
         v-model="form.message"

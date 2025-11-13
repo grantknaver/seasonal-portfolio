@@ -3,8 +3,9 @@ import { watch } from 'vue';
 import { themeMap } from './shared/utils/themeMap';
 import { useMainStore } from './stores/main';
 import { storeToRefs } from 'pinia';
+import { TopicName } from './shared/constants/topicName';
 const mainStore = useMainStore();
-const { activeTheme } = storeToRefs(mainStore);
+const { activeTheme, activeTopic } = storeToRefs(mainStore);
 
 watch(
   activeTheme,
@@ -15,6 +16,16 @@ watch(
     root.style.setProperty('--q-secondary', theme.secondary);
     root.style.setProperty('--q-accent', theme.accent);
     root.style.setProperty('--q-dark', theme.dark);
+  },
+  { immediate: true },
+);
+
+watch(
+  activeTopic,
+  (topic) => {
+    if (topic !== TopicName.Contact && topic !== TopicName.Packages) {
+      mainStore.SET_PACKAGE_OF_INTEREST(null);
+    }
   },
   { immediate: true },
 );
