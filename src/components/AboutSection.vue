@@ -898,10 +898,6 @@ $winter-mobile-background: map-get(tokens.$winter-theme, primary);
 }
 
 .responsive-view {
-  @media (min-width: tokens.$breakpoint-lg) {
-    display: none;
-  }
-
   .q-card {
     background-color: rgba(black, 0.5);
     padding: 1rem;
@@ -976,8 +972,6 @@ $winter-mobile-background: map-get(tokens.$winter-theme, primary);
 }
 
 .desktop-view {
-  display: none;
-
   @media (min-width: tokens.$breakpoint-lg) {
     display: flex;
   }

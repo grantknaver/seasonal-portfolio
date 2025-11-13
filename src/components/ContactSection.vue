@@ -5,6 +5,7 @@ import { storeToRefs } from 'pinia';
 import { mdiAccount, mdiEmailOutline } from '@quasar/extras/mdi-v7';
 import { useViewport } from 'src/shared/utils/viewWidth';
 import { Package } from 'src/shared/constants/packages';
+import { setSeasonClasses } from 'src/shared/utils/setSeasonColors';
 
 // const FORMSPREE_ENDPOINT = 'https://formspree.io/f/your_form_id'; // <-- replace with your actual Formspree endpoint (e.g., https://formspree.io/f/abcd1234)
 // If you're actually using Formsubmit instead, use:
@@ -24,7 +25,7 @@ const error = ref(false);
 const errorMsg = ref<string | null>(null);
 const contactRef = ref<HTMLElement | null>(null);
 const mainStore = useMainStore();
-const { isHuman, packageOfInterest } = storeToRefs(mainStore);
+const { isHuman, packageOfInterest, activeTheme } = storeToRefs(mainStore);
 const { lgBreakpoint, width } = useViewport();
 const isResponsive = computed(() => width.value < lgBreakpoint);
 
@@ -106,12 +107,12 @@ const sendEmail = async () => {
   <section v-if="isResponsive" id="contact" ref="contactRef" class="responsive-view full-width">
     <q-form
       @submit.prevent="sendEmail"
-      class="full-width bg-accent q-pt-md q-pr-xl q-pb-xl q-pl-xl"
+      class="column full-width bg-accent q-gutter-y-sm q-pt-md q-pr-xl q-pb-xl q-pl-xl"
       :style="{ 'border-top': isHuman ? 'solid 2px white' : 'none' }"
     >
-      <h1 class="text-h1 text-white q-mt-md q-ml-none text-center">Contact Me</h1>
-      <q-separator class="q-mb-md" color="primary" />
-      <p class="text-white text-center">
+      <h1 class="text-h1 text-white text-center">Contact Me</h1>
+      <q-separator color="primary" />
+      <p class="q-mt-md text-white text-center">
         Want something interactive, fast, and intelligent? Let’s talk about what we can build.
       </p>
 
@@ -130,7 +131,6 @@ const sendEmail = async () => {
         v-model="form.name"
         label="Your Name"
         bg-color="primary"
-        class="q-mb-sm"
         outlined
         required
         :disable="!isHuman"
@@ -140,17 +140,16 @@ const sendEmail = async () => {
         type="email"
         label="Your Email"
         bg-color="primary"
-        class="q-mb-sm"
         outlined
         required
         :disable="!isHuman"
       />
+      <q-separator color="primary" class="separator"></q-separator>
       <q-input
         v-model="form.subject"
         type="text"
         label="Subject"
         bg-color="primary"
-        class="q-mb-sm"
         outlined
         required
         :disable="!isHuman"
@@ -159,7 +158,7 @@ const sendEmail = async () => {
         v-model="form.message"
         type="textarea"
         label="Your Message"
-        class="q-mb-sm message"
+        class="message"
         bg-color="primary"
         outlined
         required
@@ -191,99 +190,118 @@ const sendEmail = async () => {
     </q-form>
   </section>
 
-  <section
-    v-if="!isResponsive"
-    class="desktop-view full-width full-height column justify-center items-center"
-  >
-    <q-form
-      @submit.prevent="sendEmail"
-      class="full-width q-gutter-y-sm q-pt-md q-pr-xl q-pb-lg q-pl-xl"
-    >
-      <h1 class="text-h1 text-white q-ml-none">Contact Me</h1>
-      <q-separator color="primary" />
-      <p class="text-white text-body-2 q-mt-md">
-        Want something interactive, fast, and intelligent? Let’s talk about what we can build.
-      </p>
+  <section v-if="!isResponsive" class="desktop-view full-width column">
+    <q-card class="flex column full-width q-pa-none">
+      <q-card-section>
+        <h1
+          class="full-width text-h1 q-mt-none q-mb-md q-pt-md q-pb-md text-center border-black font-secondary"
+          :class="
+            setSeasonClasses(
+              {
+                Fall: 'bg-dark text-secondary',
+                Winter: 'bg-dark text-secondary',
+                Spring: 'bg-dark text-secondary',
+                Summer: 'bg-dark text-white',
+              },
+              activeTheme,
+            )
+          "
+        >
+          Contact Me
+        </h1>
+        <p class="text-center text-white text-body-2">
+          Want something interactive, fast, and intelligent? Let’s talk about what we can build.
+        </p>
+        <q-separator color="primary" />
+        <div class="form-container column items-center q-pl-lg q-pr-lg q-pb-lg">
+          <q-form @submit.prevent="sendEmail" class="column full-width q-gutter-y-sm">
+            <!-- <p class="text-white text-body-2 q-mt-md">
+              Want something interactive, fast, and intelligent? Let’s talk about what we can build.
+            </p> -->
+            <!-- Honeypot (hidden) -->
+            <input
+              v-model="form._honey"
+              type="text"
+              autocomplete="off"
+              tabindex="-1"
+              style="display: none"
+            />
+            <q-input
+              color="dark"
+              bg-color="primary"
+              filled
+              v-model="form.name"
+              label="Name"
+              required
+              :disable="!isHuman"
+            >
+              <template #prepend><q-icon :name="mdiAccount" /></template>
+            </q-input>
 
-      <!-- Honeypot (hidden) -->
-      <input
-        v-model="form._honey"
-        type="text"
-        autocomplete="off"
-        tabindex="-1"
-        style="display: none"
-      />
-      <q-input
-        color="dark"
-        bg-color="primary"
-        filled
-        v-model="form.name"
-        label="Name"
-        required
-        :disable="!isHuman"
-      >
-        <template #prepend><q-icon :name="mdiAccount" /></template>
-      </q-input>
+            <q-input
+              class="q-mb-md"
+              color="dark"
+              bg-color="primary"
+              filled
+              v-model="form.email"
+              label="Email"
+              type="email"
+              required
+              :disable="!isHuman"
+            >
+              <template #prepend><q-icon :name="mdiEmailOutline" /></template>
+            </q-input>
+            <q-separator color="primary" class="separator"></q-separator>
+            <q-input
+              class="q-mt-lg"
+              color="dark"
+              bg-color="primary"
+              filled
+              v-model="form.subject"
+              label="Subject"
+              type="text"
+              required
+              :disable="!isHuman"
+            >
+            </q-input>
 
-      <q-input
-        color="dark"
-        bg-color="primary"
-        filled
-        v-model="form.email"
-        label="Email"
-        type="email"
-        required
-        :disable="!isHuman"
-      >
-        <template #prepend><q-icon :name="mdiEmailOutline" /></template>
-      </q-input>
-      <br />
-      <q-input
-        color="dark"
-        bg-color="primary"
-        filled
-        v-model="form.subject"
-        label="Subject"
-        type="text"
-        required
-        :disable="!isHuman"
-      >
-      </q-input>
+            <q-input
+              v-model="form.message"
+              type="textarea"
+              label="Your Message"
+              class="message"
+              bg-color="primary"
+              outlined
+              required
+              autogrow
+              :disable="!isHuman"
+            />
 
-      <q-input
-        v-model="form.message"
-        type="textarea"
-        label="Your Message"
-        class="q-ml-none message"
-        bg-color="primary"
-        outlined
-        required
-        autogrow
-        :disable="!isHuman"
-      />
+            <RecaptchaWidget v-show="!isHuman" class="q-mt-md"></RecaptchaWidget>
+            <q-btn
+              v-show="isHuman"
+              class="q-mt-md"
+              color="accent"
+              type="submit"
+              size="lg"
+              :loading="sending"
+              :disable="sending"
+            >
+              {{ sending ? 'Sending…' : 'Submit' }}
+            </q-btn>
 
-      <RecaptchaWidget v-show="!isHuman" class="q-mt-md"></RecaptchaWidget>
-      <q-btn
-        v-show="isHuman"
-        class="q-mt-md"
-        color="accent"
-        type="submit"
-        size="lg"
-        :loading="sending"
-        :disable="sending"
-      >
-        {{ sending ? 'Sending…' : 'Submit' }}
-      </q-btn>
-
-      <q-banner v-if="success" class="bg-green-2 text-black q-mt-sm">
-        ✅ Message sent successfully!
-      </q-banner>
-      <q-banner v-if="error" class="bg-red-2 text-black q-mt-sm">
-        ❌ Failed to send. {{ errorMsg || 'Please try again.' }}
-      </q-banner>
-    </q-form>
-    <p class="q-mb-none text-white">Phone: (541) 288-3502</p>
-    <p class="q-mt-none q-mb-sm text-white">Address: OR United States</p>
+            <q-banner v-if="success" class="bg-green-2 text-black q-mt-sm">
+              ✅ Message sent successfully!
+            </q-banner>
+            <q-banner v-if="error" class="bg-red-2 text-black q-mt-sm">
+              ❌ Failed to send. {{ errorMsg || 'Please try again.' }}
+            </q-banner>
+          </q-form>
+          <p class="q-mt-md q-mb-none text-white text-center">Phone: (541) 288-3502</p>
+          <p class="q-mt-none q-mb-sm text-white text-center">Address: OR United States</p>
+        </div>
+      </q-card-section>
+    </q-card>
   </section>
 </template>
 
@@ -301,8 +319,20 @@ const sendEmail = async () => {
     flex-direction: column;
   }
 
-  .q-form {
-    max-width: 600px;
+  .q-card {
+    background-color: transparent;
+
+    .form-container {
+      margin-top: 32px;
+      .q-form {
+        max-width: 500px;
+      }
+    }
   }
+}
+
+.separator {
+  width: 50%;
+  align-self: center;
 }
 </style>
