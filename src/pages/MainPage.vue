@@ -195,11 +195,13 @@ watch(mobileScrollTarget, (newTopic) => {
 watch(
   activeTopic,
   async (newTopic: TopicName | null) => {
-    if (newTopic) loadComponent(newTopic);
+    if (newTopic) {
+      loadComponent(newTopic);
+      expandedPanel.value = newTopic;
+    }
     await nextTick();
     const el = homeContainerRef.value;
     if (!el) return;
-
     if (!newTopic) {
       gsap.to(el, {
         scale: 1,
@@ -209,14 +211,12 @@ watch(
       });
       return;
     }
-
     gsap.to(el, {
       scale: 0.8,
       duration: 0.8,
       ease: 'power2.out',
       overwrite: 'auto',
     });
-    expandedPanel.value = newTopic;
   },
   { immediate: true },
 );

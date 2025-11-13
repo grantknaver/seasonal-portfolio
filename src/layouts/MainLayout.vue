@@ -93,13 +93,14 @@ onBeforeUnmount(() => window.removeEventListener('resize', updateWidths));
         >
           <q-list>
             <q-item
-              v-for="topic in topics"
-              :key="topic.name"
+              v-for="topic in topics.filter((topic) => topic.name !== TopicName.Contact)"
+              :key="topic.id"
               class="menu-item text-dark"
               clickable
               @click="
                 {
                   mainStore.SET_ACTIVE_TOPIC(topic.name);
+                  console.log('activeTopic', activeTopic);
                   mobileMenu = false;
                 }
               "
