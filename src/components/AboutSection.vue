@@ -11,6 +11,15 @@ import { type PastClient } from 'src/shared/types/pastClient';
 const mainStore = useMainStore();
 const { activeTheme } = storeToRefs(mainStore);
 const getImg = (file: string) => new URL(`../assets/${file}`, import.meta.url).href;
+const emit = defineEmits(['toContact']);
+const toContact = () => {
+  if (isResponsive.value) {
+    emit('toContact');
+    console.log('EMIT');
+  } else {
+    mainStore.SET_ACTIVE_TOPIC(TopicName.Contact);
+  }
+};
 const generalBullets = ref<AboutBulletPoints[]>([
   {
     src: getImg('gsap-animation.avif'),
@@ -71,6 +80,7 @@ const whyClientsBullets = ref<AboutBulletPoints[]>([
     text: 'I focus on the “wow” factor — animations, interactions, and storytelling that make your product stand out and leave a lasting impression.',
   },
 ]);
+
 const { lgBreakpoint, width } = useViewport();
 const isResponsive = computed(() => width.value < lgBreakpoint);
 
@@ -79,6 +89,7 @@ import ornl from 'src/assets/ornl.jpg?w=800;1280;1600&format=avif;jpg&as=picture
 import amtrak from 'src/assets/amtrak.jpg?w=800;1280;1600&format=avif;jpg&as=picture';
 import lockheedMartin from 'src/assets/lockheed-martin.png?w=800;1280;1600&format=avif;png&as=picture';
 import { useViewport } from 'src/shared/utils/viewWidth';
+import { TopicName } from 'src/shared/constants/topicName';
 
 const pastClients = ref<PastClient[]>([
   {
@@ -207,12 +218,12 @@ onMounted(() => {
           learned that whether you’re a startup founder or a creative team, you need more than just
           a functioning app. You need an experience that stands out.
         </p>
-        <q-btn class="q-mt-md full-width" color="dark" size="lg" glossy>
-          <span class="text-body-1">Let’s Connect </span>
+        <q-btn @click="toContact" class="q-mt-md full-width" color="dark" size="lg" glossy>
+          <span class="text-body-1">Let’s Connect! </span>
         </q-btn>
       </q-card-section>
     </q-card>
-    <q-intersection transition="slide-up" transition-duration="1000" :once="true">
+    <q-intersection transition="slide-up" transition-duration="500" :once="true">
       <q-card class="full-width">
         <q-card-section class="section-container q-pa-lg">
           <div class="h2-container row justify-center q-mb-lg text-center bg-dark text-white">
@@ -435,7 +446,7 @@ onMounted(() => {
         </q-card-section> </q-card
     ></q-intersection>
 
-    <q-intersection transition="slide-up" transition-duration="1000" :once="true">
+    <!-- <q-intersection transition="slide-up" transition-duration="1000" :once="true">
       <q-card class="full-width last-card">
         <q-card-section class="section-container q-pa-lg">
           <div class="h2-container row justify-center q-mb-lg text-center bg-dark text-white">
@@ -494,7 +505,7 @@ onMounted(() => {
           >
         </q-card-section>
       </q-card></q-intersection
-    >
+    > -->
   </section>
 
   <section v-if="!isResponsive" class="desktop-view full-width column">
@@ -520,20 +531,7 @@ onMounted(() => {
           If you’re working on something creative or ambitious, I’d love to hear about it.
         </p>
         <q-separator color="primary" class="q-mb-md" />
-        <p
-          class="text-body-2 text-primary q-mb-none font-primary"
-          :class="
-            setSeasonClasses(
-              {
-                Fall: 'text-white',
-                Winter: 'text-white',
-                Spring: 'text-white',
-                Summer: 'text-white',
-              },
-              activeTheme,
-            )
-          "
-        >
+        <p class="text-body-2 text-primary q-mb-none font-primary">
           I’m Grant, a frontend engineer and creative problem-solver. For the past 7+ years, I’ve
           worked at the intersection of design, code, and storytelling — helping companies and
           creators bring their ideas to life on the web.
@@ -544,9 +542,9 @@ onMounted(() => {
           :class="
             setSeasonClasses(
               {
-                Fall: 'text-primary',
-                Winter: 'text-primary',
-                Spring: 'text-primary',
+                Fall: 'text-secondary',
+                Winter: 'text-primary text-underline',
+                Spring: 'text-primary text-underline',
                 Summer: 'text-white',
               },
               activeTheme,
@@ -557,36 +555,34 @@ onMounted(() => {
         </p>
         <br />
         <q-separator></q-separator>
-        <q-intersection transition="slide-left" transition-duration="1000" :once="true">
-          <q-list>
-            <div
-              v-for="bullet in generalBullets"
-              :key="bullet.id"
-              :name="bullet.id"
-              expand-separator
-              :label="bullet.label"
-              class="font-primary about-bullet"
-            >
-              <q-expansion-item group="aboutMe" header-class="bg-primary text-dark">
-                <template v-slot:header>
-                  <q-item-section avatar>
-                    <q-avatar>
-                      <img :src="bullet.src" />
-                    </q-avatar>
-                  </q-item-section>
+        <q-list>
+          <div
+            v-for="bullet in generalBullets"
+            :key="bullet.id"
+            :name="bullet.id"
+            expand-separator
+            :label="bullet.label"
+            class="font-primary about-bullet"
+          >
+            <q-expansion-item group="aboutMe" header-class="bg-primary text-dark">
+              <template v-slot:header>
+                <q-item-section avatar>
+                  <q-avatar>
+                    <img :src="bullet.src" />
+                  </q-avatar>
+                </q-item-section>
 
-                  <q-item-section> {{ bullet.label }}</q-item-section>
-                </template>
+                <q-item-section> {{ bullet.label }}</q-item-section>
+              </template>
 
-                <q-card class="bg-white">
-                  <q-card-section>
-                    <p>{{ bullet.text }}</p>
-                  </q-card-section>
-                </q-card>
-              </q-expansion-item>
-            </div>
-          </q-list></q-intersection
-        >
+              <q-card class="bg-white">
+                <q-card-section>
+                  <p>{{ bullet.text }}</p>
+                </q-card-section>
+              </q-card>
+            </q-expansion-item>
+          </div>
+        </q-list>
         <br />
         <p
           class="font-primary text-body-2 q-mb-none"
@@ -596,7 +592,7 @@ onMounted(() => {
                 Fall: 'text-primary',
                 Winter: 'text-primary',
                 Spring: 'text-primary',
-                Summer: 'text-white',
+                Summer: 'text-primary',
               },
               activeTheme,
             )
@@ -606,49 +602,57 @@ onMounted(() => {
           learned that whether you’re a startup founder or a creative team, you need more than just
           a functioning app. You need an experience that stands out.
         </p>
-        <q-btn class="q-mt-md full-width" color="accent" size="lg" glossy>
+        <q-btn @click="toContact" class="q-mt-md full-width" color="accent" size="lg" glossy>
           <span class="text-body-1">Let’s Connect </span>
         </q-btn>
       </q-card-section>
-      <q-card-section class="section-container">
-        <h2
-          class="text-h2 font-secondary q-mt-none q-pt-md q-pb-md text-secondary text-center bg-dark border-black"
-          :class="
-            setSeasonClasses(
-              {
-                Fall: 'text-secondary',
-                Winter: 'text-secondary',
-                Spring: 'text-secondary',
-                Summer: 'text-secondary',
-              },
-              activeTheme,
-            )
-          "
-        >
-          My Approach
-        </h2>
-        <q-separator color="primary" class="q-mb-md" />
-        <p
-          class="font-primary text-body-2 q-mb-none"
-          :class="
-            setSeasonClasses(
-              {
-                Fall: 'text-primary',
-                Winter: 'text-primary',
-                Spring: 'text-primary',
-                Summer: 'text-white',
-              },
-              activeTheme,
-            )
-          "
-        >
-          Before I dive into code, I focus on understanding the vision behind the project. Every
-          product has a story, and my role is to translate that story into an interface that feels
-          intuitive, engaging, and alive.
-        </p>
-        <br />
-        <q-separator></q-separator>
-        <q-intersection transition="slide-left" transition-duration="1000" :once="true">
+
+      <q-intersection
+        transition="slide-up"
+        transition-duration="2000"
+        :once="true"
+        :threshold="0.2"
+        margin="-100px"
+      >
+        <q-card-section class="section-container">
+          <h2
+            class="text-h2 font-secondary q-mt-none q-pt-md q-pb-md text-secondary text-center bg-dark border-black"
+            :class="
+              setSeasonClasses(
+                {
+                  Fall: 'text-secondary',
+                  Winter: 'text-secondary',
+                  Spring: 'text-secondary',
+                  Summer: 'text-secondary',
+                },
+                activeTheme,
+              )
+            "
+          >
+            My Approach
+          </h2>
+          <q-separator color="primary" class="q-mb-md" />
+          <p
+            class="font-primary text-body-2 q-mb-none"
+            :class="
+              setSeasonClasses(
+                {
+                  Fall: 'text-primary',
+                  Winter: 'text-primary',
+                  Spring: 'text-primary',
+                  Summer: 'text-primary',
+                },
+                activeTheme,
+              )
+            "
+          >
+            Before I dive into code, I focus on understanding the vision behind the project. Every
+            product has a story, and my role is to translate that story into an interface that feels
+            intuitive, engaging, and alive.
+          </p>
+          <br />
+          <q-separator></q-separator>
+
           <q-list separator>
             <div
               v-for="bullet in myApproachBullets"
@@ -679,48 +683,48 @@ onMounted(() => {
                 </q-card>
               </q-expansion-item>
             </div>
-          </q-list></q-intersection
-        >
-      </q-card-section>
-      <q-card-section class="section-container">
-        <h2
-          class="font-secondary text-h2 q-mt-none q-pt-md q-pb-md text-secondary text-center bg-dark border-black"
-          :class="
-            setSeasonClasses(
-              {
-                Fall: 'text-secondary',
-                Winter: 'text-secondary',
-                Spring: 'text-secondary',
-                Summer: 'text-secondary',
-              },
-              activeTheme,
-            )
-          "
-        >
-          Why Clients Work With Me
-        </h2>
-        <q-separator color="primary" class="q-mb-md" />
-        <p
-          class="font-primary text-body-2 q-mb-none"
-          :class="
-            setSeasonClasses(
-              {
-                Fall: 'text-primary',
-                Winter: 'text-primary',
-                Spring: 'text-primary',
-                Summer: 'text-white',
-              },
-              activeTheme,
-            )
-          "
-        >
-          I know you’re not just looking for code — you’re looking for results. My clients come to
-          me when they want their projects to stand out, attract attention, and deliver value
-          quickly.
-        </p>
-        <br />
-        <q-separator></q-separator>
-        <q-intersection transition="slide-left" transition-duration="1000" :once="true">
+          </q-list>
+        </q-card-section>
+
+        <q-card-section class="section-container">
+          <h2
+            class="font-secondary text-h2 q-mt-none q-pt-md q-pb-md text-secondary text-center bg-dark border-black"
+            :class="
+              setSeasonClasses(
+                {
+                  Fall: 'text-secondary',
+                  Winter: 'text-secondary',
+                  Spring: 'text-secondary',
+                  Summer: 'text-secondary',
+                },
+                activeTheme,
+              )
+            "
+          >
+            Why Clients Work With Me
+          </h2>
+          <q-separator color="primary" class="q-mb-md" />
+          <p
+            class="font-primary text-body-2 q-mb-none"
+            :class="
+              setSeasonClasses(
+                {
+                  Fall: 'text-primary',
+                  Winter: 'text-primary',
+                  Spring: 'text-primary',
+                  Summer: 'text-primary',
+                },
+                activeTheme,
+              )
+            "
+          >
+            I know you’re not just looking for code — you’re looking for results. My clients come to
+            me when they want their projects to stand out, attract attention, and deliver value
+            quickly.
+          </p>
+          <br />
+          <q-separator></q-separator>
+
           <q-list>
             <div
               v-for="bullet in whyClientsBullets"
@@ -751,75 +755,76 @@ onMounted(() => {
                 </q-card>
               </q-expansion-item>
             </div>
-          </q-list></q-intersection
-        >
-      </q-card-section>
-      <q-card-section class="section-container">
-        <h2
-          class="past-clients-header font-secondary q-mt-none q-pb-md text-white text-center"
-          :class="
-            setSeasonClasses(
-              {
-                Fall: 'text-secondary',
-                Winter: 'text-secondary',
-                Spring: 'text-secondary',
-                Summer: 'text-secondary',
-              },
-              activeTheme,
-            )
-          "
-        >
-          Past Clients
-        </h2>
-        <q-separator color="primary" />
-        <p
-          class="font-primary text-body-2 q-mt-md q-mb-none font-bold"
-          :class="
-            setSeasonClasses(
-              {
-                Fall: 'text-primary',
-                Winter: 'text-primary',
-                Spring: 'text-primary',
-                Summer: 'text-white',
-              },
-              activeTheme,
-            )
-          "
-        >
-          I know you’re not just looking for code — you’re looking for results. My clients come to
-          me when they want their projects to stand out, attract attention, and deliver value
-          quickly.
-        </p>
-        <q-intersection
-          v-for="(client, index) in pastClients"
-          :key="client.id"
-          transition="slide-left"
-          transition-duration="1000"
-          :once="true"
-        >
-          <div ref="client" class="client bg-white full-width q-pa-xl q-mt-md">
-            <a class="full-width" :href="client.url" target="_blank">
-              <picture class="full-width">
-                <source
-                  v-for="(src, k) in client.img.sources"
-                  :key="k"
-                  :srcset="src"
-                  :type="`image/${k}`"
-                  sizes="(min-width: 1450px) 100%"
-                />
-                <img
-                  :src="client.img.img.src"
-                  sizes="(min-width: 1024px) 25vw, 90vw"
-                  fetchpriority="high"
-                  :loading="index === 0 ? 'eager' : 'lazy'"
-                  decoding="async"
-                  :alt="client.name"
-                /> </picture
-            ></a>
+          </q-list>
+        </q-card-section>
+
+        <q-card-section class="section-container">
+          <h2
+            class="past-clients-header font-secondary q-mt-none text-white text-center"
+            :class="
+              setSeasonClasses(
+                {
+                  Fall: 'text-secondary',
+                  Winter: 'text-secondary',
+                  Spring: 'text-secondary',
+                  Summer: 'text-secondary',
+                },
+                activeTheme,
+              )
+            "
+          >
+            Past Clients
+          </h2>
+          <q-separator color="primary" />
+          <p
+            class="font-primary text-body-2 q-mt-lg q-mb-lg font-bold"
+            :class="
+              setSeasonClasses(
+                {
+                  Fall: 'text-primary',
+                  Winter: 'text-primary',
+                  Spring: 'text-primary',
+                  Summer: 'text-primary',
+                },
+                activeTheme,
+              )
+            "
+          >
+            I know you’re not just looking for code — you’re looking for results. My clients come to
+            me when they want their projects to stand out, attract attention, and deliver value
+            quickly.
+          </p>
+
+          <div class="full-width row justify-center">
+            <div
+              v-for="(client, index) in pastClients"
+              :key="client.id"
+              ref="client"
+              class="client bg-white full-width q-pa-lg q-mt-lg"
+            >
+              <a class="full-width" :href="client.url" target="_blank">
+                <picture class="full-width">
+                  <source
+                    v-for="(src, k) in client.img.sources"
+                    :key="k"
+                    :srcset="src"
+                    :type="`image/${k}`"
+                    sizes="(min-width: 1450px) 100%"
+                  />
+                  <img
+                    :src="client.img.img.src"
+                    sizes="(min-width: 1024px) 25vw, 90vw"
+                    fetchpriority="high"
+                    :loading="index === 0 ? 'eager' : 'lazy'"
+                    decoding="async"
+                    :alt="client.name"
+                  /> </picture
+              ></a>
+            </div>
           </div>
-        </q-intersection>
-      </q-card-section>
-      <q-card-section class="section-container">
+        </q-card-section>
+      </q-intersection>
+      <!-- <q-card-section class="section-container">
         <h2
           class="font-secondary text-h2 q-mt-none q-pt-md q-pb-md text-secondary text-center bg-dark border-black"
           :class="
@@ -836,7 +841,6 @@ onMounted(() => {
         >
           Projects Under Development
         </h2>
-        <!-- <q-intersection transition="slide-up" transition-duration="1000" :once="true"> -->
         <div class="project full-width bg-white q-pa-xl">
           <a href="https://www.draindata.org/" class="column q-mb-xl">
             <div
@@ -870,9 +874,7 @@ onMounted(() => {
             process.
           </p>
         </div>
-        <!-- </q-intersection
-        > -->
-      </q-card-section>
+      </q-card-section> -->
     </q-card>
   </section>
 </template>
@@ -968,6 +970,10 @@ $winter-mobile-background: map-get(tokens.$winter-theme, primary);
   .q-card {
     background-color: transparent;
 
+    .my-skills {
+      font-size: 1.4rem;
+    }
+
     .section-container {
       .past-clients-header {
         font-size: 3rem;
@@ -977,6 +983,7 @@ $winter-mobile-background: map-get(tokens.$winter-theme, primary);
         border-radius: 10px;
         transition: transform border 200ms ease;
         border: solid 0.5rem var(--q-secondary);
+        max-width: 80%;
         cursor: pointer;
 
         picture {

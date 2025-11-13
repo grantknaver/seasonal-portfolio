@@ -367,7 +367,7 @@ const scrollToFooter = () => {
 };
 
 const toContact = (p: Package | null) => {
-  mainStore.SET_PACKAGE_OF_INTEREST(p);
+  if (p) mainStore.SET_PACKAGE_OF_INTEREST(p);
   mainStore.SET_ACTIVE_TOPIC(TopicName.Contact);
   expandedPanel.value = TopicName.Contact;
 };
@@ -600,6 +600,7 @@ const toContact = (p: Package | null) => {
                       v-else
                       :is="catalog[topic.cachedName as CacheEntry]"
                       :key="topic.id"
+                      @toContact="toContact"
                     />
                   </template>
 
