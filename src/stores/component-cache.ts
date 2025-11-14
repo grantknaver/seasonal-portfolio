@@ -3,15 +3,9 @@ import { defineAsyncComponent, markRaw, reactive, type DefineComponent } from 'v
 import { CacheEntry } from 'src/shared/constants/cacheEntry';
 import { capitalize } from 'vue';
 
-// Combine CacheEntry and CaseStudies into one type
-
-// Define the catalog type
 type CacheCatalog = Record<CacheEntry, DefineComponent | null>;
 
 export const useCacheStore = defineStore('cache', () => {
-  // Initialize catalog with all keys set to null
-
-  // Initialize catalog with all keys set to null
   const catalog: CacheCatalog = reactive({
     [CacheEntry.WeatherAndTheme]: null,
     [CacheEntry.AiChat]: null,
@@ -25,28 +19,23 @@ export const useCacheStore = defineStore('cache', () => {
   });
 
   const CACHE_COMPONENT = (name: CacheEntry) => {
-    if (name) {
-      const component = defineAsyncComponent(
-        () => import(`../components/${capitalize(name)}.vue`),
-      ) as DefineComponent;
-      catalog[name] = markRaw(component); // Cache the component
-      console.log('catalog', catalog);
-      // console.log('catalog', catalog);
-    }
+    if (!name || catalog[name]) return;
+
+    const component = defineAsyncComponent({
+      loader: () => import(`../components/${capitalize(name)}.vue`),
+      delay: 0, // show skeleton immediately
+    }) as DefineComponent;
+
+    catalog[name] = markRaw(component);
+    console.log('catalog', catalog);
   };
 
   const GET_COMPONENT = (name: CacheEntry) => catalog[name];
 
   const CLEAR_CACHE = () => {
-    catalog.aboutSection = null;
-    catalog['ai-chat'] = null;
-    catalog.caseStudiesSection = null;
-    catalog.contactSection = null;
-    catalog.packageSection = null;
-    catalog.proof = null;
-    catalog.recaptchaWidget = null;
-    catalog.waveform = null;
-    catalog['weather-and-theme'] = null;
+    (Object.keys(catalog) as CacheEntry[]).forEach((key) => {
+      catalog[key] = null;
+    });
   };
 
   return { catalog, CACHE_COMPONENT, GET_COMPONENT, CLEAR_CACHE };

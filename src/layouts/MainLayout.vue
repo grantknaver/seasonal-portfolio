@@ -1,5 +1,5 @@
 <script lang="ts" setup>
-import { computed, ref, onMounted, onBeforeUnmount, watch, onUnmounted } from 'vue';
+import { computed, ref, onMounted, onBeforeUnmount } from 'vue';
 import { useMainStore } from '../stores/main';
 import { storeToRefs } from 'pinia';
 import { Theme } from '../shared/constants/theme';
@@ -9,14 +9,12 @@ import { type Topic } from '../shared/types/topic';
 import { v4 as uuidv4 } from 'uuid';
 import { useViewport } from '../shared/utils/viewWidth';
 import { mdiMenu, mdiHeart, mdiGithub, mdiLinkedin } from '@quasar/extras/mdi-v7';
-import { useLoadComponent } from 'src/shared/composables/useLoadComponent';
 import { useCacheStore } from 'src/stores/component-cache';
 import { CacheEntry } from 'src/shared/constants/cacheEntry';
 const cacheStore = useCacheStore();
 
 const mainStore = useMainStore();
 const { activeTheme, activeTopic } = storeToRefs(mainStore);
-const { catalog } = storeToRefs(cacheStore);
 const { height } = useViewport();
 const windowWidth = ref(window.innerWidth);
 const desktopDrawerWidth = ref(window.innerWidth * 0.5);
@@ -32,7 +30,7 @@ const mobileMenu = ref(false);
 const topics = ref<Topic[]>([
   {
     id: uuidv4(),
-    name: 'Case Studies' as TopicName,
+    name: TopicName.CaseStudies,
     icon: 'menu_book',
     label: TopicName.CaseStudies,
   },
@@ -48,20 +46,26 @@ const cacheBinding = {
   [TopicName.Packages]: CacheEntry.PackageSection,
 };
 
+const activeEntry = computed(() => {
+  if (!activeTopic.value) return null;
+  return cacheBinding[activeTopic.value];
+});
+
+const activeComponent = computed(() => {
+  const entry = activeEntry.value;
+  if (!entry) return null;
+
+  if (!cacheStore.catalog[entry]) {
+    cacheStore.CACHE_COMPONENT(entry);
+  }
+
+  return cacheStore.catalog[entry];
+});
+
 onMounted(() => {
-  if (activeTopic.value) useLoadComponent(activeTopic.value);
   window.addEventListener('resize', updateWidths);
 });
 onBeforeUnmount(() => window.removeEventListener('resize', updateWidths));
-onUnmounted(() => {
-  cacheStore.CLEAR_CACHE();
-});
-
-watch(activeTopic, (newTopic) => {
-  if (newTopic) {
-    useLoadComponent(newTopic);
-  }
-});
 </script>
 
 <template>
@@ -193,16 +197,19 @@ watch(activeTopic, (newTopic) => {
         class="q-pa-md"
         :bar-style="{ backgroundColor: 'white', opacity: '1' }"
       >
-        <!-- one Suspense boundary for the active topic -->
-        <Suspense>
+        <div v-if="!activeEntry" class="text-white q-pa-md">
+          <p>No active topic yet.</p>
+          <p>activeTopic: {{ activeTopic }}</p>
+        </div>
+
+        <!-- 2 & 3. We have an entry → let Suspense handle loading vs loaded -->
+        <Suspense v-else>
           <template #default>
-            <component
-              v-if="activeTopic"
-              :is="catalog[cacheBinding[activeTopic]]"
-              :key="activeTopic"
-            />
+            <!-- 3. Loaded: async component has resolved -->
+            <component :is="activeComponent" :key="activeEntry" />
           </template>
 
+          <!-- 2. Loading: while defineAsyncComponent is resolving -->
           <template #fallback>
             <q-skeleton type="rect" :width="desktopDrawerWidth + 'px'" :height="height + 'px'" />
           </template>
