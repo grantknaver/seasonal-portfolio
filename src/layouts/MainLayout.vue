@@ -1,5 +1,5 @@
 <script lang="ts" setup>
-import { computed, ref, onMounted, onBeforeUnmount, defineAsyncComponent } from 'vue';
+import { computed, ref, onMounted, onBeforeUnmount, watch, onUnmounted } from 'vue';
 import { useMainStore } from '../stores/main';
 import { storeToRefs } from 'pinia';
 import { Theme } from '../shared/constants/theme';
@@ -9,10 +9,15 @@ import { type Topic } from '../shared/types/topic';
 import { v4 as uuidv4 } from 'uuid';
 import { useViewport } from '../shared/utils/viewWidth';
 import { mdiMenu, mdiHeart, mdiGithub, mdiLinkedin } from '@quasar/extras/mdi-v7';
+import { useLoadComponent } from 'src/shared/composables/useLoadComponent';
+import { useCacheStore } from 'src/stores/component-cache';
+import { CacheEntry } from 'src/shared/constants/cacheEntry';
+const cacheStore = useCacheStore();
 
 const mainStore = useMainStore();
 const { activeTheme, activeTopic } = storeToRefs(mainStore);
-const { width, height } = useViewport();
+const { catalog } = storeToRefs(cacheStore);
+const { height } = useViewport();
 const windowWidth = ref(window.innerWidth);
 const desktopDrawerWidth = ref(window.innerWidth * 0.5);
 const showTopicBreakpoint = +`${getCustomCssVar('breakpoint-lg')}`.slice(0, -2);
@@ -35,17 +40,28 @@ const topics = ref<Topic[]>([
   { id: uuidv4(), name: TopicName.About, icon: 'info', label: TopicName.About },
   { id: uuidv4(), name: TopicName.Contact, icon: 'contact_mail', label: TopicName.Contact },
 ]);
-const SectionMap: Record<TopicName, ReturnType<typeof defineAsyncComponent>> = {
-  ['Case Studies']: defineAsyncComponent(() => import('../components/CaseStudiesSection.vue')),
-  [TopicName.Packages]: defineAsyncComponent(() => import('../components/PackageSection.vue')),
-  [TopicName.About]: defineAsyncComponent(() => import('../components/AboutSection.vue')),
-  [TopicName.Contact]: defineAsyncComponent(() => import('../components/ContactSection.vue')),
+
+const cacheBinding = {
+  [TopicName.CaseStudies]: CacheEntry.CaseStudiesSection,
+  [TopicName.About]: CacheEntry.AboutSection,
+  [TopicName.Contact]: CacheEntry.ContactSection,
+  [TopicName.Packages]: CacheEntry.PackageSection,
 };
 
 onMounted(() => {
+  if (activeTopic.value) useLoadComponent(activeTopic.value);
   window.addEventListener('resize', updateWidths);
 });
 onBeforeUnmount(() => window.removeEventListener('resize', updateWidths));
+onUnmounted(() => {
+  cacheStore.CLEAR_CACHE();
+});
+
+watch(activeTopic, (newTopic) => {
+  if (newTopic) {
+    useLoadComponent(newTopic);
+  }
+});
 </script>
 
 <template>
@@ -164,7 +180,6 @@ onBeforeUnmount(() => window.removeEventListener('resize', updateWidths));
       </section>
     </q-page-container>
 
-    <!-- Right desktop drawer stays the same -->
     <q-drawer
       :model-value="showTopicPanel"
       side="right"
@@ -178,27 +193,20 @@ onBeforeUnmount(() => window.removeEventListener('resize', updateWidths));
         class="q-pa-md"
         :bar-style="{ backgroundColor: 'white', opacity: '1' }"
       >
-        <div v-for="topic in topics" :key="topic.id">
-          <Suspense>
-            <template #default>
-              <component
-                v-if="activeTopic === topic.name && topic.name !== TopicName.Contact"
-                :is="SectionMap[topic.name]"
-                :key="topic.name"
-              />
-              <div
-                v-else-if="activeTopic === topic.name && topic.name === TopicName.Contact"
-                class="contact-card"
-              >
-                <component :is="SectionMap[TopicName.Contact]" :key="topics[3]?.id" />
-              </div>
-            </template>
+        <!-- one Suspense boundary for the active topic -->
+        <Suspense>
+          <template #default>
+            <component
+              v-if="activeTopic"
+              :is="catalog[cacheBinding[activeTopic]]"
+              :key="activeTopic"
+            />
+          </template>
 
-            <template #fallback>
-              <q-skeleton type="rect" :width="width / 2 - 16 + 'px'" :height="height + 'px'" />
-            </template>
-          </Suspense>
-        </div>
+          <template #fallback>
+            <q-skeleton type="rect" :width="desktopDrawerWidth + 'px'" :height="height + 'px'" />
+          </template>
+        </Suspense>
       </q-scroll-area>
     </q-drawer>
   </q-layout>
@@ -272,14 +280,5 @@ aside {
 .activeTopic {
   color: var(--q-accent);
   font-weight: bold;
-}
-
-.contact-tab {
-  width: 100%;
-  height: 100%;
-  flex-direction: column;
-  justify-content: center;
-  align-items: center;
-  padding: 1rem;
 }
 </style>

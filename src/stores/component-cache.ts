@@ -30,6 +30,7 @@ export const useCacheStore = defineStore('cache', () => {
         () => import(`../components/${capitalize(name)}.vue`),
       ) as DefineComponent;
       catalog[name] = markRaw(component); // Cache the component
+      console.log('catalog', catalog);
       // console.log('catalog', catalog);
     }
   };
@@ -47,34 +48,6 @@ export const useCacheStore = defineStore('cache', () => {
     catalog.waveform = null;
     catalog['weather-and-theme'] = null;
   };
-
-  // Utility function to resolve file names based on CacheKey
-  // const getFileNameForCacheKey = (key: CacheKey): string | null => {
-  //   switch (key) {
-  //     case CaseStudies.WeatherAndTheme:
-  //       return 'CaseStudy';
-  //     case CaseStudies.AiChat:
-  //       return 'CaseStudy';
-  //     case CaseStudies.Waveform:
-  //       return 'CaseStudy';
-  //     case CaseStudies.Proof:
-  //       return 'Proof';
-  //     case CacheEntry.WeatherBackground:
-  //       return 'WeatherBackground';
-  //     case CacheEntry.RecaptchaWidget:
-  //       return 'RecaptchaWidget';
-  //     case CacheEntry.CaseStudiesSection:
-  //       return 'CaseStudiesSection';
-  //     case CacheEntry.PackageSection:
-  //       return 'PackageSection';
-  //     case CacheEntry.AboutSection:
-  //       return 'AboutSection';
-  //     case CacheEntry.ContactSection:
-  //       return 'ContactSection';
-  //     default:
-  //       return null;
-  //   }
-  // };
 
   return { catalog, CACHE_COMPONENT, GET_COMPONENT, CLEAR_CACHE };
 });

@@ -13,7 +13,6 @@ import { Theme } from '../shared/constants/theme';
 import gsap from 'gsap';
 import { ViewType } from '../shared/constants/viewType';
 import { useViewport } from '../shared/utils/viewWidth';
-import { flattenElements } from '../shared/utils/flattenElements';
 import { defineAsyncComponent } from 'vue';
 import {
   mdiChevronUp,
@@ -113,23 +112,6 @@ const ctaBtnRef = ref<HTMLElement | null>(null);
 const homeContainerRef = ref<HTMLElement | null>(null);
 const showCarousel = ref<boolean>(false);
 
-const loadComponent = (topicName: TopicName) => {
-  switch (topicName) {
-    case TopicName.CaseStudies:
-      cacheStore.CACHE_COMPONENT(CacheEntry.CaseStudiesSection);
-      break;
-    case TopicName.Packages:
-      cacheStore.CACHE_COMPONENT(CacheEntry.PackageSection);
-      break;
-    case TopicName.About:
-      cacheStore.CACHE_COMPONENT(CacheEntry.AboutSection);
-      break;
-    case TopicName.Contact:
-      cacheStore.CACHE_COMPONENT(CacheEntry.ContactSection);
-      break;
-  }
-};
-
 onMounted(async () => {
   await nextTick();
   await waitForLayout(root.value);
@@ -140,7 +122,6 @@ onMounted(async () => {
     } catch (e) {
       console.log('Responsive main page animations error: ', e);
     }
-    if (activeTopic.value) loadComponent(activeTopic.value);
   } else {
     try {
       dispose.value = buildAnimations(ViewType.Desktop);
@@ -189,7 +170,6 @@ watch(
   activeTopic,
   async (newTopic: TopicName | null) => {
     if (newTopic) {
-      loadComponent(newTopic);
       expandedPanel.value = newTopic;
     }
     await nextTick();
@@ -219,7 +199,7 @@ watch(slide, (newVal) => mainStore.SET_ACTIVE_THEME(newVal));
 watch(expandedPanel, (panel) => {
   if (!panel) return;
   requestAnimationFrame(() => {
-    scrollToElement(panel);
+    if (isResponsive.value) scrollToElement(panel);
   });
 });
 
@@ -239,16 +219,26 @@ const waitForLayout = async (el: HTMLElement | null, frames = 8): Promise<boolea
 const buildAnimations = (mode: ViewType) => {
   const el = root.value;
   if (!el) return () => {};
-  const homeConentEls = document.querySelectorAll('.home-content');
-  const responsiveEls = [homeConentEls];
-  const desktopEls = [nameRef.value, simonRef.value, titleRef.value, sepRef.value, servRef.value];
+  // Responsive: all elements with .home-content
+  const homeContentEls = Array.from(document.querySelectorAll<HTMLElement>('.home-content'));
+
+  // Desktop: only non-null refs
+  const desktopEls = [
+    nameRef.value,
+    simonRef.value,
+    titleRef.value,
+    sepRef.value,
+    servRef.value,
+    ctaBtnRef.value,
+  ].filter((x): x is HTMLElement => !!x);
+
   if (mode === ViewType.Responsive) {
-    if (!flattenElements(responsiveEls)) return () => {};
-    gsap.killTweensOf(responsiveEls);
-    gsap.set(responsiveEls, { clearProps: 'all' });
+    if (!homeContentEls.length) return () => {};
+    gsap.killTweensOf(homeContentEls);
+    gsap.set(homeContentEls, { clearProps: 'all' });
 
     gsap.fromTo(
-      homeConentEls,
+      homeContentEls,
       { x: 150, autoAlpha: 0 },
       {
         keyframes: [{ x: 0, autoAlpha: 1 }],
@@ -258,9 +248,14 @@ const buildAnimations = (mode: ViewType) => {
         stagger: 1,
       },
     );
+    return () => {
+      gsap.killTweensOf(homeContentEls);
+      gsap.set(homeContentEls, { clearProps: 'all' });
+    };
   }
   if (mode === ViewType.Desktop) {
-    if (!flattenElements(desktopEls)) return () => {};
+    if (!desktopEls.length) return () => {};
+
     gsap.killTweensOf(desktopEls);
     gsap.set(desktopEls, { clearProps: 'all' });
 
@@ -341,6 +336,12 @@ const buildAnimations = (mode: ViewType) => {
         delay: 2.5,
       },
     );
+
+    // disposer for desktop mode
+    return () => {
+      gsap.killTweensOf(desktopEls);
+      gsap.set(desktopEls, { clearProps: 'all' });
+    };
   }
   return () => {
     gsap.killTweensOf([desktopEls]);
@@ -592,15 +593,20 @@ const toContact = (p: Package | null) => {
                     <component
                       v-if="topic.name === TopicName.Packages"
                       :is="catalog[topic.cachedName as CacheEntry]"
-                      :key="topic.name"
                       @requestConsultation="toContact"
                     />
 
                     <component
-                      v-else
+                      v-else-if="
+                        topic.name === TopicName.About || topic.name === TopicName.CaseStudies
+                      "
                       :is="catalog[topic.cachedName as CacheEntry]"
-                      :key="topic.id"
                       @toContact="toContact"
+                    />
+
+                    <component
+                      v-else-if="topic.name === TopicName.Contact"
+                      :is="catalog[topic.cachedName as CacheEntry]"
                     />
                   </template>
 
