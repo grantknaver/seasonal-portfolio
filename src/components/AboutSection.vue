@@ -531,88 +531,93 @@ onMounted(() => {
           If you’re working on something creative or ambitious, I’d love to hear about it.
         </p>
         <q-separator color="primary" class="q-mb-md" />
-        <p class="text-body-2 text-primary q-mb-none font-primary">
-          I’m Grant, a frontend engineer and creative problem-solver. For the past 7+ years, I’ve
-          worked at the intersection of design, code, and storytelling — helping companies and
-          creators bring their ideas to life on the web.
-        </p>
-
-        <p
-          class="q-pt-lg text-body-2 q-mb-none font-primary"
-          :class="
-            setSeasonClasses(
-              {
-                Fall: 'text-secondary',
-                Winter: 'text-primary text-underline',
-                Spring: 'text-primary text-underline',
-                Summer: 'text-white',
-              },
-              activeTheme,
-            )
-          "
+        <q-intersection
+          class="about-intersection"
+          transition="fade"
+          transition-duration="2000"
+          :once="true"
         >
-          What sets me apart isn’t just the code I write, but the experiences I design:
-        </p>
-        <br />
-        <q-separator></q-separator>
-        <q-list>
-          <div
-            v-for="bullet in generalBullets"
-            :key="bullet.id"
-            :name="bullet.id"
-            expand-separator
-            :label="bullet.label"
-            class="font-primary about-bullet"
+          <p class="text-body-2 text-primary q-mb-none font-primary">
+            I’m Grant, a frontend engineer and creative problem-solver. For the past 7+ years, I’ve
+            worked at the intersection of design, code, and storytelling — helping companies and
+            creators bring their ideas to life on the web.
+          </p>
+
+          <p
+            class="q-pt-lg text-body-2 q-mb-none font-primary"
+            :class="
+              setSeasonClasses(
+                {
+                  Fall: 'text-secondary',
+                  Winter: 'text-primary text-underline',
+                  Spring: 'text-primary text-underline',
+                  Summer: 'text-white',
+                },
+                activeTheme,
+              )
+            "
           >
-            <q-expansion-item group="aboutMe" header-class="bg-primary text-dark">
-              <template v-slot:header>
-                <q-item-section avatar>
-                  <q-avatar>
-                    <img :src="bullet.src" />
-                  </q-avatar>
-                </q-item-section>
+            What sets me apart isn’t just the code I write, but the experiences I design:
+          </p>
+          <br />
+          <q-separator></q-separator>
+          <q-list>
+            <div
+              v-for="bullet in generalBullets"
+              :key="bullet.id"
+              :name="bullet.id"
+              expand-separator
+              :label="bullet.label"
+              class="font-primary about-bullet"
+            >
+              <q-expansion-item group="aboutMe" header-class="bg-primary text-dark">
+                <template v-slot:header>
+                  <q-item-section avatar>
+                    <q-avatar>
+                      <img :src="bullet.src" />
+                    </q-avatar>
+                  </q-item-section>
 
-                <q-item-section> {{ bullet.label }}</q-item-section>
-              </template>
+                  <q-item-section> {{ bullet.label }}</q-item-section>
+                </template>
 
-              <q-card class="bg-white">
-                <q-card-section>
-                  <p>{{ bullet.text }}</p>
-                </q-card-section>
-              </q-card>
-            </q-expansion-item>
-          </div>
-        </q-list>
-        <br />
-        <p
-          class="font-primary text-body-2 q-mb-none"
-          :class="
-            setSeasonClasses(
-              {
-                Fall: 'text-primary',
-                Winter: 'text-primary',
-                Spring: 'text-primary',
-                Summer: 'text-primary',
-              },
-              activeTheme,
-            )
-          "
+                <q-card class="bg-white">
+                  <q-card-section>
+                    <p>{{ bullet.text }}</p>
+                  </q-card-section>
+                </q-card>
+              </q-expansion-item>
+            </div>
+          </q-list>
+          <br />
+          <p
+            class="font-primary text-body-2 q-mb-none"
+            :class="
+              setSeasonClasses(
+                {
+                  Fall: 'text-primary',
+                  Winter: 'text-primary',
+                  Spring: 'text-primary',
+                  Summer: 'text-primary',
+                },
+                activeTheme,
+              )
+            "
+          >
+            I’ve built tools for industries as diverse as healthcare, publishing, and SaaS — and
+            I’ve learned that whether you’re a startup founder or a creative team, you need more
+            than just a functioning app. You need an experience that stands out.
+          </p>
+          <q-btn @click="toContact" class="q-mt-md full-width" color="accent" size="lg" glossy>
+            <span class="text-body-1">Let’s Connect </span>
+          </q-btn></q-intersection
         >
-          I’ve built tools for industries as diverse as healthcare, publishing, and SaaS — and I’ve
-          learned that whether you’re a startup founder or a creative team, you need more than just
-          a functioning app. You need an experience that stands out.
-        </p>
-        <q-btn @click="toContact" class="q-mt-md full-width" color="accent" size="lg" glossy>
-          <span class="text-body-1">Let’s Connect </span>
-        </q-btn>
       </q-card-section>
-
       <q-intersection
-        transition="slide-up"
+        class="about-intersection"
+        transition="fade"
         transition-duration="2000"
         :once="true"
-        :threshold="0.2"
-        margin="-100px"
       >
         <q-card-section class="section-container">
           <h2
@@ -756,9 +761,10 @@ onMounted(() => {
               </q-expansion-item>
             </div>
           </q-list>
-        </q-card-section>
-
-        <q-card-section class="section-container">
+        </q-card-section></q-intersection
+      >
+      <q-intersection transition="slide-up" transition-duration="2000" :once="true"
+        ><q-card-section class="section-container row justify-center">
           <h2
             class="past-clients-header font-secondary q-mt-none text-white text-center"
             :class="
@@ -795,35 +801,34 @@ onMounted(() => {
             quickly.
           </p>
 
-          <div class="full-width row justify-center">
-            <div
-              v-for="(client, index) in pastClients"
-              :key="client.id"
-              ref="client"
-              class="client bg-white full-width q-pa-lg q-mt-lg"
-            >
-              <a class="full-width" :href="client.url" target="_blank">
-                <picture class="full-width">
-                  <source
-                    v-for="(src, k) in client.img.sources"
-                    :key="k"
-                    :srcset="src"
-                    :type="`image/${k}`"
-                    sizes="(min-width: 1450px) 100%"
-                  />
-                  <img
-                    :src="client.img.img.src"
-                    sizes="(min-width: 1024px) 25vw, 90vw"
-                    fetchpriority="high"
-                    :loading="index === 0 ? 'eager' : 'lazy'"
-                    decoding="async"
-                    :alt="client.name"
-                  /> </picture
-              ></a>
-            </div>
+          <div
+            v-for="(client, index) in pastClients"
+            :key="client.id"
+            ref="client"
+            class="client bg-white full-width q-pa-lg q-mt-lg"
+          >
+            <a class="full-width" :href="client.url" target="_blank">
+              <picture class="full-width">
+                <source
+                  v-for="(src, k) in client.img.sources"
+                  :key="k"
+                  :srcset="src"
+                  :type="`image/${k}`"
+                  sizes="(min-width: 1450px) 100%"
+                />
+                <img
+                  :src="client.img.img.src"
+                  sizes="(min-width: 1024px) 25vw, 90vw"
+                  fetchpriority="high"
+                  :loading="index === 0 ? 'eager' : 'lazy'"
+                  decoding="async"
+                  :alt="client.name"
+                /> </picture
+            ></a>
           </div>
-        </q-card-section>
-      </q-intersection>
+          <div class="full-width row justify-center"></div> </q-card-section
+      ></q-intersection>
+
       <!-- <q-card-section class="section-container">
         <h2
           class="font-secondary text-h2 q-mt-none q-pt-md q-pb-md text-secondary text-center bg-dark border-black"
@@ -969,6 +974,11 @@ $winter-mobile-background: map-get(tokens.$winter-theme, primary);
 
   .q-card {
     background-color: transparent;
+
+    .about-intersection {
+      min-height: 60vh;
+      display: block;
+    }
 
     .my-skills {
       font-size: 1.4rem;

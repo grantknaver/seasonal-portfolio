@@ -287,11 +287,7 @@ onMounted(async () => {
               )
             "
           >
-            I'm a full-stack JavaScript developer focused on front-end architecture and UX. I began
-            with the MEAN stack, later shifting to the Vue ecosystem to build responsive,
-            component-driven UIs. My backend work centers on MongoDB, recently expanding into
-            DynamoDB for cloud-native apps. I thrive at the intersection of design and data,
-            ensuring every component is fast, purposeful, and polished.
+            AI tools I'm familiar with.
           </p>
         </q-card-section>
 
