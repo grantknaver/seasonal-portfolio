@@ -725,7 +725,7 @@ const toContact = (p: Package | null) => {
                       )
                     "
                   >
-                    &
+                    •
                   </span>
                   <span
                     class="text-secondary"
