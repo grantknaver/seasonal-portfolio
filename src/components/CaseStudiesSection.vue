@@ -476,6 +476,17 @@ const toContact = () => {
               </div>
             </div>
           </template>
+          <template #waveform-result>
+            <div class="narrator-container full-width row justify-center q-pa-md bg-white">
+              <iframe
+                id="inlineFrameExample"
+                title="Inline Frame Example"
+                class="narrator full-width"
+                src="https://robot-narrator.pages.dev/"
+              >
+              </iframe>
+            </div>
+          </template>
         </CaseStudy>
 
         <!-- Optional: visual separation between CaseStudy blocks -->
@@ -620,6 +631,17 @@ const toContact = () => {
               </div>
             </div>
           </template>
+          <template #waveform-result>
+            <div class="narrator-container bg-white full-width">
+              <iframe
+                id="inlineFrameExample"
+                title="Inline Frame Example"
+                class="narrator full-width"
+                src="https://robot-narrator.pages.dev/"
+              >
+              </iframe>
+            </div>
+          </template>
         </CaseStudy>
       </q-tab-panel>
     </q-tab-panels>
@@ -642,28 +664,6 @@ const toContact = () => {
     border-top-right-radius: 0;
   }
 
-  .weather-theme {
-    .weather-theme-blockquote-section {
-      background: var(--q-primary);
-      border-radius: 6px;
-      transition: transform 0.2s ease;
-
-      blockquote {
-        position: relative;
-        border-left: 3px solid var(--q-dark);
-        cursor: pointer;
-
-        p {
-          line-height: 1.5;
-        }
-      }
-    }
-  }
-
-  .weather-theme-border {
-    border: solid 1rem var(--q-secondary);
-  }
-
   .ai-chat-container {
     height: 900px;
     border-radius: 10px;
@@ -681,40 +681,18 @@ const toContact = () => {
       margin-right: 1rem;
     }
   }
+
+  .narrator-container {
+    height: 500px;
+    min-height: 500px;
+    .narrator {
+      height: 100%;
+      width: 90%;
+    }
+  }
 }
 
 .desktop-view {
-  .weather-theme-border {
-    border: solid 1rem var(--q-secondary);
-  }
-
-  .weather-theme {
-    .weather-theme-header-section {
-      p {
-        line-height: 1.5;
-        font-family: tokens.$cursive-stack;
-        background-color: transparent;
-      }
-    }
-
-    .weather-theme-blockquote-section {
-      background: var(--q-primary);
-      border-radius: 6px;
-      transition: transform 0.2s ease;
-      box-shadow: 5px 5px 10px var(--q-dark);
-
-      blockquote {
-        position: relative;
-        cursor: pointer;
-
-        p {
-          line-height: 1.5;
-          font-family: tokens.$cursive-stack;
-        }
-      }
-    }
-  }
-
   .ai-chat-container {
     height: 800px;
     border-radius: 10px;
@@ -726,6 +704,14 @@ const toContact = () => {
     }
     .description {
       border-radius: 10px;
+    }
+  }
+
+  .narrator-container {
+    height: 500px;
+    min-height: 500px;
+    .narrator {
+      height: 100%;
     }
   }
 }
