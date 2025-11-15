@@ -52,7 +52,7 @@ const init = async () => {
   grecaptcha.ready(() => {
     // ✅ render into the element, not the string id
     const id = grecaptcha.render(recaptchaEl.value!, {
-      sitekey: `${import.meta.env.VITE_BASE_URL}`,
+      sitekey: import.meta.env.VITE_RECAPTCHA_SITE_KEY,
       theme: 'light',
       size: 'normal',
       callback: (token: string) => {
@@ -82,7 +82,8 @@ watch(
 );
 
 onMounted(() => {
-  console.log('mount recaptcha');
+  console.log('VITE_RECAPTCHA_SITE_KEY: ', import.meta.env.VITE_RECAPTCHA_SITE_KEY);
+  console.log('hard coded: 6Lfgtr8rAAAAAMLTtsoeUz0tkVGKcGLog0JWasz6');
 });
 
 // if this component gets destroyed (e.g., view switch), clear id so you can re-init later
