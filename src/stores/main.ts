@@ -188,6 +188,7 @@ export const useMainStore = defineStore('main', () => {
         signal: controller.signal,
       });
       const data = await res.json();
+      console.log('data', data);
       isHuman.value = data.isHuman;
     } catch (err) {
       console.error('[VERIFY_IS_HUMAN] error:', err);

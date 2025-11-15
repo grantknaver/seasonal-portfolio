@@ -56,6 +56,7 @@ const init = async () => {
       theme: 'light',
       size: 'normal',
       callback: (token: string) => {
+        console.log('token', token);
         mainStore
           .VERIFY_RECAPTCHA(token)
           .then(async () => {
