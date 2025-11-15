@@ -7,8 +7,8 @@ declare const grecaptcha: ReCaptchaV2.ReCaptcha;
 
 const mainStore = useMainStore();
 const { recaptchaWidgetId } = storeToRefs(mainStore);
-
 const recaptchaEl = ref<HTMLElement | null>(null);
+const test = import.meta.env.VITE_RECAPTCHA_SITE_KEY;
 
 const waitForGrecaptcha = () =>
   new Promise<void>((resolve) => {
@@ -52,7 +52,7 @@ const init = async () => {
   grecaptcha.ready(() => {
     // ✅ render into the element, not the string id
     const id = grecaptcha.render(recaptchaEl.value!, {
-      sitekey: '6Lfgtr8rAAAAAMLTtsoeUz0tkVGKcGLog0JWasz6',
+      sitekey: import.meta.env.VITE_RECAPTCHA_SITE_KEY,
       theme: 'light',
       size: 'normal',
       callback: (token: string) => {
