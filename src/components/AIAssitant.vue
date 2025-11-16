@@ -15,12 +15,11 @@ const { activeAiAssistLogo, chatLog, activeTheme, isHuman, oaLogs, isLoading } =
   storeToRefs(mainStore);
 const isChatting = ref(false);
 const text = ref('');
-const QScrollArea = defineAsyncComponent(() => import('quasar'));
 
 const chatScroll = ref();
 const { lgBreakpoint, width } = useViewport();
 const isResponsive = computed(() => width.value < lgBreakpoint);
-const dialog = ref(false);
+const hasDialog = ref(false);
 const RecaptchaWidget = defineAsyncComponent(() => import('../components/RecaptchaWidget.vue'));
 
 const flushLogs = debounce(async () => {
@@ -61,7 +60,7 @@ watch(oaLogs, async () => {
 <template>
   <div v-if="isResponsive" class="responsive-view">
     <q-dialog
-      v-model="dialog"
+      v-model="hasDialog"
       :maximized="isResponsive"
       transition-show="jump-up"
       transition-hide="jump-down"
@@ -75,7 +74,7 @@ watch(oaLogs, async () => {
           style="flex: 1 1 auto; min-height: 0"
         >
           <q-scroll-area
-            v-if="dialog && isHuman"
+            v-if="hasDialog && isHuman"
             ref="chatScroll"
             style="
               flex: 1 1 auto;
@@ -117,7 +116,7 @@ watch(oaLogs, async () => {
           <q-separator style="flex: 0 0 auto" />
 
           <q-input
-            v-if="dialog && isHuman"
+            v-if="hasDialog && isHuman"
             color="dark"
             bg-color="white"
             filled
@@ -155,7 +154,7 @@ watch(oaLogs, async () => {
 
     <q-separator class="full-width"></q-separator>
     <q-btn
-      @click="dialog = !dialog"
+      @click="hasDialog = !hasDialog"
       style="background-color: #f7f8f5; align-self: self-end; margin-top: 1rem"
     >
       <q-tooltip
