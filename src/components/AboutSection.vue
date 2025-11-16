@@ -763,10 +763,15 @@ onMounted(() => {
           </q-list>
         </q-card-section></q-intersection
       >
-      <q-intersection transition="slide-up" transition-duration="2000" :once="true"
-        ><q-card-section class="section-container row justify-center">
+      <q-intersection
+        transition="slide-up"
+        transition-duration="2000"
+        :once="true"
+        class="about-intersection"
+      >
+        <q-card-section class="section-container row justify-center">
           <h2
-            class="past-clients-header font-secondary q-mt-none text-white text-center"
+            class="past-clients-header font-secondary q-mt-none q-mb-md text-white text-center"
             :class="
               setSeasonClasses(
                 {
@@ -826,8 +831,9 @@ onMounted(() => {
                 /> </picture
             ></a>
           </div>
-          <div class="full-width row justify-center"></div> </q-card-section
-      ></q-intersection>
+          <div class="full-width row justify-center"></div>
+        </q-card-section>
+      </q-intersection>
 
       <!-- <q-card-section class="section-container">
         <h2
@@ -975,11 +981,6 @@ $winter-mobile-background: map-get(tokens.$winter-theme, primary);
   .q-card {
     background-color: transparent;
 
-    .about-intersection {
-      min-height: 60vh;
-      display: block;
-    }
-
     .my-skills {
       font-size: 1.4rem;
     }
@@ -1023,6 +1024,11 @@ $winter-mobile-background: map-get(tokens.$winter-theme, primary);
       }
     }
   }
+}
+
+.about-intersection {
+  min-height: 60vh;
+  display: block;
 }
 
 .winter-mobile-background {
