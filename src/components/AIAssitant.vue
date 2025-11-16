@@ -46,6 +46,7 @@ const addToLog = async (): Promise<void | undefined> => {
 
 onMounted(async () => {
   if (isHuman.value && chatLog.value.length === 0) {
+    // mainStore.SET;
     await mainStore.SEND_OALOGS();
   }
 });

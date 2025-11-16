@@ -42,7 +42,7 @@ export const useMainStore = defineStore('main', () => {
   ]);
   const chatLog = ref<ChatMessage[]>([]);
   const lastAssistantIndex = ref<number>(-1);
-  const isLoading = ref<boolean>(false);
+  const isLoading = ref<boolean>(true);
   const { notifyHttp, notifyGeneric } = useErrorNotifier();
   const recaptchaWidgetId = ref<number | null>();
   const containsScrollbar = ref<boolean>(false);
@@ -83,6 +83,7 @@ export const useMainStore = defineStore('main', () => {
   };
   const SET_OALOG = (logItems: OALog[]) => {
     oaLogs.value = [...oaLogs.value, ...logItems];
+    isLoading.value = true;
   };
 
   const constructChatMessage = (log: OALog): ChatMessage => {
@@ -111,7 +112,6 @@ export const useMainStore = defineStore('main', () => {
     caseStudyActiveTab.value = tab;
   };
   const SEND_OALOGS = async () => {
-    isLoading.value = true;
     const url = `${import.meta.env.VITE_BASE_URL}/api/openAi/submit-logs`;
     const TIMEOUT_MS = 6000;
 
@@ -138,18 +138,19 @@ export const useMainStore = defineStore('main', () => {
 
       oaLogs.value = [...oaLogs.value, logItem];
       UPDATE_CHATLOG(logItem);
-      // chatLog.value = oaLogs.value
-      //   .filter((log) => log.role !== OARole.System)
-      //   .map((log) => constructChatMessage(log));
+      isLoading.value = false;
     } catch (err) {
+      const logError: OALog = {
+        role: OARole.Assistant,
+        content: [{ type: 'output_text', text: 'Chat failure - please reload page' }],
+      };
       if (err instanceof HttpError) {
-        notifyHttp(err);
-        const logError: OALog = {
-          role: OARole.Assistant,
-          content: [{ type: 'output_text', text: 'Chat failure - please reload page' }],
-        };
         UPDATE_CHATLOG(logError);
+        isLoading.value = false;
+        notifyHttp(err);
       } else {
+        UPDATE_CHATLOG(logError);
+        isLoading.value = false;
         notifyGeneric(err);
       }
     } finally {
