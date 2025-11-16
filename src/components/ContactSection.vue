@@ -9,7 +9,6 @@ import { setSeasonClasses } from 'src/shared/utils/setSeasonColors';
 
 // const FORMSPREE_ENDPOINT = 'https://formspree.io/f/your_form_id'; // <-- replace with your actual Formspree endpoint (e.g., https://formspree.io/f/abcd1234)
 // If you're actually using Formsubmit instead, use:
-const FORMSPREE_ENDPOINT = 'https://formsubmit.co/glkfreelance@gmail.com';
 const form = reactive({
   name: '',
   email: '',
@@ -51,8 +50,58 @@ const setSubject = (packageName: Package) => {
   }
 };
 
+// const sendEmail = async () => {
+//   if (form._honey) return; // bot trap
+//   sending.value = true;
+//   success.value = false;
+//   error.value = false;
+//   errorMsg.value = null;
+
+//   try {
+//     const fd = new FormData();
+//     fd.append('name', form.name);
+//     fd.append('email', form.email);
+//     fd.append('message', form.message);
+//     fd.append('subject', form.subject);
+//     fd.append('_subject', `Portfolio - ${form.subject}`);
+//     // Where to redirect after success (comment out if you don't want redirect behavior):
+//     // fd.append('_next', 'https://yourdomain.com/thank-you');
+
+//     const res = await fetch(import.meta.env.VITE_FORMSPREE_ENDPOINT, {
+//       method: 'POST',
+//       headers: { Accept: 'application/json' },
+//       body: fd,
+//     });
+
+//     if (res.ok) {
+//       success.value = true;
+//       form.name = '';
+//       form.email = '';
+//       form.subject = '';
+//       form.message = '';
+//       form._honey = '';
+//     } else {
+//       error.value = true;
+//       // Try to parse Formspree JSON error for details
+//       try {
+//         const data = await res.json();
+//         errorMsg.value = data?.errors?.[0]?.message || `Request failed (${res.status})`;
+//       } catch {
+//         errorMsg.value = `Request failed (${res.status})`;
+//       }
+//     }
+//     // eslint-disable-next-line @typescript-eslint/no-explicit-any
+//   } catch (e: any) {
+//     error.value = true;
+//     errorMsg.value = e?.message || 'Network error';
+//   } finally {
+//     sending.value = false;
+//   }
+// };
+
 const sendEmail = async () => {
-  if (form._honey) return; // bot trap
+  if (form._honey) return;
+
   sending.value = true;
   success.value = false;
   error.value = false;
@@ -63,14 +112,9 @@ const sendEmail = async () => {
     fd.append('name', form.name);
     fd.append('email', form.email);
     fd.append('message', form.message);
+    fd.append('subject', form.subject);
 
-    // Optional extras supported by many form backends:
-    // Subject for the email:
-    fd.append('_subject', `New portfolio message from ${form.name}`);
-    // Where to redirect after success (comment out if you don't want redirect behavior):
-    // fd.append('_next', 'https://yourdomain.com/thank-you');
-
-    const res = await fetch(FORMSPREE_ENDPOINT, {
+    const res = await fetch(import.meta.env.VITE_FORMSPREE_ENDPOINT, {
       method: 'POST',
       headers: { Accept: 'application/json' },
       body: fd,
@@ -85,7 +129,6 @@ const sendEmail = async () => {
       form._honey = '';
     } else {
       error.value = true;
-      // Try to parse Formspree JSON error for details
       try {
         const data = await res.json();
         errorMsg.value = data?.errors?.[0]?.message || `Request failed (${res.status})`;
@@ -93,10 +136,10 @@ const sendEmail = async () => {
         errorMsg.value = `Request failed (${res.status})`;
       }
     }
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  } catch (e: any) {
+  } catch (err) {
     error.value = true;
-    errorMsg.value = e?.message || 'Network error';
+    console.log('Form error', err);
+    errorMsg.value = 'Network error';
   } finally {
     sending.value = false;
   }
@@ -167,6 +210,7 @@ const sendEmail = async () => {
       />
 
       <RecaptchaWidget v-show="!isHuman" class="full-width q-mt-md"></RecaptchaWidget>
+
       <q-btn
         v-show="isHuman"
         class="full-width"

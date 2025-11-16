@@ -85,6 +85,28 @@ export const useMainStore = defineStore('main', () => {
     oaLogs.value = [...oaLogs.value, ...logItems];
   };
 
+  const constructChatMessage = (log: OALog): ChatMessage => {
+    const d = new Date();
+    const stamp = d.toISOString();
+    return {
+      id: uuidv4(),
+      name: log.role === OARole.Assistant ? 'Bot' : 'Me',
+      avatar:
+        log.role === OARole.Assistant
+          ? 'https://cdn.quasar.dev/img/avatar3.jpg'
+          : 'https://cdn.quasar.dev/img/avatar4.jpg',
+      text: [log.content[0]?.text],
+      sent: log.role === OARole.Assistant ? false : true,
+      stamp: useChatTime(stamp).format('h:mm A'),
+      bgColor: log.role === OARole.Assistant ? 'grey-4' : 'primary',
+    };
+  };
+  const UPDATE_CHATLOG = (logItem: OALog) => {
+    if (logItem.role !== OARole.System) {
+      const message = constructChatMessage(logItem);
+      chatLog.value = [...chatLog.value, message];
+    }
+  };
   const SET_CASE_STUDY_ACTIVE_TAB = (tab: CaseStudies) => {
     caseStudyActiveTab.value = tab;
   };
@@ -93,26 +115,8 @@ export const useMainStore = defineStore('main', () => {
     const url = `${import.meta.env.VITE_BASE_URL}/api/openAi/submit-logs`;
     const TIMEOUT_MS = 6000;
 
-    const constructChatMessage = (log: OALog): ChatMessage => {
-      const d = new Date();
-      const stamp = d.toISOString();
-      return {
-        id: uuidv4(),
-        name: log.role === OARole.Assistant ? 'Bot' : 'Me',
-        avatar:
-          log.role === OARole.Assistant
-            ? 'https://cdn.quasar.dev/img/avatar3.jpg'
-            : 'https://cdn.quasar.dev/img/avatar4.jpg',
-        text: [log.content[0]?.text],
-        sent: log.role === OARole.Assistant ? false : true,
-        stamp: useChatTime(stamp).format('h:mm A'),
-        bgColor: log.role === OARole.Assistant ? 'grey-4' : 'primary',
-      };
-    };
-
     const controller = new AbortController();
     const t = setTimeout(() => controller.abort(), TIMEOUT_MS);
-
     try {
       const res = await fetchRetry(url, {
         method: 'POST',
@@ -126,7 +130,6 @@ export const useMainStore = defineStore('main', () => {
       if (!res.ok) {
         throw new HttpError(res.status, data);
       }
-
       const { text: assistantDialog } = data;
       const logItem: OALog = {
         role: OARole.Assistant,
@@ -134,12 +137,18 @@ export const useMainStore = defineStore('main', () => {
       };
 
       oaLogs.value = [...oaLogs.value, logItem];
-      chatLog.value = oaLogs.value
-        .filter((log) => log.role !== OARole.System)
-        .map((log) => constructChatMessage(log));
+      UPDATE_CHATLOG(logItem);
+      // chatLog.value = oaLogs.value
+      //   .filter((log) => log.role !== OARole.System)
+      //   .map((log) => constructChatMessage(log));
     } catch (err) {
       if (err instanceof HttpError) {
         notifyHttp(err);
+        const logError: OALog = {
+          role: OARole.Assistant,
+          content: [{ type: 'output_text', text: 'Chat failure - please reload page' }],
+        };
+        UPDATE_CHATLOG(logError);
       } else {
         notifyGeneric(err);
       }
@@ -188,7 +197,6 @@ export const useMainStore = defineStore('main', () => {
         signal: controller.signal,
       });
       const data = await res.json();
-      console.log('data', data);
       isHuman.value = data.isHuman;
     } catch (err) {
       console.error('[VERIFY_IS_HUMAN] error:', err);
@@ -235,5 +243,6 @@ export const useMainStore = defineStore('main', () => {
     SET_CASE_STUDY_ACTIVE_TAB,
     SET_PAINTED_STATUS,
     SET_PACKAGE_OF_INTEREST,
+    UPDATE_CHATLOG,
   };
 });

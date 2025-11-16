@@ -27,7 +27,6 @@ export const useCacheStore = defineStore('cache', () => {
     }) as DefineComponent;
 
     catalog[name] = markRaw(component);
-    console.log('catalog', catalog);
   };
 
   const GET_COMPONENT = (name: CacheEntry) => catalog[name];

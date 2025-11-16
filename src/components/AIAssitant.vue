@@ -1,5 +1,5 @@
 <script lang="ts" setup>
-import { ref, nextTick, watch, computed } from 'vue';
+import { ref, nextTick, watch, computed, onMounted } from 'vue';
 import { useMainStore } from '../stores/main';
 import { storeToRefs } from 'pinia';
 import { debounce } from 'quasar';
@@ -37,11 +37,18 @@ const addToLog = async (): Promise<void | undefined> => {
       role: OARole.User,
       content: [{ type: 'input_text', text: t }],
     };
+    mainStore.UPDATE_CHATLOG(logItem);
     mainStore.SET_OALOG([logItem]);
     text.value = '';
     flushLogs();
   }
 };
+
+onMounted(async () => {
+  if (isHuman.value && chatLog.value.length === 0) {
+    await mainStore.SEND_OALOGS();
+  }
+});
 
 watch(isHuman, async (newHumanStatus) => {
   if (newHumanStatus) {
@@ -171,7 +178,7 @@ watch(oaLogs, async () => {
   <div v-if="!isResponsive" class="desktop-view">
     <div class="dv-ai-assistant-chat column no-wrap q-pa-lg bg-white">
       <!-- The ONLY scrollable area -->
-      <q-scroll-area v-if="isHuman" ref="chatScroll" class="dv-chat-feed">
+      <q-scroll-area v-if="isHuman" ref="chatScroll" class="dv-chat-feed q-pa-md">
         <q-chat-message
           v-for="message in chatLog"
           :key="message.id"
@@ -180,7 +187,7 @@ watch(oaLogs, async () => {
           :text="message.text"
           :sent="message.sent"
           :stamp="message.stamp"
-          :text-color="message.sent && activeTheme === Theme.Summer ? 'black' : 'primary'"
+          text-color="white"
           :bg-color="message.sent ? 'accent' : 'dark'"
         />
         <q-chat-message v-if="isLoading && isHuman" bg-color="secondary" avatar="/robot-avatar.svg">
