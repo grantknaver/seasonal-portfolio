@@ -556,6 +556,22 @@ const toContact = (p: Package | null) => {
             data, and intelligence.
           </p>
         </div>
+        <div class="full-width">
+          <q-btn @click="toContact(null)" class="full-width" color="accent" size="lg" glossy>
+            <span class="text-body-2">Hire Me for Your Next AI UI </span>
+          </q-btn>
+          <q-btn
+            class="q-mt-xs q-mb-md full-width"
+            text-color="primary"
+            color="dark"
+            size="lg"
+            glossy
+            href="https://www.loom.com/share/47e23f8eaefe4bf99cd37c9bec62116c"
+            target="_blank"
+          >
+            <span class="text-body-2">Watch the 90-Second Demo </span>
+          </q-btn>
+        </div>
 
         <q-list class="full-width font-primary">
           <q-item
@@ -750,6 +766,17 @@ const toContact = (p: Package | null) => {
               <div ref="ctaBtnRef">
                 <q-btn @click="toContact(null)" class="q-mt-md" color="accent" size="lg" glossy>
                   <span class="text-body-2">Hire Me for Your Next AI UI </span>
+                </q-btn>
+                <q-btn
+                  class="q-mt-md"
+                  text-color="accent"
+                  color="secondary"
+                  size="lg"
+                  glossy
+                  href="https://www.loom.com/share/47e23f8eaefe4bf99cd37c9bec62116c"
+                  target="_blank"
+                >
+                  <span class="text-body-2">Watch the 90-Second Demo </span>
                 </q-btn>
               </div>
             </div>

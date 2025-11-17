@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref, watch, onBeforeUnmount, onMounted } from 'vue';
+import { ref, watch, onBeforeUnmount } from 'vue';
 import { useMainStore } from 'src/stores/main';
 import { storeToRefs } from 'pinia';
 
@@ -56,7 +56,6 @@ const init = async () => {
       theme: 'light',
       size: 'normal',
       callback: (token: string) => {
-        console.log('token', token);
         mainStore
           .VERIFY_RECAPTCHA(token)
           .then(async () => {
@@ -81,11 +80,6 @@ watch(
   },
   { flush: 'post' },
 );
-
-onMounted(() => {
-  console.log('VITE_RECAPTCHA_SITE_KEY: ', import.meta.env.VITE_RECAPTCHA_SITE_KEY);
-  console.log('hard coded: 6Lfgtr8rAAAAAMLTtsoeUz0tkVGKcGLog0JWasz6');
-});
 
 // if this component gets destroyed (e.g., view switch), clear id so you can re-init later
 onBeforeUnmount(() => mainStore.SET_RECAPTCHA_WIDGET_ID(null));
