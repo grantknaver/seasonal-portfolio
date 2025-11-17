@@ -132,7 +132,7 @@ const caseStudies = ref<CS[]>([
           name: 'ai-chat-challenge',
           icon: mdiBoxingGlove,
           label: 'Challenge:',
-          text: 'Most animation libraries break when Vue’s reactivity and lifecycle rebuilds occur (especially on resize or layout shift). Achieving <i>fluid, context-aware motion</i> without memory leaks or stale timelines required deep integration between GSAP context lifecycles and Vue composables.',
+          text: 'Most animation libraries break when Vue’s reactivity and lifecycle rebuilds occur (especially on resize or layout shift). Achieving fluid, context-aware motion without memory leaks or stale timelines required deep integration between GSAP context lifecycles and Vue composables.',
           hasSeparator: false,
         },
       ],

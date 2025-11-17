@@ -228,7 +228,7 @@ onMounted(() => {
         <q-card-section class="section-container q-pa-lg">
           <div class="h2-container row justify-center q-mb-lg text-center bg-dark text-white">
             <h2
-              class="bg-accent text-h2 font-secondary"
+              class="bg-dark text-h2 font-secondary"
               :class="
                 setSeasonClasses(
                   {
@@ -304,7 +304,7 @@ onMounted(() => {
         <q-card-section class="section-container q-pa-lg">
           <div class="h2-container row justify-center q-mb-lg text-center bg-dark text-white">
             <h2
-              class="bg-accent text-h2 font-secondary"
+              class="bg-dark text-h2 font-secondary"
               :class="
                 setSeasonClasses(
                   {
@@ -380,7 +380,7 @@ onMounted(() => {
         <q-card-section class="section-container q-pa-lg text-primary">
           <div class="h2-container row justify-center q-mb-lg text-center bg-dark text-white">
             <h2
-              class="bg-accent text-h2 font-secondary"
+              class="bg-dark text-h2 font-secondary"
               :class="
                 setSeasonClasses(
                   {
