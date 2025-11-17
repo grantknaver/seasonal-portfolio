@@ -100,7 +100,7 @@ const { activeTheme, activeTopic, mobileScrollTarget } = storeToRefs(mainStore);
 const root = ref<HTMLElement | null>(null);
 const showFooter = ref<boolean>(false);
 const io = ref<IntersectionObserver | null>(null);
-const { lgBreakpoint, width } = useViewport();
+const { lgBreakpoint, width, height } = useViewport();
 const isResponsive = computed(() => width.value < lgBreakpoint);
 const dispose = ref<() => void>(() => {});
 const nameRef = ref<HTMLElement | null>(null);
@@ -376,7 +376,13 @@ const toContact = (p: Package | null) => {
 
 <template>
   <q-page class="page-container column">
-    <div class="carousel-background" v-if="showCarousel">
+    <div
+      class="carousel-background"
+      :class="{
+        'responsive-carousel-background': isResponsive,
+      }"
+      v-if="showCarousel"
+    >
       <q-carousel
         v-model="slide"
         transition-prev="fade"
@@ -384,7 +390,7 @@ const toContact = (p: Package | null) => {
         animated
         infinite
         :autoplay="15000"
-        height="100%"
+        :height="height + 'px'"
         class="carousel-absolute bg-dark"
         :transition-duration="2500"
       >
@@ -851,6 +857,12 @@ const toContact = (p: Package | null) => {
       object-fit: cover;
       display: block;
     }
+  }
+
+  .responsive-carousel-background {
+    height: 100vh;
+    transform: translateZ(0);
+    will-change: transform;
   }
 
   .weather-layer {

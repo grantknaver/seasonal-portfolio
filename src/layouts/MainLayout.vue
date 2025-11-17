@@ -169,7 +169,7 @@ onBeforeUnmount(() => window.removeEventListener('resize', updateWidths));
               />
             </a>
 
-            <a href="https://www.linkedin.com/in/grant-knaver/">
+            <a href="www.linkedin.com/in/grant-knaver" target="_blank">
               <q-btn
                 flat
                 round
