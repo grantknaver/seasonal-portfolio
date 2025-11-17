@@ -100,7 +100,7 @@ const { activeTheme, activeTopic, mobileScrollTarget } = storeToRefs(mainStore);
 const root = ref<HTMLElement | null>(null);
 const showFooter = ref<boolean>(false);
 const io = ref<IntersectionObserver | null>(null);
-const { lgBreakpoint, width, height } = useViewport();
+const { lgBreakpoint, width } = useViewport();
 const isResponsive = computed(() => width.value < lgBreakpoint);
 const dispose = ref<() => void>(() => {});
 const nameRef = ref<HTMLElement | null>(null);
@@ -390,8 +390,7 @@ const toContact = (p: Package | null) => {
         animated
         infinite
         :autoplay="15000"
-        :height="height + 'px'"
-        class="carousel-absolute bg-dark"
+        class="carousel-absolute bg-dark fullscreen-carousel"
         :transition-duration="2500"
       >
         <q-carousel-slide
@@ -837,7 +836,7 @@ const toContact = (p: Package | null) => {
 
   .carousel-background {
     position: fixed;
-    height: 100%;
+    height: 100vh;
     top: 0;
     left: 0;
     z-index: 0;
@@ -859,10 +858,18 @@ const toContact = (p: Package | null) => {
     }
   }
 
-  .responsive-carousel-background {
-    height: 100vh;
-    transform: translateZ(0);
-    will-change: transform;
+  .fullscreen-carousel {
+    height: 100vh; // match the wrapper
+  }
+
+  @supports (height: 100dvh) {
+    .page-container .carousel-background {
+      height: 100dvh;
+    }
+
+    .page-container .fullscreen-carousel {
+      height: 100dvh;
+    }
   }
 
   .weather-layer {
@@ -905,10 +912,6 @@ const toContact = (p: Package | null) => {
       line-height: 2.2rem;
       text-transform: uppercase;
     }
-
-    // p:nth-of-type(2) {
-    //   font-size: 1rem;
-    // }
 
     /* ---------- Mobile / NotDesktop ---------- */
 
