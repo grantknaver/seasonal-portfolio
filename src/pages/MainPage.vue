@@ -850,7 +850,7 @@ const toContact = (p: Package | null) => {
 
   .carousel-background {
     position: fixed;
-    height: 100dvh;
+    height: 100vh;
     top: 0;
     left: 0;
     z-index: 0;
