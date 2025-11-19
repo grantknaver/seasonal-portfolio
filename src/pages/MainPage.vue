@@ -834,6 +834,13 @@ const toContact = (p: Package | null) => {
     background-color: initial;
   }
 
+  .carousel-background .q-carousel,
+  .carousel-background .q-carousel__slides-container,
+  .carousel-background .q-carousel__slide,
+  .carousel-background .slide-bg {
+    height: 100%;
+  }
+
   .carousel-background {
     position: fixed;
     height: 100vh;
