@@ -30,6 +30,7 @@ import { CacheEntry } from 'src/shared/constants/cacheEntry';
 import { useCacheStore } from 'src/stores/component-cache';
 import type { Package } from 'src/shared/constants/packages';
 import { scrollToElement } from 'src/shared/utils/scrollToElement';
+import { CacheBinding } from 'src/shared/constants/cacheBinding';
 
 const WeatherBackground = defineAsyncComponent(() => import('../components/WeatherBackground.vue'));
 const mainStore = useMainStore();
@@ -65,7 +66,6 @@ const mobileTopics: Topic[] = [
     cachedName: CacheEntry.ContactSection,
   },
 ];
-const { catalog } = storeToRefs(cacheStore);
 const slides = ref<Slide[]>([
   {
     id: uuidv4(),
@@ -111,6 +111,22 @@ const servRef = ref<HTMLElement | null>(null);
 const ctaBtnRef = ref<HTMLElement | null>(null);
 const homeContainerRef = ref<HTMLElement | null>(null);
 const showCarousel = ref<boolean>(false);
+
+const activeEntry = computed(() => {
+  if (!activeTopic.value) return null;
+  return CacheBinding[activeTopic.value];
+});
+
+const activeComponent = computed(() => {
+  const entry = activeEntry.value;
+  if (!entry) return null;
+
+  if (!cacheStore.catalog[entry]) {
+    cacheStore.CACHE_COMPONENT(entry);
+  }
+
+  return cacheStore.catalog[entry];
+});
 
 onMounted(async () => {
   await nextTick();
@@ -609,26 +625,24 @@ const toContact = (p: Package | null) => {
               switch-toggle-side
             >
               <div v-if="expandedPanel === topic.name" class="anchor full-width">
-                <Suspense>
+                <div v-if="!activeEntry" class="text-white q-pa-md">
+                  <p>Topic confusion</p>
+                </div>
+                <Suspense v-else>
                   <template #default>
                     <component
                       v-if="topic.name === TopicName.Packages"
-                      :is="catalog[topic.cachedName as CacheEntry]"
+                      :is="activeComponent"
                       @requestConsultation="toContact"
                     />
-
                     <component
                       v-else-if="
                         topic.name === TopicName.About || topic.name === TopicName.CaseStudies
                       "
-                      :is="catalog[topic.cachedName as CacheEntry]"
+                      :is="activeComponent"
                       @toContact="toContact"
                     />
-
-                    <component
-                      v-else-if="topic.name === TopicName.Contact"
-                      :is="catalog[topic.cachedName as CacheEntry]"
-                    />
+                    <component v-else-if="topic.name === TopicName.Contact" :is="activeComponent" />
                   </template>
 
                   <template #fallback>

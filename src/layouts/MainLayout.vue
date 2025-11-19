@@ -10,7 +10,8 @@ import { v4 as uuidv4 } from 'uuid';
 import { useViewport } from '../shared/utils/viewWidth';
 import { mdiMenu, mdiHeart, mdiGithub, mdiLinkedin } from '@quasar/extras/mdi-v7';
 import { useCacheStore } from 'src/stores/component-cache';
-import { CacheEntry } from 'src/shared/constants/cacheEntry';
+import { CacheBinding } from 'src/shared/constants/cacheBinding';
+
 const cacheStore = useCacheStore();
 
 const mainStore = useMainStore();
@@ -39,16 +40,9 @@ const topics = ref<Topic[]>([
   { id: uuidv4(), name: TopicName.Contact, icon: 'contact_mail', label: TopicName.Contact },
 ]);
 
-const cacheBinding = {
-  [TopicName.CaseStudies]: CacheEntry.CaseStudiesSection,
-  [TopicName.About]: CacheEntry.AboutSection,
-  [TopicName.Contact]: CacheEntry.ContactSection,
-  [TopicName.Packages]: CacheEntry.PackageSection,
-};
-
 const activeEntry = computed(() => {
   if (!activeTopic.value) return null;
-  return cacheBinding[activeTopic.value];
+  return CacheBinding[activeTopic.value];
 });
 
 const activeComponent = computed(() => {
