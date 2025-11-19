@@ -96,7 +96,7 @@ const slides = ref<Slide[]>([
 const expandedPanel = ref<TopicName | null>();
 const { getScrollTarget, setVerticalScrollPosition } = scroll;
 const slide = ref<Theme>(Theme.Fall);
-const { activeTheme, activeTopic, mobileScrollTarget } = storeToRefs(mainStore);
+const { activeTheme, activeTopic } = storeToRefs(mainStore);
 const root = ref<HTMLElement | null>(null);
 const showFooter = ref<boolean>(false);
 const io = ref<IntersectionObserver | null>(null);
@@ -177,11 +177,6 @@ watch(
   { flush: 'post' },
 );
 
-watch(mobileScrollTarget, (newTopic) => {
-  if (!newTopic) return;
-  expandedPanel.value = newTopic;
-});
-
 watch(
   activeTopic,
   async (newTopic: TopicName | null) => {
@@ -212,12 +207,12 @@ watch(
 
 watch(slide, (newVal) => mainStore.SET_ACTIVE_THEME(newVal));
 
-watch(expandedPanel, (panel) => {
-  if (!panel) return;
-  requestAnimationFrame(() => {
-    if (isResponsive.value) scrollToElement(panel);
-  });
-});
+// watch(expandedPanel, (panel) => {
+//   if (!panel) return;
+//   requestAnimationFrame(() => {
+//     if (isResponsive.value) scrollToElement(panel);
+//   });
+// });
 
 const waitForLayout = async (el: HTMLElement | null, frames = 8): Promise<boolean> => {
   if (!el) return false;
@@ -606,8 +601,9 @@ const toContact = (p: Package | null) => {
               :icon="topic.icon"
               :label="topic.label"
               :model-value="expandedPanel === topic.name"
-              @show="
+              @after-show="
                 () => {
+                  scrollToElement(topic.name);
                   expandedPanel = topic.name;
                   mainStore.SET_ACTIVE_TOPIC(topic.name);
                 }
@@ -626,7 +622,7 @@ const toContact = (p: Package | null) => {
             >
               <div v-if="expandedPanel === topic.name" class="anchor full-width">
                 <div v-if="!activeEntry" class="text-white q-pa-md">
-                  <p>Topic confusion</p>
+                  <p>No active Topic - Error</p>
                 </div>
                 <Suspense v-else>
                   <template #default>
@@ -646,7 +642,7 @@ const toContact = (p: Package | null) => {
                   </template>
 
                   <template #fallback>
-                    <q-skeleton type="rect" height="200px" />
+                    <q-skeleton type="rect" height="100dvh" />
                   </template>
                 </Suspense>
               </div>
