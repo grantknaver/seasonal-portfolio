@@ -406,7 +406,7 @@ const toContact = (p: Package | null) => {
         animated
         infinite
         :autoplay="15000"
-        class="carousel-absolute bg-dark fullscreen-carousel"
+        class="carousel-absolute bg-dark"
         :transition-duration="2500"
       >
         <q-carousel-slide
@@ -848,16 +848,9 @@ const toContact = (p: Package | null) => {
     background-color: initial;
   }
 
-  .carousel-background .q-carousel,
-  .carousel-background .q-carousel__slides-container,
-  .carousel-background .q-carousel__slide,
-  .carousel-background .slide-bg {
-    height: 100%;
-  }
-
   .carousel-background {
     position: fixed;
-    height: 100vh;
+    height: 100dvh;
     top: 0;
     left: 0;
     z-index: 0;
@@ -871,6 +864,7 @@ const toContact = (p: Package | null) => {
       z-index: 0;
       pointer-events: none;
     }
+
     .slide-bg img {
       width: 100%;
       height: 100%;
@@ -879,16 +873,8 @@ const toContact = (p: Package | null) => {
     }
   }
 
-  .fullscreen-carousel {
-    height: 100vh; // match the wrapper
-  }
-
   @supports (height: 100dvh) {
-    .page-container .carousel-background {
-      height: 100dvh;
-    }
-
-    .page-container .fullscreen-carousel {
+    .carousel-background {
       height: 100dvh;
     }
   }

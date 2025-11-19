@@ -54,6 +54,13 @@ body::-webkit-scrollbar {
   text-decoration: underline;
 }
 
+.carousel-background .q-carousel,
+.carousel-background .q-carousel__slides-container,
+.carousel-background .q-carousel__slide,
+.carousel-background .slide-bg {
+  height: 100%;
+}
+
 /* only the variables you truly need at startup */
 :root {
   @include mix.export-css-vars(
