@@ -831,28 +831,58 @@ const toContact = (p: Package | null) => {
 
 .page-container {
   position: relative;
-  min-height: 100vh; /* fill the viewport; not just “100% of parent” */
+  min-height: 100vh;
+  min-height: 100dvh; // safe viewport if supported
+
+  // .carousel-background {
+  //   display: flex;
+  //   flex-direction: column;
+  //   position: fixed;
+  //   inset: 0; /* top:0; right:0; bottom:0; left:0 */
+  //   width: 100%;
+  //   height: 100vh; /* fallback */
+  //   height: 100dvh; /* modern viewport units */
+  //   z-index: 0;
+  //   pointer-events: none;
+  //   overflow: hidden;
+
+  //   .q-carousel {
+  //     flex: 1 1 auto; /* fine to keep */
+  //   }
+
+  //   .slide-bg {
+  //     position: absolute;
+  //     width: 100%;
+  //     height: 100%;
+  //     inset: 0;
+  //     z-index: 0;
+  //     pointer-events: none;
+
+  //     img {
+  //       width: 100%;
+  //       height: 100%;
+  //       object-fit: cover;
+  //       display: block;
+  //     }
+  //   }
+  // }
 
   .carousel-background {
-    display: flex;
-    flex-direction: column;
     position: fixed;
-    inset: 0; /* top:0; right:0; bottom:0; left:0 */
+    inset: 0;
     width: 100%;
-    height: 100vh; /* fallback */
-    height: 100dvh; /* modern viewport units */
+    height: 100vh;
+    height: 100dvh; // newer units; ignored if not supported
     z-index: 0;
     pointer-events: none;
     overflow: hidden;
 
     .q-carousel {
-      flex: 1 1 auto; /* fine to keep */
+      height: 100%;
     }
 
     .slide-bg {
       position: absolute;
-      width: 100%;
-      height: 100%;
       inset: 0;
       z-index: 0;
       pointer-events: none;
