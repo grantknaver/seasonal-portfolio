@@ -35,7 +35,6 @@ import { CacheBinding } from 'src/shared/constants/cacheBinding';
 const WeatherBackground = defineAsyncComponent(() => import('../components/WeatherBackground.vue'));
 const mainStore = useMainStore();
 const cacheStore = useCacheStore();
-
 const mobileTopics: Topic[] = [
   {
     id: uuidv4(),
@@ -67,7 +66,6 @@ const mobileTopics: Topic[] = [
     cachedName: CacheEntry.ContactSection,
   },
 ];
-
 const slides = ref<Slide[]>([
   {
     id: uuidv4(),
@@ -112,6 +110,7 @@ const sepRef = ref<HTMLElement | null>(null);
 const servRef = ref<HTMLElement | null>(null);
 const ctaBtnRef = ref<HTMLElement | null>(null);
 const homeContainerRef = ref<HTMLElement | null>(null);
+const showCarousel = ref<boolean>(false);
 
 const activeEntry = computed(() => {
   if (!activeTopic.value) return null;
@@ -132,6 +131,7 @@ const activeComponent = computed(() => {
 onMounted(async () => {
   await nextTick();
   await waitForLayout(root.value);
+  showCarousel.value = true;
   if (isResponsive.value) {
     try {
       dispose.value = buildAnimations(ViewType.Responsive);
@@ -380,8 +380,13 @@ const toContact = (p: Package | null) => {
 
 <template>
   <q-page class="page-container column">
-    <!-- Fixed full-screen background carousel -->
-    <div class="carousel-background">
+    <div
+      class="carousel-background"
+      :class="{
+        'responsive-carousel-background': isResponsive,
+      }"
+      v-if="showCarousel"
+    >
       <q-carousel
         v-model="slide"
         transition-prev="fade"
@@ -424,11 +429,9 @@ const toContact = (p: Package | null) => {
         </q-carousel-slide>
       </q-carousel>
     </div>
-
     <div v-if="!isResponsive" class="weather-layer">
       <WeatherBackground />
     </div>
-
     <div class="logo">
       <img
         class="q-pt-sm"
@@ -441,7 +444,6 @@ const toContact = (p: Package | null) => {
         ><span class="text-primary-font text-white">Freelance</span></span
       >
     </div>
-
     <div ref="root" class="sub-container column items-center">
       <section v-if="isResponsive" key="mobile" class="responsive-view full-width q-pa-md">
         <div
@@ -641,7 +643,6 @@ const toContact = (p: Package | null) => {
           </q-item>
         </q-list>
       </section>
-
       <section
         v-if="!isResponsive"
         key="desktop"
@@ -832,23 +833,26 @@ const toContact = (p: Package | null) => {
   position: relative;
   height: 100%;
 
-  /* Fixed, full-screen background */
   .carousel-background {
+    display: flex;
+    flex-direction: column;
     position: fixed;
-    inset: 0;
-    width: 100%;
-    height: 100vh;
+    height: 100%;
+    top: 0;
+    left: 0;
     z-index: 0;
+    width: 100%;
     pointer-events: none;
     overflow: hidden;
 
     .q-carousel {
-      height: 100%;
-      transition: none;
+      flex: 1 1 auto;
     }
 
     .slide-bg {
       position: absolute;
+      width: 100%;
+      height: 100%;
       inset: 0;
       z-index: 0;
       pointer-events: none;
@@ -891,7 +895,7 @@ const toContact = (p: Package | null) => {
 
   .sub-container {
     flex: 1 1 0%;
-
+    background-color: orange;
     @media (min-width: tokens.$breakpoint-lg) {
       position: relative;
       padding: initial;
