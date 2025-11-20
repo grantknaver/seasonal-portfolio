@@ -832,6 +832,7 @@ const toContact = (p: Package | null) => {
 .page-container {
   position: relative;
   height: 100%;
+  height: 100svh;
 
   .carousel-background {
     display: flex;
