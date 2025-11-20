@@ -832,14 +832,12 @@ const toContact = (p: Package | null) => {
 .page-container {
   position: relative;
   height: 100%;
-  height: 100svh;
 
   .carousel-background {
     display: flex;
     flex-direction: column;
     position: fixed;
     height: 100%;
-    height: 100svh;
     top: 0;
     left: 0;
     z-index: 0;
@@ -853,16 +851,18 @@ const toContact = (p: Package | null) => {
 
     .slide-bg {
       position: absolute;
+      width: 100%;
+      height: 100%;
       inset: 0;
       z-index: 0;
       pointer-events: none;
-    }
 
-    .slide-bg img {
-      width: 100%;
-      height: 100%;
-      object-fit: cover;
-      display: block;
+      img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        display: block;
+      }
     }
   }
 
