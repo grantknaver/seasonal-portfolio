@@ -830,21 +830,17 @@ const toContact = (p: Package | null) => {
 @use '/src/css/_tokens.scss' as tokens;
 
 .page-container {
-  background-color: rgba($color: white, $alpha: 0.7);
-  display: flex;
-  flex-direction: column;
   position: relative;
-
+  height: 100%;
   @media (min-width: tokens.$breakpoint-md) {
     background-color: initial;
   }
 
   .carousel-background {
     display: flex;
-    flex: 1 1 auto;
     flex-direction: column;
     position: fixed;
-    height: 100vh;
+    height: 100%;
     top: 0;
     left: 0;
     z-index: 0;
@@ -871,11 +867,11 @@ const toContact = (p: Package | null) => {
     }
   }
 
-  @supports (height: 100dvh) {
-    .carousel-background {
-      height: 100dvh;
-    }
-  }
+  // @supports (height: 100dvh) {
+  //   .carousel-background {
+  //     height: 100dvh;
+  //   }
+  // }
 
   .weather-layer {
     position: fixed;
