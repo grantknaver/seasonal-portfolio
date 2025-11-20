@@ -112,7 +112,6 @@ const sepRef = ref<HTMLElement | null>(null);
 const servRef = ref<HTMLElement | null>(null);
 const ctaBtnRef = ref<HTMLElement | null>(null);
 const homeContainerRef = ref<HTMLElement | null>(null);
-const showCarousel = ref<boolean>(false);
 
 const activeEntry = computed(() => {
   if (!activeTopic.value) return null;
@@ -133,7 +132,6 @@ const activeComponent = computed(() => {
 onMounted(async () => {
   await nextTick();
   await waitForLayout(root.value);
-  showCarousel.value = true;
   if (isResponsive.value) {
     try {
       dispose.value = buildAnimations(ViewType.Responsive);
@@ -383,7 +381,7 @@ const toContact = (p: Package | null) => {
 <template>
   <q-page class="page-container column">
     <!-- Fixed full-screen background carousel -->
-    <div class="carousel-background" v-if="showCarousel">
+    <div class="carousel-background">
       <q-carousel
         v-model="slide"
         transition-prev="fade"
@@ -843,7 +841,6 @@ const toContact = (p: Package | null) => {
     z-index: 0;
     pointer-events: none;
     overflow: hidden;
-    background: #000;
 
     .q-carousel {
       height: 100%;
