@@ -16,10 +16,11 @@ const cacheStore = useCacheStore();
 
 const mainStore = useMainStore();
 const { activeTheme, activeTopic } = storeToRefs(mainStore);
-const { height } = useViewport();
+const { height, width, lgBreakpoint } = useViewport();
 const windowWidth = ref(window.innerWidth);
 const desktopDrawerWidth = ref(window.innerWidth * 0.5);
 const showTopicBreakpoint = +`${getCustomCssVar('breakpoint-lg')}`.slice(0, -2);
+const isResponsive = computed(() => width.value < lgBreakpoint);
 const showTopicPanel = computed(
   () => !!activeTopic.value && windowWidth.value > showTopicBreakpoint,
 );
@@ -129,7 +130,7 @@ onBeforeUnmount(() => window.removeEventListener('resize', updateWidths));
       <router-view />
 
       <!-- ensure content exceeds viewport so footer starts off-screen -->
-      <div class="footer-spacer bg-red" />
+      <div v-if="!isResponsive" class="footer-spacer bg-red" />
 
       <!-- "Footer" lives in normal flow so we can scroll to it -->
       <section id="footer" class="bg-dark text-white" aria-label="Site footer">

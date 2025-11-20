@@ -831,22 +831,22 @@ const toContact = (p: Package | null) => {
 
 .page-container {
   position: relative;
-  height: 100%;
+  min-height: 100vh; /* fill the viewport; not just “100% of parent” */
 
   .carousel-background {
     display: flex;
     flex-direction: column;
     position: fixed;
-    height: 100%;
-    top: 0;
-    left: 0;
-    z-index: 0;
+    inset: 0; /* top:0; right:0; bottom:0; left:0 */
     width: 100%;
+    height: 100vh; /* fallback */
+    height: 100dvh; /* modern viewport units */
+    z-index: 0;
     pointer-events: none;
     overflow: hidden;
 
     .q-carousel {
-      flex: 1 1 auto;
+      flex: 1 1 auto; /* fine to keep */
     }
 
     .slide-bg {
@@ -895,7 +895,7 @@ const toContact = (p: Package | null) => {
 
   .sub-container {
     flex: 1 1 0%;
-    background-color: orange;
+
     @media (min-width: tokens.$breakpoint-lg) {
       position: relative;
       padding: initial;
