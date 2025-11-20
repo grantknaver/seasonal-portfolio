@@ -838,6 +838,7 @@ const toContact = (p: Package | null) => {
     flex-direction: column;
     position: fixed;
     height: 100%;
+    height: 100svh;
     top: 0;
     left: 0;
     z-index: 0;
@@ -863,12 +864,6 @@ const toContact = (p: Package | null) => {
       display: block;
     }
   }
-
-  // @supports (height: 100dvh) {
-  //   .carousel-background {
-  //     height: 100dvh;
-  //   }
-  // }
 
   .weather-layer {
     position: fixed;
