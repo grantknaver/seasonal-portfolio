@@ -361,7 +361,7 @@ const toContact = (p: Package | null) => {
     <div ref="root" class="sub-container column items-center">
       <section v-if="isResponsive" key="mobile" class="responsive-view full-width q-pa-md">
         <div
-          class="home-container relative-position full-width column items-start text-primary-font q-mb-sm q-pa-lg font-primary"
+          class="home-container relative-position full-width column items-center text-center text-primary-font q-mb-sm q-pa-lg font-primary"
         >
           <p
             class="name home-content q-mb-none text-white"
