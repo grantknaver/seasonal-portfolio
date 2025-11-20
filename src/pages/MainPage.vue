@@ -207,13 +207,6 @@ watch(
 
 watch(slide, (newVal) => mainStore.SET_ACTIVE_THEME(newVal));
 
-// watch(expandedPanel, (panel) => {
-//   if (!panel) return;
-//   requestAnimationFrame(() => {
-//     if (isResponsive.value) scrollToElement(panel);
-//   });
-// });
-
 const waitForLayout = async (el: HTMLElement | null, frames = 8): Promise<boolean> => {
   if (!el) return false;
   for (let i = 0; i < frames; i++) {
@@ -401,7 +394,7 @@ const toContact = (p: Package | null) => {
         animated
         infinite
         :autoplay="15000"
-        class="carousel-absolute bg-dark"
+        class="bg-dark"
         :transition-duration="2500"
       >
         <q-carousel-slide
@@ -846,7 +839,7 @@ const toContact = (p: Package | null) => {
 
   .carousel-background {
     position: fixed;
-    height: 100vh;
+    height: 300vh;
     top: 0;
     left: 0;
     z-index: 0;
@@ -871,7 +864,7 @@ const toContact = (p: Package | null) => {
 
   @supports (height: 100dvh) {
     .carousel-background {
-      height: 100dvh;
+      height: 300vh;
     }
   }
 
