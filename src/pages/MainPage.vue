@@ -895,6 +895,7 @@ const toContact = (p: Package | null) => {
 
   .sub-container {
     flex: 1 1 0%;
+    background-color: purple;
 
     @media (min-width: tokens.$breakpoint-lg) {
       position: relative;
