@@ -1,5 +1,5 @@
 <script lang="ts" setup>
-import { computed, ref, onMounted, onBeforeUnmount } from 'vue';
+import { computed, ref, onMounted, onBeforeUnmount, watch } from 'vue';
 import { useMainStore } from '../stores/main';
 import { storeToRefs } from 'pinia';
 import { Theme } from '../shared/constants/theme';
@@ -40,7 +40,39 @@ const topics = ref<Topic[]>([
   { id: uuidv4(), name: TopicName.About, icon: 'info', label: TopicName.About },
   { id: uuidv4(), name: TopicName.Contact, icon: 'contact_mail', label: TopicName.Contact },
 ]);
-
+import autumn from 'src/assets/autumn-forestry.jpg?w=768;1280;1600&format=avif;webp;jpeg&quality=40&withoutEnlargement=true&as=picture';
+import winter from 'src/assets/snowy-winter-landscape.jpg?w=768;1280;1600&format=avif;webp;jpeg&quality=40&withoutEnlargement=true&as=picture';
+import spring from 'src/assets/beautiful-forest-spring-season.jpg?w=768;1280;1600&format=avif;webp;jpeg&quality=40&withoutEnlargement=true&as=picture';
+import summer from 'src/assets/beach.jpg?w=768;1280;1600&format=avif;webp;jpeg&quality=40&withoutEnlargement=true&as=picture';
+import { type Slide } from 'src/shared/types/slide';
+const slides = ref<Slide[]>([
+  {
+    id: uuidv4(),
+    picture: autumn,
+    theme: Theme.Fall,
+    name: 'Fall Background',
+  },
+  {
+    id: uuidv4(),
+    picture: winter,
+    theme: Theme.Winter,
+    name: 'Winter Background',
+  },
+  {
+    id: uuidv4(),
+    picture: spring,
+    theme: Theme.Spring,
+    name: 'Spring Background',
+  },
+  {
+    id: uuidv4(),
+    picture: summer,
+    theme: Theme.Summer,
+    name: 'Summer Background',
+  },
+]);
+const slide = ref<Theme>(Theme.Fall);
+const showCarousel = ref<boolean>(false);
 const activeEntry = computed(() => {
   if (!activeTopic.value) return null;
   return CacheBinding[activeTopic.value];
@@ -58,14 +90,66 @@ const activeComponent = computed(() => {
 });
 
 onMounted(() => {
+  showCarousel.value = true;
   window.addEventListener('resize', updateWidths);
 });
 onBeforeUnmount(() => window.removeEventListener('resize', updateWidths));
+
+watch(slide, (newVal) => mainStore.SET_ACTIVE_THEME(newVal));
 </script>
 
 <template>
   <!-- changed view: no fixed footer token needed; keep header fixed -->
   <q-layout view="hHh Lpr fff">
+    <div
+      class="carousel-background"
+      :class="{
+        'responsive-carousel-background': isResponsive,
+      }"
+      v-if="showCarousel"
+    >
+      <q-carousel
+        v-model="slide"
+        transition-prev="fade"
+        transition-next="fade"
+        animated
+        infinite
+        :autoplay="15000"
+        class="bg-dark"
+        :transition-duration="2500"
+      >
+        <q-carousel-slide
+          v-for="(slide, index) in slides"
+          :key="slide.id"
+          :name="slide.theme"
+          class="relative-position"
+        >
+          <div class="slide-bg">
+            <picture>
+              <source
+                v-for="(src, k) in slide.picture.sources"
+                :key="k"
+                :srcset="src"
+                :type="`image/${k}`"
+              />
+              <img
+                :src="slide.picture.img.src"
+                :width="slide.picture.img.w"
+                :height="slide.picture.img.h"
+                sizes="(min-width: 1440px) 1600px,
+        (min-width: 1024px) 1280px,
+        (min-width: 600px)  768px,
+        100vw"
+                :fetchpriority="index === 0 ? 'high' : 'low'"
+                :loading="index === 0 ? 'eager' : 'lazy'"
+                decoding="async"
+                :alt="slide.name"
+              />
+            </picture>
+          </div>
+        </q-carousel-slide>
+      </q-carousel>
+    </div>
     <q-header id="mobile-header" class="text-black">
       <q-toolbar class="bg-dark q-pa-lg">
         <q-toolbar-title>
@@ -236,6 +320,38 @@ onBeforeUnmount(() => window.removeEventListener('resize', updateWidths));
 aside {
   @media (min-width: tokens.$breakpoint-sm) {
     background-color: transparent !important;
+  }
+}
+
+.carousel-background {
+  display: flex;
+  flex-direction: column;
+  position: fixed;
+  inset: 0; /* top:0; right:0; bottom:0; left:0 */
+  width: 100%;
+  height: 100%;
+  z-index: 0;
+  pointer-events: none;
+  overflow: hidden;
+
+  .q-carousel {
+    flex: 1 1 auto; /* fine to keep */
+  }
+
+  .slide-bg {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    inset: 0;
+    z-index: 0;
+    pointer-events: none;
+
+    img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      display: block;
+    }
   }
 }
 

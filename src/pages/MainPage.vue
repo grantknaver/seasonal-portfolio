@@ -7,9 +7,7 @@ import { storeToRefs } from 'pinia';
 import { TopicName } from '../shared/constants/topicName';
 import { setSeasonClasses } from '../shared/utils/setSeasonColors';
 import SimonMenu from '../components/SimonMenu.vue';
-import type { Slide } from '../shared/types/slide';
 import { scroll } from 'quasar';
-import { Theme } from '../shared/constants/theme';
 import gsap from 'gsap';
 import { ViewType } from '../shared/constants/viewType';
 import { useViewport } from '../shared/utils/viewWidth';
@@ -22,10 +20,7 @@ import {
   mdiEmailBox,
 } from '@quasar/extras/mdi-v7';
 import { mdiChevronDown } from '@quasar/extras/mdi-v7';
-import autumn from 'src/assets/autumn-forestry.jpg?w=768;1280;1600&format=avif;webp;jpeg&quality=40&withoutEnlargement=true&as=picture';
-import winter from 'src/assets/snowy-winter-landscape.jpg?w=768;1280;1600&format=avif;webp;jpeg&quality=40&withoutEnlargement=true&as=picture';
-import spring from 'src/assets/beautiful-forest-spring-season.jpg?w=768;1280;1600&format=avif;webp;jpeg&quality=40&withoutEnlargement=true&as=picture';
-import summer from 'src/assets/beach.jpg?w=768;1280;1600&format=avif;webp;jpeg&quality=40&withoutEnlargement=true&as=picture';
+
 import { CacheEntry } from 'src/shared/constants/cacheEntry';
 import { useCacheStore } from 'src/stores/component-cache';
 import type { Package } from 'src/shared/constants/packages';
@@ -66,36 +61,10 @@ const mobileTopics: Topic[] = [
     cachedName: CacheEntry.ContactSection,
   },
 ];
-const slides = ref<Slide[]>([
-  {
-    id: uuidv4(),
-    picture: autumn,
-    theme: Theme.Fall,
-    name: 'Fall Background',
-  },
-  {
-    id: uuidv4(),
-    picture: winter,
-    theme: Theme.Winter,
-    name: 'Winter Background',
-  },
-  {
-    id: uuidv4(),
-    picture: spring,
-    theme: Theme.Spring,
-    name: 'Spring Background',
-  },
-  {
-    id: uuidv4(),
-    picture: summer,
-    theme: Theme.Summer,
-    name: 'Summer Background',
-  },
-]);
 
 const expandedPanel = ref<TopicName | null>();
 const { getScrollTarget, setVerticalScrollPosition } = scroll;
-const slide = ref<Theme>(Theme.Fall);
+
 const { activeTheme, activeTopic } = storeToRefs(mainStore);
 const root = ref<HTMLElement | null>(null);
 const showFooter = ref<boolean>(false);
@@ -110,7 +79,6 @@ const sepRef = ref<HTMLElement | null>(null);
 const servRef = ref<HTMLElement | null>(null);
 const ctaBtnRef = ref<HTMLElement | null>(null);
 const homeContainerRef = ref<HTMLElement | null>(null);
-const showCarousel = ref<boolean>(false);
 
 const activeEntry = computed(() => {
   if (!activeTopic.value) return null;
@@ -129,9 +97,6 @@ const activeComponent = computed(() => {
 });
 
 onMounted(async () => {
-  await nextTick();
-  await waitForLayout(root.value);
-  showCarousel.value = true;
   if (isResponsive.value) {
     try {
       dispose.value = buildAnimations(ViewType.Responsive);
@@ -204,8 +169,6 @@ watch(
   },
   { immediate: true },
 );
-
-watch(slide, (newVal) => mainStore.SET_ACTIVE_THEME(newVal));
 
 const waitForLayout = async (el: HTMLElement | null, frames = 8): Promise<boolean> => {
   if (!el) return false;
@@ -380,55 +343,6 @@ const toContact = (p: Package | null) => {
 
 <template>
   <q-page class="page-container column">
-    <div
-      class="carousel-background"
-      :class="{
-        'responsive-carousel-background': isResponsive,
-      }"
-      v-if="showCarousel"
-    >
-      <q-carousel
-        v-model="slide"
-        transition-prev="fade"
-        transition-next="fade"
-        animated
-        infinite
-        :autoplay="15000"
-        class="bg-dark"
-        :transition-duration="2500"
-      >
-        <q-carousel-slide
-          v-for="(slide, index) in slides"
-          :key="slide.id"
-          :name="slide.theme"
-          class="relative-position"
-        >
-          <div class="slide-bg">
-            <picture>
-              <source
-                v-for="(src, k) in slide.picture.sources"
-                :key="k"
-                :srcset="src"
-                :type="`image/${k}`"
-              />
-              <img
-                :src="slide.picture.img.src"
-                :width="slide.picture.img.w"
-                :height="slide.picture.img.h"
-                sizes="(min-width: 1440px) 1600px,
-        (min-width: 1024px) 1280px,
-        (min-width: 600px)  768px,
-        100vw"
-                :fetchpriority="index === 0 ? 'high' : 'low'"
-                :loading="index === 0 ? 'eager' : 'lazy'"
-                decoding="async"
-                :alt="slide.name"
-              />
-            </picture>
-          </div>
-        </q-carousel-slide>
-      </q-carousel>
-    </div>
     <div v-if="!isResponsive" class="weather-layer">
       <WeatherBackground />
     </div>
@@ -834,38 +748,6 @@ const toContact = (p: Package | null) => {
   min-height: 100vh;
   min-height: 100dvh; // safe viewport if supported
 
-  .carousel-background {
-    display: flex;
-    flex-direction: column;
-    position: fixed;
-    inset: 0; /* top:0; right:0; bottom:0; left:0 */
-    width: 100%;
-    height: 100%;
-    z-index: 0;
-    pointer-events: none;
-    overflow: hidden;
-
-    .q-carousel {
-      flex: 1 1 auto; /* fine to keep */
-    }
-
-    .slide-bg {
-      position: absolute;
-      width: 100%;
-      height: 100%;
-      inset: 0;
-      z-index: 0;
-      pointer-events: none;
-
-      img {
-        width: 100%;
-        height: 100%;
-        object-fit: cover;
-        display: block;
-      }
-    }
-  }
-
   .weather-layer {
     position: fixed;
     inset: 0;
@@ -895,7 +777,6 @@ const toContact = (p: Package | null) => {
 
   .sub-container {
     flex: 1 1 0%;
-    background-color: purple;
 
     @media (min-width: tokens.$breakpoint-lg) {
       position: relative;
