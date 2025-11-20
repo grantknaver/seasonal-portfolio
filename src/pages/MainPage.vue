@@ -876,6 +876,7 @@ const toContact = (p: Package | null) => {
     z-index: 0;
     pointer-events: none;
     overflow: hidden;
+    background-color: pink;
 
     .q-carousel {
       height: 100%;
@@ -925,7 +926,6 @@ const toContact = (p: Package | null) => {
 
   .sub-container {
     flex: 1 1 0%;
-    background-color: purple;
 
     @media (min-width: tokens.$breakpoint-lg) {
       position: relative;
