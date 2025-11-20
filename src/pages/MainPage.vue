@@ -838,14 +838,20 @@ const toContact = (p: Package | null) => {
   }
 
   .carousel-background {
+    display: flex;
+    flex-direction: column;
     position: fixed;
-    height: 300vh;
+    height: 100vh;
     top: 0;
     left: 0;
     z-index: 0;
     width: 100%;
     pointer-events: none;
     overflow: hidden;
+
+    .q-carousel {
+      flex: 1 1 auto;
+    }
 
     .slide-bg {
       position: absolute;
@@ -864,7 +870,7 @@ const toContact = (p: Package | null) => {
 
   @supports (height: 100dvh) {
     .carousel-background {
-      height: 300vh;
+      height: 100dvh;
     }
   }
 
