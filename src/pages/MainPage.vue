@@ -831,6 +831,8 @@ const toContact = (p: Package | null) => {
 
 .page-container {
   background-color: rgba($color: white, $alpha: 0.7);
+  display: flex;
+  flex-direction: column;
   position: relative;
 
   @media (min-width: tokens.$breakpoint-md) {
@@ -839,6 +841,7 @@ const toContact = (p: Package | null) => {
 
   .carousel-background {
     display: flex;
+    flex: 1 1 auto;
     flex-direction: column;
     position: fixed;
     height: 100vh;
