@@ -129,7 +129,7 @@ onBeforeUnmount(() => window.removeEventListener('resize', updateWidths));
       <router-view />
 
       <!-- ensure content exceeds viewport so footer starts off-screen -->
-      <div class="footer-spacer" />
+      <!-- <div class="footer-spacer" /> -->
 
       <!-- "Footer" lives in normal flow so we can scroll to it -->
       <section id="footer" class="bg-dark text-white" aria-label="Site footer">

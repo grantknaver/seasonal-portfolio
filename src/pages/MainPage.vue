@@ -832,9 +832,6 @@ const toContact = (p: Package | null) => {
 .page-container {
   position: relative;
   height: 100%;
-  @media (min-width: tokens.$breakpoint-md) {
-    background-color: initial;
-  }
 
   .carousel-background {
     display: flex;
