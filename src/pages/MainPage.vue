@@ -35,6 +35,7 @@ import { CacheBinding } from 'src/shared/constants/cacheBinding';
 const WeatherBackground = defineAsyncComponent(() => import('../components/WeatherBackground.vue'));
 const mainStore = useMainStore();
 const cacheStore = useCacheStore();
+
 const mobileTopics: Topic[] = [
   {
     id: uuidv4(),
@@ -66,6 +67,7 @@ const mobileTopics: Topic[] = [
     cachedName: CacheEntry.ContactSection,
   },
 ];
+
 const slides = ref<Slide[]>([
   {
     id: uuidv4(),
@@ -380,13 +382,8 @@ const toContact = (p: Package | null) => {
 
 <template>
   <q-page class="page-container column">
-    <div
-      class="carousel-background"
-      :class="{
-        'responsive-carousel-background': isResponsive,
-      }"
-      v-if="showCarousel"
-    >
+    <!-- Fixed full-screen background carousel -->
+    <div class="carousel-background" v-if="showCarousel">
       <q-carousel
         v-model="slide"
         transition-prev="fade"
@@ -429,9 +426,11 @@ const toContact = (p: Package | null) => {
         </q-carousel-slide>
       </q-carousel>
     </div>
+
     <div v-if="!isResponsive" class="weather-layer">
       <WeatherBackground />
     </div>
+
     <div class="logo">
       <img
         class="q-pt-sm"
@@ -444,6 +443,7 @@ const toContact = (p: Package | null) => {
         ><span class="text-primary-font text-white">Freelance</span></span
       >
     </div>
+
     <div ref="root" class="sub-container column items-center">
       <section v-if="isResponsive" key="mobile" class="responsive-view full-width q-pa-md">
         <div
@@ -643,6 +643,7 @@ const toContact = (p: Package | null) => {
           </q-item>
         </q-list>
       </section>
+
       <section
         v-if="!isResponsive"
         key="desktop"
@@ -833,26 +834,24 @@ const toContact = (p: Package | null) => {
   position: relative;
   height: 100%;
 
+  /* Fixed, full-screen background */
   .carousel-background {
-    display: flex;
-    flex-direction: column;
     position: fixed;
-    height: 100%;
-    top: 0;
-    left: 0;
-    z-index: 0;
+    inset: 0;
     width: 100%;
+    height: 100vh;
+    z-index: 0;
     pointer-events: none;
     overflow: hidden;
+    background: #000;
 
     .q-carousel {
-      flex: 1 1 auto;
+      height: 100%;
+      transition: none;
     }
 
     .slide-bg {
       position: absolute;
-      width: 100%;
-      height: 100%;
       inset: 0;
       z-index: 0;
       pointer-events: none;
