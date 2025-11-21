@@ -739,8 +739,9 @@ const toContact = (p: Package | null) => {
 
 .page-container {
   position: relative;
-  min-height: 100vh;
-  min-height: 100dvh; // safe viewport if supported
+  // min-height: 100vh;
+  // min-height: 100dvh; // safe viewport if supported
+  min-height: calc(var(--app-vh, 1vh) * 100);
 
   .logo {
     display: none;
@@ -770,7 +771,7 @@ const toContact = (p: Package | null) => {
   /* ---------- Mobile / NotDesktop ---------- */
 
   .responsive-view {
-    height: 100%;
+    height: calc(var(--app-vh, 1vh) * 100);
     max-width: 600px;
 
     @media (min-width: tokens.$breakpoint-md) {
@@ -801,7 +802,7 @@ const toContact = (p: Package | null) => {
     justify-content: center;
     align-items: center;
     position: relative;
-    height: 100dvh;
+    height: calc(var(--app-vh, 1vh) * 100);
 
     .home-container {
       margin-top: 4rem;
