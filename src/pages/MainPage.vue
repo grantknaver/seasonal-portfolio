@@ -354,7 +354,7 @@ const toContact = (p: Package | null) => {
       >
     </div>
     <section v-if="isResponsive" ref="root" key="mobile" class="responsive-view full-width q-pa-md">
-      <!-- <div
+      <div
         class="home-container relative-position full-width column items-center text-center text-primary-font q-mb-sm q-pa-lg font-primary"
       >
         <p
@@ -373,7 +373,7 @@ const toContact = (p: Package | null) => {
         >
           Grant Knaver
         </p>
-        <p class="title home-content text-body-1 text-secondary q-mb-none black-text-glow">
+        <!-- <p class="title home-content text-body-1 text-secondary q-mb-none black-text-glow">
           <span
             class="frontend text-white"
             :class="
@@ -471,8 +471,8 @@ const toContact = (p: Package | null) => {
         >
           I design and build interactive, high-performance web experiences that blend motion, data,
           and intelligence.
-        </p>
-      </div> -->
+        </p> -->
+      </div>
       <div class="full-width">
         <q-btn @click="toContact(null)" class="full-width" color="accent" size="lg" glossy>
           <span class="text-body-2">Hire Me for Your Next AI UI </span>
