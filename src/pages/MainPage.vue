@@ -1,74 +1,73 @@
 <script setup lang="ts">
 import { ref, watch, nextTick, onBeforeUnmount, computed, onMounted, onUnmounted } from 'vue';
 import { useMainStore } from '../stores/main';
-// import { type Topic } from '../shared/types/topic';
-// import { v4 as uuidv4 } from 'uuid';
+import { type Topic } from '../shared/types/topic';
+import { v4 as uuidv4 } from 'uuid';
 import { storeToRefs } from 'pinia';
-import type { TopicName } from '../shared/constants/topicName';
-// import { setSeasonClasses } from '../shared/utils/setSeasonColors';
-// import SimonMenu from '../components/SimonMenu.vue';
-// import { scroll } from 'quasar';
+import { TopicName } from '../shared/constants/topicName';
+import { setSeasonClasses } from '../shared/utils/setSeasonColors';
+import SimonMenu from '../components/SimonMenu.vue';
+import { scroll } from 'quasar';
 import gsap from 'gsap';
 import { ViewType } from '../shared/constants/viewType';
 import { useViewport } from '../shared/utils/viewWidth';
 import { defineAsyncComponent } from 'vue';
-// import {
-//   mdiChevronUp,
-//   mdiBookOpenPageVariant,
-//   mdiTruckDelivery,
-//   mdiInformationOutline,
-//   mdiEmailBox,
-// } from '@quasar/extras/mdi-v7';
-// import { mdiChevronDown } from '@quasar/extras/mdi-v7';
+import {
+  mdiChevronUp,
+  mdiBookOpenPageVariant,
+  mdiTruckDelivery,
+  mdiInformationOutline,
+  mdiEmailBox,
+} from '@quasar/extras/mdi-v7';
+import { mdiChevronDown } from '@quasar/extras/mdi-v7';
 
-// import { CacheEntry } from 'src/shared/constants/cacheEntry';
+import { CacheEntry } from 'src/shared/constants/cacheEntry';
 import { useCacheStore } from 'src/stores/component-cache';
-// import type { Package } from 'src/shared/constants/packages';
-// // import { scrollToElement } from 'src/shared/utils/scrollToElement';
-// import { CacheBinding } from 'src/shared/constants/cacheBinding';
+import type { Package } from 'src/shared/constants/packages';
+import { scrollToElement } from 'src/shared/utils/scrollToElement';
+import { CacheBinding } from 'src/shared/constants/cacheBinding';
 
 const WeatherBackground = defineAsyncComponent(() => import('../components/WeatherBackground.vue'));
 const mainStore = useMainStore();
 const cacheStore = useCacheStore();
-// const mobileTopics: Topic[] = [
-//   {
-//     id: uuidv4(),
-//     name: TopicName.CaseStudies,
-//     icon: mdiBookOpenPageVariant,
-//     label: TopicName.CaseStudies,
-//     cachedName: CacheEntry.CaseStudiesSection,
-//   },
-//   {
-//     id: uuidv4(),
-//     name: TopicName.Packages,
-//     icon: mdiTruckDelivery,
-//     label: 'Packages',
-//     cachedName: CacheEntry.PackageSection,
-//   },
-//   {
-//     id: uuidv4(),
-//     name: TopicName.About,
-//     icon: mdiInformationOutline,
-//     label: TopicName.About,
-//     cachedName: CacheEntry.AboutSection,
-//   },
+const mobileTopics: Topic[] = [
+  {
+    id: uuidv4(),
+    name: TopicName.CaseStudies,
+    icon: mdiBookOpenPageVariant,
+    label: TopicName.CaseStudies,
+    cachedName: CacheEntry.CaseStudiesSection,
+  },
+  {
+    id: uuidv4(),
+    name: TopicName.Packages,
+    icon: mdiTruckDelivery,
+    label: 'Packages',
+    cachedName: CacheEntry.PackageSection,
+  },
+  {
+    id: uuidv4(),
+    name: TopicName.About,
+    icon: mdiInformationOutline,
+    label: TopicName.About,
+    cachedName: CacheEntry.AboutSection,
+  },
 
-//   {
-//     id: uuidv4(),
-//     name: TopicName.Contact,
-//     icon: mdiEmailBox,
-//     label: TopicName.Contact,
-//     cachedName: CacheEntry.ContactSection,
-//   },
-// ];
+  {
+    id: uuidv4(),
+    name: TopicName.Contact,
+    icon: mdiEmailBox,
+    label: TopicName.Contact,
+    cachedName: CacheEntry.ContactSection,
+  },
+];
 
 const expandedPanel = ref<TopicName | null>();
-// const { getScrollTarget, setVerticalScrollPosition } = scroll;
+const { getScrollTarget, setVerticalScrollPosition } = scroll;
 
-// const { activeTheme, activeTopic } = storeToRefs(mainStore);
-const { activeTopic } = storeToRefs(mainStore);
+const { activeTheme, activeTopic } = storeToRefs(mainStore);
 const root = ref<HTMLElement | null>(null);
-// const showFooter = ref<boolean>(false);
+const showFooter = ref<boolean>(false);
 const io = ref<IntersectionObserver | null>(null);
 const { lgBreakpoint, width } = useViewport();
 const isResponsive = computed(() => width.value < lgBreakpoint);
@@ -81,21 +80,21 @@ const servRef = ref<HTMLElement | null>(null);
 const ctaBtnRef = ref<HTMLElement | null>(null);
 const homeContainerRef = ref<HTMLElement | null>(null);
 
-// const activeEntry = computed(() => {
-//   if (!activeTopic.value) return null;
-//   return CacheBinding[activeTopic.value];
-// });
+const activeEntry = computed(() => {
+  if (!activeTopic.value) return null;
+  return CacheBinding[activeTopic.value];
+});
 
-// const activeComponent = computed(() => {
-//   const entry = activeEntry.value;
-//   if (!entry) return null;
+const activeComponent = computed(() => {
+  const entry = activeEntry.value;
+  if (!entry) return null;
 
-//   if (!cacheStore.catalog[entry]) {
-//     cacheStore.CACHE_COMPONENT(entry);
-//   }
+  if (!cacheStore.catalog[entry]) {
+    cacheStore.CACHE_COMPONENT(entry);
+  }
 
-//   return cacheStore.catalog[entry];
-// });
+  return cacheStore.catalog[entry];
+});
 
 onMounted(async () => {
   if (isResponsive.value) {
@@ -317,29 +316,29 @@ const buildAnimations = (mode: ViewType) => {
   };
 };
 
-// const scrollToFooter = () => {
-//   if (!showFooter.value) {
-//     const footerEl = document.getElementById('footer');
-//     if (!footerEl) return;
-//     const target = getScrollTarget(footerEl); // auto-detects the correct scrollable container
-//     const y = footerEl.offsetTop; // position inside that container
-//     setVerticalScrollPosition(target, y, 500); // smooth scroll (ms)
-//     showFooter.value = true;
-//   } else {
-//     const logoEl = document.getElementById('logo');
-//     if (!logoEl) return;
-//     const target = getScrollTarget(logoEl); // auto-detects the correct scrollable container
-//     const y = logoEl.offsetHeight; // position inside that container
-//     setVerticalScrollPosition(target, y, 500); // smooth scroll (ms)
-//     showFooter.value = false;
-//   }
-// };
+const scrollToFooter = () => {
+  if (!showFooter.value) {
+    const footerEl = document.getElementById('footer');
+    if (!footerEl) return;
+    const target = getScrollTarget(footerEl); // auto-detects the correct scrollable container
+    const y = footerEl.offsetTop; // position inside that container
+    setVerticalScrollPosition(target, y, 500); // smooth scroll (ms)
+    showFooter.value = true;
+  } else {
+    const logoEl = document.getElementById('logo');
+    if (!logoEl) return;
+    const target = getScrollTarget(logoEl); // auto-detects the correct scrollable container
+    const y = logoEl.offsetHeight; // position inside that container
+    setVerticalScrollPosition(target, y, 500); // smooth scroll (ms)
+    showFooter.value = false;
+  }
+};
 
-// const toContact = (p: Package | null) => {
-//   if (p) mainStore.SET_PACKAGE_OF_INTEREST(p);
-//   mainStore.SET_ACTIVE_TOPIC(TopicName.Contact);
-//   expandedPanel.value = TopicName.Contact;
-// };
+const toContact = (p: Package | null) => {
+  if (p) mainStore.SET_PACKAGE_OF_INTEREST(p);
+  mainStore.SET_ACTIVE_TOPIC(TopicName.Contact);
+  expandedPanel.value = TopicName.Contact;
+};
 </script>
 
 <template>
@@ -359,7 +358,7 @@ const buildAnimations = (mode: ViewType) => {
         ><span class="text-primary-font text-white">Freelance</span></span
       >
     </div>
-    <!-- <div ref="root" class="sub-container column items-center">
+    <div ref="root" class="sub-container column items-center">
       <section v-if="isResponsive" key="mobile" class="responsive-view full-width q-pa-md">
         <div
           class="home-container relative-position full-width column items-center text-center text-primary-font q-mb-sm q-pa-lg font-primary"
@@ -737,7 +736,7 @@ const buildAnimations = (mode: ViewType) => {
           aria-label="Scroll to footer"
         />
       </section>
-    </div> -->
+    </div>
   </q-page>
 </template>
 
@@ -777,11 +776,10 @@ const buildAnimations = (mode: ViewType) => {
   }
 
   .sub-container {
-    flex: 1 1 0%;
-
     @media (min-width: tokens.$breakpoint-lg) {
       position: relative;
       padding: initial;
+      flex: 1 1 0%;
     }
 
     p:nth-of-type(1) {
