@@ -1,5 +1,5 @@
 <script lang="ts" setup>
-import { computed, ref, onMounted, onBeforeUnmount, watch } from 'vue';
+import { computed, ref, onMounted, onBeforeUnmount, watch, defineAsyncComponent } from 'vue';
 import { useMainStore } from '../stores/main';
 import { storeToRefs } from 'pinia';
 import { Theme } from '../shared/constants/theme';
@@ -88,6 +88,7 @@ const activeComponent = computed(() => {
 
   return cacheStore.catalog[entry];
 });
+const WeatherBackground = defineAsyncComponent(() => import('../components/WeatherBackground.vue'));
 
 onMounted(() => {
   showCarousel.value = true;
@@ -149,6 +150,9 @@ watch(slide, (newVal) => mainStore.SET_ACTIVE_THEME(newVal));
           </div>
         </q-carousel-slide>
       </q-carousel>
+    </div>
+    <div v-if="!isResponsive" class="weather-layer">
+      <WeatherBackground />
     </div>
     <q-header id="mobile-header" class="text-black">
       <q-toolbar class="bg-dark q-pa-lg">
@@ -353,6 +357,14 @@ aside {
       display: block;
     }
   }
+}
+
+.weather-layer {
+  position: fixed;
+  inset: 0;
+  z-index: 1;
+  pointer-events: none;
+  overflow: hidden;
 }
 
 .desktop-drawer {

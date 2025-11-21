@@ -11,7 +11,6 @@ import { scroll } from 'quasar';
 import gsap from 'gsap';
 import { ViewType } from '../shared/constants/viewType';
 import { useViewport } from '../shared/utils/viewWidth';
-import { defineAsyncComponent } from 'vue';
 import {
   mdiChevronUp,
   mdiBookOpenPageVariant,
@@ -27,7 +26,6 @@ import type { Package } from 'src/shared/constants/packages';
 import { scrollToElement } from 'src/shared/utils/scrollToElement';
 import { CacheBinding } from 'src/shared/constants/cacheBinding';
 
-const WeatherBackground = defineAsyncComponent(() => import('../components/WeatherBackground.vue'));
 const mainStore = useMainStore();
 const cacheStore = useCacheStore();
 const mobileTopics: Topic[] = [
@@ -343,9 +341,6 @@ const toContact = (p: Package | null) => {
 
 <template>
   <q-page class="page-container column">
-    <div v-if="!isResponsive" class="weather-layer">
-      <WeatherBackground />
-    </div>
     <div class="logo">
       <img
         class="q-pt-sm"
@@ -358,385 +353,384 @@ const toContact = (p: Package | null) => {
         ><span class="text-primary-font text-white">Freelance</span></span
       >
     </div>
-    <div ref="root" class="sub-container column items-center">
-      <section v-if="isResponsive" key="mobile" class="responsive-view full-width q-pa-md">
-        <div
-          class="home-container relative-position full-width column items-center text-center text-primary-font q-mb-sm q-pa-lg font-primary"
-        >
-          <p
-            class="name home-content q-mb-none text-white"
-            :class="
-              setSeasonClasses(
-                {
-                  Fall: 'dark-text-outline',
-                  Winter: 'dark-text-outline',
-                  Spring: 'black-text-outline',
-                  Summer: 'black-text-outline',
-                },
-                activeTheme,
-              )
-            "
-          >
-            Grant Knaver
-          </p>
-          <p class="title home-content text-body-1 text-secondary q-mb-none black-text-glow">
-            <span
-              class="frontend text-white"
-              :class="
-                setSeasonClasses(
-                  {
-                    Fall: 'dark-text-outline',
-                    Winter: 'dark-text-outline',
-                    Spring: 'dark-text-outline',
-                    Summer: 'black-text-outline',
-                  },
-                  activeTheme,
-                )
-              "
-              >Frontend Developer</span
-            >
-            <span
-              class="text-white"
-              :class="
-                setSeasonClasses(
-                  {
-                    Fall: 'dark-text-outline',
-                    Winter: 'dark-text-outline',
-                    Spring: 'dark-text-outline',
-                    Summer: 'black-text-outline',
-                  },
-                  activeTheme,
-                )
-              "
-            >
-              •
-            </span>
-            <span
-              class="gsap text-secondary"
-              :class="
-                setSeasonClasses(
-                  {
-                    Fall: 'dark-text-outline',
-                    Winter: 'dark-text-outline',
-                    Spring: 'black-text-outline',
-                    Summer: 'black-text-outline',
-                  },
-                  activeTheme,
-                )
-              "
-              >GSAP</span
-            >
-            <span
-              class="text-white"
-              :class="
-                setSeasonClasses(
-                  {
-                    Fall: 'dark-text-outline',
-                    Winter: 'dark-text-outline',
-                    Spring: 'black-text-outline',
-                    Summer: 'black-text-outline',
-                  },
-                  activeTheme,
-                )
-              "
-            >
-              •
-            </span>
-            <span
-              class="text-secondary"
-              :class="
-                setSeasonClasses(
-                  {
-                    Fall: 'dark-text-outline',
-                    Winter: 'dark-text-outline',
-                    Spring: 'black-text-outline',
-                    Summer: 'black-text-outline',
-                  },
-                  activeTheme,
-                )
-              "
-              >AI Integration</span
-            >
-          </p>
-          <div ref="sepRef" class="home-content column full-width q-mt-md q-mb-md">
-            <q-separator class="font-bold" color="primary"></q-separator>
-          </div>
-          <p
-            class="services-description home-content text-white font-bold q-mt-sm q-mb-none text-center"
-            :class="
-              setSeasonClasses(
-                {
-                  Fall: 'dark-text-outline',
-                  Winter: 'dark-text-outline',
-                  Spring: 'black-text-outline',
-                  Summer: 'black-text-outline',
-                },
-                activeTheme,
-              )
-            "
-          >
-            I design and build interactive, high-performance web experiences that blend motion,
-            data, and intelligence.
-          </p>
-        </div>
-        <div class="full-width">
-          <q-btn @click="toContact(null)" class="full-width" color="accent" size="lg" glossy>
-            <span class="text-body-2">Hire Me for Your Next AI UI </span>
-          </q-btn>
-          <q-btn
-            class="q-mt-xs q-mb-md full-width"
-            text-color="primary"
-            color="dark"
-            size="lg"
-            glossy
-            href="https://www.loom.com/share/47e23f8eaefe4bf99cd37c9bec62116c"
-            target="_blank"
-          >
-            <span class="text-body-2">Watch the 90-Second Demo </span>
-          </q-btn>
-        </div>
-
-        <q-list class="full-width font-primary">
-          <q-item
-            v-for="topic in mobileTopics"
-            :key="topic.id"
-            :id="topic.name"
-            class="full-width bg-transparent q-pa-none q-mb-sm"
-          >
-            <q-expansion-item
-              group="responsive-main-menu"
-              :icon="topic.icon"
-              :label="topic.label"
-              :model-value="expandedPanel === topic.name"
-              @after-show="
-                () => {
-                  scrollToElement(topic.name);
-                  expandedPanel = topic.name;
-                  mainStore.SET_ACTIVE_TOPIC(topic.name);
-                }
-              "
-              @hide="
-                () => {
-                  if (expandedPanel === topic.name) {
-                    expandedPanel = null;
-                    mainStore.SET_ACTIVE_TOPIC(null);
-                  }
-                }
-              "
-              :header-class="['text-dark', 'bg-secondary']"
-              class="expansion-item full-width"
-              switch-toggle-side
-            >
-              <div v-if="expandedPanel === topic.name" class="anchor full-width">
-                <div v-if="!activeEntry" class="text-white q-pa-md">
-                  <p>No active Topic - Error</p>
-                </div>
-                <Suspense v-else>
-                  <template #default>
-                    <component
-                      v-if="topic.name === TopicName.Packages"
-                      :is="activeComponent"
-                      @requestConsultation="toContact"
-                    />
-                    <component
-                      v-else-if="
-                        topic.name === TopicName.About || topic.name === TopicName.CaseStudies
-                      "
-                      :is="activeComponent"
-                      @toContact="toContact"
-                    />
-                    <component v-else-if="topic.name === TopicName.Contact" :is="activeComponent" />
-                  </template>
-
-                  <template #fallback>
-                    <q-skeleton type="rect" height="100dvh" />
-                  </template>
-                </Suspense>
-              </div>
-            </q-expansion-item>
-          </q-item>
-        </q-list>
-      </section>
-      <section
-        v-if="!isResponsive"
-        key="desktop"
-        class="desktop-view row justify-end items-center full-width"
+    <section v-if="isResponsive" ref="root" key="mobile" class="responsive-view full-width q-pa-md">
+      <div
+        class="home-container relative-position full-width column items-center text-center text-primary-font q-mb-sm q-pa-lg font-primary"
       >
-        <div ref="homeContainerRef" class="home-container q-pl-xl q-pr-xl column">
-          <p
-            v-if="!activeTopic"
-            ref="nameRef"
-            class="name q-mb-lg text-body-1 text-left text-white"
+        <p
+          class="name home-content q-mb-none text-white"
+          :class="
+            setSeasonClasses(
+              {
+                Fall: 'dark-text-outline',
+                Winter: 'dark-text-outline',
+                Spring: 'black-text-outline',
+                Summer: 'black-text-outline',
+              },
+              activeTheme,
+            )
+          "
+        >
+          Grant Knaver
+        </p>
+        <p class="title home-content text-body-1 text-secondary q-mb-none black-text-glow">
+          <span
+            class="frontend text-white"
             :class="
               setSeasonClasses(
                 {
-                  Fall: 'secondary-font fall-secondary dark-text-outline',
-                  Winter: 'secondary-font winter-secondary dark-text-outline',
-                  Spring: 'secondary-font spring-secondary black-text-outline',
-                  Summer: 'secondary-font summer-secondary black-text-outline',
+                  Fall: 'dark-text-outline',
+                  Winter: 'dark-text-outline',
+                  Spring: 'dark-text-outline',
+                  Summer: 'black-text-outline',
+                },
+                activeTheme,
+              )
+            "
+            >Frontend Developer</span
+          >
+          <span
+            class="text-white"
+            :class="
+              setSeasonClasses(
+                {
+                  Fall: 'dark-text-outline',
+                  Winter: 'dark-text-outline',
+                  Spring: 'dark-text-outline',
+                  Summer: 'black-text-outline',
                 },
                 activeTheme,
               )
             "
           >
-            Grant Knaver
-          </p>
-          <div class="row no-wrap">
-            <div ref="simonRef" class="simon"><SimonMenu></SimonMenu></div>
-            <div
-              v-if="!activeTopic"
-              class="title-container column justify-center items-center q-pa-md"
-            >
-              <div class="clip-container relative-position overflow-hidden">
-                <p
-                  ref="titleRef"
-                  class="title full-width text-body-2 text-center q-mb-lg q-pl-lg text-secondary"
+            •
+          </span>
+          <span
+            class="gsap text-secondary"
+            :class="
+              setSeasonClasses(
+                {
+                  Fall: 'dark-text-outline',
+                  Winter: 'dark-text-outline',
+                  Spring: 'black-text-outline',
+                  Summer: 'black-text-outline',
+                },
+                activeTheme,
+              )
+            "
+            >GSAP</span
+          >
+          <span
+            class="text-white"
+            :class="
+              setSeasonClasses(
+                {
+                  Fall: 'dark-text-outline',
+                  Winter: 'dark-text-outline',
+                  Spring: 'black-text-outline',
+                  Summer: 'black-text-outline',
+                },
+                activeTheme,
+              )
+            "
+          >
+            •
+          </span>
+          <span
+            class="text-secondary"
+            :class="
+              setSeasonClasses(
+                {
+                  Fall: 'dark-text-outline',
+                  Winter: 'dark-text-outline',
+                  Spring: 'black-text-outline',
+                  Summer: 'black-text-outline',
+                },
+                activeTheme,
+              )
+            "
+            >AI Integration</span
+          >
+        </p>
+        <div ref="sepRef" class="home-content column full-width q-mt-md q-mb-md">
+          <q-separator class="font-bold" color="primary"></q-separator>
+        </div>
+        <p
+          class="services-description home-content text-white font-bold q-mt-sm q-mb-none text-center"
+          :class="
+            setSeasonClasses(
+              {
+                Fall: 'dark-text-outline',
+                Winter: 'dark-text-outline',
+                Spring: 'black-text-outline',
+                Summer: 'black-text-outline',
+              },
+              activeTheme,
+            )
+          "
+        >
+          I design and build interactive, high-performance web experiences that blend motion, data,
+          and intelligence.
+        </p>
+      </div>
+      <div class="full-width">
+        <q-btn @click="toContact(null)" class="full-width" color="accent" size="lg" glossy>
+          <span class="text-body-2">Hire Me for Your Next AI UI </span>
+        </q-btn>
+        <q-btn
+          class="q-mt-xs q-mb-md full-width"
+          text-color="primary"
+          color="dark"
+          size="lg"
+          glossy
+          href="https://www.loom.com/share/47e23f8eaefe4bf99cd37c9bec62116c"
+          target="_blank"
+        >
+          <span class="text-body-2">Watch the 90-Second Demo </span>
+        </q-btn>
+      </div>
+
+      <q-list class="full-width font-primary">
+        <q-item
+          v-for="topic in mobileTopics"
+          :key="topic.id"
+          :id="topic.name"
+          class="full-width bg-transparent q-pa-none q-mb-sm"
+        >
+          <q-expansion-item
+            group="responsive-main-menu"
+            :icon="topic.icon"
+            :label="topic.label"
+            :model-value="expandedPanel === topic.name"
+            @after-show="
+              () => {
+                scrollToElement(topic.name);
+                expandedPanel = topic.name;
+                mainStore.SET_ACTIVE_TOPIC(topic.name);
+              }
+            "
+            @hide="
+              () => {
+                if (expandedPanel === topic.name) {
+                  expandedPanel = null;
+                  mainStore.SET_ACTIVE_TOPIC(null);
+                }
+              }
+            "
+            :header-class="['text-dark', 'bg-secondary']"
+            class="expansion-item full-width"
+            switch-toggle-side
+          >
+            <div v-if="expandedPanel === topic.name" class="anchor full-width">
+              <div v-if="!activeEntry" class="text-white q-pa-md">
+                <p>No active Topic - Error</p>
+              </div>
+              <Suspense v-else>
+                <template #default>
+                  <component
+                    v-if="topic.name === TopicName.Packages"
+                    :is="activeComponent"
+                    @requestConsultation="toContact"
+                  />
+                  <component
+                    v-else-if="
+                      topic.name === TopicName.About || topic.name === TopicName.CaseStudies
+                    "
+                    :is="activeComponent"
+                    @toContact="toContact"
+                  />
+                  <component v-else-if="topic.name === TopicName.Contact" :is="activeComponent" />
+                </template>
+
+                <template #fallback>
+                  <q-skeleton type="rect" height="100dvh" />
+                </template>
+              </Suspense>
+            </div>
+          </q-expansion-item>
+        </q-item>
+      </q-list>
+    </section>
+    <section
+      v-if="!isResponsive"
+      ref="root"
+      key="desktop"
+      class="desktop-view column justify-end items-center full-width"
+    >
+      <div ref="homeContainerRef" class="home-container q-pl-xl q-pr-xl column">
+        <p
+          v-if="!activeTopic"
+          ref="nameRef"
+          class="name q-mb-lg text-body-1 text-left text-white"
+          :class="
+            setSeasonClasses(
+              {
+                Fall: 'secondary-font fall-secondary dark-text-outline',
+                Winter: 'secondary-font winter-secondary dark-text-outline',
+                Spring: 'secondary-font spring-secondary black-text-outline',
+                Summer: 'secondary-font summer-secondary black-text-outline',
+              },
+              activeTheme,
+            )
+          "
+        >
+          Grant Knaver
+        </p>
+        <div class="row no-wrap">
+          <div ref="simonRef" class="simon"><SimonMenu></SimonMenu></div>
+          <div
+            v-if="!activeTopic"
+            class="title-container column justify-center items-center q-pa-md"
+          >
+            <div class="clip-container relative-position overflow-hidden">
+              <p
+                ref="titleRef"
+                class="title full-width text-body-2 text-center q-mb-lg q-pl-lg text-secondary"
+                :class="
+                  setSeasonClasses(
+                    {
+                      Fall: 'secondary-font fall-secondary',
+                      Winter: 'secondary-font winter-secondary',
+                      Spring: 'secondary-font spring-secondary',
+                      Summer: 'secondary-font summer-secondary',
+                    },
+                    activeTheme,
+                  )
+                "
+              >
+                <span
+                  class="frontend text-white"
                   :class="
                     setSeasonClasses(
                       {
-                        Fall: 'secondary-font fall-secondary',
-                        Winter: 'secondary-font winter-secondary',
-                        Spring: 'secondary-font spring-secondary',
-                        Summer: 'secondary-font summer-secondary',
+                        Fall: 'dark-text-outline',
+                        Winter: ' dark-text-outline',
+                        Spring: 'dark-text-outline',
+                        Summer: 'black-text-outline',
+                      },
+                      activeTheme,
+                    )
+                  "
+                  >Frontend Developer</span
+                >
+                <span
+                  class="text-white"
+                  :class="
+                    setSeasonClasses(
+                      {
+                        Fall: 'dark-text-outline',
+                        Winter: 'dark-text-outline',
+                        Spring: 'dark-text-outline',
+                        Summer: 'black-text-outline',
                       },
                       activeTheme,
                     )
                   "
                 >
-                  <span
-                    class="frontend text-white"
-                    :class="
-                      setSeasonClasses(
-                        {
-                          Fall: 'dark-text-outline',
-                          Winter: ' dark-text-outline',
-                          Spring: 'dark-text-outline',
-                          Summer: 'black-text-outline',
-                        },
-                        activeTheme,
-                      )
-                    "
-                    >Frontend Developer</span
-                  >
-                  <span
-                    class="text-white"
-                    :class="
-                      setSeasonClasses(
-                        {
-                          Fall: 'dark-text-outline',
-                          Winter: 'dark-text-outline',
-                          Spring: 'dark-text-outline',
-                          Summer: 'black-text-outline',
-                        },
-                        activeTheme,
-                      )
-                    "
-                  >
-                    •
-                  </span>
-                  <span
-                    class="text-secondary"
-                    :class="
-                      setSeasonClasses(
-                        {
-                          Fall: 'fall-secondary dark-text-outline',
-                          Winter: 'winter-secondary dark-text-outline',
-                          Spring: 'spring-secondary black-text-outline',
-                          Summer: 'summer-secondary black-text-outline',
-                        },
-                        activeTheme,
-                      )
-                    "
-                    >GSAP</span
-                  >
-                  <span
-                    class="text-white"
-                    :class="
-                      setSeasonClasses(
-                        {
-                          Fall: 'fall-secondary dark-text-outline',
-                          Winter: 'winter-secondary dark-text-outline',
-                          Spring: 'spring-secondary black-text-outline',
-                          Summer: 'summer-secondary black-text-outline',
-                        },
-                        activeTheme,
-                      )
-                    "
-                  >
-                    •
-                  </span>
-                  <span
-                    class="text-secondary"
-                    :class="
-                      setSeasonClasses(
-                        {
-                          Fall: 'fall-secondary dark-text-outline',
-                          Winter: 'winter-secondary dark-text-outline',
-                          Spring: 'spring-secondary black-text-outline',
-                          Summer: 'summer-secondary black-text-outline',
-                        },
-                        activeTheme,
-                      )
-                    "
-                    >AI Integration</span
-                  >
-                </p>
-              </div>
-              <div ref="sepRef" class="separator">
-                <q-separator color="primary"></q-separator>
-              </div>
-              <div ref="ctaBtnRef">
-                <q-btn @click="toContact(null)" class="q-mt-md" color="accent" size="lg" glossy>
-                  <span class="text-body-2">Hire Me for Your Next AI UI </span>
-                </q-btn>
-                <q-btn
-                  class="q-mt-md"
-                  text-color="accent"
-                  color="secondary"
-                  size="lg"
-                  glossy
-                  href="https://www.loom.com/share/47e23f8eaefe4bf99cd37c9bec62116c"
-                  target="_blank"
+                  •
+                </span>
+                <span
+                  class="text-secondary"
+                  :class="
+                    setSeasonClasses(
+                      {
+                        Fall: 'fall-secondary dark-text-outline',
+                        Winter: 'winter-secondary dark-text-outline',
+                        Spring: 'spring-secondary black-text-outline',
+                        Summer: 'summer-secondary black-text-outline',
+                      },
+                      activeTheme,
+                    )
+                  "
+                  >GSAP</span
                 >
-                  <span class="text-body-2">Watch the 90-Second Demo </span>
-                </q-btn>
-              </div>
+                <span
+                  class="text-white"
+                  :class="
+                    setSeasonClasses(
+                      {
+                        Fall: 'fall-secondary dark-text-outline',
+                        Winter: 'winter-secondary dark-text-outline',
+                        Spring: 'spring-secondary black-text-outline',
+                        Summer: 'summer-secondary black-text-outline',
+                      },
+                      activeTheme,
+                    )
+                  "
+                >
+                  •
+                </span>
+                <span
+                  class="text-secondary"
+                  :class="
+                    setSeasonClasses(
+                      {
+                        Fall: 'fall-secondary dark-text-outline',
+                        Winter: 'winter-secondary dark-text-outline',
+                        Spring: 'spring-secondary black-text-outline',
+                        Summer: 'summer-secondary black-text-outline',
+                      },
+                      activeTheme,
+                    )
+                  "
+                  >AI Integration</span
+                >
+              </p>
+            </div>
+            <div ref="sepRef" class="separator full-width">
+              <q-separator color="primary"></q-separator>
+            </div>
+            <div ref="ctaBtnRef" class="column">
+              <q-btn @click="toContact(null)" class="q-mt-md" color="accent" size="lg" glossy>
+                <span class="text-body-2">Hire Me for Your Next AI UI </span>
+              </q-btn>
+              <q-btn
+                class="q-mt-md"
+                text-color="accent"
+                color="secondary"
+                size="lg"
+                glossy
+                href="https://www.loom.com/share/47e23f8eaefe4bf99cd37c9bec62116c"
+                target="_blank"
+              >
+                <span class="text-body-2">Watch the 90-Second Demo </span>
+              </q-btn>
             </div>
           </div>
-
-          <div
-            ref="servRef"
-            v-if="!activeTopic"
-            class="services-description row q-mt-md q-pa-md wrap justify-center start-animation text-white text-bold"
-            :class="
-              setSeasonClasses(
-                {
-                  Fall: 'primary-font dark-text-outline',
-                  Winter: 'primary-font dark-text-outline',
-                  Spring: 'primary-font dark-text-outline',
-                  Summer: 'primary-font text-white black-text-outline',
-                },
-                activeTheme,
-              )
-            "
-          >
-            <i
-              >I design and build interactive, high-performance web experiences that blend motion,
-              data, and intelligence.</i
-            >
-          </div>
         </div>
-        <q-btn
-          id="showFooterBtn"
-          round
-          color="accent"
-          :icon="!showFooter ? mdiChevronUp : mdiChevronDown"
-          class="q-px-sm"
-          @click="scrollToFooter"
-          aria-label="Scroll to footer"
-        />
-      </section>
-    </div>
+
+        <div
+          ref="servRef"
+          v-if="!activeTopic"
+          class="services-description row q-mt-md q-pa-md wrap justify-center start-animation text-white text-bold"
+          :class="
+            setSeasonClasses(
+              {
+                Fall: 'primary-font dark-text-outline',
+                Winter: 'primary-font dark-text-outline',
+                Spring: 'primary-font dark-text-outline',
+                Summer: 'primary-font text-white black-text-outline',
+              },
+              activeTheme,
+            )
+          "
+        >
+          <i
+            >I design and build interactive, high-performance web experiences that blend motion,
+            data, and intelligence.</i
+          >
+        </div>
+      </div>
+      <q-btn
+        id="showFooterBtn"
+        round
+        color="accent"
+        :icon="!showFooter ? mdiChevronUp : mdiChevronDown"
+        class="q-px-sm"
+        @click="scrollToFooter"
+        aria-label="Scroll to footer"
+      />
+    </section>
   </q-page>
 </template>
 
@@ -747,14 +741,6 @@ const toContact = (p: Package | null) => {
   position: relative;
   min-height: 100vh;
   min-height: 100dvh; // safe viewport if supported
-
-  .weather-layer {
-    position: fixed;
-    inset: 0;
-    z-index: 1;
-    pointer-events: none;
-    overflow: hidden;
-  }
 
   .logo {
     display: none;
@@ -775,100 +761,92 @@ const toContact = (p: Package | null) => {
     }
   }
 
-  .sub-container {
+  p:nth-of-type(1) {
+    font-weight: bold;
+    line-height: 2.2rem;
+    text-transform: uppercase;
+  }
+
+  /* ---------- Mobile / NotDesktop ---------- */
+
+  .responsive-view {
     height: 100%;
-    @media (min-width: tokens.$breakpoint-lg) {
-      position: relative;
-      padding: initial;
+    max-width: 600px;
+
+    @media (min-width: tokens.$breakpoint-md) {
+      max-width: 800px;
     }
 
-    p:nth-of-type(1) {
-      font-weight: bold;
-      line-height: 2.2rem;
-      text-transform: uppercase;
-    }
+    .home-container {
+      background: color-mix(in srgb, black 30%, transparent);
+      border-radius: 0.5rem;
+      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
+      padding: 1.5rem;
 
-    /* ---------- Mobile / NotDesktop ---------- */
-
-    .responsive-view {
-      height: 100%;
-      max-width: 600px;
-
-      @media (min-width: tokens.$breakpoint-md) {
-        max-width: 800px;
+      .name {
+        font-size: 1.5rem;
       }
 
-      .home-container {
-        background: color-mix(in srgb, black 30%, transparent);
-        border-radius: 0.5rem;
-        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
-        padding: 1.5rem;
-
-        .name {
-          font-size: 1.5rem;
-        }
-
-        .services-description {
-          font-size: 1.3rem;
-          line-height: 2rem;
-        }
+      .services-description {
+        font-size: 1.3rem;
+        line-height: 2rem;
       }
     }
+  }
 
-    /* ---------- Desktop ---------- */
+  /* ---------- Desktop ---------- */
 
-    .desktop-view {
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      position: relative;
-      height: 100dvh;
+  .desktop-view {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    position: relative;
+    height: 100dvh;
 
-      .home-container {
-        margin-top: 4rem;
-        max-width: 700px;
+    .home-container {
+      margin-top: 4rem;
+      max-width: 700px;
 
-        /* NOTE: No opacity/transform here; GSAP controls them */
-        .name {
-          font-size: 1.8rem;
-        }
+      /* NOTE: No opacity/transform here; GSAP controls them */
+      .name {
+        font-size: 1.8rem;
+      }
 
-        .simon {
-          width: 40%;
-          min-width: 275px;
-          max-width: 275px;
-          /* no transform-origin/scale here; GSAP sets them */
-        }
+      .simon {
+        width: 40%;
+        min-width: 275px;
+        max-width: 275px;
+        /* no transform-origin/scale here; GSAP sets them */
+      }
 
-        .title-container {
-          width: 60%;
+      .title-container {
+        width: 60%;
 
-          .separator {
-            width: 75%; /* GSAP handles opacity/transform */
-          }
-        }
-
-        .services-description {
-          position: relative;
-          z-index: 1;
-          font-size: 1.2rem;
-          border-radius: 5px; /* GSAP handles opacity/transform */
-        }
-
-        .services-description::before {
-          content: '';
-          position: absolute;
-          inset: 0;
-          z-index: -1;
-          margin: -10px;
+        .separator {
+          width: 75%; /* GSAP handles opacity/transform */
         }
       }
 
-      #showFooterBtn {
+      .services-description {
+        position: relative;
+        z-index: 1;
+        font-size: 1.2rem;
+        border-radius: 5px; /* GSAP handles opacity/transform */
+      }
+
+      .services-description::before {
+        content: '';
         position: absolute;
-        bottom: 1rem;
-        left: 1rem;
+        inset: 0;
+        z-index: -1;
+        margin: -10px;
       }
+    }
+
+    #showFooterBtn {
+      position: absolute;
+      bottom: 1rem;
+      left: 1rem;
     }
   }
 }
