@@ -804,6 +804,8 @@ const toContact = (p: Package | null) => {
     height: 100dvh;
 
     .home-container {
+      position: relative;
+      z-index: 2;
       margin-top: 4rem;
       max-width: 700px;
 
