@@ -218,7 +218,7 @@ watch(slide, (newVal) => mainStore.SET_ACTIVE_THEME(newVal));
       <router-view />
 
       <!-- ensure content exceeds viewport so footer starts off-screen -->
-      <div v-if="!isResponsive" class="footer-spacer bg-red" />
+      <div v-if="!isResponsive" class="footer-spacer" />
 
       <!-- "Footer" lives in normal flow so we can scroll to it -->
       <section id="footer" class="bg-dark text-white" aria-label="Site footer">
@@ -333,6 +333,7 @@ aside {
   width: 100%;
   height: 100vh;
   height: 100dvh;
+  height: 100%;
   z-index: 0;
   pointer-events: none;
   overflow: hidden;
