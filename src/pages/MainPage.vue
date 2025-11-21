@@ -7,7 +7,7 @@ import { storeToRefs } from 'pinia';
 import type { TopicName } from '../shared/constants/topicName';
 // import { setSeasonClasses } from '../shared/utils/setSeasonColors';
 // import SimonMenu from '../components/SimonMenu.vue';
-import { scroll } from 'quasar';
+// import { scroll } from 'quasar';
 import gsap from 'gsap';
 import { ViewType } from '../shared/constants/viewType';
 import { useViewport } from '../shared/utils/viewWidth';
