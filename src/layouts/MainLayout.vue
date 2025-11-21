@@ -324,26 +324,30 @@ aside {
 }
 
 .carousel-background {
-  display: flex;
-  flex-direction: column;
   position: fixed;
-  inset: 0; /* top:0; right:0; bottom:0; left:0 */
+  inset: 0;
   width: 100%;
   height: 100%;
   z-index: 0;
   pointer-events: none;
   overflow: hidden;
+  background-color: #000; // important: base layer
 
   .q-carousel {
-    flex: 1 1 auto; /* fine to keep */
+    height: 100%;
+  }
+
+  .q-carousel__slides-container,
+  .q-carousel__slide {
+    height: 100%;
   }
 
   .slide-bg {
     position: absolute;
+    inset: 0;
     width: 100%;
     height: 100%;
-    inset: 0;
-    z-index: 0;
+    background-color: #000; // if image isn't ready, still black
     pointer-events: none;
 
     img {
