@@ -11,7 +11,7 @@ import { scroll } from 'quasar';
 import gsap from 'gsap';
 import { ViewType } from '../shared/constants/viewType';
 import { useViewport } from '../shared/utils/viewWidth';
-import { defineAsyncComponent } from 'vue';
+// import { defineAsyncComponent } from 'vue';
 import {
   mdiChevronUp,
   mdiBookOpenPageVariant,
@@ -27,7 +27,7 @@ import type { Package } from 'src/shared/constants/packages';
 import { scrollToElement } from 'src/shared/utils/scrollToElement';
 import { CacheBinding } from 'src/shared/constants/cacheBinding';
 
-const WeatherBackground = defineAsyncComponent(() => import('../components/WeatherBackground.vue'));
+// const WeatherBackground = defineAsyncComponent(() => import('../components/WeatherBackground.vue'));
 const mainStore = useMainStore();
 const cacheStore = useCacheStore();
 const mobileTopics: Topic[] = [
