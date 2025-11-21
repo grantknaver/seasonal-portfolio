@@ -340,7 +340,7 @@ const toContact = (p: Package | null) => {
 </script>
 
 <template>
-  <q-page class="page-container column">
+  <q-page class="page-container column bg-red">
     <div class="logo">
       <img
         class="q-pt-sm"
