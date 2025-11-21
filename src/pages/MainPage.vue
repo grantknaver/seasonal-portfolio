@@ -343,9 +343,9 @@ const toContact = (p: Package | null) => {
 
 <template>
   <q-page class="page-container column">
-    <div v-if="!isResponsive" class="weather-layer">
+    <!-- <div v-if="!isResponsive" class="weather-layer">
       <WeatherBackground />
-    </div>
+    </div> -->
     <div class="logo">
       <img
         class="q-pt-sm"
