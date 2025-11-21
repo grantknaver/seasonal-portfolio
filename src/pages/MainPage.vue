@@ -373,7 +373,7 @@ const toContact = (p: Package | null) => {
         >
           Grant Knaver
         </p>
-        <!-- <p class="title home-content text-body-1 text-secondary q-mb-none black-text-glow">
+        <p class="title home-content text-body-1 text-secondary q-mb-none black-text-glow">
           <span
             class="frontend text-white"
             :class="
@@ -471,7 +471,7 @@ const toContact = (p: Package | null) => {
         >
           I design and build interactive, high-performance web experiences that blend motion, data,
           and intelligence.
-        </p> -->
+        </p>
       </div>
       <div class="full-width">
         <q-btn @click="toContact(null)" class="full-width" color="accent" size="lg" glossy>
