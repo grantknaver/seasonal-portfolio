@@ -776,10 +776,10 @@ const toContact = (p: Package | null) => {
   }
 
   .sub-container {
+    height: 100%;
     @media (min-width: tokens.$breakpoint-lg) {
       position: relative;
       padding: initial;
-      flex: 1 1 0%;
     }
 
     p:nth-of-type(1) {
@@ -791,7 +791,7 @@ const toContact = (p: Package | null) => {
     /* ---------- Mobile / NotDesktop ---------- */
 
     .responsive-view {
-      height: auto;
+      height: 100%;
       max-width: 600px;
 
       @media (min-width: tokens.$breakpoint-md) {
@@ -821,8 +821,8 @@ const toContact = (p: Package | null) => {
       display: flex;
       justify-content: center;
       align-items: center;
-      flex: 1 0 0%;
       position: relative;
+      height: 100dvh;
 
       .home-container {
         margin-top: 4rem;
