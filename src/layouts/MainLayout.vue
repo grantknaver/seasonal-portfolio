@@ -327,7 +327,8 @@ aside {
   position: fixed;
   inset: 0;
   width: 100%;
-  height: 100%;
+  height: 100vh;
+  height: 100dvh;
   z-index: 0;
   pointer-events: none;
   overflow: hidden;
@@ -337,17 +338,12 @@ aside {
     height: 100%;
   }
 
-  .q-carousel__slides-container,
-  .q-carousel__slide {
-    height: 100%;
-  }
-
   .slide-bg {
     position: absolute;
     inset: 0;
     width: 100%;
     height: 100%;
-    background-color: #000; // if image isn't ready, still black
+    background-color: #000;
     pointer-events: none;
 
     img {
