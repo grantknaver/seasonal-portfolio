@@ -91,8 +91,7 @@ const activeComponent = computed(() => {
 const WeatherBackground = defineAsyncComponent(() => import('../components/WeatherBackground.vue'));
 
 function setAppVh() {
-  const headerHeight = document.getElementById('mobile-header')?.offsetHeight;
-  const vh = window.innerHeight * 0.01 - (headerHeight ? headerHeight : 0);
+  const vh = window.innerHeight * 0.01;
 
   document.documentElement.style.setProperty('--app-vh', `${vh}px`);
 }
@@ -100,7 +99,6 @@ function setAppVh() {
 onMounted(() => {
   setAppVh();
   showCarousel.value = true;
-  window.addEventListener('resize', setAppVh);
   window.addEventListener('orientationchange', setAppVh);
   window.addEventListener('resize', updateWidths);
 });
