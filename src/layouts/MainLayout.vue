@@ -90,8 +90,16 @@ const activeComponent = computed(() => {
 });
 const WeatherBackground = defineAsyncComponent(() => import('../components/WeatherBackground.vue'));
 
+function setAppVh() {
+  const vh = window.innerHeight * 0.01;
+  document.documentElement.style.setProperty('--app-vh', `${vh}px`);
+}
+
 onMounted(() => {
+  setAppVh();
   showCarousel.value = true;
+  window.addEventListener('resize', setAppVh);
+  window.addEventListener('orientationchange', setAppVh);
   window.addEventListener('resize', updateWidths);
 });
 onBeforeUnmount(() => window.removeEventListener('resize', updateWidths));
@@ -331,9 +339,8 @@ aside {
   position: fixed;
   inset: 0;
   width: 100%;
-  height: 100vh;
-  height: 100dvh;
-  height: 100%;
+  height: calc(var(--app-vh, 1vh) * 100);
+  min-height: 100vh; // fallback
   z-index: 0;
   pointer-events: none;
   overflow: hidden;
@@ -348,14 +355,15 @@ aside {
     inset: 0;
     width: 100%;
     height: 100%;
-    background-color: #000;
     pointer-events: none;
+    background-color: #000; // in case image is still sizing/loading
 
     img {
       width: 100%;
       height: 100%;
       object-fit: cover;
       display: block;
+      background-color: #000; // in case image is still sizing/loading
     }
   }
 }
