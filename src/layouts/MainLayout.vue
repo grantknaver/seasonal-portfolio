@@ -91,7 +91,9 @@ const activeComponent = computed(() => {
 const WeatherBackground = defineAsyncComponent(() => import('../components/WeatherBackground.vue'));
 
 function setAppVh() {
-  const vh = window.innerHeight * 0.01;
+  const headerHeight = document.getElementById('mobile-header')?.offsetHeight;
+  const vh = window.innerHeight * 0.01 - (headerHeight ? headerHeight : 0);
+
   document.documentElement.style.setProperty('--app-vh', `${vh}px`);
 }
 
