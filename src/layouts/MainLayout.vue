@@ -92,7 +92,6 @@ const WeatherBackground = defineAsyncComponent(() => import('../components/Weath
 
 function setAppVh() {
   const vh = window.innerHeight * 0.01;
-
   document.documentElement.style.setProperty('--app-vh', `${vh}px`);
 }
 
