@@ -742,6 +742,10 @@ const toContact = (p: Package | null) => {
   min-height: 100vh;
   min-height: 100dvh; // safe viewport if supported
 
+  @media (min-width: tokens.$breakpoint-md) {
+    align-items: center;
+  }
+
   .logo {
     display: none;
     position: absolute;
