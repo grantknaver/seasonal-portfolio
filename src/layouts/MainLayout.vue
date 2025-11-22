@@ -259,7 +259,7 @@ watch(slide, (newVal) => mainStore.SET_ACTIVE_THEME(newVal));
               />
             </a>
 
-            <a href="www.linkedin.com/in/grant-knaver" target="_blank">
+            <a href="https://www.linkedin.com/in/grant-knaver/" target="_blank">
               <q-btn
                 flat
                 round
