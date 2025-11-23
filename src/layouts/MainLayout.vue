@@ -45,6 +45,7 @@ import winter from 'src/assets/snowy-winter-landscape.jpg?w=768;1280;1600&format
 import spring from 'src/assets/beautiful-forest-spring-season.jpg?w=768;1280;1600&format=avif;webp;jpeg&quality=40&withoutEnlargement=true&as=picture';
 import summer from 'src/assets/beach.jpg?w=768;1280;1600&format=avif;webp;jpeg&quality=40&withoutEnlargement=true&as=picture';
 import { type Slide } from 'src/shared/types/slide';
+import { scrollToElement } from 'src/shared/utils/scrollToElement';
 const slides = ref<Slide[]>([
   {
     id: uuidv4(),
@@ -207,13 +208,17 @@ watch(slide, (newVal) => mainStore.SET_ACTIVE_THEME(newVal));
               clickable
               @click="
                 () => {
-                  mainStore.SET_ACTIVE_TOPIC(topic.name);
+                  if (activeTopic === topic.name) {
+                    scrollToElement(topic.name);
+                  } else {
+                    mainStore.SET_ACTIVE_TOPIC(topic.name);
+                  }
                   mobileMenu = false;
                 }
               "
               :class="{ activeTopic: topic.name === activeTopic }"
             >
-              <q-item-section>{{ topic.label }}</q-item-section>
+              <q-item-section>{{ topic.label }} -- {{ activeTopic }}</q-item-section>
             </q-item>
           </q-list>
         </q-drawer>

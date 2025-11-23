@@ -143,9 +143,7 @@ watch(
 watch(
   activeTopic,
   async (newTopic: TopicName | null) => {
-    if (newTopic) {
-      expandedPanel.value = newTopic;
-    }
+    expandedPanel.value = newTopic;
     await nextTick();
     const el = homeContainerRef.value;
     if (!el) return;
@@ -165,7 +163,7 @@ watch(
       overwrite: 'auto',
     });
   },
-  { immediate: true },
+  { immediate: true, deep: true },
 );
 
 const waitForLayout = async (el: HTMLElement | null, frames = 8): Promise<boolean> => {
@@ -505,7 +503,7 @@ const toContact = (p: Package | null) => {
             @after-show="
               () => {
                 scrollToElement(topic.name);
-                expandedPanel = topic.name;
+                // expandedPanel = topic.name;
                 mainStore.SET_ACTIVE_TOPIC(topic.name);
               }
             "
