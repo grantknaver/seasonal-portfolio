@@ -340,7 +340,7 @@ const toContact = (p: Package | null) => {
 </script>
 
 <template>
-  <q-page class="page-container column">
+  <q-page class="page-container column items-center">
     <div class="logo">
       <img
         class="q-pt-sm"
@@ -741,10 +741,6 @@ const toContact = (p: Package | null) => {
   position: relative;
   min-height: 100vh;
   min-height: 100dvh; // safe viewport if supported
-
-  @media (min-width: tokens.$breakpoint-md) {
-    align-items: center;
-  }
 
   .logo {
     display: none;
