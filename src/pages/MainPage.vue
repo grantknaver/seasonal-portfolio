@@ -356,7 +356,7 @@ const toContact = (p: Package | null) => {
         class="home-container relative-position full-width column items-center text-center text-primary-font q-mb-sm q-pa-lg font-primary"
       >
         <p
-          class="name home-content q-mb-none text-white"
+          class="name home-content q-mt-md q-mb-md text-white"
           :class="
             setSeasonClasses(
               {
@@ -782,7 +782,7 @@ const toContact = (p: Package | null) => {
       padding: 1.5rem;
 
       .name {
-        font-size: 1.5rem;
+        font-size: 2rem;
       }
 
       .services-description {

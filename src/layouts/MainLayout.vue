@@ -218,7 +218,7 @@ watch(slide, (newVal) => mainStore.SET_ACTIVE_THEME(newVal));
               "
               :class="{ activeTopic: topic.name === activeTopic }"
             >
-              <q-item-section>{{ topic.label }} -- {{ activeTopic }}</q-item-section>
+              <q-item-section>{{ topic.label }}</q-item-section>
             </q-item>
           </q-list>
         </q-drawer>
