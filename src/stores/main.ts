@@ -188,14 +188,10 @@ export const useMainStore = defineStore('main', () => {
   };
   const VERIFY_IS_HUMAN = async () => {
     const url = new URL(`${import.meta.env.VITE_BASE_URL}/api/auth/verify-status`).toString();
-    const controller = new AbortController();
-    const t = setTimeout(() => controller.abort(), 6000);
-
     try {
       const res = await fetchRetry(url, {
         credentials: 'include',
         headers: { Accept: 'application/json' },
-        signal: controller.signal,
       });
       const data = await res.json();
       isHuman.value = data.isHuman;
@@ -203,8 +199,6 @@ export const useMainStore = defineStore('main', () => {
       console.error('[VERIFY_IS_HUMAN] error:', err);
       $q.notify({ type: 'negative', message: `500 - Server Error` });
       return;
-    } finally {
-      clearTimeout(t);
     }
   };
   const HAS_SCROLLBAR = (status: boolean) => {
