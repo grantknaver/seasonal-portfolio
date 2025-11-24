@@ -192,7 +192,7 @@ export const useMainStore = defineStore('main', () => {
     const t = setTimeout(() => controller.abort(), 6000);
 
     try {
-      const res = await fetch(url, {
+      const res = await fetchRetry(url, {
         credentials: 'include',
         headers: { Accept: 'application/json' },
         signal: controller.signal,
