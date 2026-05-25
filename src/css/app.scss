@@ -2,6 +2,25 @@
 @use './tokens' as tokens;
 @use './typography';
 
+/* only the variables you truly need at startup */
+:root {
+  @include mix.export-css-vars(
+    (
+      'q-primary': map-get(tokens.$fall-theme, primary),
+      'q-secondary': map-get(tokens.$fall-theme, secondary),
+      'q-accent': map-get(tokens.$fall-theme, accent),
+      'q-dark': map-get(tokens.$fall-theme, dark),
+    )
+  );
+  @include mix.export-css-vars(
+    (
+      'breakpoint-sm': tokens.$breakpoint-sm,
+      'breakpoint-md': tokens.$breakpoint-md,
+      'breakpoint-lg': tokens.$breakpoint-lg,
+    )
+  );
+}
+
 html,
 body,
 #q-app {
@@ -60,21 +79,26 @@ body::-webkit-scrollbar {
   height: 100%;
 }
 
-/* only the variables you truly need at startup */
-:root {
-  @include mix.export-css-vars(
-    (
-      'q-primary': map-get(tokens.$fall-theme, primary),
-      'q-secondary': map-get(tokens.$fall-theme, secondary),
-      'q-accent': map-get(tokens.$fall-theme, accent),
-      'q-dark': map-get(tokens.$fall-theme, dark),
-    )
-  );
-  @include mix.export-css-vars(
-    (
-      'breakpoint-sm': tokens.$breakpoint-sm,
-      'breakpoint-md': tokens.$breakpoint-md,
-      'breakpoint-lg': tokens.$breakpoint-lg,
-    )
-  );
+.u-grid {
+  display: grid;
+}
+
+.u-grid-cols-2 {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.u-gap-0 {
+  gap: 0;
+}
+
+.u-gap-xs {
+  gap: 4px;
+}
+
+.u-gap-sm {
+  gap: 8px;
+}
+
+.u-gap-md {
+  gap: 16px;
 }

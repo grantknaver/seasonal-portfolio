@@ -377,18 +377,10 @@ const toContact = () => {
         :class="
           setSeasonClasses(
             {
-              Fall: isResponsive
-                ? 'text-white bg-dark q-pa-md'
-                : 'text-secondary black-text-outline',
-              Winter: isResponsive
-                ? 'text-white bg-dark q-pa-md'
-                : 'text-secondary black-text-outline',
-              Spring: isResponsive
-                ? 'text-white bg-dark q-pa-md'
-                : 'text-secondary black-text-outline',
-              Summer: isResponsive
-                ? 'text-white bg-dark q-pa-md'
-                : 'text-secondary black-text-outline',
+              Fall: isResponsive ? 'text-white bg-dark q-pa-md' : 'text-secondary ',
+              Winter: isResponsive ? 'text-white bg-dark q-pa-md' : 'text-secondary ',
+              Spring: isResponsive ? 'text-white bg-dark q-pa-md' : 'text-secondary ',
+              Summer: isResponsive ? 'text-white bg-dark q-pa-md' : 'text-secondary ',
             },
             activeTheme,
           )
@@ -536,10 +528,10 @@ const toContact = () => {
         :class="
           setSeasonClasses(
             {
-              Fall: isResponsive ? 'bg-dark text-secondary' : 'text-secondary black-text-outline',
-              Winter: isResponsive ? 'bg-dark text-secondary' : 'text-secondary black-text-outline',
-              Spring: isResponsive ? 'bg-dark text-secondary' : 'text-secondary black-text-outline',
-              Summer: isResponsive ? 'bg-dark text-secondary' : 'text-secondary black-text-outline',
+              Fall: isResponsive ? 'bg-dark text-secondary' : 'text-secondary ',
+              Winter: isResponsive ? 'bg-dark text-secondary' : 'text-secondary ',
+              Spring: isResponsive ? 'bg-dark text-secondary' : 'text-secondary ',
+              Summer: isResponsive ? 'bg-dark text-secondary' : 'text-secondary ',
             },
             activeTheme,
           )

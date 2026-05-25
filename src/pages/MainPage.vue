@@ -330,10 +330,10 @@ const scrollToFooter = () => {
   }
 };
 
-const toContact = (p: Package | null) => {
+const toPackages = (p: Package | null) => {
   if (p) mainStore.SET_PACKAGE_OF_INTEREST(p);
-  mainStore.SET_ACTIVE_TOPIC(TopicName.Contact);
-  expandedPanel.value = TopicName.Contact;
+  mainStore.SET_ACTIVE_TOPIC(TopicName.Packages);
+  expandedPanel.value = TopicName.Packages;
 };
 </script>
 
@@ -355,100 +355,8 @@ const toContact = (p: Package | null) => {
       <div
         class="home-container relative-position full-width column items-center text-center text-primary-font q-mb-sm q-pa-lg font-primary"
       >
-        <p
-          class="name home-content q-mt-md q-mb-md text-white"
-          :class="
-            setSeasonClasses(
-              {
-                Fall: 'dark-text-outline',
-                Winter: 'dark-text-outline',
-                Spring: 'black-text-outline',
-                Summer: 'black-text-outline',
-              },
-              activeTheme,
-            )
-          "
-        >
-          Grant Knaver
-        </p>
-        <p class="title home-content text-body-1 text-secondary q-mb-none black-text-glow">
-          <span
-            class="frontend text-white"
-            :class="
-              setSeasonClasses(
-                {
-                  Fall: 'dark-text-outline',
-                  Winter: 'dark-text-outline',
-                  Spring: 'dark-text-outline',
-                  Summer: 'black-text-outline',
-                },
-                activeTheme,
-              )
-            "
-            >Frontend Developer</span
-          >
-          <span
-            class="text-white"
-            :class="
-              setSeasonClasses(
-                {
-                  Fall: 'dark-text-outline',
-                  Winter: 'dark-text-outline',
-                  Spring: 'dark-text-outline',
-                  Summer: 'black-text-outline',
-                },
-                activeTheme,
-              )
-            "
-          >
-            •
-          </span>
-          <span
-            class="gsap text-secondary"
-            :class="
-              setSeasonClasses(
-                {
-                  Fall: 'dark-text-outline',
-                  Winter: 'dark-text-outline',
-                  Spring: 'black-text-outline',
-                  Summer: 'black-text-outline',
-                },
-                activeTheme,
-              )
-            "
-            >GSAP</span
-          >
-          <span
-            class="text-white"
-            :class="
-              setSeasonClasses(
-                {
-                  Fall: 'dark-text-outline',
-                  Winter: 'dark-text-outline',
-                  Spring: 'black-text-outline',
-                  Summer: 'black-text-outline',
-                },
-                activeTheme,
-              )
-            "
-          >
-            •
-          </span>
-          <span
-            class="text-secondary"
-            :class="
-              setSeasonClasses(
-                {
-                  Fall: 'dark-text-outline',
-                  Winter: 'dark-text-outline',
-                  Spring: 'black-text-outline',
-                  Summer: 'black-text-outline',
-                },
-                activeTheme,
-              )
-            "
-            >AI Integration</span
-          >
+        <p class="title home-content text-body-1 q-mb-none black-text-glow">
+          Living, breathing interfaces that build trust in AI systems.
         </p>
         <div ref="sepRef" class="home-content column full-width q-mt-md q-mb-md">
           <q-separator class="font-bold" color="primary"></q-separator>
@@ -458,21 +366,20 @@ const toContact = (p: Package | null) => {
           :class="
             setSeasonClasses(
               {
-                Fall: 'dark-text-outline',
-                Winter: 'dark-text-outline',
-                Spring: 'black-text-outline',
-                Summer: 'black-text-outline',
+                Fall: '',
+                Winter: '',
+                Spring: '',
+                Summer: '',
               },
               activeTheme,
             )
           "
         >
-          I design and build interactive, high-performance web experiences that blend motion, data,
-          and intelligence.
+          Motion and feedback that make complex AI feel clear, reliable, and alive.
         </p>
       </div>
       <div class="full-width">
-        <q-btn @click="toContact(null)" class="full-width" color="accent" size="lg" glossy>
+        <q-btn @click="toPackages(null)" class="full-width" color="accent" size="lg" glossy>
           <span class="text-body-2">Hire Me for Your Next AI UI </span>
         </q-btn>
         <q-btn
@@ -528,14 +435,14 @@ const toContact = (p: Package | null) => {
                   <component
                     v-if="topic.name === TopicName.Packages"
                     :is="activeComponent"
-                    @requestConsultation="toContact"
+                    @requestConsultation="toPackages"
                   />
                   <component
                     v-else-if="
                       topic.name === TopicName.About || topic.name === TopicName.CaseStudies
                     "
                     :is="activeComponent"
-                    @toContact="toContact"
+                    @toPackages="toPackages"
                   />
                   <component v-else-if="topic.name === TopicName.Contact" :is="activeComponent" />
                 </template>
@@ -556,24 +463,6 @@ const toContact = (p: Package | null) => {
       class="desktop-view column justify-end items-center full-width"
     >
       <div ref="homeContainerRef" class="home-container q-pl-xl q-pr-xl column">
-        <p
-          v-if="!activeTopic"
-          ref="nameRef"
-          class="name q-mb-lg text-body-1 text-left text-white"
-          :class="
-            setSeasonClasses(
-              {
-                Fall: 'secondary-font fall-secondary dark-text-outline',
-                Winter: 'secondary-font winter-secondary dark-text-outline',
-                Spring: 'secondary-font spring-secondary black-text-outline',
-                Summer: 'secondary-font summer-secondary black-text-outline',
-              },
-              activeTheme,
-            )
-          "
-        >
-          Grant Knaver
-        </p>
         <div class="row no-wrap">
           <div ref="simonRef" class="simon"><SimonMenu></SimonMenu></div>
           <div
@@ -581,106 +470,16 @@ const toContact = (p: Package | null) => {
             class="title-container column justify-center items-center q-pa-md"
           >
             <div class="clip-container relative-position overflow-hidden">
-              <p
-                ref="titleRef"
-                class="title full-width text-body-2 text-center q-mb-lg q-pl-lg text-secondary"
-                :class="
-                  setSeasonClasses(
-                    {
-                      Fall: 'secondary-font fall-secondary',
-                      Winter: 'secondary-font winter-secondary',
-                      Spring: 'secondary-font spring-secondary',
-                      Summer: 'secondary-font summer-secondary',
-                    },
-                    activeTheme,
-                  )
-                "
-              >
-                <span
-                  class="frontend text-white"
-                  :class="
-                    setSeasonClasses(
-                      {
-                        Fall: 'dark-text-outline',
-                        Winter: ' dark-text-outline',
-                        Spring: 'dark-text-outline',
-                        Summer: 'black-text-outline',
-                      },
-                      activeTheme,
-                    )
-                  "
-                  >Frontend Developer</span
-                >
-                <span
-                  class="text-white"
-                  :class="
-                    setSeasonClasses(
-                      {
-                        Fall: 'dark-text-outline',
-                        Winter: 'dark-text-outline',
-                        Spring: 'dark-text-outline',
-                        Summer: 'black-text-outline',
-                      },
-                      activeTheme,
-                    )
-                  "
-                >
-                  •
-                </span>
-                <span
-                  class="text-secondary"
-                  :class="
-                    setSeasonClasses(
-                      {
-                        Fall: 'fall-secondary dark-text-outline',
-                        Winter: 'winter-secondary dark-text-outline',
-                        Spring: 'spring-secondary black-text-outline',
-                        Summer: 'summer-secondary black-text-outline',
-                      },
-                      activeTheme,
-                    )
-                  "
-                  >GSAP</span
-                >
-                <span
-                  class="text-white"
-                  :class="
-                    setSeasonClasses(
-                      {
-                        Fall: 'fall-secondary dark-text-outline',
-                        Winter: 'winter-secondary dark-text-outline',
-                        Spring: 'spring-secondary black-text-outline',
-                        Summer: 'summer-secondary black-text-outline',
-                      },
-                      activeTheme,
-                    )
-                  "
-                >
-                  •
-                </span>
-                <span
-                  class="text-secondary"
-                  :class="
-                    setSeasonClasses(
-                      {
-                        Fall: 'fall-secondary dark-text-outline',
-                        Winter: 'winter-secondary dark-text-outline',
-                        Spring: 'spring-secondary black-text-outline',
-                        Summer: 'summer-secondary black-text-outline',
-                      },
-                      activeTheme,
-                    )
-                  "
-                  >AI Integration</span
-                >
+              <p ref="titleRef" class="title full-width text-body-2 q-mb-lg q-pl-lg">
+                Living, breathing interfaces that build trust in AI systems.
               </p>
             </div>
             <div ref="sepRef" class="separator full-width">
               <q-separator color="primary"></q-separator>
             </div>
-            <div ref="ctaBtnRef" class="column">
-              <q-btn @click="toContact(null)" class="q-mt-md" color="accent" size="lg" glossy>
-                <span class="text-body-2">Hire Me for Your Next AI UI </span>
+            <div class="u-grid u-grid-cols-2 u-gap-sm" ref="ctaBtnRef">
+              <q-btn @click="toPackages(null)" class="q-mt-md" color="accent" size="lg" glossy>
+                <span class="text-body-2">Packages</span>
               </q-btn>
               <q-btn
                 class="q-mt-md"
@@ -688,10 +487,9 @@ const toContact = (p: Package | null) => {
                 color="secondary"
                 size="lg"
                 glossy
-                href="https://www.loom.com/share/c78ed9a194174eeb8bd34989a4fb8ac9"
                 target="_blank"
               >
-                <span class="text-body-2">Watch the 90-Second Demo </span>
+                <span class="text-body-2">Proof</span>
               </q-btn>
             </div>
           </div>
@@ -704,19 +502,16 @@ const toContact = (p: Package | null) => {
           :class="
             setSeasonClasses(
               {
-                Fall: 'primary-font dark-text-outline',
-                Winter: 'primary-font dark-text-outline',
-                Spring: 'primary-font dark-text-outline',
-                Summer: 'primary-font text-white black-text-outline',
+                Fall: 'primary-font ',
+                Winter: 'primary-font ',
+                Spring: 'primary-font ',
+                Summer: 'primary-font text-white ',
               },
               activeTheme,
             )
           "
         >
-          <i
-            >I design and build interactive, high-performance web experiences that blend motion,
-            data, and intelligence.</i
-          >
+          <i>Motion and feedback that make complex AI feel clear, reliable, and alive.</i>
         </div>
       </div>
       <q-btn
@@ -781,10 +576,6 @@ const toContact = (p: Package | null) => {
       box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
       padding: 1.5rem;
 
-      .name {
-        font-size: 2rem;
-      }
-
       .services-description {
         font-size: 1.3rem;
         line-height: 2rem;
@@ -806,11 +597,6 @@ const toContact = (p: Package | null) => {
       z-index: 2;
       margin-top: 4rem;
       max-width: 700px;
-
-      /* NOTE: No opacity/transform here; GSAP controls them */
-      .name {
-        font-size: 1.8rem;
-      }
 
       .simon {
         width: 40%;

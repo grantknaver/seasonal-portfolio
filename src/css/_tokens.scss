@@ -18,45 +18,61 @@ $cursive-stack: cursive;
 $secondary-font: 'Avenir Next', 'Helvetica Neue', Arial, sans-serif;
 $primary-font: 'Helvetica Neue', Helvetica, Arial, sans-serif;
 
+$premium-base: (
+  ink: #06111f,
+  ink-soft: #0b1f2e,
+  panel: rgba(6, 17, 31, 0.74),
+  panel-strong: rgba(6, 17, 31, 0.88),
+  panel-soft: rgba(255, 255, 255, 0.08),
+  border: rgba(255, 255, 255, 0.16),
+  border-strong: rgba(255, 255, 255, 0.28),
+  text: #f8fafc,
+  text-muted: rgba(248, 250, 252, 0.74),
+  text-soft: rgba(248, 250, 252, 0.56),
+  ivory: #f6efe3,
+  champagne: #d8bd7a,
+
+  cta: #075e66,
+  cta-hover: #087985,
+  cta-text: #ffffff,
+);
+
 // ----------------------------
 // Seasonal Color Themes
 // ----------------------------
+
 $fall-theme: (
   primary: #f7eddc,
-  // cream
   secondary: #eac08c,
-  // squash
-  accent: #8d3a1e,
-  // rust (AA/AAA on light)
-  dark: #3b2718, // warm charcoal (AAA on light)
+  accent: #d98245,
+  accent-deep: #8d3a1e,
+  accent-soft: rgba(217, 130, 69, 0.18),
+  dark: #3b2718,
 );
 
 $winter-theme: (
   primary: #e3f2fd,
-  // ice
   secondary: #bbdefb,
-  // pale sky
-  accent: #0d47a1,
-  // deep cold blue (AAA on white)
-  dark: #0b1f3b, // navy-charcoal (AAA on light)
+  accent: #8ab4f8,
+  accent-deep: #0d47a1,
+  accent-soft: rgba(138, 180, 248, 0.18),
+  dark: #0b1f3b,
 );
 
 $spring-theme: (
   primary: #e8f5e9,
-  // mint
   secondary: #c8e6c9,
-  // soft leaf
-  accent: #00796b,
-  // leafy teal (AA on white; AAA on pastels)
-  dark: #233129, // greenish charcoal (AAA on light)
+  accent: #79d7b0,
+  accent-deep: #00796b,
+  accent-soft: rgba(121, 215, 176, 0.18),
+  dark: #233129,
 );
 
 $summer-theme: (
-  primary: #fff9c4,
-  // sand 1 (bg only)
-  secondary: #ffe082,
-  // sand 2 (cards/stripes)
-  accent: #006064,
-  // ocean teal (AAA on white)
-  dark: #0d3b66, // nautical navy (AAA on white)
+  primary: #fff6cf,
+  secondary: #ffe08a,
+  accent: #2ec4d6,
+  accent-deep: #006064,
+  accent-soft: rgba(46, 196, 214, 0.18),
+  dark: #0d3b66,
 );

@@ -73,10 +73,10 @@ const cardBackgrounds = {
               :class="
                 setSeasonClasses(
                   {
-                    Fall: 'text-secondary black-text-outline',
-                    Winter: 'text-secondary black-text-outline',
-                    Spring: 'text-secondary black-text-outline',
-                    Summer: 'text-secondary black-text-outline',
+                    Fall: 'text-secondary ',
+                    Winter: 'text-secondary ',
+                    Spring: 'text-secondary ',
+                    Summer: 'text-secondary ',
                   },
                   activeTheme,
                 )
@@ -222,10 +222,10 @@ const cardBackgrounds = {
           :class="
             setSeasonClasses(
               {
-                Fall: 'text-secondary black-text-outline',
-                Winter: 'text-secondary black-text-outline',
-                Spring: 'text-secondary black-text-outline',
-                Summer: 'text-secondary black-text-outline',
+                Fall: 'text-secondary ',
+                Winter: 'text-secondary ',
+                Spring: 'text-secondary ',
+                Summer: 'text-secondary ',
               },
               activeTheme,
             )
