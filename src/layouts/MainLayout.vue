@@ -11,6 +11,7 @@ import { useViewport } from '../shared/utils/viewWidth';
 import { mdiMenu, mdiHeart, mdiGithub, mdiLinkedin } from '@quasar/extras/mdi-v7';
 import { useCacheStore } from 'src/stores/component-cache';
 import { CacheBinding } from 'src/shared/constants/cacheBinding';
+import { syncThemeGlobals } from '../shared/utils/theme';
 
 const cacheStore = useCacheStore();
 
@@ -101,6 +102,7 @@ onMounted(() => {
   showCarousel.value = true;
   window.addEventListener('orientationchange', setAppVh);
   window.addEventListener('resize', updateWidths);
+  syncThemeGlobals(Theme.Fall);
 });
 onBeforeUnmount(() => window.removeEventListener('resize', updateWidths));
 

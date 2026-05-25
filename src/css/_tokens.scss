@@ -18,24 +18,26 @@ $cursive-stack: cursive;
 $secondary-font: 'Avenir Next', 'Helvetica Neue', Arial, sans-serif;
 $primary-font: 'Helvetica Neue', Helvetica, Arial, sans-serif;
 
-$premium-base: (
-  ink: #06111f,
-  ink-soft: #0b1f2e,
-  panel: rgba(6, 17, 31, 0.74),
-  panel-strong: rgba(6, 17, 31, 0.88),
-  panel-soft: rgba(255, 255, 255, 0.08),
-  border: rgba(255, 255, 255, 0.16),
-  border-strong: rgba(255, 255, 255, 0.28),
-  text: #f8fafc,
-  text-muted: rgba(248, 250, 252, 0.74),
-  text-soft: rgba(248, 250, 252, 0.56),
-  ivory: #f6efe3,
-  champagne: #d8bd7a,
+// ----------------------------
+// Primary Theme
+// ----------------------------
 
-  cta: #075e66,
-  cta-hover: #087985,
-  cta-text: #ffffff,
-);
+$ink: #06111f;
+$ink-soft: #0b1f2e;
+$panel: rgba(6, 17, 31, 0.74);
+$panel-strong: rgba(6, 17, 31, 0.88);
+$panel-soft: rgba(255, 255, 255, 0.08);
+$border: rgba(255, 255, 255, 0.16);
+$border-strong: rgba(255, 255, 255, 0.28);
+$text: #f8fafc;
+$text-muted: rgba(248, 250, 252, 0.74);
+$text-soft: rgba(248, 250, 252, 0.56);
+$ivory: #f6efe3;
+$champagne: #d8bd7a;
+
+$cta: #075e66;
+$cta-hover: #087985;
+$cta-text: #ffffff;
 
 // ----------------------------
 // Seasonal Color Themes

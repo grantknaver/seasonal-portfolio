@@ -5,7 +5,6 @@ import { type Topic } from '../shared/types/topic';
 import { v4 as uuidv4 } from 'uuid';
 import { storeToRefs } from 'pinia';
 import { TopicName } from '../shared/constants/topicName';
-import { setSeasonClasses } from '../shared/utils/setSeasonColors';
 import SimonMenu from '../components/SimonMenu.vue';
 import { scroll } from 'quasar';
 import gsap from 'gsap';
@@ -19,7 +18,6 @@ import {
   mdiEmailBox,
 } from '@quasar/extras/mdi-v7';
 import { mdiChevronDown } from '@quasar/extras/mdi-v7';
-
 import { CacheEntry } from 'src/shared/constants/cacheEntry';
 import { useCacheStore } from 'src/stores/component-cache';
 import type { Package } from 'src/shared/constants/packages';
@@ -59,11 +57,9 @@ const mobileTopics: Topic[] = [
     cachedName: CacheEntry.ContactSection,
   },
 ];
-
 const expandedPanel = ref<TopicName | null>();
 const { getScrollTarget, setVerticalScrollPosition } = scroll;
-
-const { activeTheme, activeTopic } = storeToRefs(mainStore);
+const { activeTopic } = storeToRefs(mainStore);
 const root = ref<HTMLElement | null>(null);
 const showFooter = ref<boolean>(false);
 const io = ref<IntersectionObserver | null>(null);
@@ -72,7 +68,7 @@ const isResponsive = computed(() => width.value < lgBreakpoint);
 const dispose = ref<() => void>(() => {});
 const nameRef = ref<HTMLElement | null>(null);
 const simonRef = ref<HTMLElement | null>(null);
-const titleRef = ref<HTMLElement | null>(null);
+const headlineRef = ref<HTMLElement | null>(null);
 const sepRef = ref<HTMLElement | null>(null);
 const servRef = ref<HTMLElement | null>(null);
 const ctaBtnRef = ref<HTMLElement | null>(null);
@@ -182,14 +178,14 @@ const waitForLayout = async (el: HTMLElement | null, frames = 8): Promise<boolea
 const buildAnimations = (mode: ViewType) => {
   const el = root.value;
   if (!el) return () => {};
-  // Responsive: all elements with .home-content
-  const homeContentEls = Array.from(document.querySelectorAll<HTMLElement>('.home-content'));
+  // Responsive: all elements with .mobile-content
+  const homeContentEls = Array.from(document.querySelectorAll<HTMLElement>('.mobile-content'));
 
   // Desktop: only non-null refs
   const desktopEls = [
     nameRef.value,
     simonRef.value,
-    titleRef.value,
+    headlineRef.value,
     sepRef.value,
     servRef.value,
     ctaBtnRef.value,
@@ -255,7 +251,7 @@ const buildAnimations = (mode: ViewType) => {
     );
 
     gsap.fromTo(
-      titleRef.value,
+      headlineRef.value,
       { y: 150, autoAlpha: 0 },
       {
         keyframes: [{ y: 0, autoAlpha: 1 }],
@@ -355,25 +351,15 @@ const toPackages = (p: Package | null) => {
       <div
         class="home-container relative-position full-width column items-center text-center text-primary-font q-mb-sm q-pa-lg font-primary"
       >
-        <p class="title home-content text-body-1 q-mb-none black-text-glow">
+        <p class="hero-kicker mobile-content">Motion UI for AI systems</p>
+        <h1 class="mobile-content text-body-1 q-mb-none black-text-glow">
           Living, breathing interfaces that build trust in AI systems.
-        </p>
-        <div ref="sepRef" class="home-content column full-width q-mt-md q-mb-md">
+        </h1>
+        <div ref="sepRef" class="mobile-content column full-width q-mt-md q-mb-md">
           <q-separator class="font-bold" color="primary"></q-separator>
         </div>
         <p
-          class="services-description home-content text-white font-bold q-mt-sm q-mb-none text-center"
-          :class="
-            setSeasonClasses(
-              {
-                Fall: '',
-                Winter: '',
-                Spring: '',
-                Summer: '',
-              },
-              activeTheme,
-            )
-          "
+          class="hero-subheadline mobile-content text-white font-bold q-mt-sm q-mb-none text-center"
         >
           Motion and feedback that make complex AI feel clear, reliable, and alive.
         </p>
@@ -462,17 +448,18 @@ const toPackages = (p: Package | null) => {
       key="desktop"
       class="desktop-view column justify-end items-center full-width"
     >
-      <div ref="homeContainerRef" class="home-container q-pl-xl q-pr-xl column">
+      <div ref="homeContainerRef" class="home-container q-pa-xl column">
         <div class="row no-wrap">
           <div ref="simonRef" class="simon"><SimonMenu></SimonMenu></div>
           <div
             v-if="!activeTopic"
-            class="title-container column justify-center items-center q-pa-md"
+            class="copy-container column justify-center items-center q-pa-md"
           >
             <div class="clip-container relative-position overflow-hidden">
-              <p ref="titleRef" class="title full-width text-body-2 q-mb-lg q-pl-lg">
+              <p class="hero-kicker">Motion UI for AI systems</p>
+              <h1 ref="headlineRef" class="full-width text-body-2 q-mb-lg q-pl-lg">
                 Living, breathing interfaces that build trust in AI systems.
-              </p>
+              </h1>
             </div>
             <div ref="sepRef" class="separator full-width">
               <q-separator color="primary"></q-separator>
@@ -498,18 +485,7 @@ const toPackages = (p: Package | null) => {
         <div
           ref="servRef"
           v-if="!activeTopic"
-          class="services-description row q-mt-md q-pa-md wrap justify-center start-animation text-white text-bold"
-          :class="
-            setSeasonClasses(
-              {
-                Fall: 'primary-font ',
-                Winter: 'primary-font ',
-                Spring: 'primary-font ',
-                Summer: 'primary-font text-white ',
-              },
-              activeTheme,
-            )
-          "
+          class="hero-subheadline row q-mt-md q-pa-md wrap justify-center start-animation text-bold"
         >
           <i>Motion and feedback that make complex AI feel clear, reliable, and alive.</i>
         </div>
@@ -560,6 +536,34 @@ const toPackages = (p: Package | null) => {
     text-transform: uppercase;
   }
 
+  .home-container {
+    background: linear-gradient(
+      135deg,
+      color-mix(in srgb, tokens.$ink-soft 90%, tokens.$ivory 10%),
+      tokens.$ink
+    );
+
+    border: 1px solid var(--q-accent);
+
+    box-shadow:
+      0 0 64px color-mix(in srgb, var(--q-accent) 38%, transparent),
+      0 28px 80px color-mix(in srgb, tokens.$ink 90%, transparent);
+
+    border-radius: 1rem;
+
+    h1 {
+      color: tokens.$text;
+    }
+
+    .hero-subheadline {
+      color: tokens.$text-muted;
+    }
+
+    .hero-kicker {
+      color: tokens.$champagne;
+    }
+  }
+
   /* ---------- Mobile / NotDesktop ---------- */
 
   .responsive-view {
@@ -571,12 +575,14 @@ const toPackages = (p: Package | null) => {
     }
 
     .home-container {
-      background: color-mix(in srgb, black 30%, transparent);
       border-radius: 0.5rem;
       box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
       padding: 1.5rem;
 
-      .services-description {
+      h1 {
+      }
+
+      .hero-subheadline {
         font-size: 1.3rem;
         line-height: 2rem;
       }
@@ -605,7 +611,7 @@ const toPackages = (p: Package | null) => {
         /* no transform-origin/scale here; GSAP sets them */
       }
 
-      .title-container {
+      .copy-container {
         width: 60%;
 
         .separator {
@@ -613,14 +619,14 @@ const toPackages = (p: Package | null) => {
         }
       }
 
-      .services-description {
+      .hero-subheadline {
         position: relative;
         z-index: 1;
         font-size: 1.2rem;
         border-radius: 5px; /* GSAP handles opacity/transform */
       }
 
-      .services-description::before {
+      .hero-subheadline::before {
         content: '';
         position: absolute;
         inset: 0;

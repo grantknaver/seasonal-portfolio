@@ -16,6 +16,8 @@ $primary: map-get(tokens.$fall-theme, primary);
 $secondary: map-get(tokens.$fall-theme, secondary);
 $accent: map-get(tokens.$fall-theme, accent);
 $dark: map-get(tokens.$fall-theme, dark);
+$accent-deep: map-get(tokens.$fall-theme, accent-deep);
+$accent-soft: map-get(tokens.$fall-theme, accent-soft);
 
 $positive: #21ba45;
 $negative: #c10015;
