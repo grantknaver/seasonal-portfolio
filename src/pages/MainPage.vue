@@ -633,7 +633,7 @@ const toPackages = (p: Package | null) => {
     .home-container {
       position: relative;
       z-index: 2;
-      margin-top: 4rem;
+      margin-top: 3rem;
       max-width: 760px;
 
       .simon-copy {
