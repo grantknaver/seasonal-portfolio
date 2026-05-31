@@ -590,9 +590,10 @@ const toProof = () => {
 
       .proof-card {
         padding: 0.85rem 1rem;
-        border: 1px solid color-mix(in srgb, var(--q-accent) 28%, transparent);
+        border: 1px solid color-mix(in srgb, var(--q-accent) 38%, transparent);
+
         border-radius: 0.75rem;
-        background: color-mix(in srgb, tokens.$ink-soft 78%, transparent);
+        background: color-mix(in srgb, tokens.$ink-soft 82%, tokens.$ivory 6%);
         box-shadow: inset 0 1px 0 color-mix(in srgb, tokens.$ivory 8%, transparent);
 
         .proof-label {
