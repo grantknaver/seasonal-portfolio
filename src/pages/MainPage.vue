@@ -318,6 +318,11 @@ const toPackages = (p: Package | null) => {
   mainStore.SET_ACTIVE_TOPIC(TopicName.Packages);
   expandedPanel.value = TopicName.Packages;
 };
+
+const toProof = () => {
+  mainStore.SET_ACTIVE_TOPIC(TopicName.CaseStudies);
+  expandedPanel.value = TopicName.CaseStudies;
+};
 </script>
 
 <template>
@@ -336,32 +341,52 @@ const toPackages = (p: Package | null) => {
     </div>
     <section v-if="isResponsive" ref="root" key="mobile" class="responsive-view full-width q-pa-md">
       <div
-        class="home-container relative-position full-width column items-center text-center text-primary-font q-mb-sm q-pa-lg font-primary"
+        ref="homeContainerRef"
+        class="home-container relative-position full-width column text-primary-font q-mt-md q-mb-md q-pa-lg font-primary"
       >
-        <p class="kicker mobile-content">Motion UI for AI systems</p>
-        <h1 class="mobile-content text-h1 q-mb-none black-text-glow">
-          Living, breathing interfaces that build trust in AI systems.
-        </h1>
+        <div class="mobile-hero-copy text-center">
+          <p class="text-caption kicker mobile-content q-mt-none q-mb-sm">
+            Focused UI Motion + AI Interaction
+          </p>
 
-        <p class="subheadline mobile-content text-white font-bold q-mt-sm q-mb-none text-center">
-          Motion and feedback that make complex AI feel clear, reliable, and alive.
-        </p>
-      </div>
-      <div class="full-width">
-        <q-btn @click="toPackages(null)" class="full-width" color="accent" size="lg" glossy>
-          <span class="text-body-2">Hire Me for Your Next AI UI </span>
-        </q-btn>
-        <q-btn
-          class="q-mt-xs q-mb-md full-width"
-          text-color="primary"
-          color="dark"
-          size="lg"
-          glossy
-          href="https://www.loom.com/share/c78ed9a194174eeb8bd34989a4fb8ac9"
-          target="_blank"
-        >
-          <span class="text-body-2">Watch the 90-Second Demo </span>
-        </q-btn>
+          <h1 class="mobile-content text-h1 q-mt-none q-mb-md">
+            Build Clarity. Earn Trust. Create Momentum.
+          </h1>
+
+          <div class="subheadline mobile-content q-mt-md start-animation">
+            <p class="q-ma-none text-body-2">
+              Premium motion, AI interaction, and section-level implementation for platforms that
+              need sharper user flow.
+            </p>
+          </div>
+        </div>
+
+        <div class="u-grid u-gap-sm full-width q-mt-md mobile-content">
+          <q-btn @click="toPackages(null)" color="accent" size="lg" glossy>
+            <span class="text-body-2">Packages</span>
+          </q-btn>
+
+          <q-btn @click="toProof" text-color="accent" color="secondary" size="lg" glossy>
+            <span class="text-body-2">Proof</span>
+          </q-btn>
+        </div>
+
+        <div class="proofs mobile-content full-width q-mt-lg">
+          <div class="proof-card">
+            <span class="proof-label">CLARITY</span>
+            <strong>Less confusion. More understanding.</strong>
+          </div>
+
+          <div class="proof-card">
+            <span class="proof-label">TRUST</span>
+            <strong>More confidence. Better decisions.</strong>
+          </div>
+
+          <div class="proof-card">
+            <span class="proof-label">MOMENTUM</span>
+            <strong>More engagement. More action.</strong>
+          </div>
+        </div>
       </div>
 
       <q-list class="full-width font-primary">
@@ -611,12 +636,32 @@ const toPackages = (p: Package | null) => {
     }
 
     .home-container {
-      border-radius: 0.5rem;
-      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
+      border-radius: 1rem;
       padding: 1.5rem;
 
+      .mobile-hero-copy {
+        max-width: 34rem;
+        margin-inline: auto;
+      }
+
+      h1 {
+        max-width: 26rem;
+        margin-inline: auto;
+      }
+
       .subheadline {
-        line-height: 2rem;
+        max-width: 32rem;
+        margin-inline: auto;
+        line-height: 1.5;
+      }
+
+      .proofs {
+        grid-template-columns: 1fr;
+        gap: 0.75rem;
+      }
+
+      .proof-card {
+        text-align: left;
       }
     }
   }
