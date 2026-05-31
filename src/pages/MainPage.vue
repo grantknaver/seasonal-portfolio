@@ -436,9 +436,11 @@ const toPackages = (p: Package | null) => {
           <div ref="simonRef" class="simon"><SimonMenu></SimonMenu></div>
           <div v-if="!activeTopic" class="column justify-center">
             <div class="relative-position overflow-hidden">
-              <p class="text-caption kicker q-mt-none q-mb-sm">Motion UI for AI systems</p>
+              <p class="text-caption kicker q-mt-none q-mb-sm">
+                Focused UI Motion + AI Interaction
+              </p>
               <h1 ref="headlineRef" class="text-h1 full-width q-mt-none q-mb-none">
-                Living, breathing interfaces that build trust in AI systems.
+                Build Clarity. Earn Trust. Create Momentum.
               </h1>
               <div
                 ref="servRef"
@@ -446,7 +448,8 @@ const toPackages = (p: Package | null) => {
                 class="text-lead subheadline q-mt-md start-animation"
               >
                 <p class="q-ma-none text-body-2">
-                  Motion and feedback that make complex AI feel clear, reliable, and alive.
+                  Premium motion, AI interaction, and section-level implementation for platforms
+                  that need sharper user flow.
                 </p>
               </div>
             </div>
@@ -467,20 +470,20 @@ const toPackages = (p: Package | null) => {
             </div>
           </div>
         </div>
-        <div class="proofs">
+        <div class="proofs q-mt-xl">
           <div class="proof-card">
-            <span class="proof-label">Motion</span>
-            <strong>GSAP-driven UI systems</strong>
+            <span class="proof-label">CLARITY</span>
+            <strong>Less confusion. More understanding.</strong>
           </div>
 
           <div class="proof-card">
-            <span class="proof-label">AI</span>
-            <strong>Clearer product interactions</strong>
+            <span class="proof-label">TRUST</span>
+            <strong>More confidence. Better decisions.</strong>
           </div>
 
           <div class="proof-card">
-            <span class="proof-label">Build</span>
-            <strong>Responsive, polished delivery</strong>
+            <span class="proof-label">MOMENTUM</span>
+            <strong>More engagement. More action.</strong>
           </div>
         </div>
       </div>
@@ -559,7 +562,6 @@ const toPackages = (p: Package | null) => {
       display: grid;
       grid-template-columns: repeat(3, minmax(0, 1fr));
       gap: 0.75rem;
-      margin-top: 1.25rem;
 
       .proof-card {
         padding: 0.85rem 1rem;

@@ -96,10 +96,11 @@ const simonRef = ref();
   z-index: 1;
 
   &:hover {
-    transform: scale(1.25);
+    transform: scale(0.9);
     z-index: 10;
     background: var(--q-secondary);
     border: solid 4px var(--q-accent);
+    cursor: pointer;
 
     .q-icon {
       opacity: 0.1;
