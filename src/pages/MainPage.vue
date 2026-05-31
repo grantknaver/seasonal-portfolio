@@ -338,14 +338,12 @@ const toPackages = (p: Package | null) => {
       <div
         class="home-container relative-position full-width column items-center text-center text-primary-font q-mb-sm q-pa-lg font-primary"
       >
-        <p class="hero-kicker mobile-content">Motion UI for AI systems</p>
+        <p class="kicker mobile-content">Motion UI for AI systems</p>
         <h1 class="mobile-content text-h1 q-mb-none black-text-glow">
           Living, breathing interfaces that build trust in AI systems.
         </h1>
 
-        <p
-          class="hero-subheadline mobile-content text-white font-bold q-mt-sm q-mb-none text-center"
-        >
+        <p class="subheadline mobile-content text-white font-bold q-mt-sm q-mb-none text-center">
           Motion and feedback that make complex AI feel clear, reliable, and alive.
         </p>
       </div>
@@ -438,14 +436,14 @@ const toPackages = (p: Package | null) => {
           <div ref="simonRef" class="simon"><SimonMenu></SimonMenu></div>
           <div v-if="!activeTopic" class="column justify-center">
             <div class="relative-position overflow-hidden">
-              <p class="text-caption hero-kicker q-mt-none q-mb-sm">Motion UI for AI systems</p>
+              <p class="text-caption kicker q-mt-none q-mb-sm">Motion UI for AI systems</p>
               <h1 ref="headlineRef" class="text-h1 full-width q-mt-none q-mb-none">
                 Living, breathing interfaces that build trust in AI systems.
               </h1>
               <div
                 ref="servRef"
                 v-if="!activeTopic"
-                class="text-lead hero-subheadline q-mt-md start-animation"
+                class="text-lead subheadline q-mt-md start-animation"
               >
                 <p class="q-ma-none text-body-2">
                   Motion and feedback that make complex AI feel clear, reliable, and alive.
@@ -467,6 +465,22 @@ const toPackages = (p: Package | null) => {
                 <span class="text-body-2">Proof</span>
               </q-btn>
             </div>
+          </div>
+        </div>
+        <div class="proofs">
+          <div class="proof-card">
+            <span class="proof-label">Motion</span>
+            <strong>GSAP-driven UI systems</strong>
+          </div>
+
+          <div class="proof-card">
+            <span class="proof-label">AI</span>
+            <strong>Clearer product interactions</strong>
+          </div>
+
+          <div class="proof-card">
+            <span class="proof-label">Build</span>
+            <strong>Responsive, polished delivery</strong>
           </div>
         </div>
       </div>
@@ -522,8 +536,12 @@ const toPackages = (p: Package | null) => {
     box-shadow:
       0 0 64px color-mix(in srgb, var(--q-accent) 38%, transparent),
       0 28px 80px color-mix(in srgb, tokens.$ink 90%, transparent);
-
     border-radius: 1rem;
+
+    .kicker {
+      color: tokens.$champagne;
+      text-transform: uppercase;
+    }
 
     h1 {
       color: tokens.$text;
@@ -533,13 +551,50 @@ const toPackages = (p: Package | null) => {
       text-wrap: balance;
     }
 
-    .hero-subheadline {
+    .subheadline {
       color: tokens.$text-muted;
     }
 
-    .hero-kicker {
-      color: tokens.$champagne;
-      text-transform: uppercase;
+    .proofs {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 0.75rem;
+      margin-top: 1.25rem;
+
+      .proof-card {
+        padding: 0.85rem 1rem;
+        border: 1px solid color-mix(in srgb, var(--q-accent) 28%, transparent);
+        border-radius: 0.75rem;
+        background: color-mix(in srgb, tokens.$ink-soft 78%, transparent);
+        box-shadow: inset 0 1px 0 color-mix(in srgb, tokens.$ivory 8%, transparent);
+
+        .proof-label {
+          display: block;
+          margin-bottom: 0.25rem;
+          color: tokens.$champagne;
+          font-size: 0.72rem;
+          line-height: 1;
+          letter-spacing: 0.08em;
+          text-transform: uppercase;
+          font-weight: 700;
+        }
+
+        strong {
+          display: block;
+          color: tokens.$text-muted;
+          font-size: 0.85rem;
+          line-height: 1.25;
+          font-weight: 600;
+        }
+      }
+    }
+
+    .proof-card strong {
+      display: block;
+      color: tokens.$text-muted;
+      font-size: 0.85rem;
+      line-height: 1.25;
+      font-weight: 600;
     }
   }
 
@@ -558,7 +613,7 @@ const toPackages = (p: Package | null) => {
       box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
       padding: 1.5rem;
 
-      .hero-subheadline {
+      .subheadline {
         line-height: 2rem;
       }
     }
@@ -591,14 +646,14 @@ const toPackages = (p: Package | null) => {
         }
       }
 
-      .hero-subheadline {
+      .subheadline {
         position: relative;
         z-index: 1;
         border-radius: 5px; /* GSAP handles opacity/transform */
         line-height: 1rem;
       }
 
-      .hero-subheadline::before {
+      .subheadline::before {
         content: '';
         position: absolute;
         inset: 0;
