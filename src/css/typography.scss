@@ -4,40 +4,52 @@
 // Text sizes (per breakpoint)
 // ----------------------------
 $text-sizes: (
-  'h1': (
-    2.7rem,
+  'display': (
+    2.4rem,
     2.8rem,
-    2.9rem,
-    3rem,
+    3.35rem,
+    4rem,
+  ),
+  'h1': (
+    1.45rem,
+    1.55rem,
+    1.65rem,
+    1.8rem,
   ),
   'h2': (
-    1.8rem,
-    1.8rem,
-    2.2rem,
-    2.2rem,
+    1.3rem,
+    1.4rem,
+    1.5rem,
+    1.65rem,
   ),
   'h3': (
-    1.6rem,
-    1.6rem,
-    2rem,
-    2rem,
+    1.15rem,
+    1.22rem,
+    1.3rem,
+    1.4rem,
+  ),
+  'lead': (
+    1rem,
+    1.05rem,
+    1.1rem,
+    1.15rem,
   ),
   'body-1': (
-    1.2rem,
-    1.2rem,
-    1.4rem,
-    1.4rem,
+    0.95rem,
+    1rem,
+    1.02rem,
+    1.05rem,
   ),
   'body-2': (
+    0.85rem,
     0.9rem,
-    0.9rem,
-    1rem,
-    1rem,
+    0.92rem,
+    0.95rem,
   ),
   'caption': (
     0.7rem,
-    0.7rem,
-    0.8rem,
+    0.72rem,
+    0.75rem,
     0.8rem,
   ),
 );

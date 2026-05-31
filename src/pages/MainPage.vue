@@ -69,7 +69,6 @@ const dispose = ref<() => void>(() => {});
 const nameRef = ref<HTMLElement | null>(null);
 const simonRef = ref<HTMLElement | null>(null);
 const headlineRef = ref<HTMLElement | null>(null);
-const sepRef = ref<HTMLElement | null>(null);
 const servRef = ref<HTMLElement | null>(null);
 const ctaBtnRef = ref<HTMLElement | null>(null);
 const homeContainerRef = ref<HTMLElement | null>(null);
@@ -186,7 +185,6 @@ const buildAnimations = (mode: ViewType) => {
     nameRef.value,
     simonRef.value,
     headlineRef.value,
-    sepRef.value,
     servRef.value,
     ctaBtnRef.value,
   ].filter((x): x is HTMLElement => !!x);
@@ -230,25 +228,25 @@ const buildAnimations = (mode: ViewType) => {
       },
     );
 
-    gsap.fromTo(
-      simonRef.value,
-      {
-        scale: 0,
-        autoAlpha: 0,
-        rotation: 0,
-        transformOrigin: '50% 50%',
-      },
-      {
-        keyframes: [
-          { scale: 0.5, rotation: 15, autoAlpha: 1 },
-          { scale: 1.1, rotation: -10 },
-          { scale: 1, rotation: 0 },
-        ],
-        ease: 'bounce.out',
-        duration: 3.8,
-        overwrite: 'auto',
-      },
-    );
+    // gsap.fromTo(
+    //   simonRef.value,
+    //   {
+    //     scale: 0,
+    //     autoAlpha: 0,
+    //     rotation: 0,
+    //     transformOrigin: '50% 50%',
+    //   },
+    //   {
+    //     keyframes: [
+    //       { scale: 0.5, rotation: 15, autoAlpha: 1 },
+    //       { scale: 1.1, rotation: -10 },
+    //       { scale: 1, rotation: 0 },
+    //     ],
+    //     ease: 'bounce.out',
+    //     duration: 3.8,
+    //     overwrite: 'auto',
+    //   },
+    // );
 
     gsap.fromTo(
       headlineRef.value,
@@ -257,17 +255,6 @@ const buildAnimations = (mode: ViewType) => {
         keyframes: [{ y: 0, autoAlpha: 1 }],
         ease: 'bounce.out',
         duration: 3,
-        overwrite: 'auto',
-      },
-    );
-
-    gsap.fromTo(
-      sepRef.value,
-      { y: 150, autoAlpha: 0 },
-      {
-        keyframes: [{ y: 0, autoAlpha: 1 }],
-        ease: 'bounce.out',
-        duration: 1,
         overwrite: 'auto',
       },
     );
@@ -352,12 +339,10 @@ const toPackages = (p: Package | null) => {
         class="home-container relative-position full-width column items-center text-center text-primary-font q-mb-sm q-pa-lg font-primary"
       >
         <p class="hero-kicker mobile-content">Motion UI for AI systems</p>
-        <h1 class="mobile-content text-body-1 q-mb-none black-text-glow">
+        <h1 class="mobile-content text-h1 q-mb-none black-text-glow">
           Living, breathing interfaces that build trust in AI systems.
         </h1>
-        <div ref="sepRef" class="mobile-content column full-width q-mt-md q-mb-md">
-          <q-separator class="font-bold" color="primary"></q-separator>
-        </div>
+
         <p
           class="hero-subheadline mobile-content text-white font-bold q-mt-sm q-mb-none text-center"
         >
@@ -449,20 +434,23 @@ const toPackages = (p: Package | null) => {
       class="desktop-view column justify-end items-center full-width"
     >
       <div ref="homeContainerRef" class="home-container q-pa-xl column">
-        <div class="row no-wrap">
+        <div class="simon-copy">
           <div ref="simonRef" class="simon"><SimonMenu></SimonMenu></div>
-          <div
-            v-if="!activeTopic"
-            class="copy-container column justify-center items-center q-pa-md"
-          >
-            <div class="clip-container relative-position overflow-hidden">
-              <p class="hero-kicker">Motion UI for AI systems</p>
-              <h1 ref="headlineRef" class="full-width text-body-2 q-mb-lg q-pl-lg">
+          <div v-if="!activeTopic" class="column justify-center">
+            <div class="relative-position overflow-hidden">
+              <p class="text-caption hero-kicker q-mt-none q-mb-sm">Motion UI for AI systems</p>
+              <h1 ref="headlineRef" class="text-h1 full-width q-mt-none q-mb-none">
                 Living, breathing interfaces that build trust in AI systems.
               </h1>
-            </div>
-            <div ref="sepRef" class="separator full-width">
-              <q-separator color="primary"></q-separator>
+              <div
+                ref="servRef"
+                v-if="!activeTopic"
+                class="text-lead hero-subheadline q-mt-md start-animation"
+              >
+                <p class="q-ma-none text-body-2">
+                  Motion and feedback that make complex AI feel clear, reliable, and alive.
+                </p>
+              </div>
             </div>
             <div class="u-grid u-grid-cols-2 u-gap-sm" ref="ctaBtnRef">
               <q-btn @click="toPackages(null)" class="q-mt-md" color="accent" size="lg" glossy>
@@ -480,14 +468,6 @@ const toPackages = (p: Package | null) => {
               </q-btn>
             </div>
           </div>
-        </div>
-
-        <div
-          ref="servRef"
-          v-if="!activeTopic"
-          class="hero-subheadline row q-mt-md q-pa-md wrap justify-center start-animation text-bold"
-        >
-          <i>Motion and feedback that make complex AI feel clear, reliable, and alive.</i>
         </div>
       </div>
       <q-btn
@@ -530,12 +510,6 @@ const toPackages = (p: Package | null) => {
     }
   }
 
-  p:nth-of-type(1) {
-    font-weight: bold;
-    line-height: 2.2rem;
-    text-transform: uppercase;
-  }
-
   .home-container {
     background: linear-gradient(
       135deg,
@@ -553,6 +527,10 @@ const toPackages = (p: Package | null) => {
 
     h1 {
       color: tokens.$text;
+      line-height: 1.16;
+      letter-spacing: -0.025em;
+      font-weight: 400;
+      text-wrap: balance;
     }
 
     .hero-subheadline {
@@ -561,6 +539,7 @@ const toPackages = (p: Package | null) => {
 
     .hero-kicker {
       color: tokens.$champagne;
+      text-transform: uppercase;
     }
   }
 
@@ -579,11 +558,7 @@ const toPackages = (p: Package | null) => {
       box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
       padding: 1.5rem;
 
-      h1 {
-      }
-
       .hero-subheadline {
-        font-size: 1.3rem;
         line-height: 2rem;
       }
     }
@@ -602,28 +577,25 @@ const toPackages = (p: Package | null) => {
       position: relative;
       z-index: 2;
       margin-top: 4rem;
-      max-width: 700px;
+      max-width: 760px;
 
-      .simon {
-        width: 40%;
-        min-width: 275px;
-        max-width: 275px;
-        /* no transform-origin/scale here; GSAP sets them */
-      }
+      .simon-copy {
+        display: grid;
+        grid-template-columns: auto 1fr;
+        column-gap: 2rem;
 
-      .copy-container {
-        width: 60%;
-
-        .separator {
-          width: 75%; /* GSAP handles opacity/transform */
+        .simon {
+          min-width: 250px;
+          max-width: 250px;
+          /* no transform-origin/scale here; GSAP sets them */
         }
       }
 
       .hero-subheadline {
         position: relative;
         z-index: 1;
-        font-size: 1.2rem;
         border-radius: 5px; /* GSAP handles opacity/transform */
+        line-height: 1rem;
       }
 
       .hero-subheadline::before {

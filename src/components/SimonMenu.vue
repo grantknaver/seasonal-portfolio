@@ -37,7 +37,7 @@ const topics: Topic[] = [
     id: uuidv4(),
     name: 'Case Studies' as TopicName,
     icon: mdiBookOpenPageVariant,
-    label: TopicName.CaseStudies,
+    label: 'Studies',
   },
 ];
 
@@ -62,14 +62,17 @@ const simonRef = ref();
       style="padding: 1rem"
       @click.stop="selectTopic(topic.name)"
     >
-      <a class="simon-link">
-        <q-icon :name="topic.icon" size="32px" />
-        <q-tooltip anchor="center middle" self="top left"> {{ topic.label }} </q-tooltip>
+      <a class="simon-link text-body-2">
+        <q-icon :name="topic.icon" size="80px" />
+        <!-- <q-tooltip anchor="center middle" self="top left"> {{ topic.label }} </q-tooltip> -->
+        <span class="label">{{ topic.label }}</span>
       </a>
     </div>
   </div>
 </template>
 <style scoped lang="scss">
+@use '/src/css/_tokens.scss' as tokens;
+
 .simon {
   position: relative;
   border-radius: 10px;
@@ -88,28 +91,19 @@ const simonRef = ref();
   transition: transform 0.3s ease;
   transform-origin: center;
   border-radius: 10px;
-  border: solid 4px rgba($color: white, $alpha: 0.7);
-  background-color: rgba($color: #521c0d, $alpha: 0.5);
+  border: solid 2px rgba($color: tokens.$ivory, $alpha: 0.5);
+  background: var(--q-dark);
   z-index: 1;
 
   &:hover {
     transform: scale(1.25);
     z-index: 10;
+    background: var(--q-secondary);
+    border: solid 4px var(--q-accent);
 
-    &.Packages {
-      background-color: var(--q-secondary);
-    }
-
-    &.CaseStudies {
-      background-color: var(--q-accent);
-    }
-
-    &.About {
-      background-color: var(--q-accent);
-    }
-
-    &.Contact {
-      background-color: var(--q-secondary);
+    .q-icon {
+      opacity: 0.1;
+      color: tokens.$ink;
     }
   }
 
@@ -144,23 +138,24 @@ const simonRef = ref();
 .simon-link {
   color: white;
   text-decoration: none;
-  font-size: 1rem;
   display: flex;
   align-items: center;
   justify-content: center;
   width: 100%;
   height: 100%;
-  text-shadow: 0 0 5px black;
+  text-shadow: 0 0 5px var(--q-dark);
+  position: relative;
+
+  .label {
+    position: absolute;
+  }
+
+  .q-icon {
+    opacity: 0.04;
+  }
 
   &:focus {
     outline: none;
-  }
-
-  &:hover {
-    .q-icon {
-      transform: scale(1.25);
-      z-index: 5;
-    }
   }
 }
 </style>
