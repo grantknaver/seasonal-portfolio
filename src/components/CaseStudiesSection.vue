@@ -1,10 +1,8 @@
 <script setup lang="ts">
-import { setSeasonClasses } from '../shared/utils/setSeasonColors';
 import { useViewport } from '../shared/utils/viewWidth';
-import { computed, ref, watch } from 'vue';
+import { computed, defineAsyncComponent, ref, watch } from 'vue';
 import { useMainStore } from '../stores/main';
 import { storeToRefs } from 'pinia';
-import { defineAsyncComponent } from 'vue';
 import { type CaseStudy as CS } from '../shared/types/caseStudy';
 import { v4 as uuidv4 } from 'uuid';
 import { Theme } from '../shared/constants/theme';
@@ -34,6 +32,7 @@ const mainStore = useMainStore();
 const { activeTheme } = storeToRefs(mainStore);
 const { lgBreakpoint, width } = useViewport();
 const isResponsive = computed(() => width.value < lgBreakpoint);
+
 const caseStudies = ref<CS[]>([
   {
     id: uuidv4(),
@@ -310,6 +309,7 @@ const caseStudies = ref<CS[]>([
     blockquote: '',
   },
 ]);
+
 const tab = ref(CaseStudies.WeatherAndTheme);
 
 watch(tab, (newTab) => {
@@ -324,10 +324,6 @@ const BG_BY_THEME: Record<Theme, string> = {
 };
 const emit = defineEmits(['toContact']);
 
-watch(tab, (newTab) => {
-  mainStore.SET_CASE_STUDY_ACTIVE_TAB(newTab);
-});
-
 const backgroundUrl = computed(() => BG_BY_THEME[activeTheme.value] ?? BG_BY_THEME[Theme.Winter]);
 
 const toContact = () => {
@@ -338,81 +334,28 @@ const toContact = () => {
   }
 };
 </script>
+
 <template>
   <!-- Mobile -->
-  <section v-if="isResponsive" class="caseStudiesSection responsive-view full-width column">
-    <q-card
-      class="first-card full-width q-mb-sm q-pa-md bg-accent"
-      :class="
-        setSeasonClasses(
-          {
-            Fall: isResponsive ? 'bg-primary ' : 'bg-transparent',
-            Winter: isResponsive ? 'bg-primary ' : 'bg-transparent',
-            Spring: isResponsive ? 'bg-primary ' : 'bg-transparent',
-            Summer: isResponsive ? 'bg-accent ' : 'bg-transparent',
-          },
-          activeTheme,
-        )
-      "
-    >
-      <h1
-        class="text-h1 text-white q-mt-none q-mb-md q-pt-md q-pb-md text-center secondary-font"
-        :class="
-          setSeasonClasses(
-            {
-              Fall: isResponsive ? 'bg-dark text-secondary' : 'bg-dark text-secondary border-black',
-              Winter: isResponsive ? 'bg-dark' : 'bg-dark  border-black',
-              Spring: isResponsive ? 'bg-dark ' : 'bg-accent  border-black',
-              Summer: isResponsive ? 'bg-dark ' : 'bg-dark border-black',
-            },
-            activeTheme,
-          )
-        "
-      >
-        Case Studies
-      </h1>
-      <q-separator color="primary" class="q-mb-md" />
-      <p
-        class="case-caseStudies-description text-bold text-body-1 text-center primary-font"
-        :class="
-          setSeasonClasses(
-            {
-              Fall: isResponsive ? 'text-white bg-dark q-pa-md' : 'text-secondary ',
-              Winter: isResponsive ? 'text-white bg-dark q-pa-md' : 'text-secondary ',
-              Spring: isResponsive ? 'text-white bg-dark q-pa-md' : 'text-secondary ',
-              Summer: isResponsive ? 'text-white bg-dark q-pa-md' : 'text-secondary ',
-            },
-            activeTheme,
-          )
-        "
-      >
+  <section v-if="isResponsive" class="caseStudiesSection responsive-view full-width column q-pa-md">
+    <div class="case-section-card q-pa-lg q-mb-md">
+      <p class="text-caption kicker q-mt-none q-mb-sm">Selected proof</p>
+      <h1 class="text-h1 q-mt-none q-mb-md">Case Studies</h1>
+      <p class="section-lead text-body-1 q-mt-none q-mb-sm">
         Interactive, AI-driven, and beautifully engineered.
       </p>
-      <p
-        class="text-body-2 primary-font"
-        :class="
-          setSeasonClasses(
-            {
-              Fall: isResponsive ? 'text-center text-primary' : 'text-primary',
-              Winter: isResponsive ? 'text-center text-primary' : 'text-primary',
-              Spring: isResponsive ? 'text-center text-primary' : 'text-primary',
-              Summer: isResponsive ? 'text-center text-primary' : 'text-white',
-            },
-            activeTheme,
-          )
-        "
-      >
-        Whether you need one polished animation, a full motion + AI upgrade, or a launch-ready
-        experience, I’ve got you covered. These packages make it simple to get started — clear
-        scope, fair pricing, and fast turnaround.
+      <p class="section-copy text-body-2 q-ma-none">
+        Focused builds that show how motion, AI interaction, and implementation polish reduce
+        friction and improve user flow.
       </p>
-    </q-card>
-    <q-list class="q-ml-sm q-mr-sm">
+    </div>
+
+    <div class="case-study-stack">
       <template v-for="(study, index) in caseStudies" :key="study.id">
         <CaseStudy
-          class="full-width"
+          class="case-study-instance full-width"
           :class="{
-            'q-mb-sm': index + 1 == caseStudies.length,
+            'q-mb-md': index + 1 !== caseStudies.length,
           }"
           :header="study.header"
           :expansionTopics="study.expansionTopics"
@@ -441,35 +384,36 @@ const toContact = () => {
                 backgroundPosition: 'center',
               }"
             >
-              <p class="description first-description q-mt-none q-mb-md q-pa-md text-dark bg-white">
-                The <b>AI’s conversational tone</b> AI’s conversational tone is dynamically
-                randomized within those seasons. One response might echo the calm focus of winter,
-                another the optimism of spring, or the playfulness of summer.
+              <p class="description first-description q-mt-none q-mb-md q-pa-md">
+                The <b>AI’s conversational tone</b> is dynamically randomized within those seasons.
+                One response might echo the calm focus of winter, another the optimism of spring, or
+                the playfulness of summer.
               </p>
 
-              <q-separator />
+              <q-separator class="slot-separator" />
 
               <div class="q-mt-md column justify-center full-width">
-                <p class="description q-pa-md text-dark text-body-2 bg-white">
+                <p class="description q-pa-md text-body-2">
                   The pairing of timed visual rhythm and randomized personality creates a system
-                  that feels organic — structured, yet spontaneous.
+                  that feels organic, structured, yet spontaneous.
                 </p>
 
-                <i class="quote text-body-1 text-accent q-pa-md bg-white text-center">
+                <i class="quote q-pa-md text-center">
                   "By blending predictable visual cycles with unpredictable tone shifts, the
                   experience becomes quietly human: familiar in pattern, but never identical."
                 </i>
 
-                <p class="description q-mt-md bg-white q-pa-md">
+                <p class="description q-mt-md q-pa-md">
                   The result blurs the line between UI design and emotional storytelling. Color
-                  becomes context; timing becomes mood. Users don’t just read messages — they feel
+                  becomes context; timing becomes mood. Users don’t just read messages, they feel
                   the passing of digital seasons.
                 </p>
               </div>
             </div>
           </template>
+
           <template #waveform-result>
-            <div class="narrator-container full-width row justify-center q-pa-md bg-white">
+            <div class="narrator-container full-width row justify-center q-pa-md">
               <iframe
                 id="inlineFrameExample"
                 title="Inline Frame Example"
@@ -480,91 +424,40 @@ const toContact = () => {
             </div>
           </template>
         </CaseStudy>
-
-        <!-- Optional: visual separation between CaseStudy blocks -->
-        <q-separator v-if="index < caseStudies.length - 1" />
       </template>
-      <q-separator color="dark" class="full-width"></q-separator>
-    </q-list>
-    <q-btn @click="toContact" class="q-mt-sm full-width" color="accent" size="lg" glossy square>
-      <span>Let’s Discuss Your Interactive Project</span>
+    </div>
+
+    <q-btn
+      @click="toContact"
+      class="case-contact-btn q-mt-md full-width"
+      color="accent"
+      size="lg"
+      glossy
+    >
+      <span class="text-body-2">Discuss a project</span>
     </q-btn>
   </section>
 
   <!-- Desktop -->
-  <section v-if="!isResponsive" class="caseStudiesSection desktop-view full-width column">
-    <div
-      class="full-width q-pa-md"
-      :class="
-        setSeasonClasses(
-          {
-            Fall: isResponsive ? 'bg-primary ' : 'bg-transparent',
-            Winter: isResponsive ? 'bg-primary ' : 'bg-transparent',
-            Spring: isResponsive ? 'bg-primary ' : 'bg-transparent',
-            Summer: isResponsive ? 'bg-white ' : 'bg-transparent',
-          },
-          activeTheme,
-        )
-      "
-    >
-      <h1
-        class="text-h1 text-white q-mt-none q-mb-md q-pt-md q-pb-md text-center secondary-font"
-        :class="
-          setSeasonClasses(
-            {
-              Fall: isResponsive ? 'bg-dark' : 'bg-dark border-black',
-              Winter: isResponsive ? 'bg-dark ' : 'bg-dark border-black',
-              Spring: isResponsive ? 'bg-dark' : 'bg-accent border-black',
-              Summer: isResponsive ? 'bg-dark' : 'bg-dark border-black',
-            },
-            activeTheme,
-          )
-        "
-      >
-        Case Studies
-      </h1>
-      <p
-        class="case-caseStudies-description text-body-1 text-bold text-center primary-font"
-        :class="
-          setSeasonClasses(
-            {
-              Fall: isResponsive ? 'bg-dark text-secondary' : 'text-secondary ',
-              Winter: isResponsive ? 'bg-dark text-secondary' : 'text-secondary ',
-              Spring: isResponsive ? 'bg-dark text-secondary' : 'text-secondary ',
-              Summer: isResponsive ? 'bg-dark text-secondary' : 'text-secondary ',
-            },
-            activeTheme,
-          )
-        "
-      >
+  <section v-if="!isResponsive" class="caseStudiesSection desktop-view full-width column q-pa-md">
+    <div class="case-section-card q-pa-xl q-mb-md">
+      <p class="text-caption kicker q-mt-none q-mb-sm">Selected proof</p>
+      <h1 class="text-h1 q-mt-none q-mb-md">Case Studies</h1>
+      <p class="section-lead text-body-1 q-mt-none q-mb-sm">
         Interactive, AI-driven, and beautifully engineered.
       </p>
-
-      <p
-        class="primary-font text-body-2 text-center"
-        :class="
-          setSeasonClasses(
-            {
-              Fall: isResponsive ? 'text-center text-dark' : 'text-primary',
-              Winter: isResponsive ? 'text-center text-dark' : 'text-primary',
-              Spring: isResponsive ? 'text-center text-dark' : 'text-primary',
-              Summer: isResponsive ? 'text-center text-dark' : 'text-white',
-            },
-            activeTheme,
-          )
-        "
-      >
-        Whether you need one polished animation, a full motion + AI upgrade, or a launch-ready
-        experience, I’ve got you covered. These packages make it simple to get started — clear
-        scope, fair pricing, and fast turnaround.
+      <p class="section-copy text-body-2 q-ma-none">
+        Focused builds that show how motion, AI interaction, and implementation polish reduce
+        friction and improve user flow.
       </p>
     </div>
+
     <q-tabs
       v-model="tab"
       align="justify"
       dense
-      class="bg-primary text-dark q-pa-sm rounded-borders q-mb-md"
-      active-color="dark"
+      class="case-tabs q-pa-sm q-mb-md"
+      active-color="accent"
       indicator-color="accent"
     >
       <q-tab
@@ -572,18 +465,26 @@ const toContact = () => {
         :key="study.id"
         :name="study.name"
         :label="study.label"
-        class="text-weight-medium"
+        class="case-tab text-body-2 text-weight-medium"
       />
     </q-tabs>
 
-    <q-tab-panels v-model="tab" animated transition-prev="fade" transition-next="fade" keep-alive>
+    <q-tab-panels
+      v-model="tab"
+      animated
+      transition-prev="fade"
+      transition-next="fade"
+      keep-alive
+      class="case-panels bg-transparent"
+    >
       <q-tab-panel
         v-for="study in caseStudies"
         :key="study.id"
         :name="study.name"
-        class="no-scroll"
+        class="case-panel no-scroll bg-transparent q-pa-none"
       >
         <CaseStudy
+          class="case-study-instance full-width"
           :header="study.header"
           :expansionTopics="study.expansionTopics"
           :listTopics="study.listTopics"
@@ -599,32 +500,38 @@ const toContact = () => {
                 backgroundPosition: 'center',
               }"
             >
-              <p class="description first-description q-mt-none q-mb-md q-pa-md text-dark bg-white">
-                The <b>AI’s conversational tone</b> AI’s conversational tone is dynamically
-                randomized within those seasons. One response might echo the calm focus of winter,
-                another the optimism of spring, or the playfulness of summer.
+              <p class="description first-description q-mt-none q-mb-md q-pa-md">
+                The <b>AI’s conversational tone</b> is dynamically randomized within those seasons.
+                One response might echo the calm focus of winter, another the optimism of spring, or
+                the playfulness of summer.
               </p>
-              <div class="q-mb-lg row justify-center ful-width"><AIAssitant /></div>
-              <q-separator></q-separator>
+
+              <div class="q-mb-lg row justify-center full-width"><AIAssitant /></div>
+
+              <q-separator class="slot-separator" />
+
               <div class="q-mt-md column justify-center full-width">
-                <p class="description q-pa-md text-dark text-body-2 bg-white">
+                <p class="description q-pa-md text-body-2">
                   The pairing of timed visual rhythm and randomized personality creates a system
-                  that feels organic — structured, yet spontaneous.
+                  that feels organic, structured, yet spontaneous.
                 </p>
-                <i class="quote text-body-1 text-accent q-pa-md bg-white text-center"
-                  >"By blending predictable visual cycles with unpredictable tone shifts, the
-                  experience becomes quietly human: familiar in pattern, but never identical.""</i
-                >
-                <p class="description q-mt-md bg-white q-pa-md bg-white">
+
+                <i class="quote q-pa-md text-center">
+                  "By blending predictable visual cycles with unpredictable tone shifts, the
+                  experience becomes quietly human: familiar in pattern, but never identical."
+                </i>
+
+                <p class="description q-mt-md q-pa-md">
                   The result blurs the line between UI design and emotional storytelling. Color
-                  becomes context; timing becomes mood. Users don’t just read messages — they feel
+                  becomes context; timing becomes mood. Users don’t just read messages, they feel
                   the passing of digital seasons.
                 </p>
               </div>
             </div>
           </template>
+
           <template #waveform-result>
-            <div class="narrator-container bg-white full-width">
+            <div class="narrator-container full-width">
               <iframe
                 id="inlineFrameExample"
                 title="Inline Frame Example"
@@ -637,8 +544,15 @@ const toContact = () => {
         </CaseStudy>
       </q-tab-panel>
     </q-tab-panels>
-    <q-btn @click="toContact" class="q-mt-md full-width" color="accent" size="lg" glossy square>
-      <span>Let’s Discuss Your Interactive Project</span>
+
+    <q-btn
+      @click="toContact"
+      class="case-contact-btn q-mt-md full-width"
+      color="accent"
+      size="lg"
+      glossy
+    >
+      <span class="text-body-2">Discuss a project</span>
     </q-btn>
   </section>
 </template>
@@ -648,27 +562,146 @@ const toContact = () => {
 .caseStudiesSection {
   content-visibility: auto;
   contain-intrinsic-size: 800px 1000px;
+  gap: 1rem;
+  color: tokens.$text;
+}
+
+.case-section-card,
+.case-tabs {
+  background: linear-gradient(
+    135deg,
+    color-mix(in srgb, tokens.$ink-soft 90%, tokens.$ivory 10%),
+    tokens.$ink
+  );
+  border: 1px solid var(--q-accent);
+  box-shadow:
+    0 0 48px color-mix(in srgb, var(--q-accent) 26%, transparent),
+    0 20px 64px color-mix(in srgb, tokens.$ink 88%, transparent);
+}
+
+.case-section-card {
+  border-radius: 1rem;
+  text-align: center;
+
+  .kicker {
+    color: tokens.$champagne;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    font-weight: 700;
+  }
+
+  h1 {
+    color: tokens.$text;
+    font-weight: 400;
+    line-height: 1.08;
+    letter-spacing: -0.025em;
+    text-wrap: balance;
+  }
+
+  .section-lead {
+    color: tokens.$text;
+    font-weight: 700;
+  }
+
+  .section-copy {
+    color: tokens.$text-muted;
+    max-width: 48rem;
+    margin-inline: auto;
+    line-height: 1.55;
+  }
+}
+
+.case-tabs {
+  border-radius: 0.85rem;
+  color: tokens.$text-muted;
+  overflow: hidden;
+}
+
+.case-tab {
+  color: tokens.$text-muted;
+  border-radius: 0.65rem;
+}
+
+.case-panels {
+  background: transparent;
+}
+
+.case-panel {
+  background: transparent;
+}
+
+.case-study-stack {
+  display: grid;
+  gap: 1rem;
+}
+
+.case-contact-btn {
+  border-radius: 0.75rem;
+}
+
+.ai-chat-container {
+  border-radius: 0.85rem;
+  overflow: auto;
+  border: 1px solid color-mix(in srgb, var(--q-accent) 32%, transparent);
+  box-shadow:
+    inset 0 1px 0 color-mix(in srgb, tokens.$ivory 8%, transparent),
+    0 16px 40px color-mix(in srgb, tokens.$ink 72%, transparent);
+}
+
+.ai-chat-container::before {
+  content: '';
+  display: block;
+}
+
+.description,
+.quote {
+  display: block;
+  border-radius: 0.75rem;
+  color: tokens.$text;
+  background: color-mix(in srgb, tokens.$ink-soft 86%, tokens.$ivory 8%);
+  border: 1px solid color-mix(in srgb, var(--q-accent) 24%, transparent);
+  box-shadow: inset 0 1px 0 color-mix(in srgb, tokens.$ivory 8%, transparent);
+}
+
+.description {
+  line-height: 1.55;
+}
+
+.quote {
+  color: tokens.$champagne;
+  line-height: 1.6;
+}
+
+.slot-separator {
+  background: color-mix(in srgb, var(--q-accent) 24%, transparent);
+  opacity: 1;
+}
+
+.narrator-container {
+  border-radius: 0.85rem;
+  overflow: hidden;
+  background: color-mix(in srgb, tokens.$ink-soft 86%, transparent);
+  border: 1px solid color-mix(in srgb, var(--q-accent) 28%, transparent);
+  box-shadow: 0 16px 40px color-mix(in srgb, tokens.$ink 72%, transparent);
 }
 
 .responsive-view {
-  .first-card {
+  .case-section-card {
     border-top-left-radius: 0;
     border-top-right-radius: 0;
   }
 
   .ai-chat-container {
     height: 900px;
-    border-radius: 10px;
-    border-top: solid 2px var(--q-dark);
     padding-left: 0;
     padding-right: 0;
 
     .first-description {
-      font-size: 1.2rem;
+      font-size: 1.1rem;
     }
-    .description {
-      border-radius: 10px;
-      font-size: 1.2rem;
+
+    .description,
+    .quote {
       margin-left: 1rem;
       margin-right: 1rem;
     }
@@ -677,6 +710,7 @@ const toContact = () => {
   .narrator-container {
     height: 500px;
     min-height: 500px;
+
     .narrator {
       height: 100%;
       width: 90%;
@@ -685,56 +719,39 @@ const toContact = () => {
 }
 
 .desktop-view {
+  .case-section-card,
+  .case-tabs,
+  .case-panels {
+    width: 100%;
+  }
+
+  .case-section-card {
+    max-width: 960px;
+    margin-inline: auto;
+  }
+
   .ai-chat-container {
     height: 800px;
-    border-radius: 10px;
-    overflow: scroll;
-    border-top: solid 2px var(--q-dark);
 
     .first-description {
-      font-size: 1.2rem;
-    }
-    .description {
-      border-radius: 10px;
+      font-size: 1.1rem;
     }
   }
 
   .narrator-container {
     height: 500px;
     min-height: 500px;
+
     .narrator {
       height: 100%;
     }
   }
 }
 
-.q-item {
-  border-bottom: solid 1px var(--q-secondary);
-}
-
-/* Smooth slide-right on hover/focus; returns on blur */
-.indent-expansion-item {
-  transform: translateX(0);
-  transition: transform 160ms ease; /* tweak speed here */
-  will-change: transform;
-}
-
-/* Mouse + keyboard */
-.indent-expansion-item:hover,
-.indent-expansion-item:focus-visible {
-  transform: translateX(0.5rem); /* tweak distance here */
-}
-
-/* Optional: tiny nudge while pressed/clicked */
-.indent-expansion-item:active {
-  transform: translateX(0.65rem);
-}
-
-/* Respect reduced motion */
 @media (prefers-reduced-motion: reduce) {
-  .indent-expansion-item {
+  .case-tab,
+  .case-contact-btn {
     transition: none;
-    transform: none;
   }
 }
 </style>
