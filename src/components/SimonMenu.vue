@@ -129,10 +129,15 @@ const simonRef = ref();
   }
 
   &.active-topic {
-    background-color: var(--q-dark);
+    background-color: var(--q-secondary);
     border: solid 5px var(--q-accent);
     transform: scale(0.9);
     transition: transform 0.7s ease-in;
+
+    .q-icon {
+      opacity: 0.1;
+      color: tokens.$ink;
+    }
   }
 }
 

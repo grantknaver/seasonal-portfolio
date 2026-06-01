@@ -175,6 +175,7 @@ const waitForLayout = async (el: HTMLElement | null, frames = 8): Promise<boolea
 };
 
 const buildAnimations = (mode: ViewType) => {
+  alert('buildAnimations');
   const el = root.value;
   if (!el) return () => {};
   // Responsive: all elements with .mobile-content
@@ -227,26 +228,6 @@ const buildAnimations = (mode: ViewType) => {
         overwrite: 'auto',
       },
     );
-
-    // gsap.fromTo(
-    //   simonRef.value,
-    //   {
-    //     scale: 0,
-    //     autoAlpha: 0,
-    //     rotation: 0,
-    //     transformOrigin: '50% 50%',
-    //   },
-    //   {
-    //     keyframes: [
-    //       { scale: 0.5, rotation: 15, autoAlpha: 1 },
-    //       { scale: 1.1, rotation: -10 },
-    //       { scale: 1, rotation: 0 },
-    //     ],
-    //     ease: 'bounce.out',
-    //     duration: 3.8,
-    //     overwrite: 'auto',
-    //   },
-    // );
 
     gsap.fromTo(
       headlineRef.value,
