@@ -233,52 +233,6 @@ watch(slide, (newVal) => mainStore.SET_ACTIVE_THEME(newVal));
 
       <!-- ensure content exceeds viewport so footer starts off-screen -->
       <div v-if="!isResponsive" class="footer-spacer" />
-
-      <!-- "Footer" lives in normal flow so we can scroll to it -->
-      <section id="footer" class="bg-dark text-white" aria-label="Site footer">
-        <q-toolbar class="justify-between">
-          <q-toolbar-title class="text-subtitle2 text-weight-light">
-            © {{ new Date().getFullYear() }} <span class="text-secondary">glk</span
-            ><span class="text-primary">Freelance</span>
-            | Crafted with
-            <q-icon :name="mdiHeart" color="accent" size="16px" />
-            using
-            <a href="https://vuejs.org/" target="_blank" class="text-primary">Vue</a>,
-            <a href="https://gsap.com/" target="_blank" class="text-primary">GSAP</a>,
-            <a
-              href="https://start.elevenlabs.io/cp/for-developers?utm_source=google&utm_medium=cpc&utm_campaign=t2_nonbrandsearch_developers_english&utm_id=23036483182&utm_term=elevenlabs%20api&utm_content=developer_-_other&gad_source=1&gad_campaignid=23036483182&gbraid=0AAAAA_PU6FZ0M3R23svUfxzzlK4tMIVv3&gclid=CjwKCAjwup3HBhAAEiwA7euZupVrpPtMDwT4bTGbiBeuLGRgeJRvvD2WxgM5nLfSbMAo1CMsKbfPtRoCiB0QAvD_BwE"
-              target="_blank"
-              class="text-primary"
-              >Elevenlabs API</a
-            >, and
-            <a href="https://openai.com/api/" target="_blank" class="text-primary">ChatGPT API</a>.
-          </q-toolbar-title>
-
-          <div>
-            <a href="https://github.com/grantknaver">
-              <q-btn
-                flat
-                round
-                :icon="mdiGithub"
-                target="_blank"
-                :class="activeTheme !== Theme.Summer ? 'text-primary' : 'text-secondary'"
-                aria-label="GitHub"
-              />
-            </a>
-
-            <a href="https://www.linkedin.com/in/grant-knaver/" target="_blank">
-              <q-btn
-                flat
-                round
-                :icon="mdiLinkedin"
-                target="_blank"
-                :class="activeTheme !== Theme.Summer ? 'text-primary' : 'text-secondary'"
-                aria-label="LinkedIn"
-              />
-            </a>
-          </div>
-        </q-toolbar>
-      </section>
     </q-page-container>
 
     <q-drawer
@@ -314,6 +268,51 @@ watch(slide, (newVal) => mainStore.SET_ACTIVE_THEME(newVal));
       </q-scroll-area>
     </q-drawer>
   </q-layout>
+  <!-- "Footer" lives in normal flow so we can scroll to it -->
+  <section id="footer" class="bg-dark text-white" aria-label="Site footer">
+    <q-toolbar class="justify-between">
+      <q-toolbar-title class="text-subtitle2 text-weight-light">
+        © {{ new Date().getFullYear() }} <span class="text-secondary">glk</span
+        ><span class="text-primary">Freelance</span>
+        | Crafted with
+        <q-icon :name="mdiHeart" color="accent" size="16px" />
+        using
+        <a href="https://vuejs.org/" target="_blank" class="text-primary">Vue</a>,
+        <a href="https://gsap.com/" target="_blank" class="text-primary">GSAP</a>,
+        <a
+          href="https://start.elevenlabs.io/cp/for-developers?utm_source=google&utm_medium=cpc&utm_campaign=t2_nonbrandsearch_developers_english&utm_id=23036483182&utm_term=elevenlabs%20api&utm_content=developer_-_other&gad_source=1&gad_campaignid=23036483182&gbraid=0AAAAA_PU6FZ0M3R23svUfxzzlK4tMIVv3&gclid=CjwKCAjwup3HBhAAEiwA7euZupVrpPtMDwT4bTGbiBeuLGRgeJRvvD2WxgM5nLfSbMAo1CMsKbfPtRoCiB0QAvD_BwE"
+          target="_blank"
+          class="text-primary"
+          >Elevenlabs API</a
+        >, and
+        <a href="https://openai.com/api/" target="_blank" class="text-primary">ChatGPT API</a>.
+      </q-toolbar-title>
+
+      <div>
+        <a href="https://github.com/grantknaver">
+          <q-btn
+            flat
+            round
+            :icon="mdiGithub"
+            target="_blank"
+            :class="activeTheme !== Theme.Summer ? 'text-primary' : 'text-secondary'"
+            aria-label="GitHub"
+          />
+        </a>
+
+        <a href="https://www.linkedin.com/in/grant-knaver/" target="_blank">
+          <q-btn
+            flat
+            round
+            :icon="mdiLinkedin"
+            target="_blank"
+            :class="activeTheme !== Theme.Summer ? 'text-primary' : 'text-secondary'"
+            aria-label="LinkedIn"
+          />
+        </a>
+      </div>
+    </q-toolbar>
+  </section>
 </template>
 
 <style lang="scss">
