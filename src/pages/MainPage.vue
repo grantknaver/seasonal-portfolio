@@ -175,7 +175,6 @@ const waitForLayout = async (el: HTMLElement | null, frames = 8): Promise<boolea
 };
 
 const buildAnimations = (mode: ViewType) => {
-  alert('buildAnimations');
   const el = root.value;
   if (!el) return () => {};
   // Responsive: all elements with .mobile-content

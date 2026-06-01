@@ -324,16 +324,9 @@ onBeforeUnmount(() => {
 
 .about-section {
   color: tokens.$text;
-  gap: 1rem;
 
   &.desktop-view {
-    max-height: calc(100dvh - 2rem);
-    overflow-y: auto;
-    overscroll-behavior: contain;
-  }
-
-  &.responsive-view {
-    gap: 1rem;
+    overflow-y: hidden;
   }
 
   .about-card {
