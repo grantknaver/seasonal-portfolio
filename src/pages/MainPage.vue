@@ -531,7 +531,6 @@ const toProof = () => {
 .page-container {
   position: relative;
   min-height: 100vh;
-  min-height: 100dvh; // safe viewport if supported
 
   .logo {
     display: none;
