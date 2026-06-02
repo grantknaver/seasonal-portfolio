@@ -439,7 +439,7 @@ const toProof = () => {
       <div ref="homeContainerRef" class="home-container q-pa-xl column">
         <div class="simon-copy">
           <div ref="simonRef" class="simon"><SimonMenu></SimonMenu></div>
-          <div v-if="!activeTopic" class="column justify-center">
+          <div class="column justify-center">
             <div class="relative-position overflow-hidden">
               <p class="text-caption kicker q-mt-none q-mb-sm">
                 Focused UI Motion + AI Interaction
@@ -447,11 +447,7 @@ const toProof = () => {
               <h1 ref="headlineRef" class="text-h1 full-width q-mt-none q-mb-none">
                 Build Clarity. Earn Trust. Create Momentum.
               </h1>
-              <div
-                ref="servRef"
-                v-if="!activeTopic"
-                class="text-lead subheadline q-mt-md start-animation"
-              >
+              <div ref="servRef" class="text-lead subheadline q-mt-md start-animation">
                 <p class="q-ma-none text-body-2">
                   Premium motion, AI interaction, and section-level implementation for platforms
                   that need sharper user flow.
