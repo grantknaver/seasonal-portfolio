@@ -329,6 +329,10 @@ onBeforeUnmount(() => {
     overflow-y: hidden;
   }
 
+  &.responsive-view {
+    gap: 1rem;
+  }
+
   .about-card {
     width: 100%;
     background: linear-gradient(

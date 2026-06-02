@@ -260,16 +260,40 @@ const sendEmail = async () => {
 
 .contactSection {
   color: tokens.$text;
+
+  &.desktop-view {
+    overflow-y: hidden;
+
+    .contact-shell {
+      margin-top: 0.25rem;
+      margin-bottom: 1rem;
+    }
+  }
+
+  &.responsive-view {
+    .contact-shell {
+      grid-template-columns: 1fr;
+      max-width: 600px;
+      padding: 1.25rem;
+    }
+
+    .contact-intro {
+      text-align: center;
+    }
+
+    .field-grid {
+      grid-template-columns: 1fr;
+    }
+  }
 }
 
 .contact-shell {
   display: grid;
-  grid-template-columns: minmax(220px, 0.85fr) minmax(360px, 1.15fr);
+  grid-template-columns: minmax(0, 1fr);
   gap: 1.25rem;
-  align-items: start;
   width: 100%;
-  max-width: 920px;
-  margin-inline: auto;
+  max-width: none;
+  margin-inline: 0;
   padding: clamp(1.25rem, 2vw, 2rem);
   border: 1px solid var(--q-accent);
   border-radius: 1rem;
@@ -282,7 +306,6 @@ const sendEmail = async () => {
     0 0 56px color-mix(in srgb, var(--q-accent) 30%, transparent),
     0 24px 72px color-mix(in srgb, tokens.$ink 88%, transparent);
 }
-
 .kicker {
   color: tokens.$champagne;
   letter-spacing: 0.08em;
@@ -416,33 +439,6 @@ const sendEmail = async () => {
   &.error {
     color: #450a0a;
     background: #fecaca;
-  }
-}
-
-.responsive-view {
-  .contact-shell {
-    grid-template-columns: 1fr;
-    max-width: 600px;
-    padding: 1.25rem;
-  }
-
-  .contact-intro {
-    text-align: center;
-  }
-
-  .field-grid {
-    grid-template-columns: 1fr;
-  }
-}
-
-.desktop-view {
-  max-height: calc(100dvh - 2rem);
-  overflow-y: auto;
-  overscroll-behavior: contain;
-
-  .contact-shell {
-    margin-top: 0.25rem;
-    margin-bottom: 1rem;
   }
 }
 
