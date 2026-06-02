@@ -680,7 +680,7 @@ const toContact = () => {
 .narrator-container {
   border-radius: 0.85rem;
   overflow: hidden;
-  background: color-mix(in srgb, tokens.$ink-soft 86%, transparent);
+  background: white;
   border: 1px solid color-mix(in srgb, var(--q-accent) 28%, transparent);
   box-shadow: 0 16px 40px color-mix(in srgb, tokens.$ink 72%, transparent);
 }
