@@ -1,15 +1,18 @@
 <script lang="ts" setup>
-import { computed, ref, watch, onMounted } from 'vue';
+import { computed, onBeforeUnmount, onMounted, ref, watch } from 'vue';
+import { debounce } from 'quasar';
 import { v4 as uuidv4 } from 'uuid';
-import { useMainStore } from '../stores/main';
 import { storeToRefs } from 'pinia';
-import { setSeasonClasses } from '../shared/utils/setSeasonColors';
+import { mdiCheckboxBlankCircle } from '@quasar/extras/mdi-v7';
+
+import { useMainStore } from '../stores/main';
 import { Package } from '../shared/constants/packages';
-import { type PackageDetails } from '../shared/types/packageDetails';
-import { useViewport } from '../shared/utils/viewWidth';
 import { Theme } from 'src/shared/constants/theme';
+import { TopicName } from 'src/shared/constants/topicName';
+import { type PackageDetails } from '../shared/types/packageDetails';
 import { type ThemePackageImages } from 'src/shared/types/themePackageImages';
 import type { PackageType } from 'src/shared/types/packageType';
+import { useViewport } from '../shared/utils/viewWidth';
 
 import starterFall from 'src/assets/starter-fall.png?w=300;600;900&format=avif;webp;png&as=picture';
 import growthFall from 'src/assets/growth-fall.png?w=300;500;900&format=avif;webp;png&as=picture';
@@ -27,13 +30,13 @@ import starterSummer from 'src/assets/starter-summer.png?w=300;500;900&format=av
 import growthSummer from 'src/assets/growth-summer.png?w=300;500;900&format=avif;webp;png&as=picture';
 import premiumSummer from 'src/assets/premium-summer.png?w=300;500;900&format=avif;webp;png&as=picture';
 
-import { mdiCheckboxBlankCircle } from '@quasar/extras/mdi-v7';
-import { debounce } from 'quasar';
-import { TopicName } from 'src/shared/constants/topicName';
-
 const mainStore = useMainStore();
 const { activeTheme } = storeToRefs(mainStore);
 const emit = defineEmits(['requestConsultation']);
+
+const { lgBreakpoint, width } = useViewport();
+const isResponsive = computed(() => width.value < lgBreakpoint);
+
 const getPackageImages = (theme: Theme): ThemePackageImages => {
   switch (theme) {
     case Theme.Fall:
@@ -60,7 +63,6 @@ const getPackageImages = (theme: Theme): ThemePackageImages => {
         growth: growthSummer,
         premium: premiumSummer,
       };
-
     default:
       return {
         starter: starterFall,
@@ -69,6 +71,7 @@ const getPackageImages = (theme: Theme): ThemePackageImages => {
       };
   }
 };
+
 const packages = ref<PackageDetails[]>([
   {
     name: Package.StarterPackage,
@@ -135,21 +138,22 @@ const packages = ref<PackageDetails[]>([
       'The complete experience — built for high-visibility launches, investors, or agencies needing that extra wow factor.',
   },
 ]);
-const { lgBreakpoint, width } = useViewport();
-const isResponsive = computed(() => width.value < lgBreakpoint);
 
-onMounted(() => {
-  setActiveAssets(activeTheme.value);
-  window.addEventListener('resize', onResize);
-});
+const setActiveAssets = (newTheme: Theme) => {
+  const activeThemePackageImages = getPackageImages(newTheme);
+  const theme = newTheme.toLowerCase();
 
-watch(
-  activeTheme,
-  (newTheme) => {
-    setActiveAssets(newTheme);
-  },
-  {},
-);
+  packages.value = packages.value.map((p) => {
+    const name = p.name.toLowerCase().replace(' ', '').replace('package', '') as PackageType;
+    const img = activeThemePackageImages[name];
+
+    return {
+      ...p,
+      src: new URL(`../assets/${name}-${theme}.png`, import.meta.url).href,
+      img,
+    };
+  });
+};
 
 const onResize = debounce(() => {
   setActiveAssets(activeTheme.value);
@@ -160,170 +164,87 @@ const toContact = (p: Package | null) => {
   mainStore.SET_PACKAGE_OF_INTEREST(p);
   mainStore.SET_ACTIVE_TOPIC(TopicName.Contact);
 };
-const setActiveAssets = (newTheme: Theme) => {
-  const activeThemePackageImages = getPackageImages(newTheme);
-  const theme = newTheme.toLowerCase();
-  const updatedPackages = packages.value.map((p) => {
-    const name = p.name.toLowerCase().replace(' ', '').replace('package', '') as PackageType;
-    const img = activeThemePackageImages[name];
-    return {
-      ...p,
-      src: new URL(`../assets/${name}-${theme}.png`, import.meta.url).href,
-      img,
-    };
-  });
-  packages.value = updatedPackages;
-};
+
+const packageTier = (name: Package) => String(name).replace(' Package', '').toUpperCase();
+
+const packageCta = (name: Package) => `Start with ${String(name).replace(' Package', '')}`;
+
+onMounted(() => {
+  setActiveAssets(activeTheme.value);
+  window.addEventListener('resize', onResize);
+});
+
+onBeforeUnmount(() => {
+  window.removeEventListener('resize', onResize);
+});
+
+watch(activeTheme, (newTheme) => {
+  setActiveAssets(newTheme);
+});
 </script>
 
 <template>
-  <!-- Mobile -->
-  <section v-if="isResponsive" class="responsive-view column q-gutter-y-md">
-    <q-card class="full-width column items-center bg-secondary">
-      <q-card-section
-        class="package-header-section full-width q-pa-lg text-primary"
-        :class="
-          setSeasonClasses(
-            {
-              Fall: 'bg-accent ',
-              Winter: 'bg-accent',
-              Spring: 'bg-accent ',
-              Summer: 'bg-accent ',
-            },
-            activeTheme,
-          )
-        "
-      >
-        <h1
-          class="text-h1 text-white q-mt-none q-mb-md q-mb-md q-pt-md q-pb-md bg-dark text-center"
-        >
-          Packages
-        </h1>
-        <q-separator
-          :color="
-            setSeasonClasses(
-              {
-                Fall: 'primary',
-                Winter: 'primary',
-                Spring: 'primary',
-                Summer: 'primary',
-              },
-              activeTheme,
-            )
-          "
-          class="q-mb-md"
-        />
-        <p
-          class="text-body-1 text-center"
-          :class="
-            setSeasonClasses(
-              {
-                Fall: 'text-primary',
-                Winter: 'text-primary',
-                Spring: 'text-primary',
-                Summer: 'text-white',
-              },
-              activeTheme,
-            )
-          "
-        >
-          Each project below demonstrates how design, animation, and intelligence combine to make
-          interfaces <i>feel alive</i>. From motion systems to AI-integrated tools, these builds
-          show how creative engineering turns complexity into clarity.
+  <section
+    class="packageSection full-width column"
+    :class="isResponsive ? 'responsive-view q-pa-md' : 'desktop-view q-pa-md'"
+  >
+    <div class="package-shell">
+      <div class="package-header">
+        <p class="text-caption kicker q-mt-none q-mb-sm">Focused implementation blocks</p>
+        <h1 class="text-h1 q-mt-none q-mb-md">Packages</h1>
+        <p class="section-lead text-body-1 q-mt-none q-mb-sm">
+          Clear scopes for motion, AI interaction, and section-level polish.
         </p>
-      </q-card-section>
+        <p class="section-copy text-body-2 q-ma-none">
+          Choose the smallest useful build. Each package is designed to improve clarity, trust, and
+          momentum without forcing a full redesign.
+        </p>
+      </div>
 
-      <q-card-section class="section-container first-section full-width column">
-        <div class="package-tile section-container full-width q-pa-md bg-white q-mb-none no-border">
-          <div class="h2-container row justify-center q-mb-md text-center bg-accent text-white">
-            <h2 class="text-h2">{{ packages[0]?.name }}</h2>
-          </div>
-
-          <div class="tagline-container bg-dark q-pa-lg">
-            <p class="text-body-2 text-center text-primary q-ma-none">
-              {{ packages[0]?.tagline }}
-            </p>
-          </div>
-          <div class="cta-container column">
-            <div class="img-container column full-width items-center bg-primary">
-              <picture
-                :class="{
-                  'responsive-fall-img': activeTheme === Theme.Fall,
-                  'responsive-winter-img': activeTheme === Theme.Winter,
-                  'responsive-spring-img': activeTheme === Theme.Spring,
-                  'responsive-summer-img': activeTheme === Theme.Summer,
-                }"
-              >
-                <source v-for="(src, k) in packages[0]?.img.sources" :key="k" :srcset="src" />
-                <img
-                  :src="packages[0]?.img.img.src"
-                  :width="packages[0]?.img.img.w"
-                  :height="packages[0]?.img.img.h"
-                  :alt="packages[0]?.name"
-                  loading="eager"
-                  fetchpriority="high"
-                  decoding="async"
-                />
-              </picture>
-            </div>
-            <br />
-            <q-btn
-              size="lg"
-              color="accent"
-              class="q-mb-md"
-              @click="toContact(packages[0]?.name ?? null)"
-              >Consultation</q-btn
-            >
-          </div>
-          <q-item v-for="(f, index) in packages[0]?.features" :key="index">
-            <span class="row full-width q-pa-none">
-              <q-item-section side>
-                <q-icon :name="mdiCheckboxBlankCircle" size=".5rem" class="text-dark" />
-              </q-item-section>
-              <q-item-section class="package-feature text-body-2 text-black">
-                {{ f.text }}
-              </q-item-section>
-            </span>
-          </q-item>
+      <div class="package-proof-grid">
+        <div class="package-proof-card">
+          <span>Scope</span>
+          <strong>Clear work block before build.</strong>
         </div>
-      </q-card-section>
-    </q-card>
-    <q-intersection
-      v-for="(p, index) in packages.slice(1)"
-      :key="p.id"
-      transition="slide-up"
-      transition-duration="1500"
-      :once="true"
-      class="q-card-container full-width"
-    >
-      <q-card class="full-width column items-center bg-secondary">
-        <q-card-section class="section-container full-width column">
-          <div class="package-tile full-width q-pa-md bg-white q-mb-none no-border rounded-borders">
-            <div class="h2-container row justify-center q-mb-md text-center bg-accent text-white">
-              <h2 class="text-h2">{{ p.name }}</h2>
-            </div>
 
-            <div class="tagline-container bg-dark q-pa-lg">
-              <p class="text-body-2 text-center text-primary q-ma-none">
-                {{ p.tagline }}
-              </p>
-            </div>
+        <div class="package-proof-card">
+          <span>Motion</span>
+          <strong>Purposeful feedback, not decoration.</strong>
+        </div>
 
-            <div class="cta-container column">
-              <div class="img-container column full-width items-center bg-primary">
+        <div class="package-proof-card">
+          <span>Delivery</span>
+          <strong>Polished, responsive implementation.</strong>
+        </div>
+      </div>
+
+      <div class="package-card-stack">
+        <article
+          v-for="(p, index) in packages"
+          :key="p.id"
+          class="package-card"
+          :class="{ 'is-recommended': p.name === Package.GrowthPackage }"
+        >
+          <div class="package-media-title">
+            <div class="package-media-column">
+              <div class="img-container column justify-center items-center">
                 <picture
                   :class="{
-                    'responsive-fall-img': activeTheme === Theme.Fall,
-                    'responsive-winter-img': activeTheme === Theme.Winter,
-                    'responsive-spring-img': activeTheme === Theme.Spring,
-                    'responsive-summer-img': activeTheme === Theme.Summer,
+                    'responsive-fall-img': isResponsive && activeTheme === Theme.Fall,
+                    'responsive-winter-img': isResponsive && activeTheme === Theme.Winter,
+                    'responsive-spring-img': isResponsive && activeTheme === Theme.Spring,
+                    'responsive-summer-img': isResponsive && activeTheme === Theme.Summer,
+                    'desktop-fall-img': !isResponsive && activeTheme === Theme.Fall,
+                    'desktop-winter-img': !isResponsive && activeTheme === Theme.Winter,
+                    'desktop-spring-img': !isResponsive && activeTheme === Theme.Spring,
+                    'desktop-summer-img': !isResponsive && activeTheme === Theme.Summer,
                   }"
                 >
                   <source v-for="(s, srcIndex) in p.img.sources" :key="srcIndex" :srcset="s" />
                   <img
                     :src="p?.img.img.src"
-                    :width="p?.img.img.w"
-                    :height="p?.img.img.h"
+                    :width="isResponsive ? p?.img.img.w : undefined"
+                    :height="isResponsive ? p?.img.img.h : undefined"
                     :alt="p?.name"
                     :loading="index === 0 ? 'eager' : 'lazy'"
                     :fetchpriority="index === 0 ? 'high' : 'auto'"
@@ -331,172 +252,57 @@ const setActiveAssets = (newTheme: Theme) => {
                   />
                 </picture>
               </div>
-              <br />
-              <q-btn size="lg" color="accent" class="q-mb-md" @click="toContact(p?.name ?? null)"
-                >Consultation</q-btn
-              >
             </div>
-            <q-list>
-              <q-item v-for="(f, index) in p.features" :key="index">
-                <span class="row full-width q-pa-none">
-                  <q-item-section side>
-                    <q-icon :name="mdiCheckboxBlankCircle" size=".5rem" class="text-dark" />
-                  </q-item-section>
-                  <q-item-section class="package-feature text-body-2 text-black">
-                    {{ f.text }}
-                  </q-item-section>
+            <div class="package-title-column">
+              <div class="package-title-row q-mb-sm">
+                <div>
+                  <p class="text-caption kicker q-mt-none q-mb-xs">{{ packageTier(p.name) }}</p>
+                  <h2 class="text-h2 q-mt-none q-mb-sm">{{ p.name }}</h2>
+                </div>
+
+                <span v-if="p.name === Package.GrowthPackage" class="recommended-pill">
+                  Recommended
                 </span>
+              </div>
+
+              <p class="package-tagline text-body-2 q-mt-none q-mb-md">
+                {{ p.tagline }}
+              </p>
+            </div>
+          </div>
+
+          <div class="package-highlights">
+            <p class="package-feature-header text-body-2 q-mt-none q-mb-md">
+              {{ p.featuresHeader }}
+            </p>
+
+            <q-list class="package-feature-list q-mb-md">
+              <q-item
+                v-for="(f, featureIndex) in p.features"
+                :key="featureIndex"
+                class="package-feature-item"
+              >
+                <q-item-section side>
+                  <q-icon :name="mdiCheckboxBlankCircle" size="8px" class="feature-dot" />
+                </q-item-section>
+
+                <q-item-section class="package-feature text-body-2">
+                  {{ f.text }}
+                </q-item-section>
               </q-item>
             </q-list>
+            <q-btn
+              @click="toContact(p?.name ?? null)"
+              color="accent"
+              class="package-cta full-width"
+              size="lg"
+              glossy
+            >
+              <span class="text-body-2">{{ packageCta(p.name) }}</span>
+            </q-btn>
           </div>
-        </q-card-section>
-      </q-card></q-intersection
-    >
-  </section>
-
-  <!-- Desktop -->
-  <section v-if="!isResponsive" class="desktop-view full-width column">
-    <div
-      class="intro-container full-width q-pt-md q-pr-md q-pb-none q-pl-md"
-      :class="
-        setSeasonClasses(
-          {
-            Fall: isResponsive ? 'bg-primary ' : 'bg-transparent',
-            Winter: isResponsive ? 'bg-primary ' : 'bg-transparent',
-            Spring: isResponsive ? 'bg-primary ' : 'bg-transparent',
-            Summer: isResponsive ? 'bg-white ' : 'bg-transparent',
-          },
-          activeTheme,
-        )
-      "
-    >
-      <h1
-        class="text-h1 text-white q-mt-none q-pt-md q-pb-md text-center"
-        :class="
-          setSeasonClasses(
-            {
-              Fall: isResponsive ? 'bg-dark' : 'bg-dark  border-black',
-              Winter: isResponsive ? 'bg-dark ' : 'bg-dark  border-black',
-              Spring: isResponsive ? 'bg-dark ' : 'bg-accent border-black',
-              Summer: isResponsive ? 'bg-dark ' : 'bg-dark  border-black',
-            },
-            activeTheme,
-          )
-        "
-      >
-        Packages
-      </h1>
-      <q-separator
-        :color="
-          setSeasonClasses(
-            {
-              Fall: isResponsive ? 'accent' : 'secondary',
-              Winter: isResponsive ? 'accent' : 'primary',
-              Spring: isResponsive ? 'accent ' : 'primary',
-              Summer: isResponsive ? 'accent ' : 'secondary',
-            },
-            activeTheme,
-          )
-        "
-      />
-      <p
-        class="q-mt-lg"
-        :class="
-          setSeasonClasses(
-            {
-              Fall: isResponsive ? 'text-center text-dark' : 'text-primary',
-              Winter: isResponsive ? 'text-center text-dark' : 'text-primary',
-              Spring: isResponsive ? 'text-center text-dark' : 'text-primary',
-              Summer: isResponsive ? 'text-center text-dark' : 'text-white',
-            },
-            activeTheme,
-          )
-        "
-      >
-        Whether you need one polished animation, a full motion + AI upgrade, or a launch-ready
-        experience, I’ve got you covered. These packages make it simple to get started — clear
-        scope, fair pricing, and fast turnaround.
-      </p>
-    </div>
-    <div class="cards-container column justify-end full-width q-pa-md">
-      <q-intersection
-        v-for="(p, index) in packages"
-        :key="p.id"
-        transition="slide-up"
-        transition-duration="1500"
-        :once="true"
-        class="q-card-container full-width"
-      >
-        <q-card
-          class="bg-secondary"
-          :class="{
-            'q-mb-md': index !== packages.length - 1,
-          }"
-        >
-          <q-card-section class="section-container">
-            <div class="package-tile row bg-white">
-              <div class="col-6">
-                <q-expansion-item
-                  header-class="expandable-header"
-                  class="full-width q-mb-md"
-                  :label="p.name"
-                >
-                  <q-card class="header-content full-width bg-dark">
-                    <q-card-section class="text-primary">
-                      {{ p.tagline }}
-                    </q-card-section>
-                  </q-card>
-                </q-expansion-item>
-
-                <div class="column no-wrap items-center q-mb-none q-pa-md border rounded-borders">
-                  <div class="img-container column justify-center items-center bg-primary">
-                    <picture
-                      :class="{
-                        'desktop-fall-img': activeTheme === Theme.Fall,
-                        'desktop-winter-img': activeTheme === Theme.Winter,
-                        'desktop-spring-img': activeTheme === Theme.Spring,
-                        'desktop-summer-img': activeTheme === Theme.Summer,
-                      }"
-                    >
-                      <source v-for="(s, srcIndex) in p.img.sources" :key="srcIndex" :srcset="s" />
-                      <img
-                        :src="p?.img.img.src"
-                        :alt="p?.name"
-                        :loading="index === 0 ? 'eager' : 'lazy'"
-                        :fetchpriority="index === 0 ? 'high' : 'auto'"
-                        decoding="async"
-                      />
-                    </picture>
-                  </div>
-                  <q-btn
-                    @click="toContact(p?.name ?? null)"
-                    color="accent"
-                    class="q-mt-md full-width"
-                    >Consultation</q-btn
-                  >
-                </div>
-              </div>
-              <q-list
-                bordered
-                padding
-                :separator="true"
-                class="col-6 q-mb-none no-border rounded-borders bg-primary"
-              >
-                <q-item v-for="(f, index) in p.features" :key="index">
-                  <span class="row full-width q-pa-none">
-                    <q-item-section side>
-                      <q-icon :name="mdiCheckboxBlankCircle" size="8px" class="text-dark" />
-                    </q-item-section>
-                    <q-item-section class="text-body-2 text-dark">
-                      {{ f.text }}
-                    </q-item-section>
-                  </span>
-                </q-item>
-              </q-list>
-            </div>
-          </q-card-section>
-        </q-card>
-      </q-intersection>
+        </article>
+      </div>
     </div>
   </section>
 </template>
@@ -505,150 +311,256 @@ const setActiveAssets = (newTheme: Theme) => {
 @use '/src/css/_tokens.scss' as tokens;
 
 .packageSection {
-  content-visibility: auto;
-  contain-intrinsic-size: 800px 1000px;
+  color: tokens.$text;
 }
 
-.responsive-view {
-  .first-section {
-    border-top-left-radius: 0;
-    border-top-right-radius: 0;
+.package-shell {
+  display: grid;
+  gap: 1.25rem;
+  padding: clamp(1.5625rem, 2.5vw, 2.5rem);
+  border: 1px solid var(--q-accent);
+  border-radius: 1rem;
+  background: linear-gradient(
+    135deg,
+    color-mix(in srgb, tokens.$ink-soft 90%, tokens.$ivory 10%),
+    tokens.$ink
+  );
+  box-shadow:
+    0 0 56px color-mix(in srgb, var(--q-accent) 30%, transparent),
+    0 24px 72px color-mix(in srgb, tokens.$ink 88%, transparent);
+}
 
-    .section-container {
-      border-radius: 5px;
-    }
-  }
-
-  .package-header-section {
-    padding: 1rem;
-    background-color: rgba(black, 0.5);
-    border-radius: 0;
-  }
-
-  .h2-container {
-    border: solid 2px var(--q-dark);
-  }
-
-  .tagline-container {
-    border-bottom: 4px solid white;
+.package-header {
+  h1 {
+    color: tokens.$text;
+    line-height: 1.08;
+    letter-spacing: -0.025em;
     font-weight: 400;
+    text-wrap: balance;
   }
 
-  .package-feature {
-    line-height: 1.6rem;
+  .section-lead {
+    color: tokens.$text;
+    font-weight: 700;
   }
 
-  .img-container {
-    width: min(100%, 300px);
-    aspect-ratio: 1 / 1;
+  .section-copy {
+    max-width: 48rem;
+    margin-inline: auto;
+    color: tokens.$text-muted;
+    line-height: 1.55;
+  }
+}
+
+.kicker {
+  color: tokens.$champagne;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  font-weight: 700;
+}
+
+.package-proof-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 0.75rem;
+}
+
+.package-proof-card,
+.package-card {
+  border: 1px solid color-mix(in srgb, var(--q-accent) 28%, transparent);
+  border-radius: 0.85rem;
+  background: color-mix(in srgb, tokens.$ink-soft 82%, transparent);
+  box-shadow: inset 0 1px 0 color-mix(in srgb, tokens.$ivory 8%, transparent);
+}
+
+.package-proof-card {
+  padding: 0.85rem 1rem;
+
+  span {
+    display: block;
+    margin-bottom: 0.25rem;
+    color: tokens.$champagne;
+    font-size: 0.72rem;
+    line-height: 1;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    font-weight: 700;
+  }
+
+  strong {
+    display: block;
+    color: tokens.$text-muted;
+    font-size: 0.9rem;
+    line-height: 1.3;
+    font-weight: 600;
+  }
+}
+
+.package-card-stack {
+  display: grid;
+  gap: 1rem;
+
+  .package-media-title {
+    display: grid;
+    grid-template-columns: minmax(220px, 0.42fr) minmax(0, 1fr);
+    gap: 1.5rem;
+  }
+
+  .package-highlights {
+    margin-top: 1rem;
+  }
+}
+
+.package-card {
+  padding: 1.25rem;
+
+  &.is-recommended {
+    border-color: color-mix(in srgb, var(--q-accent) 52%, transparent);
+  }
+}
+
+.package-media-column,
+.package-title-column {
+  min-width: 0;
+}
+
+.package-content-column {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 0.75rem;
+}
+
+.img-container {
+  width: 100%;
+  aspect-ratio: 1 / 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  border: 1px solid color-mix(in srgb, var(--q-accent) 28%, transparent);
+  border-radius: 0.85rem;
+  background: color-mix(in srgb, tokens.$ink-soft 82%, tokens.$ivory 6%);
+
+  picture {
     display: flex;
     align-items: center;
     justify-content: center;
-    overflow: hidden;
+  }
 
-    img {
-      max-width: 100%;
-      max-height: 100%;
-      width: auto;
-      height: auto;
-      object-fit: contain;
-    }
+  img {
+    display: block;
+    max-width: 100%;
+    max-height: 100%;
+    width: auto;
+    height: auto;
+    object-fit: contain;
+  }
+}
+
+.package-title-row {
+  display: flex;
+  justify-content: space-between;
+  gap: 1rem;
+
+  h2 {
+    color: tokens.$text;
+    line-height: 1.12;
+    letter-spacing: -0.02em;
+    font-weight: 400;
+    text-wrap: balance;
+  }
+}
+
+.recommended-pill {
+  align-self: flex-start;
+  padding: 0.35rem 0.6rem;
+  border: 1px solid color-mix(in srgb, var(--q-accent) 40%, transparent);
+  border-radius: 999px;
+  color: tokens.$champagne;
+  font-size: 0.72rem;
+  line-height: 1;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  font-weight: 700;
+  white-space: nowrap;
+}
+
+.package-tagline {
+  color: tokens.$text-muted;
+  line-height: 1.45;
+  font-weight: 600;
+}
+
+.package-feature-header {
+  color: tokens.$text;
+  line-height: 1.45;
+  font-weight: 700;
+}
+
+.package-feature-list {
+  display: grid;
+  gap: 0.75rem;
+}
+
+.package-feature-item {
+  min-height: auto;
+  padding: 0.85rem 1rem;
+  border: 1px solid color-mix(in srgb, var(--q-accent) 22%, transparent);
+  border-radius: 0.75rem;
+  background: color-mix(in srgb, tokens.$ink 72%, transparent);
+}
+
+.feature-dot {
+  color: var(--q-accent);
+}
+
+.package-feature {
+  color: tokens.$text-muted;
+  line-height: 1.35;
+  font-weight: 600;
+}
+
+.package-cta {
+  border-radius: 0.75rem;
+}
+
+.responsive-view {
+  .package-shell {
+    padding: 1.25rem;
+  }
+
+  .package-proof-grid,
+  .package-card {
+    grid-template-columns: 1fr;
+  }
+
+  .package-header {
+    text-align: center;
+  }
+
+  .package-card {
+    padding: 1rem;
+  }
+
+  .package-title-row {
+    display: block;
+    text-align: center;
+  }
+
+  .recommended-pill {
+    display: inline-block;
+    margin-top: 0.25rem;
   }
 }
 
 .desktop-view {
-  display: flex;
-
-  .intro-container {
-    @media (max-width: tokens.$breakpoint-lg) {
-      background-color: var(--q-accent);
-      border-bottom: solid 4px var(--q-secondary);
-    }
-    @media (min-width: $breakpoint-lg) {
-      background-color: transparent;
-    }
-
-    p {
-      font-weight: normal;
-      font-size: 1rem;
-      @media (max-width: tokens.$breakpoint-md) {
-        font-size: 1.2rem;
-      }
-    }
-  }
-
-  .cards-container {
-    @media (max-width: tokens.$breakpoint-lg) {
-      background-color: rgba(0, 0, 0, 0.5);
-      border: solid 4px var(--q-white);
-      border-top: none;
-      border-bottom-left-radius: 10px;
-      border-bottom-right-radius: 10px;
-    }
-    @media (min-width: tokens.$breakpoint-lg) {
-      background-color: transparent;
-    }
-
-    .q-card-container {
-      box-shadow: 1rem 1rem 1rem dark;
-
-      .q-card {
-        box-sizing: border-box;
-        border-radius: 10px !important;
-
-        .section-container:nth-child(2) {
-          border-radius: 10px;
-        }
-
-        .package-tile {
-          border-radius: 10px;
-
-          .header-content,
-          .header-content.q-card-section {
-            border-radius: 0 !important;
-            border-top: 1px solid lightgray;
-          }
-
-          .expandable-header {
-            border: solid 1px lightgray;
-          }
-
-          hr {
-            width: 90%;
-          }
-
-          .q-item {
-            padding-top: 0.5rem;
-            padding-bottom: 8px;
-          }
-
-          .tagline {
-            font-weight: 400; /* only one weight is available for some scripts */
-          }
-
-          .img-container {
-            width: 100%;
-            aspect-ratio: 1 / 1; /* keeps it square */
-            overflow: hidden; /* hides any accidental overflow */
-            border: solid 2px var(--q-dark);
-
-            img {
-              max-width: 100%;
-              max-height: 100%;
-              width: auto; /* don’t force 100% width */
-              height: auto; /* preserve aspect ratio */
-              object-fit: contain; /* fit entirely within the box */
-            }
-          }
-        }
-      }
-    }
-  }
+  overflow: visible;
 }
 
 .responsive-fall-img {
   width: 90%;
   max-width: 350px;
+
   @media (min-width: tokens.$breakpoint-md) {
     max-width: 600px;
   }
@@ -657,6 +569,7 @@ const setActiveAssets = (newTheme: Theme) => {
 .responsive-winter-img {
   width: 90%;
   max-width: 250px;
+
   @media (min-width: tokens.$breakpoint-md) {
     max-width: 425px;
   }
@@ -665,6 +578,7 @@ const setActiveAssets = (newTheme: Theme) => {
 .responsive-spring-img {
   width: 90%;
   max-width: 250px;
+
   @media (min-width: tokens.$breakpoint-md) {
     max-width: 400px;
   }
@@ -673,37 +587,34 @@ const setActiveAssets = (newTheme: Theme) => {
 .responsive-summer-img {
   width: 90%;
   max-width: 400px;
+
   @media (min-width: tokens.$breakpoint-md) {
     max-width: 550px;
   }
 }
-// ------------------------------
+
 .desktop-fall-img {
+  width: 90%;
   max-width: 200px;
+
   @media (min-width: tokens.$breakpoint-xl) {
     max-width: 250px;
   }
 }
 
 .desktop-winter-img {
+  width: 90%;
   max-width: 150px;
-  @media (min-width: tokens.$breakpoint-xl) {
-    background-color: transparent;
-  }
 }
 
 .desktop-spring-img {
+  width: 90%;
   max-width: 150px;
-  @media (min-width: tokens.$breakpoint-xl) {
-    background-color: transparent;
-  }
 }
 
 .desktop-summer-img {
+  width: 90%;
   max-width: 200px;
-  @media (min-width: tokens.$breakpoint-xl) {
-    background-color: transparent;
-  }
 }
 
 .fade-picture {
@@ -713,5 +624,11 @@ const setActiveAssets = (newTheme: Theme) => {
 
 .fade-picture.fading {
   opacity: 0;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .package-cta {
+    transition: none;
+  }
 }
 </style>
