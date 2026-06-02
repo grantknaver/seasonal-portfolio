@@ -457,8 +457,8 @@ const toContact = () => {
       align="justify"
       dense
       class="case-tabs q-pa-sm q-mb-md"
-      active-color="accent"
-      indicator-color="accent"
+      active-color="primary"
+      indicator-color="primary"
     >
       <q-tab
         v-for="study in caseStudies"

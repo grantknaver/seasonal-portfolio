@@ -64,7 +64,6 @@ const simonRef = ref();
     >
       <a class="simon-link text-body-2">
         <q-icon :name="topic.icon" size="80px" />
-        <!-- <q-tooltip anchor="center middle" self="top left"> {{ topic.label }} </q-tooltip> -->
         <span class="label">{{ topic.label }}</span>
       </a>
     </div>
