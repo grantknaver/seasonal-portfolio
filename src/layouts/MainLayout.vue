@@ -102,6 +102,7 @@ onMounted(() => {
   showCarousel.value = true;
   window.addEventListener('orientationchange', setAppVh);
   window.addEventListener('resize', updateWidths);
+  window.addEventListener('DOMContentLoaded', () => {});
   syncThemeGlobals(Theme.Fall);
 });
 onBeforeUnmount(() => window.removeEventListener('resize', updateWidths));

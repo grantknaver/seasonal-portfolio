@@ -89,7 +89,21 @@ const activeComponent = computed(() => {
   return cacheStore.catalog[entry];
 });
 
+const observer = new IntersectionObserver(
+  (entries) => {
+    entries.forEach((entry) => {
+      if (entry.isIntersecting) {
+        showFooter.value = true;
+      } else {
+        showFooter.value = false;
+      }
+    });
+  },
+  { threshold: 0.1 },
+); // Triggers when 10% of the element is visible
+
 onMounted(async () => {
+  const footerElement = document.getElementById('footer') as HTMLElement;
   if (isResponsive.value) {
     try {
       dispose.value = buildAnimations(ViewType.Responsive);
@@ -103,7 +117,7 @@ onMounted(async () => {
       console.log('Desktop main page animations error: ', e);
     }
   }
-
+  observer.observe(footerElement);
   await mainStore.VERIFY_IS_HUMAN();
 });
 
