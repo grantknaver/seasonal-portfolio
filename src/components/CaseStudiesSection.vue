@@ -542,18 +542,17 @@ const toContact = () => {
             </div>
           </template>
         </CaseStudy>
+        <q-btn
+          @click="toContact"
+          class="case-contact-btn q-mt-md full-width"
+          color="accent"
+          size="lg"
+          glossy
+        >
+          <span class="text-body-2">Discuss a project</span>
+        </q-btn>
       </q-tab-panel>
     </q-tab-panels>
-
-    <q-btn
-      @click="toContact"
-      class="case-contact-btn q-mt-md full-width"
-      color="accent"
-      size="lg"
-      glossy
-    >
-      <span class="text-body-2">Discuss a project</span>
-    </q-btn>
   </section>
 </template>
 <style scoped lang="scss">

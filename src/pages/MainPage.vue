@@ -665,14 +665,13 @@ const toProof = () => {
         .simon {
           min-width: 250px;
           max-width: 250px;
-          /* no transform-origin/scale here; GSAP sets them */
         }
       }
 
       .subheadline {
         position: relative;
         z-index: 1;
-        border-radius: 5px; /* GSAP handles opacity/transform */
+        border-radius: 5px;
         line-height: 1rem;
       }
 
@@ -694,7 +693,6 @@ const toProof = () => {
 }
 
 .panel-skeleton {
-  /* match the typical height of your section so there's no CLS */
   height: clamp(320px, 60vh, 720px);
 }
 </style>

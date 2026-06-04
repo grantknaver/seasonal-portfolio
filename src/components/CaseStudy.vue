@@ -322,9 +322,6 @@ const cardStyle = computed(() => ({
     color-mix(in srgb, tokens.$ink-soft 90%, tokens.$ivory 10%),
     tokens.$ink
   );
-  box-shadow:
-    0 0 48px color-mix(in srgb, var(--q-accent) 24%, transparent),
-    0 18px 56px color-mix(in srgb, tokens.$ink 88%, transparent);
 }
 
 .case-study-card::before {

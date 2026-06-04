@@ -382,15 +382,16 @@ aside {
 }
 
 .desktop-drawer {
-  display: flex;
   flex-direction: column;
   background-color: rgba(black, 0.5);
   border-left: solid 4px var(--q-primary);
   z-index: 2;
+  height: none;
 
   .q-scrollarea,
   .scroll-area {
     flex: 1 1 0%;
+    height: 100dvh;
   }
 }
 
