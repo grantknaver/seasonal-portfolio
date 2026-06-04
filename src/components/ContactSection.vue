@@ -10,7 +10,6 @@ import {
   mdiTextBoxOutline,
 } from '@quasar/extras/mdi-v7';
 import { useViewport } from 'src/shared/utils/viewWidth';
-import { Package } from 'src/shared/constants/packages';
 
 const form = reactive({
   name: '',
@@ -27,7 +26,7 @@ const error = ref(false);
 const errorMsg = ref<string | null>(null);
 const contactRef = ref<HTMLElement | null>(null);
 const mainStore = useMainStore();
-const { isHuman, packageOfInterest } = storeToRefs(mainStore);
+const { isHuman, packageInterestText } = storeToRefs(mainStore);
 const { lgBreakpoint, width } = useViewport();
 const isResponsive = computed(() => width.value < lgBreakpoint);
 
@@ -48,25 +47,8 @@ const contactDetails = [
 
 onMounted(() => {
   mainStore.SET_CONTACT_SECTION_REF(contactRef.value);
-  if (!packageOfInterest.value) return;
-  setSubject(packageOfInterest.value);
+  form.subject = packageInterestText.value;
 });
-
-const setSubject = (packageName: Package) => {
-  switch (packageName) {
-    case Package.StarterPackage:
-      form.subject = 'Interested in Starter Package';
-      break;
-    case Package.GrowthPackage:
-      form.subject = 'Interested in Growth Package';
-      break;
-    case Package.PremiumPackage:
-      form.subject = 'Interested in Premium Package';
-      break;
-    default:
-      form.subject = '';
-  }
-};
 
 const sendEmail = async () => {
   if (form._honey) return;

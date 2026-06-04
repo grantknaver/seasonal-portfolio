@@ -1,5 +1,5 @@
 export enum Package {
-  StarterPackage = 'Starter Package',
-  GrowthPackage = 'Growth Package',
-  PremiumPackage = 'Premium Package',
+  HeroClarityMotionPass = 'Hero Clarity + Motion Pass',
+  CtaAttentionConversionBlock = 'CTA Attention + Conversion Block',
+  MobileResponsivenessPolishPass = 'Mobile Responsiveness + Polish Pass',
 }

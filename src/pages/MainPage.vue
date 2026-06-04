@@ -308,7 +308,7 @@ const scrollToFooter = () => {
 };
 
 const toPackages = (p: Package | null) => {
-  if (p) mainStore.SET_PACKAGE_OF_INTEREST(p);
+  if (p) mainStore.SET_PACKAGE_INTEREST_TEXT(p);
   mainStore.SET_ACTIVE_TOPIC(TopicName.Packages);
   expandedPanel.value = TopicName.Packages;
 };

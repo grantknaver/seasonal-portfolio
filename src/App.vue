@@ -24,7 +24,7 @@ watch(
   activeTopic,
   (topic) => {
     if (topic !== TopicName.Contact && topic !== TopicName.Packages) {
-      mainStore.SET_PACKAGE_OF_INTEREST(null);
+      mainStore.SET_PACKAGE_INTEREST_TEXT('');
     }
   },
   { immediate: true },

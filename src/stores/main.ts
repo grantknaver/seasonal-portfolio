@@ -48,10 +48,10 @@ export const useMainStore = defineStore('main', () => {
   const containsScrollbar = ref<boolean>(false);
   const caseStudyActiveTab = ref<CaseStudies>(CaseStudies.WeatherAndTheme);
   const hasPainted = ref<boolean>(false);
-  const packageOfInterest = ref<Package | null>(null);
+  const packageInterestText = ref<string>('');
 
-  const SET_PACKAGE_OF_INTEREST = (packageName: Package | null): void => {
-    packageOfInterest.value = packageName;
+  const SET_PACKAGE_INTEREST_TEXT = (packageName: Package | ''): void => {
+    packageInterestText.value = packageName ? 'Interested in ' + packageName : '';
   };
   const SET_MOBILE_SCROLL_TARGET = (topicName: TopicName | null): void => {
     mobileScrollTarget.value = topicName;
@@ -224,7 +224,7 @@ export const useMainStore = defineStore('main', () => {
     containsScrollbar,
     caseStudyActiveTab,
     hasPainted,
-    packageOfInterest,
+    packageInterestText,
     SET_RECAPTCHA_WIDGET_ID,
     SET_ACTIVE_TOPIC,
     SET_ACTIVE_THEME,
@@ -237,7 +237,7 @@ export const useMainStore = defineStore('main', () => {
     HAS_SCROLLBAR,
     SET_CASE_STUDY_ACTIVE_TAB,
     SET_PAINTED_STATUS,
-    SET_PACKAGE_OF_INTEREST,
+    SET_PACKAGE_INTEREST_TEXT,
     UPDATE_CHATLOG,
   };
 });

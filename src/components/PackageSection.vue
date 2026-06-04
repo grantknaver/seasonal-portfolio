@@ -1,6 +1,5 @@
 <script lang="ts" setup>
-import { computed, onBeforeUnmount, onMounted, ref, watch } from 'vue';
-import { debounce } from 'quasar';
+import { computed, ref } from 'vue';
 import { v4 as uuidv4 } from 'uuid';
 import { storeToRefs } from 'pinia';
 import { mdiCheckboxBlankCircle } from '@quasar/extras/mdi-v7';
@@ -10,25 +9,11 @@ import { Package } from '../shared/constants/packages';
 import { Theme } from 'src/shared/constants/theme';
 import { TopicName } from 'src/shared/constants/topicName';
 import { type PackageDetails } from '../shared/types/packageDetails';
-import { type ThemePackageImages } from 'src/shared/types/themePackageImages';
-import type { PackageType } from 'src/shared/types/packageType';
 import { useViewport } from '../shared/utils/viewWidth';
 
-import starterFall from 'src/assets/starter-fall.png?w=300;600;900&format=avif;webp;png&as=picture';
-import growthFall from 'src/assets/growth-fall.png?w=300;500;900&format=avif;webp;png&as=picture';
-import premiumFall from 'src/assets/premium-fall.png?w=300;500;900&format=avif;webp;png&as=picture';
-
-import starterWinter from 'src/assets/starter-winter.png?w=300;500;900&format=avif;webp;png&as=picture';
-import growthWinter from 'src/assets/growth-winter.png?w=300;500;900&format=avif;webp;png&as=picture';
-import premiumWinter from 'src/assets/premium-winter.png?w=300;500;900&format=avif;webp;png&as=picture';
-
-import starterSpring from 'src/assets/starter-spring.png?w=300;500;900&format=avif;webp;png&as=picture';
-import growthSpring from 'src/assets/growth-spring.png?w=300;500;900&format=avif;webp;png&as=picture';
-import premiumSpring from 'src/assets/premium-spring.png?w=300;500;900&format=avif;webp;png&as=picture';
-
-import starterSummer from 'src/assets/starter-summer.png?w=300;500;900&format=avif;webp;png&as=picture';
-import growthSummer from 'src/assets/growth-summer.png?w=300;500;900&format=avif;webp;png&as=picture';
-import premiumSummer from 'src/assets/premium-summer.png?w=300;500;900&format=avif;webp;png&as=picture';
+import heroClarityMotionPass from 'src/assets/starter-fall.png?w=300;600;900&format=avif;webp;png&as=picture';
+import ctaAttentionConversionBlock from 'src/assets/growth-fall.png?w=300;500;900&format=avif;webp;png&as=picture';
+import mobileResponsivenessPolishPass from 'src/assets/premium-fall.png?w=300;500;900&format=avif;webp;png&as=picture';
 
 const mainStore = useMainStore();
 const { activeTheme } = storeToRefs(mainStore);
@@ -37,150 +22,87 @@ const emit = defineEmits(['requestConsultation']);
 const { lgBreakpoint, width } = useViewport();
 const isResponsive = computed(() => width.value < lgBreakpoint);
 
-const getPackageImages = (theme: Theme): ThemePackageImages => {
-  switch (theme) {
-    case Theme.Fall:
-      return {
-        starter: starterFall,
-        growth: growthFall,
-        premium: premiumFall,
-      };
-    case Theme.Winter:
-      return {
-        starter: starterWinter,
-        growth: growthWinter,
-        premium: premiumWinter,
-      };
-    case Theme.Spring:
-      return {
-        starter: starterSpring,
-        growth: growthSpring,
-        premium: premiumSpring,
-      };
-    case Theme.Summer:
-      return {
-        starter: starterSummer,
-        growth: growthSummer,
-        premium: premiumSummer,
-      };
-    default:
-      return {
-        starter: starterFall,
-        growth: growthFall,
-        premium: premiumFall,
-      };
-  }
-};
-
 const packages = ref<PackageDetails[]>([
   {
-    name: Package.StarterPackage,
+    name: Package.HeroClarityMotionPass,
     id: uuidv4(),
-    img: starterFall,
-    alt: Package.StarterPackage,
-    featuresHeader: 'For new ideas ready to break ground.',
+    img: heroClarityMotionPass,
+    alt: Package.HeroClarityMotionPass,
+    tagline: 'Make the first screen clearer, more premium, and easier to act on.',
+    fitLine: 'Best for pages where the value needs to land faster.',
     features: [
       {
         featureIcon: 'movie_filter',
-        text: 'One polished GSAP animation or a single AI feature integration',
+        text: 'Sharper headline, subheadline, and CTA structure',
       },
-      { featureIcon: 'phone_iphone', text: 'Mobile-friendly + performance tuned' },
-      { featureIcon: 'speed', text: 'Performance tuned' },
-      { featureIcon: 'schedule', text: 'Delivered in 1–2 weeks' },
+      { featureIcon: 'phone_iphone', text: 'Premium hero layout tuned for desktop and mobile' },
+      { featureIcon: 'speed', text: 'Purposeful GSAP reveal or attention motion' },
+      {
+        featureIcon: 'schedule',
+        text: 'Proof strip, trust badges, or CTA support added where useful',
+      },
       {
         featureIcon: 'rocket_launch',
-        text: 'Ideal for: landing pages, small teams, creators testing a concept',
+        text: 'Clear before/after direction for implementation',
       },
     ],
-    tagline: 'Your first step toward a more engaging, modern experience.',
   },
   {
-    name: Package.GrowthPackage,
+    name: Package.CtaAttentionConversionBlock,
     id: uuidv4(),
-    img: growthFall,
-    alt: Package.GrowthPackage,
-    featuresHeader: 'For projects ready to scale and stand out.',
+    img: ctaAttentionConversionBlock,
+    alt: Package.CtaAttentionConversionBlock,
+    tagline: 'Make the next step easier to see, trust, and click.',
+    fitLine: 'Best for pages with weak, buried, or unclear calls to action.',
     features: [
       {
         featureIcon: 'animation',
-        text: '2–3 animations, or 1 animation + 1 AI integration together',
+        text: 'Primary CTA placement and hierarchy tightened',
       },
       {
         featureIcon: 'integration_instructions',
-        text: 'Integrates into your existing site/app seamlessly',
+        text: 'Button motion, hover, and press states polished',
       },
-      { featureIcon: 'brush', text: 'UX + design polish included' },
-      { featureIcon: 'description', text: 'Case-study style wrap-up you can share' },
-      { featureIcon: 'event', text: 'Delivered in 3–4 weeks' },
+      { featureIcon: 'brush', text: 'Sticky, inline, or final CTA block added where appropriate' },
+      { featureIcon: 'description', text: 'Trust-support copy added near the action' },
+      { featureIcon: 'event', text: 'Cleaner path from interest to inquiry, booking, or purchase' },
     ],
-    tagline: 'Perfect for startups moving from MVP to a polished product launch.',
   },
   {
-    name: Package.PremiumPackage,
+    name: Package.MobileResponsivenessPolishPass,
     id: uuidv4(),
-    img: premiumFall,
-    alt: Package.PremiumPackage,
-    featuresHeader: 'For full bloom launches that need maximum impact.',
+    img: mobileResponsivenessPolishPass,
+    alt: Package.MobileResponsivenessPolishPass,
+    tagline: 'Clean up the experience across desktop, tablet, and mobile.',
+    fitLine: 'Best for builds that feel good on desktop but rough on smaller screens.',
     features: [
       {
         featureIcon: 'slideshow',
-        text: 'Hero animation, product demo, and AI integration combined',
+        text: 'Mobile spacing, type scale, and button rhythm refined',
       },
       {
         featureIcon: 'design_services',
-        text: 'Design + strategy prototypes in Figma before build',
+        text: 'Images, videos, and sections tuned for responsive layouts',
       },
-      { featureIcon: 'priority_high', text: 'Priority support throughout development' },
-      { featureIcon: 'support_agent', text: 'Optional ongoing support after delivery' },
-      { featureIcon: 'calendar_month', text: 'Delivered in 4–6 weeks' },
+      { featureIcon: 'priority_high', text: 'Touch targets and CTA placement improved' },
+      {
+        featureIcon: 'support_agent',
+        text: 'Scroll motion adjusted for mobile and reduced-motion support',
+      },
+      { featureIcon: 'calendar_month', text: 'Final QA pass across key screen sizes' },
     ],
-    tagline:
-      'The complete experience — built for high-visibility launches, investors, or agencies needing that extra wow factor.',
   },
 ]);
 
-const setActiveAssets = (newTheme: Theme) => {
-  const activeThemePackageImages = getPackageImages(newTheme);
-  const theme = newTheme.toLowerCase();
-
-  packages.value = packages.value.map((p) => {
-    const name = p.name.toLowerCase().replace(' ', '').replace('package', '') as PackageType;
-    const img = activeThemePackageImages[name];
-
-    return {
-      ...p,
-      src: new URL(`../assets/${name}-${theme}.png`, import.meta.url).href,
-      img,
-    };
-  });
-};
-
-const onResize = debounce(() => {
-  setActiveAssets(activeTheme.value);
-}, 500);
-
-const toContact = (p: Package | null) => {
+const toContact = (p: Package | '') => {
   emit('requestConsultation', p);
-  mainStore.SET_PACKAGE_OF_INTEREST(p);
+  mainStore.SET_PACKAGE_INTEREST_TEXT(p);
   mainStore.SET_ACTIVE_TOPIC(TopicName.Contact);
 };
 
 const packageTier = (name: Package) => String(name).replace(' Package', '').toUpperCase();
 
 const packageCta = (name: Package) => `Start with ${String(name).replace(' Package', '')}`;
-
-onMounted(() => {
-  setActiveAssets(activeTheme.value);
-  window.addEventListener('resize', onResize);
-});
-
-onBeforeUnmount(() => {
-  window.removeEventListener('resize', onResize);
-});
-
-watch(activeTheme, (newTheme) => {
-  setActiveAssets(newTheme);
-});
 </script>
 
 <template>
@@ -223,7 +145,7 @@ watch(activeTheme, (newTheme) => {
           v-for="(p, index) in packages"
           :key="p.id"
           class="package-card"
-          :class="{ 'is-recommended': p.name === Package.GrowthPackage }"
+          :class="{ 'is-recommended': p.name === Package.HeroClarityMotionPass }"
         >
           <div class="package-media-title">
             <div class="package-media-column">
@@ -260,7 +182,7 @@ watch(activeTheme, (newTheme) => {
                   <h2 class="text-h2 q-mt-none q-mb-sm">{{ p.name }}</h2>
                 </div>
 
-                <span v-if="p.name === Package.GrowthPackage" class="recommended-pill">
+                <span v-if="p.name === Package.HeroClarityMotionPass" class="recommended-pill">
                   Recommended
                 </span>
               </div>
@@ -273,7 +195,7 @@ watch(activeTheme, (newTheme) => {
 
           <div class="package-highlights">
             <p class="package-feature-header text-body-2 q-mt-none q-mb-md">
-              {{ p.featuresHeader }}
+              {{ p.fitLine }}
             </p>
 
             <q-list class="package-feature-list q-mb-md">

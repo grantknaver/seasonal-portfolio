@@ -6,9 +6,9 @@ export interface PackageDetails {
   id: string;
   img: PictureData;
   alt: Package;
-  featuresHeader: string;
-  features: FeatureIcon[];
   tagline: string;
+  fitLine: string;
+  features: FeatureIcon[];
 }
 
 interface FeatureIcon {

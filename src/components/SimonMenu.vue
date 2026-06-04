@@ -47,6 +47,7 @@ const selectTopic = (name: TopicName) => {
   } else {
     mainStore.SET_ACTIVE_TOPIC(name);
   }
+  mainStore.SET_PACKAGE_INTEREST_TEXT('');
 };
 
 const simonRef = ref();
