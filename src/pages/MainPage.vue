@@ -26,6 +26,7 @@ import { CacheBinding } from 'src/shared/constants/cacheBinding';
 
 const mainStore = useMainStore();
 const cacheStore = useCacheStore();
+
 const mobileTopics: Topic[] = [
   {
     id: uuidv4(),
@@ -48,7 +49,6 @@ const mobileTopics: Topic[] = [
     label: TopicName.About,
     cachedName: CacheEntry.AboutSection,
   },
-
   {
     id: uuidv4(),
     name: TopicName.Contact,
@@ -57,14 +57,18 @@ const mobileTopics: Topic[] = [
     cachedName: CacheEntry.ContactSection,
   },
 ];
+
 const expandedPanel = ref<TopicName | null>();
 const { getScrollTarget, setVerticalScrollPosition } = scroll;
 const { activeTopic } = storeToRefs(mainStore);
+
 const root = ref<HTMLElement | null>(null);
 const showFooter = ref<boolean>(false);
 const io = ref<IntersectionObserver | null>(null);
+
 const { lgBreakpoint, width } = useViewport();
 const isResponsive = computed(() => width.value < lgBreakpoint);
+
 const dispose = ref<() => void>(() => {});
 const simonRef = ref<HTMLElement | null>(null);
 const headlineRef = ref<HTMLElement | null>(null);
@@ -91,18 +95,54 @@ const activeComponent = computed(() => {
 const observer = new IntersectionObserver(
   (entries) => {
     entries.forEach((entry) => {
-      if (entry.isIntersecting) {
-        showFooter.value = true;
-      } else {
-        showFooter.value = false;
-      }
+      showFooter.value = entry.isIntersecting;
     });
   },
   { threshold: 0.1 },
 );
 
+const applyHomeScale = (animate = true) => {
+  const el = homeContainerRef.value;
+  if (!el) return;
+
+  gsap.killTweensOf(el);
+
+  if (isResponsive.value) {
+    gsap.set(el, {
+      clearProps: 'transform',
+    });
+    return;
+  }
+
+  const shouldScale = !!activeTopic.value;
+  const nextScale = shouldScale ? 0.8 : 1;
+
+  if (!animate) {
+    gsap.set(el, {
+      scale: nextScale,
+      transformOrigin: 'center center',
+    });
+    return;
+  }
+
+  gsap.to(el, {
+    scale: nextScale,
+    transformOrigin: 'center center',
+    duration: shouldScale ? 0.8 : 0.6,
+    ease: 'power2.out',
+    overwrite: true,
+  });
+};
+
+const handleResize = () => {
+  requestAnimationFrame(() => {
+    applyHomeScale(false);
+  });
+};
+
 onMounted(async () => {
-  const footerElement = document.getElementById('footer') as HTMLElement;
+  const footerElement = document.getElementById('footer');
+
   if (isResponsive.value) {
     try {
       dispose.value = buildAnimations(ViewType.Responsive);
@@ -116,7 +156,17 @@ onMounted(async () => {
       console.log('Desktop main page animations error: ', e);
     }
   }
-  observer.observe(footerElement);
+
+  if (footerElement) {
+    observer.observe(footerElement);
+  }
+
+  window.addEventListener('resize', handleResize);
+
+  requestAnimationFrame(() => {
+    applyHomeScale(false);
+  });
+
   await mainStore.VERIFY_IS_HUMAN();
 });
 
@@ -126,6 +176,9 @@ onUnmounted(() => {
 
 onBeforeUnmount(() => {
   io.value?.disconnect();
+  observer.disconnect();
+  window.removeEventListener('resize', handleResize);
+
   try {
     dispose.value();
   } catch (e) {
@@ -141,19 +194,15 @@ watch(
     } catch (err) {
       console.log('view switch error: ', err);
     }
+
     await nextTick();
     await waitForLayout(root.value);
+
     dispose.value = buildAnimations(viewNow ? ViewType.Responsive : ViewType.Desktop);
-    if (!viewNow) {
-      const el = homeContainerRef.value;
-      console.log('el', el);
-      gsap.to(el, {
-        scale: 0.8,
-        duration: 0.8,
-        ease: 'power2.out',
-        overwrite: 'auto',
-      });
-    }
+
+    requestAnimationFrame(() => {
+      applyHomeScale(false);
+    });
   },
   { flush: 'post' },
 );
@@ -165,31 +214,23 @@ watch(
 
     await nextTick();
 
-    const el = homeContainerRef.value;
-    if (!el || isResponsive.value) return;
-
-    gsap.killTweensOf(el);
-
-    gsap.to(el, {
-      scale: newTopic ? 0.8 : 1,
-      transformOrigin: 'center center',
-      duration: newTopic ? 0.8 : 0.6,
-      ease: 'power2.out',
-      overwrite: true,
-    });
+    applyHomeScale(true);
   },
   { flush: 'post' },
 );
 
 const waitForLayout = async (el: HTMLElement | null, frames = 8): Promise<boolean> => {
   if (!el) return false;
+
   for (let i = 0; i < frames; i++) {
     await new Promise(requestAnimationFrame);
+
     if (el.offsetParent !== null && el.offsetHeight > 0 && el.offsetWidth > 0) {
       mainStore.SET_PAINTED_STATUS(true);
       return true;
     }
   }
+
   mainStore.SET_PAINTED_STATUS(false);
   return false;
 };
@@ -197,16 +238,16 @@ const waitForLayout = async (el: HTMLElement | null, frames = 8): Promise<boolea
 const buildAnimations = (mode: ViewType) => {
   const el = root.value;
   if (!el) return () => {};
-  // Responsive: all elements with .mobile-content
+
   const homeContentEls = Array.from(document.querySelectorAll<HTMLElement>('.mobile-content'));
 
-  // Desktop: only non-null refs
   const desktopEls = [simonRef.value, headlineRef.value, servRef.value, ctaBtnRef.value].filter(
     (x): x is HTMLElement => !!x,
   );
 
   if (mode === ViewType.Responsive) {
     if (!homeContentEls.length) return () => {};
+
     gsap.killTweensOf(homeContentEls);
     gsap.set(homeContentEls, { clearProps: 'all' });
 
@@ -221,11 +262,13 @@ const buildAnimations = (mode: ViewType) => {
         stagger: 1,
       },
     );
+
     return () => {
       gsap.killTweensOf(homeContentEls);
       gsap.set(homeContentEls, { clearProps: 'all' });
     };
   }
+
   if (mode === ViewType.Desktop) {
     if (!desktopEls.length) return () => {};
 
@@ -267,15 +310,15 @@ const buildAnimations = (mode: ViewType) => {
       },
     );
 
-    // disposer for desktop mode
     return () => {
       gsap.killTweensOf(desktopEls);
       gsap.set(desktopEls, { clearProps: 'all' });
     };
   }
+
   return () => {
-    gsap.killTweensOf([desktopEls]);
-    gsap.set([desktopEls], { clearProps: 'all' });
+    gsap.killTweensOf(desktopEls);
+    gsap.set(desktopEls, { clearProps: 'all' });
   };
 };
 
@@ -283,16 +326,20 @@ const scrollToFooter = () => {
   if (!showFooter.value) {
     const footerEl = document.getElementById('footer');
     if (!footerEl) return;
-    const target = getScrollTarget(footerEl); // auto-detects the correct scrollable container
-    const y = footerEl.offsetTop; // position inside that container
-    setVerticalScrollPosition(target, y, 500); // smooth scroll (ms)
+
+    const target = getScrollTarget(footerEl);
+    const y = footerEl.offsetTop;
+
+    setVerticalScrollPosition(target, y, 500);
     showFooter.value = true;
   } else {
     const logoEl = document.getElementById('logo');
     if (!logoEl) return;
-    const target = getScrollTarget(logoEl); // auto-detects the correct scrollable container
-    const y = logoEl.offsetHeight; // position inside that container
-    setVerticalScrollPosition(target, y, 500); // smooth scroll (ms)
+
+    const target = getScrollTarget(logoEl);
+    const y = logoEl.offsetHeight;
+
+    setVerticalScrollPosition(target, y, 500);
     showFooter.value = false;
   }
 };
