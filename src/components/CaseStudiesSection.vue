@@ -700,7 +700,6 @@ const toContact = () => {
   }
 
   .ai-chat-container {
-    height: 900px;
     padding-left: 0;
     padding-right: 0;
 
@@ -718,10 +717,12 @@ const toContact = () => {
   .narrator-container {
     height: 500px;
     min-height: 500px;
+    background: transparent;
 
     .narrator {
       height: 100%;
       width: 90%;
+      background-color: white;
     }
   }
 }

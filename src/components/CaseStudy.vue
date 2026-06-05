@@ -66,8 +66,6 @@ const cardStyle = computed(() => ({
     >
       <q-card class="case-study-card full-width" :style="cardStyle">
         <q-card-section class="case-study-header-section full-width">
-          <q-icon :name="props.header.icon" class="case-study-header-icon" />
-
           <h2 class="case-study-title text-h2 q-mt-sm q-mb-none secondary-font">
             {{ props.header.text }}
           </h2>
@@ -75,6 +73,8 @@ const cardStyle = computed(() => ({
           <p class="case-study-subtitle text-body-2 q-mt-sm q-mb-none primary-font">
             {{ props.header.subHeader }}
           </p>
+
+          <q-icon size="48px" :name="props.header.icon" class="case-study-header-icon q-mt-md" />
         </q-card-section>
 
         <q-separator class="case-study-separator" />
