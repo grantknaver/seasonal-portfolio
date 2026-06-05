@@ -66,7 +66,6 @@ const io = ref<IntersectionObserver | null>(null);
 const { lgBreakpoint, width } = useViewport();
 const isResponsive = computed(() => width.value < lgBreakpoint);
 const dispose = ref<() => void>(() => {});
-const nameRef = ref<HTMLElement | null>(null);
 const simonRef = ref<HTMLElement | null>(null);
 const headlineRef = ref<HTMLElement | null>(null);
 const servRef = ref<HTMLElement | null>(null);
@@ -100,7 +99,7 @@ const observer = new IntersectionObserver(
     });
   },
   { threshold: 0.1 },
-); // Triggers when 10% of the element is visible
+);
 
 onMounted(async () => {
   const footerElement = document.getElementById('footer') as HTMLElement;
@@ -145,6 +144,16 @@ watch(
     await nextTick();
     await waitForLayout(root.value);
     dispose.value = buildAnimations(viewNow ? ViewType.Responsive : ViewType.Desktop);
+    if (!viewNow) {
+      const el = homeContainerRef.value;
+      console.log('el', el);
+      gsap.to(el, {
+        scale: 0.8,
+        duration: 0.8,
+        ease: 'power2.out',
+        overwrite: 'auto',
+      });
+    }
   },
   { flush: 'post' },
 );
@@ -153,26 +162,23 @@ watch(
   activeTopic,
   async (newTopic: TopicName | null) => {
     expandedPanel.value = newTopic;
+
     await nextTick();
+
     const el = homeContainerRef.value;
-    if (!el) return;
-    if (!newTopic) {
-      gsap.to(el, {
-        scale: 1,
-        duration: 0.6,
-        ease: 'power2.out',
-        overwrite: 'auto',
-      });
-      return;
-    }
+    if (!el || isResponsive.value) return;
+
+    gsap.killTweensOf(el);
+
     gsap.to(el, {
-      scale: 0.8,
-      duration: 0.8,
+      scale: newTopic ? 0.8 : 1,
+      transformOrigin: 'center center',
+      duration: newTopic ? 0.8 : 0.6,
       ease: 'power2.out',
-      overwrite: 'auto',
+      overwrite: true,
     });
   },
-  { immediate: true, deep: true },
+  { flush: 'post' },
 );
 
 const waitForLayout = async (el: HTMLElement | null, frames = 8): Promise<boolean> => {
@@ -195,13 +201,9 @@ const buildAnimations = (mode: ViewType) => {
   const homeContentEls = Array.from(document.querySelectorAll<HTMLElement>('.mobile-content'));
 
   // Desktop: only non-null refs
-  const desktopEls = [
-    nameRef.value,
-    simonRef.value,
-    headlineRef.value,
-    servRef.value,
-    ctaBtnRef.value,
-  ].filter((x): x is HTMLElement => !!x);
+  const desktopEls = [simonRef.value, headlineRef.value, servRef.value, ctaBtnRef.value].filter(
+    (x): x is HTMLElement => !!x,
+  );
 
   if (mode === ViewType.Responsive) {
     if (!homeContentEls.length) return () => {};
@@ -229,18 +231,6 @@ const buildAnimations = (mode: ViewType) => {
 
     gsap.killTweensOf(desktopEls);
     gsap.set(desktopEls, { clearProps: 'all' });
-
-    gsap.fromTo(
-      nameRef.value,
-      { y: -150, autoAlpha: 0, rotation: 0 },
-      {
-        keyframes: [{ rotation: 15 }, { rotation: -10, y: -10 }, { rotation: 0, y: 0 }],
-        autoAlpha: 1,
-        ease: 'bounce.out',
-        duration: 3.8,
-        overwrite: 'auto',
-      },
-    );
 
     gsap.fromTo(
       headlineRef.value,
@@ -309,6 +299,7 @@ const scrollToFooter = () => {
 
 const toPackages = (p: Package | null) => {
   if (p) mainStore.SET_PACKAGE_INTEREST_TEXT(p);
+
   mainStore.SET_ACTIVE_TOPIC(TopicName.Packages);
   expandedPanel.value = TopicName.Packages;
 };
