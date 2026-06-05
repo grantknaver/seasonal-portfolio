@@ -422,6 +422,8 @@ const cardStyle = computed(() => ({
 .responsive-view {
   .case-study-card {
     border-radius: 0.75rem;
+    border-top-left-radius: 0;
+    border-top-right-radius: 0;
   }
 
   .case-study-title {
@@ -476,8 +478,12 @@ const cardStyle = computed(() => ({
       tokens.$ink
     );
     border: 1px solid color-mix(in srgb, var(--q-accent) 34%, transparent);
-    border-radius: 0.75rem;
+    border-radius: 0;
     font-weight: 700;
+
+    @media (min-width: tokens.$breakpoint-lg) {
+      border-radius: 0.75rem;
+    }
   }
 
   .case-study-expansion-header {

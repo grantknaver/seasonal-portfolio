@@ -351,12 +351,9 @@ const toContact = () => {
     </div>
 
     <div class="case-study-stack">
-      <template v-for="(study, index) in caseStudies" :key="study.id">
+      <template v-for="study in caseStudies" :key="study.id">
         <CaseStudy
           class="case-study-instance full-width"
-          :class="{
-            'q-mb-md': index + 1 !== caseStudies.length,
-          }"
           :header="study.header"
           :expansionTopics="study.expansionTopics"
           :listTopics="study.listTopics"
@@ -561,8 +558,11 @@ const toContact = () => {
 .caseStudiesSection {
   content-visibility: auto;
   contain-intrinsic-size: 800px 1000px;
-  gap: 1rem;
   color: tokens.$text;
+
+  @media (min-width: tokens.$breakpoint-lg) {
+    gap: 1rem;
+  }
 }
 
 .case-section-card,
@@ -631,7 +631,11 @@ const toContact = () => {
 
 .case-study-stack {
   display: grid;
-  gap: 1rem;
+  gap: 0.2rem;
+
+  @media (min-width: tokens.$breakpoint-lg) {
+    gap: 1rem;
+  }
 }
 
 .case-contact-btn {
@@ -686,8 +690,13 @@ const toContact = () => {
 
 .responsive-view {
   .case-section-card {
-    border-top-left-radius: 0;
-    border-top-right-radius: 0;
+    border-top-left-radius: 1rem;
+    border-top-right-radius: 1rem;
+
+    @media (min-width: tokens.$breakpoint-lg) {
+      border-top-left-radius: 0;
+      border-top-right-radius: 0;
+    }
   }
 
   .ai-chat-container {
