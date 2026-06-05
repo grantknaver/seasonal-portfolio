@@ -194,7 +194,7 @@ watch(
     await nextTick();
     await waitForLayout(root.value);
 
-    dispose.value = buildAnimations(viewNow ? ViewType.Responsive : ViewType.Desktop);
+    dispose.value = buildAnimations(viewNow ? ViewType.Responsive : ViewType.Desktop, false);
 
     requestAnimationFrame(() => {
       applyHomeScale(false);
@@ -231,7 +231,7 @@ const waitForLayout = async (el: HTMLElement | null, frames = 8): Promise<boolea
   return false;
 };
 
-const buildAnimations = (mode: ViewType) => {
+const buildAnimations = (mode: ViewType, animate = true) => {
   const el = root.value;
   if (!el) return () => {};
 
@@ -242,7 +242,7 @@ const buildAnimations = (mode: ViewType) => {
   const ctaEls = Array.from(el.querySelectorAll<HTMLElement>('.cta'));
   const proofEls = Array.from(el.querySelectorAll<HTMLElement>('.proof-card'));
 
-  const els = [kickerEl, simonEl, headlineEl, subheadlineEl, ctaEls, ...proofEls].filter(
+  const els = [kickerEl, simonEl, headlineEl, subheadlineEl, ...ctaEls, ...proofEls].filter(
     (x): x is HTMLElement => !!x,
   );
 
@@ -251,134 +251,173 @@ const buildAnimations = (mode: ViewType) => {
   gsap.killTweensOf(els);
   gsap.set(els, { clearProps: 'all' });
 
+  // Resize / breakpoint swap path:
+  // do not replay the entrance timeline, just clear stuck GSAP props
+  // and leave the new layout in its natural visible state.
+  if (!animate) {
+    return () => {
+      gsap.killTweensOf(els);
+      gsap.set(els, { clearProps: 'all' });
+    };
+  }
+
   const tl = gsap.timeline();
 
   if (mode === ViewType.Responsive) {
-    tl.fromTo(
-      headlineEl,
-      { y: 75, autoAlpha: 0 },
-      {
-        y: 0,
-        autoAlpha: 1,
-        ease: 'power2.out',
-        duration: 1.25,
-        overwrite: 'auto',
-      },
-      '-=0.2',
-    );
+    if (kickerEl) {
+      tl.fromTo(
+        kickerEl,
+        { y: 35, autoAlpha: 0 },
+        {
+          y: 0,
+          autoAlpha: 1,
+          ease: 'power2.out',
+          duration: 0.65,
+          overwrite: 'auto',
+        },
+        0,
+      );
+    }
 
-    tl.fromTo(
-      subheadlineEl,
-      { autoAlpha: 0 },
-      {
-        autoAlpha: 1,
-        ease: 'power2.out',
-        duration: 1.25,
-      },
-      '-=0.25',
-    );
+    if (headlineEl) {
+      tl.fromTo(
+        headlineEl,
+        { y: 75, autoAlpha: 0 },
+        {
+          y: 0,
+          autoAlpha: 1,
+          ease: 'power2.out',
+          duration: 1.25,
+          overwrite: 'auto',
+        },
+        0.15,
+      );
+    }
 
-    tl.fromTo(
-      ctaEls,
-      { y: 50, autoAlpha: 0 },
-      {
-        y: 0,
-        autoAlpha: 1,
-        ease: 'power2.out',
-        duration: 1,
-        stagger: 0.5,
-      },
-      '-=0.2',
-    );
+    if (subheadlineEl) {
+      tl.fromTo(
+        subheadlineEl,
+        { y: 50, autoAlpha: 0 },
+        {
+          y: 0,
+          autoAlpha: 1,
+          ease: 'power2.out',
+          duration: 1.25,
+        },
+        '-=0.25',
+      );
+    }
 
-    tl.fromTo(
-      kickerEl,
-      { autoAlpha: 0 },
-      {
-        autoAlpha: 1,
-        ease: 'power2.out',
-        duration: 1,
-      },
-    );
+    if (ctaEls.length) {
+      tl.fromTo(
+        ctaEls,
+        { y: 50, autoAlpha: 0 },
+        {
+          y: 0,
+          autoAlpha: 1,
+          ease: 'power2.out',
+          duration: 1,
+          stagger: 0.25,
+        },
+        '-=0.2',
+      );
+    }
 
-    tl.fromTo(
-      proofEls,
-      {
-        x: -16,
-        autoAlpha: 0,
-      },
-      {
-        x: 0,
-        autoAlpha: 1,
-        ease: 'power2.out',
-        duration: 0.5,
-        stagger: 0.5,
-      },
-    );
+    if (proofEls.length) {
+      tl.fromTo(
+        proofEls,
+        {
+          y: 32,
+          autoAlpha: 0,
+        },
+        {
+          y: 0,
+          autoAlpha: 1,
+          ease: 'power2.out',
+          duration: 0.5,
+          stagger: 0.18,
+        },
+        '-=0.15',
+      );
+    }
   }
 
   if (mode === ViewType.Desktop) {
-    tl.fromTo(
-      headlineEl,
-      { y: 75, autoAlpha: 0 },
-      {
-        y: 0,
-        autoAlpha: 1,
-        ease: 'power2.out',
-        duration: 1.25,
-        overwrite: 'auto',
-      },
-      '-=0.2',
-    );
+    if (kickerEl) {
+      tl.fromTo(
+        kickerEl,
+        { y: 35, autoAlpha: 0 },
+        {
+          y: 0,
+          autoAlpha: 1,
+          ease: 'power2.out',
+          duration: 0.65,
+          overwrite: 'auto',
+        },
+        0,
+      );
+    }
 
-    tl.fromTo(
-      subheadlineEl,
-      { autoAlpha: 0 },
-      {
-        autoAlpha: 1,
-        ease: 'power2.out',
-        duration: 1.25,
-      },
-      '-=0.25',
-    );
+    if (headlineEl) {
+      tl.fromTo(
+        headlineEl,
+        { y: 75, autoAlpha: 0 },
+        {
+          y: 0,
+          autoAlpha: 1,
+          ease: 'power2.out',
+          duration: 1.25,
+          overwrite: 'auto',
+        },
+        0.15,
+      );
+    }
 
-    tl.fromTo(
-      ctaEls,
-      { y: 50, autoAlpha: 0 },
-      {
-        y: 0,
-        autoAlpha: 1,
-        ease: 'power2.out',
-        duration: 1,
-        stagger: 0.5,
-      },
-      '-=0.2',
-    );
+    if (subheadlineEl) {
+      tl.fromTo(
+        subheadlineEl,
+        { autoAlpha: 0 },
+        {
+          autoAlpha: 1,
+          ease: 'power2.out',
+          duration: 1.25,
+        },
+        '-=0.25',
+      );
+    }
 
-    tl.fromTo(
-      kickerEl,
-      { autoAlpha: 0 },
-      {
-        autoAlpha: 1,
-        ease: 'power2.out',
-        duration: 1,
-      },
-    );
+    if (ctaEls.length) {
+      tl.fromTo(
+        ctaEls,
+        { y: 50, autoAlpha: 0 },
+        {
+          y: 0,
+          autoAlpha: 1,
+          ease: 'power2.out',
+          duration: 1,
+          stagger: 0.25,
+        },
+        '-=0.2',
+      );
+    }
 
-    tl.fromTo(
-      proofEls,
-      {
-        x: -16,
-        autoAlpha: 0,
-      },
-      {
-        x: 0,
-        autoAlpha: 1,
-        ease: 'power2.out',
-        duration: 0.5,
-        stagger: 0.5,
-      },
-    );
+    if (proofEls.length) {
+      tl.fromTo(
+        proofEls,
+        {
+          x: -16,
+          autoAlpha: 0,
+        },
+        {
+          x: 0,
+          autoAlpha: 1,
+          ease: 'power2.out',
+          duration: 0.45,
+          stagger: 0.18,
+        },
+        '-=0.15',
+      );
+    }
   }
 
   return () => {
@@ -443,15 +482,15 @@ const toProof = () => {
         class="home-container relative-position full-width column text-primary-font q-mt-md q-mb-md q-pa-lg font-primary"
       >
         <div class="mobile-hero-copy text-center">
-          <p ref="kickerRef" class="text-caption kicker q-mt-none q-mb-sm">
+          <p ref="kickerRef" class="text-caption kicker mobile-content q-mt-none q-mb-sm">
             Focused UI Motion + AI Interaction
           </p>
 
-          <h1 class="headline text-h1 q-mt-none q-mb-md">
+          <h1 class="headline mobile-content text-h1 q-mt-none q-mb-md">
             Build Clarity. Earn Trust. Create Momentum.
           </h1>
 
-          <div class="subheadline q-mt-md start-animation">
+          <div class="subheadline mobile-content q-mt-md start-animation">
             <p class="q-ma-none text-body-2">
               Premium motion, AI interaction, and section-level implementation for platforms that
               need sharper user flow.
@@ -459,7 +498,7 @@ const toProof = () => {
           </div>
         </div>
 
-        <div class="u-grid u-gap-sm full-width q-mt-md">
+        <div class="u-grid u-gap-sm full-width q-mt-md mobile-content">
           <q-btn class="cta" @click="toPackages(null)" color="accent" size="lg" glossy>
             <span class="text-body-2">Packages</span>
           </q-btn>
@@ -476,7 +515,7 @@ const toProof = () => {
           </q-btn>
         </div>
 
-        <div class="proofs full-width q-mt-lg">
+        <div class="proofs mobile-content full-width q-mt-lg">
           <div class="proof-card">
             <span class="proof-label">CLARITY</span>
             <strong>Less confusion. More understanding.</strong>
