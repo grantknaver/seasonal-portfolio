@@ -1,23 +1,20 @@
 <script setup lang="ts">
 import { TopicName } from '../shared/constants/topicName';
-import { ref, onMounted, onBeforeUnmount, nextTick } from 'vue';
 import { useMainStore } from '../stores/main';
 import { type Topic } from '../shared/types/topic';
 import { v4 as uuidv4 } from 'uuid';
 import { storeToRefs } from 'pinia';
-import gsap from 'gsap';
 import {
   mdiPackageVariantClosed,
   mdiInformation,
   mdiEmailOutline,
   mdiBookOpenPageVariant,
 } from '@quasar/extras/mdi-v7';
+import { onMounted, ref } from 'vue';
 
 const mainStore = useMainStore();
 const { activeTopic } = storeToRefs(mainStore);
-
-const simonRef = ref<HTMLElement | null>(null);
-let labelEls: HTMLElement[] = [];
+const labelsVisible = ref(false);
 
 const topics: Topic[] = [
   {
@@ -56,31 +53,14 @@ const selectTopic = (name: TopicName) => {
   mainStore.SET_PACKAGE_INTEREST_TEXT('');
 };
 
-onMounted(async () => {
-  await nextTick();
-
-  if (!simonRef.value) return;
-
-  labelEls = Array.from(simonRef.value.querySelectorAll<HTMLElement>('.label'));
-
-  gsap.set(labelEls, {
-    opacity: 0,
-  });
-
-  gsap.to(labelEls, {
-    opacity: 1,
-    duration: 3,
-    delay: 6,
-    ease: 'power2.out',
-  });
-});
-
-onBeforeUnmount(() => {
-  gsap.killTweensOf(labelEls);
+onMounted(() => {
+  window.setTimeout(() => {
+    labelsVisible.value = true;
+  }, 1000);
 });
 </script>
 <template>
-  <div ref="simonRef" class="simon">
+  <div class="simon">
     <div
       v-for="topic in topics"
       :key="topic.id"
@@ -92,7 +72,7 @@ onBeforeUnmount(() => {
     >
       <a class="simon-link text-body-2">
         <q-icon :name="topic.icon" size="80px" />
-        <span class="label">{{ topic.label }}</span>
+        <span class="label" :class="{ 'labels-visible': labelsVisible }">{{ topic.label }}</span>
       </a>
     </div>
   </div>
@@ -182,6 +162,11 @@ onBeforeUnmount(() => {
   .label {
     position: absolute;
     opacity: 0;
+    transition: opacity 0.8s ease-out;
+  }
+
+  .labels-visible {
+    opacity: 1;
   }
 
   .q-icon {

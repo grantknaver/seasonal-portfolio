@@ -62,7 +62,7 @@ const expandedPanel = ref<TopicName | null>();
 const { getScrollTarget, setVerticalScrollPosition } = scroll;
 const { activeTopic } = storeToRefs(mainStore);
 
-const root = ref<HTMLElement | null>(null);
+// const root = ref<HTMLElement | null>(null);
 const showFooter = ref<boolean>(false);
 const io = ref<IntersectionObserver | null>(null);
 
@@ -70,13 +70,10 @@ const { lgBreakpoint, width } = useViewport();
 const isResponsive = computed(() => width.value < lgBreakpoint);
 
 const dispose = ref<() => void>(() => {});
-const homeContainerRef = ref<HTMLElement | null>(null);
-
 const activeEntry = computed(() => {
   if (!activeTopic.value) return null;
   return CacheBinding[activeTopic.value];
 });
-
 const activeComponent = computed(() => {
   const entry = activeEntry.value;
   if (!entry) return null;
@@ -98,7 +95,7 @@ const observer = new IntersectionObserver(
 );
 
 const applyHomeScale = (animate = true) => {
-  const el = homeContainerRef.value;
+  const el = currentHomeContainer.value;
   if (!el) return;
 
   gsap.killTweensOf(el);
@@ -135,6 +132,20 @@ const handleResize = () => {
     applyHomeScale(false);
   });
 };
+
+const mobileRootRef = ref<HTMLElement | null>(null);
+const desktopRootRef = ref<HTMLElement | null>(null);
+
+const mobileHomeContainerRef = ref<HTMLElement | null>(null);
+const desktopHomeContainerRef = ref<HTMLElement | null>(null);
+
+const currentRoot = computed(() => {
+  return isResponsive.value ? mobileRootRef.value : desktopRootRef.value;
+});
+
+const currentHomeContainer = computed(() => {
+  return isResponsive.value ? mobileHomeContainerRef.value : desktopHomeContainerRef.value;
+});
 
 onMounted(async () => {
   const footerElement = document.getElementById('footer');
@@ -192,7 +203,7 @@ watch(
     }
 
     await nextTick();
-    await waitForLayout(root.value);
+    await waitForLayout(currentRoot.value);
 
     dispose.value = buildAnimations(viewNow ? ViewType.Responsive : ViewType.Desktop, false);
 
@@ -232,7 +243,7 @@ const waitForLayout = async (el: HTMLElement | null, frames = 8): Promise<boolea
 };
 
 const buildAnimations = (mode: ViewType, animate = true) => {
-  const el = root.value;
+  const el = currentRoot.value;
   if (!el) return () => {};
 
   const kickerEl = el.querySelector<HTMLElement>('.kicker');
@@ -476,9 +487,9 @@ const toProof = () => {
         ><span class="text-primary-font text-white">Freelance</span></span
       >
     </div>
-    <section v-if="isResponsive" ref="root" key="mobile" class="responsive-view full-width q-pa-md">
+    <section v-show="isResponsive" ref="mobileRootRef" class="responsive-view full-width q-pa-md">
       <div
-        ref="homeContainerRef"
+        ref="mobileHomeContainerRef"
         class="home-container relative-position full-width column text-primary-font q-mt-md q-mb-md q-pa-lg font-primary"
       >
         <div class="mobile-hero-copy text-center">
@@ -595,12 +606,11 @@ const toProof = () => {
       </q-list>
     </section>
     <section
-      v-if="!isResponsive"
-      ref="root"
-      key="desktop"
+      v-show="!isResponsive"
+      ref="desktopRootRef"
       class="desktop-view column justify-end items-center full-width"
     >
-      <div ref="homeContainerRef" class="home-container q-pa-xl column">
+      <div ref="desktopHomeContainerRef" class="home-container q-pa-xl column">
         <div class="simon-copy">
           <div ref="simonRef" class="simon"><SimonMenu></SimonMenu></div>
           <div class="column justify-center">
