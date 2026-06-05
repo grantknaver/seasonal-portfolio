@@ -339,7 +339,7 @@ const toContact = () => {
   <!-- Mobile -->
   <section v-if="isResponsive" class="caseStudiesSection responsive-view full-width column q-pa-md">
     <div class="case-section-card q-pa-lg q-mb-md">
-      <p class="text-caption kicker q-mt-none q-mb-sm">Selected proof</p>
+      <p class="text-caption kicker q-mt-none q-mb-sm">Proof</p>
       <h1 class="text-h1 q-mt-none q-mb-md">Case Studies</h1>
       <p class="section-lead text-body-1 q-mt-none q-mb-sm">
         Interactive, AI-driven, and beautifully engineered.
@@ -438,7 +438,7 @@ const toContact = () => {
   <!-- Desktop -->
   <section v-if="!isResponsive" class="caseStudiesSection desktop-view full-width column q-pa-md">
     <div class="case-section-card q-pa-xl q-mb-md">
-      <p class="text-caption kicker q-mt-none q-mb-sm">Selected proof</p>
+      <p class="text-caption kicker q-mt-none q-mb-sm">Proof</p>
       <h1 class="text-h1 q-mt-none q-mb-md">Case Studies</h1>
       <p class="section-lead text-body-1 q-mt-none q-mb-sm">
         Interactive, AI-driven, and beautifully engineered.

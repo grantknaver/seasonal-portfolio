@@ -633,6 +633,7 @@ const toProof = () => {
                 <span class="text-body-2">Packages</span>
               </q-btn>
               <q-btn
+                @click="toProof()"
                 class="cta q-mt-md"
                 text-color="accent"
                 color="secondary"
