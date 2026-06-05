@@ -138,8 +138,8 @@ onBeforeUnmount(() => {
 
 <template>
   <section
-    class="about-section full-width column"
-    :class="isResponsive ? 'responsive-view q-pa-md' : 'desktop-view q-pa-md'"
+    class="about-section full-width column q-pa-md"
+    :class="isResponsive ? 'responsive-view' : 'desktop-view'"
   >
     <q-card class="about-card q-pa-none">
       <q-card-section class="about-section-block about-intro q-pa-lg">
@@ -492,8 +492,6 @@ onBeforeUnmount(() => {
 
   &.responsive-view {
     .about-card:first-child {
-      border-top-left-radius: 0;
-      border-top-right-radius: 0;
     }
 
     .about-section-block {

@@ -167,12 +167,7 @@ const packageCta = (name: Package) => `Start with ${String(name).replace(' Packa
                   <p class="text-caption kicker q-mt-none q-mb-xs">{{ packageTier(p.name) }}</p>
                   <h2 class="text-h2 q-mt-none q-mb-sm">{{ p.name }}</h2>
                 </div>
-
-                <span v-if="p.name === Package.HeroClarityMotionPass" class="recommended-pill">
-                  Recommended
-                </span>
               </div>
-
               <p class="package-tagline text-body-2 q-mt-none q-mb-md">
                 {{ p.tagline }}
               </p>
@@ -180,10 +175,6 @@ const packageCta = (name: Package) => `Start with ${String(name).replace(' Packa
           </div>
 
           <div class="package-highlights">
-            <p class="package-feature-header text-body-2 q-mt-none q-mb-md">
-              {{ p.fitLine }}
-            </p>
-
             <q-list class="package-feature-list q-mb-md">
               <q-item
                 v-for="(f, featureIndex) in p.features"
@@ -377,20 +368,6 @@ const packageCta = (name: Package) => `Start with ${String(name).replace(' Packa
   }
 }
 
-.recommended-pill {
-  align-self: flex-start;
-  padding: 0.35rem 0.6rem;
-  border: 1px solid color-mix(in srgb, var(--q-accent) 40%, transparent);
-  border-radius: 999px;
-  color: tokens.$champagne;
-  font-size: 0.72rem;
-  line-height: 1;
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
-  font-weight: 700;
-  white-space: nowrap;
-}
-
 .package-tagline {
   color: tokens.$text-muted;
   line-height: 1.45;
@@ -435,13 +412,22 @@ const packageCta = (name: Package) => `Start with ${String(name).replace(' Packa
     padding: 1.25rem;
   }
 
+  h2 {
+    margin-bottom: 1.5rem;
+  }
+
+  .package-tagline {
+    margin-bottom: 0;
+    text-align: center;
+  }
+
+  .package-feature-header {
+    text-align: center;
+  }
+
   .package-proof-grid,
   .package-card {
     grid-template-columns: 1fr;
-  }
-
-  .package-header {
-    text-align: center;
   }
 
   .package-card {
@@ -452,75 +438,10 @@ const packageCta = (name: Package) => `Start with ${String(name).replace(' Packa
     display: block;
     text-align: center;
   }
-
-  .recommended-pill {
-    display: inline-block;
-    margin-top: 0.25rem;
-  }
 }
 
 .desktop-view {
   overflow: visible;
-}
-
-.responsive-fall-img {
-  width: 90%;
-  max-width: 350px;
-
-  @media (min-width: tokens.$breakpoint-md) {
-    max-width: 600px;
-  }
-}
-
-.responsive-winter-img {
-  width: 90%;
-  max-width: 250px;
-
-  @media (min-width: tokens.$breakpoint-md) {
-    max-width: 425px;
-  }
-}
-
-.responsive-spring-img {
-  width: 90%;
-  max-width: 250px;
-
-  @media (min-width: tokens.$breakpoint-md) {
-    max-width: 400px;
-  }
-}
-
-.responsive-summer-img {
-  width: 90%;
-  max-width: 400px;
-
-  @media (min-width: tokens.$breakpoint-md) {
-    max-width: 550px;
-  }
-}
-
-.desktop-fall-img {
-  width: 90%;
-  max-width: 200px;
-
-  @media (min-width: tokens.$breakpoint-xl) {
-    max-width: 250px;
-  }
-}
-
-.desktop-winter-img {
-  width: 90%;
-  max-width: 150px;
-}
-
-.desktop-spring-img {
-  width: 90%;
-  max-width: 150px;
-}
-
-.desktop-summer-img {
-  width: 90%;
-  max-width: 200px;
 }
 
 .fade-picture {
