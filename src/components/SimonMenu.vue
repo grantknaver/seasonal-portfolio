@@ -70,7 +70,7 @@ onMounted(async () => {
   gsap.to(labelEls, {
     opacity: 1,
     duration: 3,
-    delay: 6.25,
+    delay: 6,
     ease: 'power2.out',
   });
 });

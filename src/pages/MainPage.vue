@@ -70,11 +70,6 @@ const { lgBreakpoint, width } = useViewport();
 const isResponsive = computed(() => width.value < lgBreakpoint);
 
 const dispose = ref<() => void>(() => {});
-const simonRef = ref<HTMLElement | null>(null);
-const kickerRef = ref<HTMLElement | null>(null);
-const headlineRef = ref<HTMLElement | null>(null);
-const servRef = ref<HTMLElement | null>(null);
-const ctaBtnRef = ref<HTMLElement | null>(null);
 const homeContainerRef = ref<HTMLElement | null>(null);
 
 const activeEntry = computed(() => {
@@ -240,53 +235,27 @@ const buildAnimations = (mode: ViewType) => {
   const el = root.value;
   if (!el) return () => {};
 
-  const homeContentEls = Array.from(document.querySelectorAll<HTMLElement>('.mobile-content'));
+  const kickerEl = el.querySelector<HTMLElement>('.kicker');
+  const simonEl = el.querySelector<HTMLElement>('.simon');
+  const headlineEl = el.querySelector<HTMLElement>('.headline');
+  const subheadlineEl = el.querySelector<HTMLElement>('.subheadline');
+  const ctaEls = Array.from(el.querySelectorAll<HTMLElement>('.cta'));
+  const proofEls = Array.from(el.querySelectorAll<HTMLElement>('.proof-card'));
+
+  const els = [kickerEl, simonEl, headlineEl, subheadlineEl, ctaEls, ...proofEls].filter(
+    (x): x is HTMLElement => !!x,
+  );
+
+  if (!els.length) return () => {};
+
+  gsap.killTweensOf(els);
+  gsap.set(els, { clearProps: 'all' });
+
+  const tl = gsap.timeline();
 
   if (mode === ViewType.Responsive) {
-    if (!homeContentEls.length) return () => {};
-
-    gsap.killTweensOf(homeContentEls);
-    gsap.set(homeContentEls, { clearProps: 'all' });
-
-    gsap.fromTo(
-      homeContentEls,
-      { x: 150, autoAlpha: 0 },
-      {
-        keyframes: [{ x: 0, autoAlpha: 1 }],
-        ease: 'bounce',
-        duration: 1,
-        overwrite: 'auto',
-        stagger: 1,
-      },
-    );
-
-    return () => {
-      gsap.killTweensOf(homeContentEls);
-      gsap.set(homeContentEls, { clearProps: 'all' });
-    };
-  }
-
-  if (mode === ViewType.Desktop) {
-    const proofEls = Array.from(el.querySelectorAll<HTMLElement>('.proof-card'));
-
-    const desktopEls = [
-      kickerRef.value,
-      simonRef.value,
-      headlineRef.value,
-      servRef.value,
-      ctaBtnRef.value,
-      ...proofEls,
-    ].filter((x): x is HTMLElement => !!x);
-
-    if (!desktopEls.length) return () => {};
-
-    gsap.killTweensOf(desktopEls);
-    gsap.set(desktopEls, { clearProps: 'all' });
-
-    const tl = gsap.timeline();
-
     tl.fromTo(
-      headlineRef.value,
+      headlineEl,
       { y: 75, autoAlpha: 0 },
       {
         y: 0,
@@ -299,7 +268,7 @@ const buildAnimations = (mode: ViewType) => {
     );
 
     tl.fromTo(
-      servRef.value,
+      subheadlineEl,
       { autoAlpha: 0 },
       {
         autoAlpha: 1,
@@ -310,25 +279,25 @@ const buildAnimations = (mode: ViewType) => {
     );
 
     tl.fromTo(
-      ctaBtnRef.value,
+      ctaEls,
       { y: 50, autoAlpha: 0 },
       {
         y: 0,
         autoAlpha: 1,
         ease: 'power2.out',
         duration: 1,
+        stagger: 0.5,
       },
       '-=0.2',
     );
 
     tl.fromTo(
-      kickerRef.value,
+      kickerEl,
       { autoAlpha: 0 },
       {
         autoAlpha: 1,
         ease: 'power2.out',
         duration: 1,
-        overwrite: 'auto',
       },
     );
 
@@ -343,19 +312,80 @@ const buildAnimations = (mode: ViewType) => {
         autoAlpha: 1,
         ease: 'power2.out',
         duration: 0.5,
-        stagger: 1,
+        stagger: 0.5,
       },
-      '-=0.05',
     );
-
-    return () => {
-      tl.kill();
-      gsap.killTweensOf(desktopEls);
-      gsap.set(desktopEls, { clearProps: 'all' });
-    };
   }
 
-  return () => {};
+  if (mode === ViewType.Desktop) {
+    tl.fromTo(
+      headlineEl,
+      { y: 75, autoAlpha: 0 },
+      {
+        y: 0,
+        autoAlpha: 1,
+        ease: 'power2.out',
+        duration: 1.25,
+        overwrite: 'auto',
+      },
+      '-=0.2',
+    );
+
+    tl.fromTo(
+      subheadlineEl,
+      { autoAlpha: 0 },
+      {
+        autoAlpha: 1,
+        ease: 'power2.out',
+        duration: 1.25,
+      },
+      '-=0.25',
+    );
+
+    tl.fromTo(
+      ctaEls,
+      { y: 50, autoAlpha: 0 },
+      {
+        y: 0,
+        autoAlpha: 1,
+        ease: 'power2.out',
+        duration: 1,
+        stagger: 0.5,
+      },
+      '-=0.2',
+    );
+
+    tl.fromTo(
+      kickerEl,
+      { autoAlpha: 0 },
+      {
+        autoAlpha: 1,
+        ease: 'power2.out',
+        duration: 1,
+      },
+    );
+
+    tl.fromTo(
+      proofEls,
+      {
+        x: -16,
+        autoAlpha: 0,
+      },
+      {
+        x: 0,
+        autoAlpha: 1,
+        ease: 'power2.out',
+        duration: 0.5,
+        stagger: 0.5,
+      },
+    );
+  }
+
+  return () => {
+    tl.kill();
+    gsap.killTweensOf(els);
+    gsap.set(els, { clearProps: 'all' });
+  };
 };
 
 const scrollToFooter = () => {
@@ -413,15 +443,15 @@ const toProof = () => {
         class="home-container relative-position full-width column text-primary-font q-mt-md q-mb-md q-pa-lg font-primary"
       >
         <div class="mobile-hero-copy text-center">
-          <p ref="kickerRef" class="text-caption kicker mobile-content q-mt-none q-mb-sm">
+          <p ref="kickerRef" class="text-caption kicker q-mt-none q-mb-sm">
             Focused UI Motion + AI Interaction
           </p>
 
-          <h1 class="mobile-content text-h1 q-mt-none q-mb-md">
+          <h1 class="headline text-h1 q-mt-none q-mb-md">
             Build Clarity. Earn Trust. Create Momentum.
           </h1>
 
-          <div class="subheadline mobile-content q-mt-md start-animation">
+          <div class="subheadline q-mt-md start-animation">
             <p class="q-ma-none text-body-2">
               Premium motion, AI interaction, and section-level implementation for platforms that
               need sharper user flow.
@@ -429,17 +459,24 @@ const toProof = () => {
           </div>
         </div>
 
-        <div class="u-grid u-gap-sm full-width q-mt-md mobile-content">
-          <q-btn @click="toPackages(null)" color="accent" size="lg" glossy>
+        <div class="u-grid u-gap-sm full-width q-mt-md">
+          <q-btn class="cta" @click="toPackages(null)" color="accent" size="lg" glossy>
             <span class="text-body-2">Packages</span>
           </q-btn>
 
-          <q-btn @click="toProof" text-color="accent" color="secondary" size="lg" glossy>
+          <q-btn
+            class="cta"
+            @click="toProof"
+            text-color="accent"
+            color="secondary"
+            size="lg"
+            glossy
+          >
             <span class="text-body-2">Proof</span>
           </q-btn>
         </div>
 
-        <div class="proofs mobile-content full-width q-mt-lg">
+        <div class="proofs full-width q-mt-lg">
           <div class="proof-card">
             <span class="proof-label">CLARITY</span>
             <strong>Less confusion. More understanding.</strong>
@@ -532,7 +569,7 @@ const toProof = () => {
               <p ref="kickerRef" class="text-caption kicker q-mt-none q-mb-sm">
                 Focused UI Motion + AI Interaction
               </p>
-              <h1 ref="headlineRef" class="text-h1 full-width q-mt-none q-mb-none">
+              <h1 ref="headlineRef" class="headline text-h1 full-width q-mt-none q-mb-none">
                 Build Clarity. Earn Trust. Create Momentum.
               </h1>
               <div ref="servRef" class="text-lead subheadline q-mt-md start-animation">
@@ -542,12 +579,12 @@ const toProof = () => {
                 </p>
               </div>
             </div>
-            <div class="u-grid u-grid-cols-2 u-gap-sm" ref="ctaBtnRef">
-              <q-btn @click="toPackages(null)" class="q-mt-md" color="accent" size="lg" glossy>
+            <div class="u-grid u-grid-cols-2 u-gap-sm">
+              <q-btn @click="toPackages(null)" class="cta q-mt-md" color="accent" size="lg" glossy>
                 <span class="text-body-2">Packages</span>
               </q-btn>
               <q-btn
-                class="q-mt-md"
+                class="cta q-mt-md"
                 text-color="accent"
                 color="secondary"
                 size="lg"
