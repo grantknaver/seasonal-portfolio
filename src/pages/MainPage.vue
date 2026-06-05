@@ -71,6 +71,7 @@ const isResponsive = computed(() => width.value < lgBreakpoint);
 
 const dispose = ref<() => void>(() => {});
 const simonRef = ref<HTMLElement | null>(null);
+const kickerRef = ref<HTMLElement | null>(null);
 const headlineRef = ref<HTMLElement | null>(null);
 const servRef = ref<HTMLElement | null>(null);
 const ctaBtnRef = ref<HTMLElement | null>(null);
@@ -223,7 +224,7 @@ const waitForLayout = async (el: HTMLElement | null, frames = 8): Promise<boolea
   if (!el) return false;
 
   for (let i = 0; i < frames; i++) {
-    await new Promise(requestAnimationFrame);
+    await new Promise<void>((resolve) => requestAnimationFrame(() => resolve()));
 
     if (el.offsetParent !== null && el.offsetHeight > 0 && el.offsetWidth > 0) {
       mainStore.SET_PAINTED_STATUS(true);
@@ -240,10 +241,6 @@ const buildAnimations = (mode: ViewType) => {
   if (!el) return () => {};
 
   const homeContentEls = Array.from(document.querySelectorAll<HTMLElement>('.mobile-content'));
-
-  const desktopEls = [simonRef.value, headlineRef.value, servRef.value, ctaBtnRef.value].filter(
-    (x): x is HTMLElement => !!x,
-  );
 
   if (mode === ViewType.Responsive) {
     if (!homeContentEls.length) return () => {};
@@ -270,56 +267,95 @@ const buildAnimations = (mode: ViewType) => {
   }
 
   if (mode === ViewType.Desktop) {
+    const proofEls = Array.from(el.querySelectorAll<HTMLElement>('.proof-card'));
+
+    const desktopEls = [
+      kickerRef.value,
+      simonRef.value,
+      headlineRef.value,
+      servRef.value,
+      ctaBtnRef.value,
+      ...proofEls,
+    ].filter((x): x is HTMLElement => !!x);
+
     if (!desktopEls.length) return () => {};
 
     gsap.killTweensOf(desktopEls);
     gsap.set(desktopEls, { clearProps: 'all' });
 
-    gsap.fromTo(
+    const tl = gsap.timeline();
+
+    tl.fromTo(
       headlineRef.value,
-      { y: 150, autoAlpha: 0 },
+      { y: 75, autoAlpha: 0 },
       {
-        keyframes: [{ y: 0, autoAlpha: 1 }],
-        ease: 'bounce.out',
-        duration: 3,
+        y: 0,
+        autoAlpha: 1,
+        ease: 'power2.out',
+        duration: 1.25,
         overwrite: 'auto',
       },
+      '-=0.2',
     );
 
-    gsap.fromTo(
+    tl.fromTo(
       servRef.value,
-      { x: -100, autoAlpha: 0 },
+      { autoAlpha: 0 },
       {
-        keyframes: [{ x: 0, autoAlpha: 1 }],
-        ease: 'bounce.out',
-        duration: 1.5,
-        overwrite: 'auto',
-        delay: 2,
+        autoAlpha: 1,
+        ease: 'power2.out',
+        duration: 1.25,
       },
+      '-=0.25',
     );
 
-    gsap.fromTo(
+    tl.fromTo(
       ctaBtnRef.value,
       { y: 50, autoAlpha: 0 },
       {
-        keyframes: [{ y: 0, autoAlpha: 1 }],
+        y: 0,
+        autoAlpha: 1,
+        ease: 'power2.out',
+        duration: 1,
+      },
+      '-=0.2',
+    );
+
+    tl.fromTo(
+      kickerRef.value,
+      { autoAlpha: 0 },
+      {
+        autoAlpha: 1,
         ease: 'power2.out',
         duration: 1,
         overwrite: 'auto',
-        delay: 2.5,
       },
     );
 
+    tl.fromTo(
+      proofEls,
+      {
+        x: -16,
+        autoAlpha: 0,
+      },
+      {
+        x: 0,
+        autoAlpha: 1,
+        ease: 'power2.out',
+        duration: 0.5,
+        stagger: 1,
+      },
+      '-=0.05',
+    );
+
     return () => {
+      tl.kill();
       gsap.killTweensOf(desktopEls);
       gsap.set(desktopEls, { clearProps: 'all' });
     };
   }
 
-  return () => {
-    gsap.killTweensOf(desktopEls);
-    gsap.set(desktopEls, { clearProps: 'all' });
-  };
+  return () => {};
 };
 
 const scrollToFooter = () => {
@@ -377,7 +413,7 @@ const toProof = () => {
         class="home-container relative-position full-width column text-primary-font q-mt-md q-mb-md q-pa-lg font-primary"
       >
         <div class="mobile-hero-copy text-center">
-          <p class="text-caption kicker mobile-content q-mt-none q-mb-sm">
+          <p ref="kickerRef" class="text-caption kicker mobile-content q-mt-none q-mb-sm">
             Focused UI Motion + AI Interaction
           </p>
 
@@ -493,7 +529,7 @@ const toProof = () => {
           <div ref="simonRef" class="simon"><SimonMenu></SimonMenu></div>
           <div class="column justify-center">
             <div class="relative-position overflow-hidden">
-              <p class="text-caption kicker q-mt-none q-mb-sm">
+              <p ref="kickerRef" class="text-caption kicker q-mt-none q-mb-sm">
                 Focused UI Motion + AI Interaction
               </p>
               <h1 ref="headlineRef" class="text-h1 full-width q-mt-none q-mb-none">

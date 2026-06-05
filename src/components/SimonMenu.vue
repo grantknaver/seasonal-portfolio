@@ -1,10 +1,11 @@
 <script setup lang="ts">
 import { TopicName } from '../shared/constants/topicName';
-import { ref } from 'vue';
+import { ref, onMounted, onBeforeUnmount, nextTick } from 'vue';
 import { useMainStore } from '../stores/main';
 import { type Topic } from '../shared/types/topic';
 import { v4 as uuidv4 } from 'uuid';
 import { storeToRefs } from 'pinia';
+import gsap from 'gsap';
 import {
   mdiPackageVariantClosed,
   mdiInformation,
@@ -14,6 +15,10 @@ import {
 
 const mainStore = useMainStore();
 const { activeTopic } = storeToRefs(mainStore);
+
+const simonRef = ref<HTMLElement | null>(null);
+let labelEls: HTMLElement[] = [];
+
 const topics: Topic[] = [
   {
     id: uuidv4(),
@@ -47,10 +52,32 @@ const selectTopic = (name: TopicName) => {
   } else {
     mainStore.SET_ACTIVE_TOPIC(name);
   }
+
   mainStore.SET_PACKAGE_INTEREST_TEXT('');
 };
 
-const simonRef = ref();
+onMounted(async () => {
+  await nextTick();
+
+  if (!simonRef.value) return;
+
+  labelEls = Array.from(simonRef.value.querySelectorAll<HTMLElement>('.label'));
+
+  gsap.set(labelEls, {
+    opacity: 0,
+  });
+
+  gsap.to(labelEls, {
+    opacity: 1,
+    duration: 3,
+    delay: 6.25,
+    ease: 'power2.out',
+  });
+});
+
+onBeforeUnmount(() => {
+  gsap.killTweensOf(labelEls);
+});
 </script>
 <template>
   <div ref="simonRef" class="simon">
@@ -154,6 +181,7 @@ const simonRef = ref();
 
   .label {
     position: absolute;
+    opacity: 0;
   }
 
   .q-icon {
