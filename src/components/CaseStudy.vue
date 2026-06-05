@@ -188,8 +188,6 @@ const cardStyle = computed(() => ({
   <div v-else class="case-study-component desktop-view full-width column">
     <q-card class="case-study-card q-pa-lg full-width" :style="cardStyle">
       <q-card-section class="case-study-header-section full-width">
-        <q-icon :name="props.header.icon" class="case-study-header-icon" />
-
         <h2 class="case-study-title text-h2 q-mt-sm q-mb-none secondary-font">
           {{ props.header.text }}
         </h2>
@@ -197,6 +195,12 @@ const cardStyle = computed(() => ({
         <p class="case-study-subtitle text-body-1 q-mt-md q-mb-none primary-font">
           {{ props.header.subHeader }}
         </p>
+
+        <q-icon
+          size="64px"
+          :name="props.header.icon"
+          class="case-study-header-icon q-mt-md q-mb-sm"
+        />
       </q-card-section>
 
       <q-separator class="case-study-separator" />
@@ -346,7 +350,6 @@ const cardStyle = computed(() => ({
 
 .case-study-header-icon {
   color: var(--q-accent);
-  font-size: 2rem;
   opacity: 0.9;
 }
 
