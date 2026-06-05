@@ -8,9 +8,9 @@ import { type PastClient } from 'src/shared/types/pastClient';
 import { useViewport } from 'src/shared/utils/viewWidth';
 import { TopicName } from 'src/shared/constants/topicName';
 
-import labcorp from 'src/assets/labcorp.jpg?w=800;1280;1600&format=avif;jpg&as=picture';
-import ornl from 'src/assets/ornl.jpg?w=800;1280;1600&format=avif;jpg&as=picture';
-import amtrak from 'src/assets/amtrak.jpg?w=800;1280;1600&format=avif;jpg&as=picture';
+import labcorp from 'src/assets/labcorp.png?w=800;1280;1600&format=avif;jpg&as=picture';
+import ornl from 'src/assets/ornl.png?w=800;1280;1600&format=avif;jpg&as=picture';
+import amtrak from 'src/assets/amtrak.png?w=800;1280;1600&format=avif;jpg&as=picture';
 import lockheedMartin from 'src/assets/lockheed-martin.png?w=800;1280;1600&format=avif;png&as=picture';
 
 const mainStore = useMainStore();

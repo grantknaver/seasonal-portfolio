@@ -1,22 +1,19 @@
 <script lang="ts" setup>
 import { computed, ref } from 'vue';
 import { v4 as uuidv4 } from 'uuid';
-import { storeToRefs } from 'pinia';
 import { mdiCheckboxBlankCircle } from '@quasar/extras/mdi-v7';
 
 import { useMainStore } from '../stores/main';
 import { Package } from '../shared/constants/packages';
-import { Theme } from 'src/shared/constants/theme';
 import { TopicName } from 'src/shared/constants/topicName';
 import { type PackageDetails } from '../shared/types/packageDetails';
 import { useViewport } from '../shared/utils/viewWidth';
 
-import heroClarityMotionPass from 'src/assets/starter-fall.png?w=300;600;900&format=avif;webp;png&as=picture';
-import ctaAttentionConversionBlock from 'src/assets/growth-fall.png?w=300;500;900&format=avif;webp;png&as=picture';
-import mobileResponsivenessPolishPass from 'src/assets/premium-fall.png?w=300;500;900&format=avif;webp;png&as=picture';
+import heroClarityMotionPass from 'src/assets/hero-clarity-motion-pass.png?w=300;600;900&format=avif;webp;png&as=picture';
+import ctaAttentionConversionBlock from 'src/assets/cta-attention-conversion-block.png?w=300;500;900&format=avif;webp;png&as=picture';
+import mobileResponsivenessPolishPass from 'src/assets/mobile-responsiveness-polish-pass.png?w=300;500;900&format=avif;webp;png&as=picture';
 
 const mainStore = useMainStore();
-const { activeTheme } = storeToRefs(mainStore);
 const emit = defineEmits(['requestConsultation']);
 
 const { lgBreakpoint, width } = useViewport();
@@ -147,21 +144,10 @@ const packageCta = (name: Package) => `Start with ${String(name).replace(' Packa
           class="package-card"
           :class="{ 'is-recommended': p.name === Package.HeroClarityMotionPass }"
         >
-          <div class="package-media-title">
+          <div class="package-media-title u-grid">
             <div class="package-media-column">
-              <div class="img-container column justify-center items-center">
-                <picture
-                  :class="{
-                    'responsive-fall-img': isResponsive && activeTheme === Theme.Fall,
-                    'responsive-winter-img': isResponsive && activeTheme === Theme.Winter,
-                    'responsive-spring-img': isResponsive && activeTheme === Theme.Spring,
-                    'responsive-summer-img': isResponsive && activeTheme === Theme.Summer,
-                    'desktop-fall-img': !isResponsive && activeTheme === Theme.Fall,
-                    'desktop-winter-img': !isResponsive && activeTheme === Theme.Winter,
-                    'desktop-spring-img': !isResponsive && activeTheme === Theme.Spring,
-                    'desktop-summer-img': !isResponsive && activeTheme === Theme.Summer,
-                  }"
-                >
+              <div class="img-container">
+                <picture>
                   <source v-for="(s, srcIndex) in p.img.sources" :key="srcIndex" :srcset="s" />
                   <img
                     :src="p?.img.img.src"
@@ -323,9 +309,12 @@ const packageCta = (name: Package) => `Start with ${String(name).replace(' Packa
   gap: 1rem;
 
   .package-media-title {
-    display: grid;
-    grid-template-columns: minmax(220px, 0.42fr) minmax(0, 1fr);
+    grid-template-columns: minmax(0, 1fr);
     gap: 1.5rem;
+
+    @media (min-width: tokens.$breakpoint-lg) {
+      grid-template-columns: minmax(220px, 0.42fr) minmax(0, 1fr);
+    }
   }
 
   .package-highlights {
@@ -355,19 +344,10 @@ const packageCta = (name: Package) => `Start with ${String(name).replace(' Packa
 .img-container {
   width: 100%;
   aspect-ratio: 1 / 1;
-  display: flex;
-  align-items: center;
-  justify-content: center;
   overflow: hidden;
   border: 1px solid color-mix(in srgb, var(--q-accent) 28%, transparent);
   border-radius: 0.85rem;
   background: color-mix(in srgb, tokens.$ink-soft 82%, tokens.$ivory 6%);
-
-  picture {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-  }
 
   img {
     display: block;
@@ -376,6 +356,10 @@ const packageCta = (name: Package) => `Start with ${String(name).replace(' Packa
     width: auto;
     height: auto;
     object-fit: contain;
+  }
+
+  picture {
+    background-color: red;
   }
 }
 
