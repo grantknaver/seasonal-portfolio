@@ -330,7 +330,7 @@ const buildAnimations = (mode: ViewType, animate = true) => {
           duration: 3,
           stagger: 0.25,
         },
-        '-=0.2',
+        '-=1',
       );
     }
 
@@ -348,7 +348,7 @@ const buildAnimations = (mode: ViewType, animate = true) => {
           duration: 0.5,
           stagger: 0.18,
         },
-        '-=0.15',
+        '-=2.25',
       );
     }
   }
