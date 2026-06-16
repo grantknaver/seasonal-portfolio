@@ -327,7 +327,7 @@ const buildAnimations = (mode: ViewType, animate = true) => {
           y: 0,
           autoAlpha: 1,
           ease: 'power2.out',
-          duration: 1,
+          duration: 3,
           stagger: 0.25,
         },
         '-=0.2',
@@ -408,7 +408,7 @@ const buildAnimations = (mode: ViewType, animate = true) => {
           duration: 1,
           stagger: 0.25,
         },
-        '-=0.2',
+        '-=1',
       );
     }
 
