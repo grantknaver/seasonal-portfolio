@@ -1,5 +1,6 @@
 export enum Lens {
-  HeroClarityMotionPass = 'Hero Clarity + Motion Pass',
-  CtaAttentionConversionBlock = 'CTA Attention + Conversion Block',
-  MobileResponsivenessPolishPass = 'Mobile Responsiveness + Polish Pass',
+  Clarity = 'Clarity',
+  Trust = 'Trust',
+  Momentum = 'Momentum',
+  AILegibility = 'AI Legibility',
 }

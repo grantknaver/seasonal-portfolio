@@ -7,81 +7,136 @@ import { Lens } from '../shared/constants/lens';
 import { type LensDetails } from '../shared/types/lensDetails';
 import { useViewport } from '../shared/utils/viewWidth';
 
-import heroClarityMotionPass from 'src/assets/hero-clarity-motion-pass.png?w=300;600;900&format=avif;webp;png&as=picture';
-import ctaAttentionConversionBlock from 'src/assets/cta-attention-conversion-block.png?w=300;500;900&format=avif;webp;png&as=picture';
-import mobileResponsivenessPolishPass from 'src/assets/mobile-responsiveness-polish-pass.png?w=300;500;900&format=avif;webp;png&as=picture';
+import lensClarity from 'src/assets/lens-clarity.png?w=300;600;900&format=avif;webp;png&as=picture';
+import lensTrust from 'src/assets/lens-trust.png?w=300;500;900&format=avif;webp;png&as=picture';
+import lensMomentum from 'src/assets/lens-momentum.png?w=300;500;900&format=avif;webp;png&as=picture';
+import lensAiLegibility from 'src/assets/lens-ai-legibility.png?w=300;500;900&format=avif;webp;png&as=picture';
 
 const { lgBreakpoint, width } = useViewport();
 const isResponsive = computed(() => width.value < lgBreakpoint);
 
-const packages = ref<LensDetails[]>([
+const lens = ref<LensDetails[]>([
   {
-    name: Lens.HeroClarityMotionPass,
+    name: Lens.Clarity,
     id: uuidv4(),
-    img: heroClarityMotionPass,
-    alt: Lens.HeroClarityMotionPass,
-    tagline: 'Make the first screen clearer, more premium, and easier to act on.',
-    fitLine: 'Best for pages where the value needs to land faster.',
+    img: lensClarity,
+    alt: Lens.Clarity,
+    tagline: 'Make the main message easier to understand and act on.',
+    fitLine:
+      'Best for surfaces where visitors may not quickly understand the offer, value, or next step.',
     features: [
       {
-        featureIcon: 'movie_filter',
-        text: 'Sharper headline, subheadline, and CTA structure',
+        featureIcon: 'visibility',
+        text: 'Main message, headline, and first impression reviewed',
       },
-      { featureIcon: 'phone_iphone', text: 'Premium hero layout tuned for desktop and mobile' },
-      { featureIcon: 'speed', text: 'Purposeful GSAP reveal or attention motion' },
       {
-        featureIcon: 'schedule',
-        text: 'Proof strip, trust badges, or CTA support added where useful',
+        featureIcon: 'format_size',
+        text: 'Content hierarchy checked for faster understanding',
+      },
+      {
+        featureIcon: 'touch_app',
+        text: 'Primary action path made easier to recognize',
+      },
+      {
+        featureIcon: 'view_quilt',
+        text: 'Section flow reviewed for clearer user progression',
+      },
+      {
+        featureIcon: 'lightbulb',
+        text: 'Highest-leverage clarity improvement identified',
+      },
+    ],
+  },
+  {
+    name: Lens.Trust,
+    id: uuidv4(),
+    img: lensTrust,
+    alt: Lens.Trust,
+    tagline: 'Help people feel more confident before they take the next step.',
+    fitLine:
+      'Best for pages or product moments where hesitation, uncertainty, or lack of proof may slow action.',
+    features: [
+      {
+        featureIcon: 'verified_user',
+        text: 'Trust signals, proof, and credibility cues reviewed',
+      },
+      {
+        featureIcon: 'workspace_premium',
+        text: 'Visual polish checked for confidence and professionalism',
+      },
+      {
+        featureIcon: 'fact_check',
+        text: 'Claims reviewed for support, specificity, and believability',
+      },
+      {
+        featureIcon: 'groups',
+        text: 'Human details, process cues, or reassurance points identified',
+      },
+      {
+        featureIcon: 'security',
+        text: 'Friction points that create doubt or uncertainty surfaced',
+      },
+    ],
+  },
+  {
+    name: Lens.Momentum,
+    id: uuidv4(),
+    img: lensMomentum,
+    alt: Lens.Momentum,
+    tagline: 'Smooth the path from attention to action.',
+    fitLine: 'Best for surfaces where users may hesitate, stall, miss the next step, or drop off.',
+    features: [
+      {
+        featureIcon: 'trending_up',
+        text: 'User flow reviewed from first impression to next action',
+      },
+      {
+        featureIcon: 'speed',
+        text: 'Motion, timing, and interaction rhythm checked for drag',
+      },
+      {
+        featureIcon: 'near_me',
+        text: 'CTA placement, hierarchy, and supporting context reviewed',
+      },
+      {
+        featureIcon: 'mobile_friendly',
+        text: 'Desktop and mobile momentum checked across key moments',
       },
       {
         featureIcon: 'rocket_launch',
-        text: 'Clear before/after direction for implementation',
+        text: 'Highest-friction moment identified for focused improvement',
       },
     ],
   },
   {
-    name: Lens.CtaAttentionConversionBlock,
+    name: Lens.AILegibility,
     id: uuidv4(),
-    img: ctaAttentionConversionBlock,
-    alt: Lens.CtaAttentionConversionBlock,
-    tagline: 'Make the next step easier to see, trust, and click.',
-    fitLine: 'Best for pages with weak, buried, or unclear calls to action.',
+    img: lensAiLegibility,
+    alt: Lens.AILegibility,
+    tagline: 'Make AI interactions feel understandable, useful, and trustworthy.',
+    fitLine:
+      'Best for chatbots, assistants, generated content, AI feedback, or workflows where users need to understand what the system is doing.',
     features: [
       {
-        featureIcon: 'animation',
-        text: 'Primary CTA placement and hierarchy tightened',
+        featureIcon: 'smart_toy',
+        text: 'AI interaction flow reviewed for usefulness and clarity',
       },
       {
-        featureIcon: 'integration_instructions',
-        text: 'Button motion, hover, and press states polished',
-      },
-      { featureIcon: 'brush', text: 'Sticky, inline, or final CTA block added where appropriate' },
-      { featureIcon: 'description', text: 'Trust-support copy added near the action' },
-      { featureIcon: 'event', text: 'Cleaner path from interest to inquiry, booking, or purchase' },
-    ],
-  },
-  {
-    name: Lens.MobileResponsivenessPolishPass,
-    id: uuidv4(),
-    img: mobileResponsivenessPolishPass,
-    alt: Lens.MobileResponsivenessPolishPass,
-    tagline: 'Clean up the experience across desktop, tablet, and mobile.',
-    fitLine: 'Best for builds that feel good on desktop but rough on smaller screens.',
-    features: [
-      {
-        featureIcon: 'slideshow',
-        text: 'Mobile spacing, type scale, and button rhythm refined',
+        featureIcon: 'psychology',
+        text: 'Generated output checked for legibility and user confidence',
       },
       {
-        featureIcon: 'design_services',
-        text: 'Images, videos, and sections tuned for responsive layouts',
+        featureIcon: 'graphic_eq',
+        text: 'Motion or feedback opportunities identified where AI needs to feel active',
       },
-      { featureIcon: 'priority_high', text: 'Touch targets and CTA placement improved' },
       {
-        featureIcon: 'support_agent',
-        text: 'Scroll motion adjusted for mobile and reduced-motion support',
+        featureIcon: 'rule',
+        text: 'System states, responses, and user expectations reviewed',
       },
-      { featureIcon: 'calendar_month', text: 'Final QA pass across key screen sizes' },
+      {
+        featureIcon: 'auto_awesome',
+        text: 'Opportunities for practical AI integration surfaced',
+      },
     ],
   },
 ]);
@@ -89,56 +144,55 @@ const packages = ref<LensDetails[]>([
 
 <template>
   <section
-    class="packageSection full-width column"
+    class="lensSection full-width column"
     :class="isResponsive ? 'responsive-view q-pa-md' : 'desktop-view q-pa-md'"
   >
-    <div class="package-shell">
-      <div class="package-header">
-        <p class="text-caption kicker q-mt-none q-mb-sm">Focused implementation blocks</p>
+    <div class="lens-shell">
+      <div class="lens-header">
+        <p class="text-caption kicker q-mt-none q-mb-sm">Surface review lens</p>
+
         <h1 class="text-h1 q-mt-none q-mb-md">Lens</h1>
+
         <p class="section-lead text-body-1 q-mt-none q-mb-sm">
-          Clear scopes for motion, AI interaction, and section-level polish.
+          I review websites, product surfaces, and AI interactions through clarity, trust, momentum,
+          and AI legibility.
         </p>
+
         <p class="section-copy text-body-2 q-ma-none">
-          Choose the smallest useful build. Each package is designed to improve clarity, trust, and
-          momentum without forcing a full redesign.
+          I look for where the experience is unclear, where trust needs support, where momentum
+          slows down, and where AI needs to feel more legible, grounded, and useful.
         </p>
       </div>
 
-      <div class="package-proof-grid">
-        <div class="package-proof-card">
+      <div class="lens-proof-grid">
+        <div class="lens-proof-card">
           <span>Scope</span>
           <strong>Clear work block before build.</strong>
         </div>
 
-        <div class="package-proof-card">
+        <div class="lens-proof-card">
           <span>Motion</span>
           <strong>Purposeful feedback, not decoration.</strong>
         </div>
 
-        <div class="package-proof-card">
+        <div class="lens-proof-card">
           <span>Delivery</span>
           <strong>Polished, responsive implementation.</strong>
         </div>
       </div>
 
-      <div class="package-card-stack">
-        <article
-          v-for="(p, index) in packages"
-          :key="p.id"
-          class="package-card"
-          :class="{ 'is-recommended': p.name === Package.HeroClarityMotionPass }"
-        >
-          <div class="package-media-title u-grid">
-            <div class="package-media-column">
+      <div class="lens-card-stack">
+        <article v-for="(l, index) in lens" :key="l.id" class="lens-card">
+          <div class="lens-media-title u-grid">
+            <div class="lens-media-column">
               <div class="img-container">
                 <picture>
-                  <source v-for="(s, srcIndex) in p.img.sources" :key="srcIndex" :srcset="s" />
+                  <source v-for="(s, srcIndex) in l.img.sources" :key="srcIndex" :srcset="s" />
                   <img
-                    :src="p?.img.img.src"
-                    :width="isResponsive ? p?.img.img.w : undefined"
-                    :height="isResponsive ? p?.img.img.h : undefined"
-                    :alt="p?.name"
+                    :src="l?.img.img.src"
+                    :width="isResponsive ? l?.img.img.w : undefined"
+                    :height="isResponsive ? l?.img.img.h : undefined"
+                    :alt="l?.name"
                     :loading="index === 0 ? 'eager' : 'lazy'"
                     :fetchpriority="index === 0 ? 'high' : 'auto'"
                     decoding="async"
@@ -146,43 +200,43 @@ const packages = ref<LensDetails[]>([
                 </picture>
               </div>
             </div>
-            <div class="package-title-column">
-              <div class="package-title-row q-mb-sm">
+            <div class="lens-title-column">
+              <div class="lens-title-row q-mb-sm">
                 <div>
-                  <p class="text-caption kicker q-mt-none q-mb-xs">{{ packageTier(p.name) }}</p>
-                  <h2 class="text-h2 q-mt-none q-mb-sm">{{ p.name }}</h2>
+                  <p class="text-caption kicker q-mt-none q-mb-xs">{{ l.name }}</p>
+                  <h2 class="text-h2 q-mt-none q-mb-sm">{{ l.name }}</h2>
                 </div>
               </div>
-              <p class="package-tagline text-body-2 q-mt-none q-mb-md">
-                {{ p.tagline }}
+              <p class="lens-tagline text-body-2 q-mt-none q-mb-md">
+                {{ l.tagline }}
               </p>
             </div>
           </div>
 
-          <div class="package-highlights">
-            <q-list class="package-feature-list q-mb-md">
+          <div class="lens-highlights">
+            <q-list class="lens-feature-list q-mb-md">
               <q-item
-                v-for="(f, featureIndex) in p.features"
+                v-for="(f, featureIndex) in l.features"
                 :key="featureIndex"
-                class="package-feature-item"
+                class="lens-feature-item"
               >
                 <q-item-section side>
                   <q-icon :name="mdiCheckboxBlankCircle" size="8px" class="feature-dot" />
                 </q-item-section>
 
-                <q-item-section class="package-feature text-body-2">
+                <q-item-section class="lens-feature text-body-2">
                   {{ f.text }}
                 </q-item-section>
               </q-item>
             </q-list>
             <!-- <q-btn
-              @click="toContact(p?.name ?? null)"
+              @click="toContact(l?.name ?? null)"
               color="accent"
-              class="package-cta full-width"
+              class="lens-cta full-width"
               size="lg"
               glossy
             >
-              <span class="text-body-2">{{ packageCta(p.name) }}</span>
+              <span class="text-body-2">{{ packageCta(l.name) }}</span>
             </q-btn> -->
           </div>
         </article>
@@ -194,11 +248,11 @@ const packages = ref<LensDetails[]>([
 <style scoped lang="scss">
 @use '/src/css/_tokens.scss' as tokens;
 
-.packageSection {
+.lensSection {
   color: tokens.$text;
 }
 
-.package-shell {
+.lens-shell {
   display: grid;
   gap: 1.25rem;
   padding: clamp(1.5625rem, 2.5vw, 2.5rem);
@@ -214,7 +268,7 @@ const packages = ref<LensDetails[]>([
     0 24px 72px color-mix(in srgb, tokens.$ink 88%, transparent);
 }
 
-.package-header {
+.lens-header {
   h1 {
     color: tokens.$text;
     line-height: 1.08;
@@ -243,21 +297,21 @@ const packages = ref<LensDetails[]>([
   font-weight: 700;
 }
 
-.package-proof-grid {
+.lens-proof-grid {
   display: grid;
   grid-template-columns: repeat(3, minmax(0, 1fr));
   gap: 0.75rem;
 }
 
-.package-proof-card,
-.package-card {
+.lens-proof-card,
+.lens-card {
   border: 1px solid color-mix(in srgb, var(--q-accent) 28%, transparent);
   border-radius: 0.85rem;
   background: color-mix(in srgb, tokens.$ink-soft 82%, transparent);
   box-shadow: inset 0 1px 0 color-mix(in srgb, tokens.$ivory 8%, transparent);
 }
 
-.package-proof-card {
+.lens-proof-card {
   padding: 0.85rem 1rem;
 
   span {
@@ -280,11 +334,11 @@ const packages = ref<LensDetails[]>([
   }
 }
 
-.package-card-stack {
+.lens-card-stack {
   display: grid;
   gap: 1rem;
 
-  .package-media-title {
+  .lens-media-title {
     grid-template-columns: minmax(0, 1fr);
     gap: 1.5rem;
 
@@ -293,25 +347,21 @@ const packages = ref<LensDetails[]>([
     }
   }
 
-  .package-highlights {
+  .lens-highlights {
     margin-top: 1rem;
   }
 }
 
-.package-card {
+.lens-card {
   padding: 1.25rem;
-
-  &.is-recommended {
-    border-color: color-mix(in srgb, var(--q-accent) 52%, transparent);
-  }
 }
 
-.package-media-column,
-.package-title-column {
+.lens-media-column,
+.lens-title-column {
   min-width: 0;
 }
 
-.package-content-column {
+.lens-content-column {
   display: grid;
   grid-template-columns: 1fr;
   gap: 0.75rem;
@@ -339,7 +389,7 @@ const packages = ref<LensDetails[]>([
   }
 }
 
-.package-title-row {
+.lens-title-row {
   display: flex;
   justify-content: space-between;
   gap: 1rem;
@@ -353,24 +403,24 @@ const packages = ref<LensDetails[]>([
   }
 }
 
-.package-tagline {
+.lens-tagline {
   color: tokens.$text-muted;
   line-height: 1.45;
   font-weight: 600;
 }
 
-.package-feature-header {
+.lens-feature-header {
   color: tokens.$text;
   line-height: 1.45;
   font-weight: 700;
 }
 
-.package-feature-list {
+.lens-feature-list {
   display: grid;
   gap: 0.75rem;
 }
 
-.package-feature-item {
+.lens-feature-item {
   min-height: auto;
   padding: 0.85rem 1rem;
   border: 1px solid color-mix(in srgb, var(--q-accent) 22%, transparent);
@@ -382,18 +432,18 @@ const packages = ref<LensDetails[]>([
   color: var(--q-accent);
 }
 
-.package-feature {
+.lens-feature {
   color: tokens.$text-muted;
   line-height: 1.35;
   font-weight: 600;
 }
 
-.package-cta {
+.lens-cta {
   border-radius: 0.75rem;
 }
 
 .responsive-view {
-  .package-shell {
+  .lens-shell {
     padding: 1.25rem;
   }
 
@@ -401,25 +451,25 @@ const packages = ref<LensDetails[]>([
     margin-bottom: 1.5rem;
   }
 
-  .package-tagline {
+  .lens-tagline {
     margin-bottom: 0;
     text-align: center;
   }
 
-  .package-feature-header {
+  .lens-feature-header {
     text-align: center;
   }
 
-  .package-proof-grid,
-  .package-card {
+  .lens-proof-grid,
+  .lens-card {
     grid-template-columns: 1fr;
   }
 
-  .package-card {
+  .lens-card {
     padding: 1rem;
   }
 
-  .package-title-row {
+  .lens-title-row {
     display: block;
     text-align: center;
   }
@@ -439,7 +489,7 @@ const packages = ref<LensDetails[]>([
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .package-cta {
+  .lens-cta {
     transition: none;
   }
 }
