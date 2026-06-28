@@ -3,28 +3,23 @@ import { computed, ref } from 'vue';
 import { v4 as uuidv4 } from 'uuid';
 import { mdiCheckboxBlankCircle } from '@quasar/extras/mdi-v7';
 
-import { useMainStore } from '../stores/main';
-import { Package } from '../shared/constants/packages';
-import { TopicName } from 'src/shared/constants/topicName';
-import { type PackageDetails } from '../shared/types/packageDetails';
+import { Lens } from '../shared/constants/lens';
+import { type LensDetails } from '../shared/types/lensDetails';
 import { useViewport } from '../shared/utils/viewWidth';
 
 import heroClarityMotionPass from 'src/assets/hero-clarity-motion-pass.png?w=300;600;900&format=avif;webp;png&as=picture';
 import ctaAttentionConversionBlock from 'src/assets/cta-attention-conversion-block.png?w=300;500;900&format=avif;webp;png&as=picture';
 import mobileResponsivenessPolishPass from 'src/assets/mobile-responsiveness-polish-pass.png?w=300;500;900&format=avif;webp;png&as=picture';
 
-const mainStore = useMainStore();
-const emit = defineEmits(['requestConsultation']);
-
 const { lgBreakpoint, width } = useViewport();
 const isResponsive = computed(() => width.value < lgBreakpoint);
 
-const packages = ref<PackageDetails[]>([
+const packages = ref<LensDetails[]>([
   {
-    name: Package.HeroClarityMotionPass,
+    name: Lens.HeroClarityMotionPass,
     id: uuidv4(),
     img: heroClarityMotionPass,
-    alt: Package.HeroClarityMotionPass,
+    alt: Lens.HeroClarityMotionPass,
     tagline: 'Make the first screen clearer, more premium, and easier to act on.',
     fitLine: 'Best for pages where the value needs to land faster.',
     features: [
@@ -45,10 +40,10 @@ const packages = ref<PackageDetails[]>([
     ],
   },
   {
-    name: Package.CtaAttentionConversionBlock,
+    name: Lens.CtaAttentionConversionBlock,
     id: uuidv4(),
     img: ctaAttentionConversionBlock,
-    alt: Package.CtaAttentionConversionBlock,
+    alt: Lens.CtaAttentionConversionBlock,
     tagline: 'Make the next step easier to see, trust, and click.',
     fitLine: 'Best for pages with weak, buried, or unclear calls to action.',
     features: [
@@ -66,10 +61,10 @@ const packages = ref<PackageDetails[]>([
     ],
   },
   {
-    name: Package.MobileResponsivenessPolishPass,
+    name: Lens.MobileResponsivenessPolishPass,
     id: uuidv4(),
     img: mobileResponsivenessPolishPass,
-    alt: Package.MobileResponsivenessPolishPass,
+    alt: Lens.MobileResponsivenessPolishPass,
     tagline: 'Clean up the experience across desktop, tablet, and mobile.',
     fitLine: 'Best for builds that feel good on desktop but rough on smaller screens.',
     features: [
@@ -90,16 +85,6 @@ const packages = ref<PackageDetails[]>([
     ],
   },
 ]);
-
-const toContact = (p: Package | '') => {
-  emit('requestConsultation', p);
-  mainStore.SET_PACKAGE_INTEREST_TEXT(p);
-  mainStore.SET_ACTIVE_TOPIC(TopicName.Contact);
-};
-
-const packageTier = (name: Package) => String(name).replace(' Package', '').toUpperCase();
-
-const packageCta = (name: Package) => `Start with ${String(name).replace(' Package', '')}`;
 </script>
 
 <template>
@@ -190,7 +175,7 @@ const packageCta = (name: Package) => `Start with ${String(name).replace(' Packa
                 </q-item-section>
               </q-item>
             </q-list>
-            <q-btn
+            <!-- <q-btn
               @click="toContact(p?.name ?? null)"
               color="accent"
               class="package-cta full-width"
@@ -198,7 +183,7 @@ const packageCta = (name: Package) => `Start with ${String(name).replace(' Packa
               glossy
             >
               <span class="text-body-2">{{ packageCta(p.name) }}</span>
-            </q-btn>
+            </q-btn> -->
           </div>
         </article>
       </div>
