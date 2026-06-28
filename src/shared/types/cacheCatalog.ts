@@ -8,8 +8,8 @@ export interface CacheCatelog {
   [CaseStudies.Waveform]: DefineComponent | null;
   [CacheEntry.Proof]: DefineComponent | null;
   [CacheEntry.RecaptchaWidget]: DefineComponent | null;
-  [CacheEntry.CaseStudiesSection]: DefineComponent | null;
   [CacheEntry.PackageSection]: DefineComponent | null;
   [CacheEntry.AboutSection]: DefineComponent | null;
   [CacheEntry.ContactSection]: DefineComponent | null;
+  [CacheEntry.ExamplesSection]: DefineComponent | null;
 }

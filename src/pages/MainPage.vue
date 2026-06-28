@@ -30,17 +30,17 @@ const cacheStore = useCacheStore();
 const mobileTopics: Topic[] = [
   {
     id: uuidv4(),
-    name: TopicName.CaseStudies,
-    icon: mdiBookOpenPageVariant,
-    label: TopicName.CaseStudies,
-    cachedName: CacheEntry.CaseStudiesSection,
-  },
-  {
-    id: uuidv4(),
     name: TopicName.Lens,
     icon: mdiMagnify,
     label: TopicName.Lens,
     cachedName: CacheEntry.PackageSection,
+  },
+  {
+    id: uuidv4(),
+    name: TopicName.Examples,
+    icon: mdiBookOpenPageVariant,
+    label: TopicName.Examples,
+    cachedName: CacheEntry.ExamplesSection,
   },
   {
     id: uuidv4(),

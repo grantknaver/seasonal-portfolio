@@ -7,8 +7,8 @@ import { storeToRefs } from 'pinia';
 import {
   mdiInformation,
   mdiEmailOutline,
-  mdiBookOpenPageVariant,
   mdiMagnify,
+  mdiViewGalleryOutline,
 } from '@quasar/extras/mdi-v7';
 import { onMounted, ref } from 'vue';
 
@@ -17,6 +17,18 @@ const { activeTopic } = storeToRefs(mainStore);
 const labelsVisible = ref(false);
 
 const topics: Topic[] = [
+  {
+    id: uuidv4(),
+    name: TopicName.Lens,
+    icon: mdiMagnify,
+    label: TopicName.Lens,
+  },
+  {
+    id: uuidv4(),
+    name: TopicName.Examples,
+    icon: mdiViewGalleryOutline,
+    label: TopicName.Examples,
+  },
   {
     id: uuidv4(),
     name: TopicName.About,
@@ -28,18 +40,6 @@ const topics: Topic[] = [
     name: TopicName.Contact,
     icon: mdiEmailOutline,
     label: TopicName.Contact,
-  },
-  {
-    id: uuidv4(),
-    name: TopicName.Lens,
-    icon: mdiMagnify,
-    label: TopicName.Lens,
-  },
-  {
-    id: uuidv4(),
-    name: 'Case Studies' as TopicName,
-    icon: mdiBookOpenPageVariant,
-    label: 'Proof',
   },
 ];
 
@@ -65,7 +65,7 @@ onMounted(() => {
       v-for="topic in topics"
       :key="topic.id"
       class="simon-quadrant"
-      :class="[topic.name.replace(' ', ''), { 'active-topic': topic.name === activeTopic }]"
+      :class="[topic.name, { 'active-topic': topic.name === activeTopic }]"
       tabindex="0"
       style="padding: 1rem"
       @click.stop="selectTopic(topic.name)"
@@ -115,19 +115,14 @@ onMounted(() => {
     }
   }
 
-  &.Packages {
-    top: 0;
-    right: 0;
-  }
-
   &.Lens {
     top: 0;
-    right: 0;
+    left: 0;
   }
 
-  &.CaseStudies {
+  &.Examples {
     top: 0;
-    left: 0;
+    right: 0;
   }
 
   &.About {

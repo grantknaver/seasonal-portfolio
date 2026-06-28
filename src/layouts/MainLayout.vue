@@ -31,13 +31,13 @@ const updateWidths = () => {
 };
 const mobileMenu = ref(false);
 const topics = ref<Topic[]>([
+  { id: uuidv4(), name: TopicName.Lens, icon: '', label: TopicName.Lens },
   {
     id: uuidv4(),
-    name: TopicName.CaseStudies,
+    name: TopicName.Examples,
     icon: 'menu_book',
-    label: TopicName.CaseStudies,
+    label: TopicName.Examples,
   },
-  { id: uuidv4(), name: TopicName.Lens, icon: '', label: TopicName.Lens },
   { id: uuidv4(), name: TopicName.About, icon: 'info', label: TopicName.About },
   { id: uuidv4(), name: TopicName.Contact, icon: 'contact_mail', label: TopicName.Contact },
 ]);

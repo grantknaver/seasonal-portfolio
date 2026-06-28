@@ -5,9 +5,9 @@ const cacheStore = useCacheStore();
 
 export const useLoadComponent = (topicName: TopicName) => {
   switch (topicName) {
-    case TopicName.CaseStudies:
-      cacheStore.CACHE_COMPONENT(CacheEntry.CaseStudiesSection);
-      return CacheEntry.CaseStudiesSection;
+    case TopicName.Examples:
+      cacheStore.CACHE_COMPONENT(CacheEntry.ExamplesSection);
+      return CacheEntry.ExamplesSection;
 
     case TopicName.Packages:
       cacheStore.CACHE_COMPONENT(CacheEntry.PackageSection);

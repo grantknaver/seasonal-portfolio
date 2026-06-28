@@ -12,7 +12,7 @@ export const useCacheStore = defineStore('cache', () => {
     [CacheEntry.Waveform]: null,
     [CacheEntry.Proof]: null,
     [CacheEntry.RecaptchaWidget]: null,
-    [CacheEntry.CaseStudiesSection]: null,
+    [CacheEntry.ExamplesSection]: null,
     [CacheEntry.PackageSection]: null,
     [CacheEntry.AboutSection]: null,
     [CacheEntry.ContactSection]: null,

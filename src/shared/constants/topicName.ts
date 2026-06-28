@@ -3,5 +3,5 @@ export enum TopicName {
   Contact = 'Contact',
   Packages = 'Packages',
   Lens = 'Lens',
-  CaseStudies = 'Case Studies',
+  Examples = 'Examples',
 }

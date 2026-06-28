@@ -6,9 +6,9 @@ export enum CacheEntry {
   Waveform = CaseStudies.Waveform,
   Proof = CaseStudies.Proof,
   RecaptchaWidget = 'recaptchaWidget',
-  CaseStudiesSection = 'caseStudiesSection',
   PackageSection = 'packageSection',
   AboutSection = 'aboutSection',
   ContactSection = 'contactSection',
   LensSection = 'lensSection',
+  ExamplesSection = 'examplesSection',
 }

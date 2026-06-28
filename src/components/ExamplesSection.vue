@@ -337,7 +337,7 @@ const toContact = () => {
 
 <template>
   <!-- Mobile -->
-  <section v-if="isResponsive" class="caseStudiesSection responsive-view full-width column q-pa-md">
+  <section v-if="isResponsive" class="examplesSection responsive-view full-width column q-pa-md">
     <div class="case-section-card q-pa-lg q-mb-md">
       <p class="text-caption kicker q-mt-none q-mb-sm">Proof</p>
       <h1 class="text-h1 q-mt-none q-mb-md">Case Studies</h1>
@@ -436,7 +436,7 @@ const toContact = () => {
   </section>
 
   <!-- Desktop -->
-  <section v-if="!isResponsive" class="caseStudiesSection desktop-view full-width column q-pa-md">
+  <section v-if="!isResponsive" class="examplesSection desktop-view full-width column q-pa-md">
     <div class="case-section-card q-pa-xl q-mb-md">
       <p class="text-caption kicker q-mt-none q-mb-sm">Proof</p>
       <h1 class="text-h1 q-mt-none q-mb-md">Case Studies</h1>
@@ -555,7 +555,7 @@ const toContact = () => {
 <style scoped lang="scss">
 @use '/src/css/_tokens.scss' as tokens;
 
-.caseStudiesSection {
+.examplesSection {
   content-visibility: auto;
   contain-intrinsic-size: 800px 1000px;
   color: tokens.$text;
