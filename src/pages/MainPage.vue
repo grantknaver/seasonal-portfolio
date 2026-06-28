@@ -35,13 +35,6 @@ const mobileTopics: Topic[] = [
     label: TopicName.CaseStudies,
     cachedName: CacheEntry.CaseStudiesSection,
   },
-  // {
-  //   id: uuidv4(),
-  //   name: TopicName.Packages,
-  //   icon: mdiTruckDelivery,
-  //   label: 'Packages',
-  //   cachedName: CacheEntry.PackageSection,
-  // },
   {
     id: uuidv4(),
     name: TopicName.Lens,
@@ -467,13 +460,6 @@ const scrollToFooter = () => {
   }
 };
 
-// const toPackages = (p: Package | null) => {
-//   if (p) mainStore.SET_PACKAGE_INTEREST_TEXT(p);
-
-//   mainStore.SET_ACTIVE_TOPIC(TopicName.Packages);
-//   expandedPanel.value = TopicName.Packages;
-// };
-
 const toContact = () => {
   mainStore.SET_ACTIVE_TOPIC(TopicName.Contact);
   expandedPanel.value = TopicName.Contact;
@@ -510,8 +496,8 @@ const toContact = () => {
 
           <div class="subheadline mobile-content q-mt-md start-animation">
             <p class="q-ma-none text-body-2">
-              Premium motion, AI interaction, and section-level implementation for platforms that
-              need sharper user flow.
+              Targeted motion, AI interaction, and website/product improvements that make key
+              moments clearer, more trustworthy, and easier to act on.
             </p>
           </div>
         </div>
@@ -577,11 +563,7 @@ const toContact = () => {
               </div>
               <Suspense v-else>
                 <template #default>
-                  <component
-                    v-if="topic.name === TopicName.Contact"
-                    :is="activeComponent"
-                    @requestConsultation="toContact"
-                  />
+                  <component :is="activeComponent" />
                 </template>
 
                 <template #fallback>
@@ -611,8 +593,8 @@ const toContact = () => {
               </h1>
               <div ref="servRef" class="text-lead subheadline q-mt-md start-animation">
                 <p class="q-ma-none text-body-2">
-                  Premium motion, AI interaction, and section-level implementation for platforms
-                  that need sharper user flow.
+                  Targeted motion, AI interaction, and website/product improvements that make key
+                  moments clearer, more trustworthy, and easier to act on.
                 </p>
               </div>
             </div>

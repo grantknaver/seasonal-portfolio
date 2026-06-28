@@ -5,7 +5,6 @@ import { type Topic } from '../shared/types/topic';
 import { v4 as uuidv4 } from 'uuid';
 import { storeToRefs } from 'pinia';
 import {
-  // mdiPackageVariantClosed,
   mdiInformation,
   mdiEmailOutline,
   mdiBookOpenPageVariant,
@@ -30,12 +29,6 @@ const topics: Topic[] = [
     icon: mdiEmailOutline,
     label: TopicName.Contact,
   },
-  // {
-  //   id: uuidv4(),
-  //   name: TopicName.Packages,
-  //   icon: mdiPackageVariantClosed,
-  //   label: 'Packages',
-  // },
   {
     id: uuidv4(),
     name: TopicName.Lens,
@@ -46,7 +39,7 @@ const topics: Topic[] = [
     id: uuidv4(),
     name: 'Case Studies' as TopicName,
     icon: mdiBookOpenPageVariant,
-    label: 'Studies',
+    label: 'Proof',
   },
 ];
 

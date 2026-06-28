@@ -37,7 +37,6 @@ const topics = ref<Topic[]>([
     icon: 'menu_book',
     label: TopicName.CaseStudies,
   },
-  // { id: uuidv4(), name: TopicName.Packages, icon: 'local_shipping', label: TopicName.Packages },
   { id: uuidv4(), name: TopicName.Lens, icon: '', label: TopicName.Lens },
   { id: uuidv4(), name: TopicName.About, icon: 'info', label: TopicName.About },
   { id: uuidv4(), name: TopicName.Contact, icon: 'contact_mail', label: TopicName.Contact },
