@@ -12,11 +12,10 @@ import { ViewType } from '../shared/constants/viewType';
 import { useViewport } from '../shared/utils/viewWidth';
 import {
   mdiChevronUp,
-  mdiBookOpenPageVariant,
-  // mdiTruckDelivery,
   mdiInformationOutline,
   mdiEmailBox,
   mdiMagnify,
+  mdiViewGalleryOutline,
 } from '@quasar/extras/mdi-v7';
 import { mdiChevronDown } from '@quasar/extras/mdi-v7';
 import { CacheEntry } from 'src/shared/constants/cacheEntry';
@@ -38,7 +37,7 @@ const mobileTopics: Topic[] = [
   {
     id: uuidv4(),
     name: TopicName.Examples,
-    icon: mdiBookOpenPageVariant,
+    icon: mdiViewGalleryOutline,
     label: TopicName.Examples,
     cachedName: CacheEntry.ExamplesSection,
   },

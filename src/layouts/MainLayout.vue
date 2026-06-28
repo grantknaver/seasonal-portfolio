@@ -35,11 +35,11 @@ const topics = ref<Topic[]>([
   {
     id: uuidv4(),
     name: TopicName.Examples,
-    icon: 'menu_book',
+    icon: '',
     label: TopicName.Examples,
   },
-  { id: uuidv4(), name: TopicName.About, icon: 'info', label: TopicName.About },
-  { id: uuidv4(), name: TopicName.Contact, icon: 'contact_mail', label: TopicName.Contact },
+  { id: uuidv4(), name: TopicName.About, icon: '', label: TopicName.About },
+  { id: uuidv4(), name: TopicName.Contact, icon: '', label: TopicName.Contact },
 ]);
 import autumn from 'src/assets/autumn-forestry.jpg?w=768;1280;1600&format=avif;webp;jpeg&quality=40&withoutEnlargement=true&as=picture';
 import winter from 'src/assets/snowy-winter-landscape.jpg?w=768;1280;1600&format=avif;webp;jpeg&quality=40&withoutEnlargement=true&as=picture';
