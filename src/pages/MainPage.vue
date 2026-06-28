@@ -495,15 +495,15 @@ const toContact = () => {
 
           <div class="subheadline mobile-content q-mt-md start-animation">
             <p class="q-ma-none text-body-2">
-              Targeted motion, AI interaction, and website/product improvements that make key
-              moments clearer, more trustworthy, and easier to act on.
+              I review websites, product surfaces, and AI interactions to identify where clarity,
+              trust, momentum, or AI legibility can be improved through focused implementation.
             </p>
           </div>
         </div>
 
         <div class="u-grid u-gap-sm full-width q-mt-md mobile-content">
           <q-btn class="cta" @click="toContact()" color="accent" size="lg" glossy>
-            <span class="text-body-2">Get a review</span>
+            <span class="text-body-2">LET’S TALK</span>
           </q-btn>
         </div>
 
@@ -592,14 +592,15 @@ const toContact = () => {
               </h1>
               <div ref="servRef" class="text-lead subheadline q-mt-md start-animation">
                 <p class="q-ma-none text-body-2">
-                  Targeted motion, AI interaction, and website/product improvements that make key
-                  moments clearer, more trustworthy, and easier to act on.
+                  I review websites, product surfaces, and AI interactions to identify where
+                  clarity, trust, momentum, or AI legibility can be improved through focused
+                  implementation.
                 </p>
               </div>
             </div>
             <div class="u-grid u-grid-cols-2 u-gap-sm">
               <q-btn @click="toContact()" class="cta q-mt-md" color="accent" size="lg" glossy>
-                <span class="text-body-2">Get a review</span>
+                <span class="text-body-2">LET’S TALK</span>
               </q-btn>
             </div>
           </div>
