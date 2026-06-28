@@ -16,6 +16,7 @@ export const useCacheStore = defineStore('cache', () => {
     [CacheEntry.PackageSection]: null,
     [CacheEntry.AboutSection]: null,
     [CacheEntry.ContactSection]: null,
+    [CacheEntry.LensSection]: null,
   });
 
   const CACHE_COMPONENT = (name: CacheEntry) => {

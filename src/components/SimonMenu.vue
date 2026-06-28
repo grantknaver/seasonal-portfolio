@@ -5,10 +5,11 @@ import { type Topic } from '../shared/types/topic';
 import { v4 as uuidv4 } from 'uuid';
 import { storeToRefs } from 'pinia';
 import {
-  mdiPackageVariantClosed,
+  // mdiPackageVariantClosed,
   mdiInformation,
   mdiEmailOutline,
   mdiBookOpenPageVariant,
+  mdiMagnify,
 } from '@quasar/extras/mdi-v7';
 import { onMounted, ref } from 'vue';
 
@@ -29,11 +30,17 @@ const topics: Topic[] = [
     icon: mdiEmailOutline,
     label: TopicName.Contact,
   },
+  // {
+  //   id: uuidv4(),
+  //   name: TopicName.Packages,
+  //   icon: mdiPackageVariantClosed,
+  //   label: 'Packages',
+  // },
   {
     id: uuidv4(),
-    name: TopicName.Packages,
-    icon: mdiPackageVariantClosed,
-    label: 'Packages',
+    name: TopicName.Lens,
+    icon: mdiMagnify,
+    label: TopicName.Lens,
   },
   {
     id: uuidv4(),
@@ -116,6 +123,11 @@ onMounted(() => {
   }
 
   &.Packages {
+    top: 0;
+    right: 0;
+  }
+
+  &.Lens {
     top: 0;
     right: 0;
   }

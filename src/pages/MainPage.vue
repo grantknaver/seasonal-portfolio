@@ -13,14 +13,14 @@ import { useViewport } from '../shared/utils/viewWidth';
 import {
   mdiChevronUp,
   mdiBookOpenPageVariant,
-  mdiTruckDelivery,
+  // mdiTruckDelivery,
   mdiInformationOutline,
   mdiEmailBox,
+  mdiMagnify,
 } from '@quasar/extras/mdi-v7';
 import { mdiChevronDown } from '@quasar/extras/mdi-v7';
 import { CacheEntry } from 'src/shared/constants/cacheEntry';
 import { useCacheStore } from 'src/stores/component-cache';
-import type { Package } from 'src/shared/constants/packages';
 import { scrollToElement } from 'src/shared/utils/scrollToElement';
 import { CacheBinding } from 'src/shared/constants/cacheBinding';
 
@@ -35,11 +35,18 @@ const mobileTopics: Topic[] = [
     label: TopicName.CaseStudies,
     cachedName: CacheEntry.CaseStudiesSection,
   },
+  // {
+  //   id: uuidv4(),
+  //   name: TopicName.Packages,
+  //   icon: mdiTruckDelivery,
+  //   label: 'Packages',
+  //   cachedName: CacheEntry.PackageSection,
+  // },
   {
     id: uuidv4(),
-    name: TopicName.Packages,
-    icon: mdiTruckDelivery,
-    label: 'Packages',
+    name: TopicName.Lens,
+    icon: mdiMagnify,
+    label: TopicName.Lens,
     cachedName: CacheEntry.PackageSection,
   },
   {
@@ -460,16 +467,16 @@ const scrollToFooter = () => {
   }
 };
 
-const toPackages = (p: Package | null) => {
-  if (p) mainStore.SET_PACKAGE_INTEREST_TEXT(p);
+// const toPackages = (p: Package | null) => {
+//   if (p) mainStore.SET_PACKAGE_INTEREST_TEXT(p);
 
-  mainStore.SET_ACTIVE_TOPIC(TopicName.Packages);
-  expandedPanel.value = TopicName.Packages;
-};
+//   mainStore.SET_ACTIVE_TOPIC(TopicName.Packages);
+//   expandedPanel.value = TopicName.Packages;
+// };
 
-const toProof = () => {
-  mainStore.SET_ACTIVE_TOPIC(TopicName.CaseStudies);
-  expandedPanel.value = TopicName.CaseStudies;
+const toContact = () => {
+  mainStore.SET_ACTIVE_TOPIC(TopicName.Contact);
+  expandedPanel.value = TopicName.Contact;
 };
 </script>
 
@@ -510,36 +517,25 @@ const toProof = () => {
         </div>
 
         <div class="u-grid u-gap-sm full-width q-mt-md mobile-content">
-          <q-btn class="cta" @click="toPackages(null)" color="accent" size="lg" glossy>
-            <span class="text-body-2">Packages</span>
-          </q-btn>
-
-          <q-btn
-            class="cta"
-            @click="toProof"
-            text-color="accent"
-            color="secondary"
-            size="lg"
-            glossy
-          >
-            <span class="text-body-2">Proof</span>
+          <q-btn class="cta" @click="toContact()" color="accent" size="lg" glossy>
+            <span class="text-body-2">Get a review</span>
           </q-btn>
         </div>
 
         <div class="proofs mobile-content full-width q-mt-lg">
           <div class="proof-card">
-            <span class="proof-label">CLARITY</span>
-            <strong>Less confusion. More understanding.</strong>
+            <span class="proof-label">MORE INQUIRIES</span>
+            <strong>Clearer paths from interest to contact.</strong>
           </div>
 
           <div class="proof-card">
             <span class="proof-label">TRUST</span>
-            <strong>More confidence. Better decisions.</strong>
+            <strong>Help people understand, trust, and move forward.</strong>
           </div>
 
           <div class="proof-card">
-            <span class="proof-label">MOMENTUM</span>
-            <strong>More engagement. More action.</strong>
+            <span class="proof-label">LESS FRICTION</span>
+            <strong>Smooth the moments where users hesitate, stall, or drop off.</strong>
           </div>
         </div>
       </div>
@@ -582,18 +578,10 @@ const toProof = () => {
               <Suspense v-else>
                 <template #default>
                   <component
-                    v-if="topic.name === TopicName.Packages"
+                    v-if="topic.name === TopicName.Contact"
                     :is="activeComponent"
-                    @requestConsultation="toPackages"
+                    @requestConsultation="toContact"
                   />
-                  <component
-                    v-else-if="
-                      topic.name === TopicName.About || topic.name === TopicName.CaseStudies
-                    "
-                    :is="activeComponent"
-                    @toPackages="toPackages"
-                  />
-                  <component v-else-if="topic.name === TopicName.Contact" :is="activeComponent" />
                 </template>
 
                 <template #fallback>
@@ -629,37 +617,26 @@ const toProof = () => {
               </div>
             </div>
             <div class="u-grid u-grid-cols-2 u-gap-sm">
-              <q-btn @click="toPackages(null)" class="cta q-mt-md" color="accent" size="lg" glossy>
-                <span class="text-body-2">Packages</span>
-              </q-btn>
-              <q-btn
-                @click="toProof()"
-                class="cta q-mt-md"
-                text-color="accent"
-                color="secondary"
-                size="lg"
-                glossy
-                target="_blank"
-              >
-                <span class="text-body-2">Proof</span>
+              <q-btn @click="toContact()" class="cta q-mt-md" color="accent" size="lg" glossy>
+                <span class="text-body-2">Get a review</span>
               </q-btn>
             </div>
           </div>
         </div>
         <div class="proofs q-mt-xl">
           <div class="proof-card">
-            <span class="proof-label">CLARITY</span>
-            <strong>Less confusion. More understanding.</strong>
+            <span class="proof-label">MORE INQUIRIES</span>
+            <strong>Clearer paths from interest to contact.</strong>
           </div>
 
           <div class="proof-card">
-            <span class="proof-label">TRUST</span>
-            <strong>More confidence. Better decisions.</strong>
+            <span class="proof-label">BETTER DECISIONS</span>
+            <strong>Help people understand, trust, and move forward.</strong>
           </div>
 
           <div class="proof-card">
-            <span class="proof-label">MOMENTUM</span>
-            <strong>More engagement. More action.</strong>
+            <span class="proof-label">LESS FRICTION</span>
+            <strong>Smooth the moments where users hesitate, stall, or drop off.</strong>
           </div>
         </div>
       </div>

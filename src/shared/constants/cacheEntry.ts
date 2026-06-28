@@ -10,4 +10,5 @@ export enum CacheEntry {
   PackageSection = 'packageSection',
   AboutSection = 'aboutSection',
   ContactSection = 'contactSection',
+  LensSection = 'lensSection',
 }

@@ -6,4 +6,5 @@ export const CacheBinding = {
   [TopicName.About]: CacheEntry.AboutSection,
   [TopicName.Contact]: CacheEntry.ContactSection,
   [TopicName.Packages]: CacheEntry.PackageSection,
+  [TopicName.Lens]: CacheEntry.LensSection,
 };
