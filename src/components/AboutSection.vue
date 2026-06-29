@@ -14,6 +14,7 @@ import amtrak from 'src/assets/amtrak.png?w=800;1280;1600&format=avif;jpg&as=pic
 import lockheedMartin from 'src/assets/lockheed-martin.png?w=800;1280;1600&format=avif;png&as=picture';
 
 const mainStore = useMainStore();
+
 const emit = defineEmits<{
   (event: 'toContact'): void;
 }>();
@@ -35,63 +36,63 @@ const toContact = () => {
 const generalBullets = ref<AboutBulletPoints[]>([
   {
     src: getImg('gsap-animation.avif'),
-    label: 'Motion systems',
+    label: 'Focused implementation',
     id: uuidv4(),
-    text: 'Purposeful GSAP motion that guides attention, creates feedback, and makes complex interfaces feel clear and alive.',
+    text: 'I improve websites, product interfaces, and AI interactions through focused frontend implementation instead of broad, unfocused redesign work.',
   },
   {
     src: getImg('ai-integration.avif'),
     label: 'AI interaction',
     id: uuidv4(),
-    text: 'AI-supported interfaces with stronger pacing, clearer states, and interaction patterns that help users understand what is happening.',
+    text: 'I build and refine AI-supported surfaces so users can understand what the system is doing, why it matters, and what to do next.',
   },
   {
     src: getImg('interactive-data-visualization.avif'),
-    label: 'Interface clarity',
+    label: 'Surface clarity',
     id: uuidv4(),
-    text: 'Product sections, demos, dashboards, and flows shaped around comprehension, trust, and the next useful action.',
+    text: 'I look at the parts of an experience where people need to understand, trust, decide, or act, then improve the surface around that moment.',
   },
 ]);
 
 const myApproachBullets = ref<AboutBulletPoints[]>([
   {
     src: getImg('creative-engineering.avif'),
-    label: 'Strategy before build',
+    label: 'Find the right path',
     id: uuidv4(),
-    text: 'I start by understanding the surface, the user moment, and the friction before deciding what should move, change, or be rebuilt.',
+    text: 'If the priority is already clear, we can move into implementation alignment. If it is not clear yet, a diagnostic can identify the strongest opportunities first.',
   },
   {
     src: getImg('future-proof-thinking.avif'),
-    label: 'Reusable implementation',
+    label: 'Build the first focused block',
     id: uuidv4(),
-    text: 'I build with clean structure, responsive behavior, and reusable pieces so the first version can keep improving instead of becoming throwaway work.',
+    text: 'Once the direction is clear, I scope the smallest useful implementation block that can improve clarity, trust, momentum, or AI legibility without forcing a full rebuild.',
   },
   {
     src: getImg('collaborative-mindset.avif'),
-    label: 'Clear collaboration',
+    label: 'Keep decisions clear',
     id: uuidv4(),
-    text: 'I keep the work scoped, practical, and understandable so decisions are easier and progress does not get buried in complexity.',
+    text: 'I keep the work understandable and decision-oriented so the path from review, to scope, to implementation does not get buried in complexity.',
   },
 ]);
 
 const whyClientsBullets = ref<AboutBulletPoints[]>([
   {
     src: getImg('fast-results.avif'),
-    label: 'Fast usable progress',
+    label: 'Less friction',
     id: uuidv4(),
-    text: 'Focused implementation blocks make it easier to move from idea to usable experience without dragging the work into a long redesign cycle.',
+    text: 'Focused improvements help remove the small moments where users hesitate, miss the next step, or lose confidence.',
   },
   {
     src: getImg('scalable-systems.avif'),
-    label: 'Scalable systems',
+    label: 'Clearer experiences',
     id: uuidv4(),
-    text: 'The work is structured to adapt across breakpoints, content changes, and future product needs instead of only solving the current screen.',
+    text: 'The work is shaped around what users need to understand, what they need to trust, and what action should feel natural next.',
   },
   {
     src: getImg('memorable-experiences.avif'),
-    label: 'Memorable experience',
+    label: 'Stronger interaction',
     id: uuidv4(),
-    text: 'Motion, feedback, and polish help the product feel more considered, more trustworthy, and easier to remember.',
+    text: 'Motion, feedback, and AI-aware UI patterns help the experience feel more responsive, legible, and considered.',
   },
 ]);
 
@@ -143,19 +144,19 @@ onBeforeUnmount(() => {
   >
     <q-card class="about-card q-pa-none">
       <q-card-section class="about-section-block about-intro q-pa-lg">
-        <p class="text-caption kicker q-mt-none q-mb-sm">Motion UI + AI Interaction</p>
+        <p class="text-caption kicker q-mt-none q-mb-sm">Focused implementation</p>
 
         <h1 class="text-h1 q-mt-none q-mb-md">About the Work</h1>
 
         <p class="section-lead text-body-1 q-mt-none q-mb-sm">
-          Focused implementation for interfaces that need to feel clearer, more responsive, and
-          easier to trust.
+          I improve websites, product interfaces, and AI interactions through targeted frontend
+          implementation.
         </p>
 
         <p class="section-copy text-body-2 q-mt-none q-mb-md">
-          I work across motion, AI interaction, product clarity, and frontend implementation. The
-          goal is not decoration. The goal is helping complex digital experiences feel more
-          understandable, reliable, and alive.
+          I look at surfaces through clarity, trust, momentum, and AI legibility. If the priority is
+          already clear, we can scope the first focused build. If the priority still needs to be
+          found, a diagnostic can identify the strongest path before implementation.
         </p>
 
         <q-list class="about-list q-mt-lg">
@@ -189,7 +190,7 @@ onBeforeUnmount(() => {
           size="lg"
           glossy
         >
-          <span class="text-body-2">Let’s Connect</span>
+          <span class="text-body-2">Let’s Talk</span>
         </q-btn>
       </q-card-section>
     </q-card>
@@ -197,13 +198,14 @@ onBeforeUnmount(() => {
     <q-intersection transition="slide-up" transition-duration="600" :once="true">
       <q-card class="about-card q-mt-md q-pa-none">
         <q-card-section class="about-section-block q-pa-lg">
-          <p class="text-caption kicker q-mt-none q-mb-sm">Process</p>
+          <p class="text-caption kicker q-mt-none q-mb-sm">How it starts</p>
 
           <h2 class="text-h2 q-mt-none q-mb-md">My Approach</h2>
 
           <p class="section-copy text-body-2 q-mt-none q-mb-md">
-            Before I dive into code, I focus on the product moment, what the user needs to
-            understand, and where motion or AI support can reduce friction.
+            The first step is understanding whether the priority is already known or whether the
+            surface needs a deeper diagnostic. From there, the work moves toward a focused
+            implementation block that improves the part of the experience that matters most.
           </p>
 
           <q-list class="about-list q-mt-lg">
@@ -241,8 +243,9 @@ onBeforeUnmount(() => {
           <h2 class="text-h2 q-mt-none q-mb-md">Why Clients Work With Me</h2>
 
           <p class="section-copy text-body-2 q-mt-none q-mb-md">
-            Clients usually need more than a functioning screen. They need a clearer experience, a
-            sharper flow, and implementation that can move quickly without feeling rushed.
+            Clients usually do not need another broad redesign conversation. They need a clearer
+            surface, a stronger interaction, or a focused build that helps users understand, trust,
+            and move forward.
           </p>
 
           <q-list class="about-list q-mt-lg">
@@ -280,7 +283,7 @@ onBeforeUnmount(() => {
           <h2 class="text-h2 q-mt-none q-mb-md">Past Clients</h2>
 
           <p class="section-copy text-body-2 q-mt-none q-mb-lg">
-            Selected organizations I’ve supported through product, frontend, interface, or
+            Selected organizations I’ve supported through frontend, product, interface, and
             implementation work.
           </p>
 
@@ -491,9 +494,6 @@ onBeforeUnmount(() => {
   }
 
   &.responsive-view {
-    .about-card:first-child {
-    }
-
     .about-section-block {
       padding: 1.25rem;
     }
