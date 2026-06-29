@@ -6,11 +6,11 @@ import { storeToRefs } from 'pinia';
 import { Theme } from 'src/shared/constants/theme';
 import { type PropType } from 'vue';
 import type {
-  CaseStudyHeader,
-  CaseStudyListTopicGroup,
-  CaseStudyExpansionTopicGroup,
-  CaseStudyDefaultTopicGroup,
-} from '../shared/types/caseStudy';
+  ExampleHeader,
+  ExampleListTopicGroup,
+  ExampleExpansionTopicGroup,
+  ExampleDefaultTopicGroup,
+} from '../shared/types/example';
 
 const mainStore = useMainStore();
 const { activeTheme } = storeToRefs(mainStore);
@@ -20,19 +20,19 @@ const isResponsive = computed(() => width.value < lgBreakpoint);
 
 const props = defineProps({
   header: {
-    type: Object as PropType<CaseStudyHeader>,
+    type: Object as PropType<ExampleHeader>,
     required: true,
   },
   expansionTopics: {
-    type: Object as PropType<CaseStudyExpansionTopicGroup | undefined>,
+    type: Object as PropType<ExampleExpansionTopicGroup | undefined>,
     required: false,
   },
   listTopics: {
-    type: Object as PropType<CaseStudyListTopicGroup | undefined>,
+    type: Object as PropType<ExampleListTopicGroup | undefined>,
     required: false,
   },
   defaultTopics: {
-    type: Object as PropType<CaseStudyDefaultTopicGroup | undefined>,
+    type: Object as PropType<ExampleDefaultTopicGroup | undefined>,
     required: false,
   },
   blockquote: {
@@ -172,13 +172,11 @@ const cardStyle = computed(() => ({
 
         <!-- Blockquote -->
         <div v-if="props.blockquote" class="full-width">
-          <q-intersection transition="scale" transition-duration="500" once>
-            <q-card-section class="case-study-quote-section q-pa-md full-width">
-              <blockquote class="case-study-quote primary-font q-ma-none full-width">
-                <i>{{ props.blockquote }}</i>
-              </blockquote>
-            </q-card-section>
-          </q-intersection>
+          <q-card-section class="case-study-quote-section q-pa-md full-width">
+            <blockquote class="case-study-quote primary-font q-ma-none full-width">
+              <i>{{ props.blockquote }}</i>
+            </blockquote>
+          </q-card-section>
         </div>
       </q-card>
     </q-expansion-item>
@@ -298,11 +296,9 @@ const cardStyle = computed(() => ({
       <!-- Blockquote -->
       <div v-if="props.blockquote" class="full-width">
         <q-card-section class="case-study-quote-section q-pa-md full-width">
-          <q-intersection transition="scale" transition-duration="1250" once>
-            <blockquote class="case-study-quote primary-font q-ma-none full-width">
-              <i>{{ props.blockquote }}</i>
-            </blockquote>
-          </q-intersection>
+          <blockquote class="case-study-quote primary-font q-ma-none full-width">
+            <i>{{ props.blockquote }}</i>
+          </blockquote>
         </q-card-section>
       </div>
     </q-card>
