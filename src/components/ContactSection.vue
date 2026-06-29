@@ -20,13 +20,16 @@ const form = reactive({
 });
 
 const RecaptchaWidget = defineAsyncComponent(() => import('./RecaptchaWidget.vue'));
+
 const sending = ref(false);
 const success = ref(false);
 const error = ref(false);
 const errorMsg = ref<string | null>(null);
 const contactRef = ref<HTMLElement | null>(null);
+
 const mainStore = useMainStore();
 const { isHuman, packageInterestText } = storeToRefs(mainStore);
+
 const { lgBreakpoint, width } = useViewport();
 const isResponsive = computed(() => width.value < lgBreakpoint);
 
@@ -80,6 +83,7 @@ const sendEmail = async () => {
       form._honey = '';
     } else {
       error.value = true;
+
       try {
         const data = await res.json();
         errorMsg.value = data?.errors?.[0]?.message || `Request failed (${res.status})`;
@@ -106,24 +110,29 @@ const sendEmail = async () => {
   >
     <div class="contact-shell">
       <div class="contact-intro">
-        <p class="text-caption kicker q-mt-none q-mb-sm">Start a project</p>
+        <p class="text-caption kicker q-mt-none q-mb-sm">Start the conversation</p>
 
-        <h1 class="text-h1 q-mt-none q-mb-md">Let’s make the next interaction clearer.</h1>
+        <h1 class="text-h1 q-mt-none q-mb-md">Let’s talk through what you want improved.</h1>
 
         <p class="intro-copy text-body-2 q-mt-none q-mb-lg">
-          Send the surface, flow, or idea you want sharpened. I’ll help shape the cleanest next
-          step, whether that is motion polish, an AI interaction, or a focused implementation block.
+          Send the website, product surface, AI interaction, or idea you want to improve. If the
+          priority is already clear, we can talk through implementation and scope the first focused
+          build. If the priority still needs to be figured out, we can start with a diagnostic to
+          identify the strongest path.
         </p>
 
         <div class="contact-proof-grid q-mb-lg">
           <div class="contact-proof-card">
-            <span>Best for</span>
-            <strong>AI UI, motion, and user-flow polish</strong>
+            <span>Already know what should change?</span>
+            <strong>We can align on implementation and scope the first focused build.</strong>
           </div>
 
           <div class="contact-proof-card">
-            <span>Next step</span>
-            <strong>Clear scope before build</strong>
+            <span>Still finding the priority?</span>
+            <strong>
+              We can use a diagnostic to find the biggest friction points, strongest opportunities,
+              and AI-supported workflow potential.
+            </strong>
           </div>
         </div>
 
@@ -141,9 +150,12 @@ const sendEmail = async () => {
       <q-form @submit.prevent="sendEmail" class="contact-form column q-gutter-y-sm">
         <div class="form-heading q-mb-sm">
           <p class="text-caption kicker q-mt-none q-mb-xs">Project details</p>
-          <h2 class="text-h2 q-mt-none q-mb-xs">Send a quick note.</h2>
+
+          <h2 class="text-h2 q-mt-none q-mb-xs">Send the starting point.</h2>
+
           <p class="text-body-2 q-ma-none">
-            A few sentences are enough. I can ask focused follow-up questions from there.
+            A link and a few sentences are enough. Tell me what you want improved, what feels
+            unclear, or what you are considering building.
           </p>
         </div>
 
@@ -186,7 +198,7 @@ const sendEmail = async () => {
         <q-input
           v-model="form.subject"
           type="text"
-          label="Subject"
+          label="Website, product, or project"
           color="accent"
           bg-color="primary"
           filled
@@ -199,7 +211,7 @@ const sendEmail = async () => {
         <q-input
           v-model="form.message"
           type="textarea"
-          label="Your message"
+          label="What do you want improved?"
           class="message"
           color="accent"
           bg-color="primary"
@@ -222,7 +234,7 @@ const sendEmail = async () => {
           :loading="sending"
           :disable="sending"
         >
-          <span class="text-body-2">{{ sending ? 'Sending…' : 'Send message' }}</span>
+          <span class="text-body-2">{{ sending ? 'Sending…' : 'Send details' }}</span>
         </q-btn>
 
         <q-banner v-if="success" class="status-banner success q-mt-sm">
@@ -288,6 +300,7 @@ const sendEmail = async () => {
     0 0 56px color-mix(in srgb, var(--q-accent) 30%, transparent),
     0 24px 72px color-mix(in srgb, tokens.$ink 88%, transparent);
 }
+
 .kicker {
   color: tokens.$champagne;
   letter-spacing: 0.08em;
