@@ -345,9 +345,6 @@ onBeforeUnmount(() => {
     );
     border: 1px solid var(--q-accent);
     border-radius: 1rem;
-    box-shadow:
-      0 0 48px color-mix(in srgb, var(--q-accent) 28%, transparent),
-      0 20px 64px color-mix(in srgb, tokens.$ink 88%, transparent);
     overflow: hidden;
   }
 

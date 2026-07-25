@@ -6,10 +6,12 @@
 :root {
   @include mix.export-css-vars(
     (
-      'q-primary': map-get(tokens.$fall-theme, primary),
-      'q-secondary': map-get(tokens.$fall-theme, secondary),
-      'q-accent': map-get(tokens.$fall-theme, accent),
-      'q-dark': map-get(tokens.$fall-theme, dark),
+      'q-primary': #e3f2fd,
+      'q-secondary': #bbdefb,
+      'q-accent': #0d47a1,
+      'q-dark': #0b1f3b,
+      'q-accent-deep': #0d47a1,
+      'q-accent-soft': rgba(138, 180, 248, 0.18),
     )
   );
   @include mix.export-css-vars(

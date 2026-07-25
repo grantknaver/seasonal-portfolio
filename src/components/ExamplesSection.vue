@@ -2,10 +2,8 @@
 import { useViewport } from '../shared/utils/viewWidth';
 import { computed, defineAsyncComponent, ref, watch } from 'vue';
 import { useMainStore } from '../stores/main';
-import { storeToRefs } from 'pinia';
 import { type Example } from '../shared/types/example';
 import { v4 as uuidv4 } from 'uuid';
-import { Theme } from '../shared/constants/theme';
 import { CaseStudies } from 'src/shared/constants/caseStudies';
 import {
   mdiMotionPlay,
@@ -21,19 +19,20 @@ import {
   mdiChartAreaspline,
   mdiPalette,
   mdiOpenInNew,
+  mdiWeatherPartlyCloudy,
 } from '@quasar/extras/mdi-v7';
 import { TopicName } from 'src/shared/constants/topicName';
 const ExampleProject = defineAsyncComponent(() => import('../components/ExampleProject.vue'));
 const AIAssitant = defineAsyncComponent(() => import('../components/AIAssitant.vue'));
 const mainStore = useMainStore();
-const { activeTheme } = storeToRefs(mainStore);
 const { lgBreakpoint, width } = useViewport();
 const isResponsive = computed(() => width.value < lgBreakpoint);
-const HERO_MOTION_CODEPEN_URL = 'https://codepen.io/GrantKnaver/full/myOeOYe';
+const HERO_MOTION_CODEPEN_URL = 'https://codepen.io/GrantKnaver/pen/KwaxGwv';
+const WEATHER_EFFECTS_CODEPEN_URL = 'https://codepen.io/GrantKnaver/full/myOeOYe';
 const examples = ref<Example[]>([
   {
     id: uuidv4(),
-    name: CaseStudies.WeatherAndTheme,
+    name: CaseStudies.HeroMotion,
     label: 'Hero Motion',
     header: {
       text: 'Animated Hero Experience',
@@ -253,19 +252,91 @@ const examples = ref<Example[]>([
     },
     blockquote: '',
   },
+  {
+    id: uuidv4(),
+    name: CaseStudies.WeatherEffects,
+    label: 'Weather Effects',
+    header: {
+      text: 'Atmospheric Weather Effects',
+      subHeader:
+        'Purposeful environmental motion designed to strengthen context without competing with content.',
+      icon: mdiWeatherPartlyCloudy,
+    },
+    expansionTopics: {
+      topics: [
+        {
+          id: uuidv4(),
+          name: 'weather-effects-overview',
+          icon: mdiViewDashboard,
+          label: 'Overview:',
+          text: 'A collection of GSAP-driven weather effects created to demonstrate how atmospheric motion can give a digital experience more presence while preserving hierarchy, readability, and user focus.',
+          hasSeparator: false,
+        },
+        {
+          id: uuidv4(),
+          name: 'weather-effects-challenge',
+          icon: mdiBoxingGlove,
+          label: 'Challenge:',
+          text: 'Environmental animation can quickly become visual noise. The challenge was creating recognizable motion with enough character to shape the experience while keeping it restrained, performant, and subordinate to the platform’s content and actions.',
+          hasSeparator: false,
+        },
+      ],
+      hasSeparator: true,
+    },
+    listTopics: {
+      topics: [
+        {
+          id: uuidv4(),
+          name: 'weather-effects-solution',
+          header: 'Solution:',
+          list: [
+            {
+              id: uuidv4(),
+              icon: mdiAnimation,
+              text: 'Built reusable GSAP motion systems with controlled timing, direction, density, and variation.',
+            },
+            {
+              id: uuidv4(),
+              icon: mdiLayers,
+              text: 'Separated atmospheric effects into layered visual planes so motion could create depth without obscuring interface content.',
+            },
+            {
+              id: uuidv4(),
+              icon: mdiWeatherPartlyCloudy,
+              text: 'Matched each effect’s pacing and behavior to the atmosphere it was designed to create.',
+            },
+            {
+              id: uuidv4(),
+              icon: mdiViewDashboard,
+              text: 'Preserved clear content hierarchy by controlling contrast, placement, opacity, and the visual weight of moving elements.',
+            },
+          ],
+          hasSeparator: true,
+        },
+      ],
+      hasSeparator: true,
+    },
+    defaultTopics: {
+      topics: [
+        {
+          id: uuidv4(),
+          name: 'weather-effects-result',
+          header: 'Result:',
+          text: 'A flexible atmospheric motion system that demonstrates technical control without allowing animation to overpower the interface. The effects add context and polish while keeping important content legible, interactions predictable, and the overall experience trustworthy.',
+          hasSeparator: false,
+        },
+      ],
+      hasSeparator: false,
+    },
+    blockquote:
+      'Motion earns its place when it strengthens the atmosphere without weakening clarity, usability, or trust.',
+  },
 ]);
-const tab = ref(CaseStudies.WeatherAndTheme);
+const tab = ref(CaseStudies.HeroMotion);
 watch(tab, (newTab) => {
   mainStore.SET_CASE_STUDY_ACTIVE_TAB(newTab);
 });
-const BG_BY_THEME: Record<Theme, string> = {
-  [Theme.Fall]: new URL('../assets/ai-bcg-fall.avif', import.meta.url).href,
-  [Theme.Winter]: new URL('../assets/ai-bcg-winter.avif', import.meta.url).href,
-  [Theme.Spring]: new URL('../assets/ai-bcg-spring.avif', import.meta.url).href,
-  [Theme.Summer]: new URL('../assets/ai-bcg-summer.avif', import.meta.url).href,
-};
 const emit = defineEmits(['toContact']);
-const backgroundUrl = computed(() => BG_BY_THEME[activeTheme.value] ?? BG_BY_THEME[Theme.Winter]);
 const toContact = () => {
   if (isResponsive.value) {
     emit('toContact');
@@ -273,6 +344,7 @@ const toContact = () => {
     mainStore.SET_ACTIVE_TOPIC(TopicName.Contact);
   }
 };
+const backgroundUrl = new URL('../assets/ai-bcg-winter.avif', import.meta.url).href;
 </script>
 <template>
   <!-- Mobile -->
@@ -310,7 +382,6 @@ const toContact = () => {
               <div
                 class="codepen-preview-media"
                 :style="{
-                  backgroundImage: `url(${backgroundUrl})`,
                   backgroundSize: 'cover',
                   backgroundPosition: 'center',
                 }"
@@ -381,6 +452,45 @@ const toContact = () => {
               >
               </iframe>
             </div>
+          </template>
+          <template #weather-effects-result>
+            <a
+              class="codepen-preview-card q-mt-md"
+              :href="WEATHER_EFFECTS_CODEPEN_URL"
+              target="_blank"
+              rel="noopener noreferrer"
+              aria-label="Open Weather Effects CodePen example"
+            >
+              <div
+                class="codepen-preview-media weather-effects-preview"
+                :style="{
+                  backgroundSize: 'cover',
+                  backgroundPosition: 'center',
+                }"
+              >
+                <div class="codepen-preview-overlay">
+                  <div class="codepen-preview-browser">
+                    <div class="browser-dots"><span /> <span /> <span /></div>
+
+                    <div class="browser-hero">
+                      <p class="preview-kicker q-ma-none">GSAP Weather Effects</p>
+
+                      <h3 class="q-mt-xs q-mb-sm">Atmospheric Motion System</h3>
+
+                      <p class="q-ma-none">
+                        Layered environmental effects designed to add depth and presence without
+                        weakening clarity or usability.
+                      </p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <div class="codepen-preview-footer">
+                <span>View live weather effects example</span>
+                <q-icon :name="mdiOpenInNew" size="sm" />
+              </div>
+            </a>
           </template>
         </ExampleProject>
       </template>
@@ -481,6 +591,46 @@ const toContact = () => {
               </div>
             </a>
           </template>
+          <template #weather-effects-result>
+            <a
+              class="codepen-preview-card q-mt-md"
+              :href="WEATHER_EFFECTS_CODEPEN_URL"
+              target="_blank"
+              rel="noopener noreferrer"
+              aria-label="Open Weather Effects CodePen example"
+            >
+              <div
+                class="codepen-preview-media weather-effects-preview"
+                :style="{
+                  backgroundImage: `url(${backgroundUrl})`,
+                  backgroundSize: 'cover',
+                  backgroundPosition: 'center',
+                }"
+              >
+                <div class="codepen-preview-overlay">
+                  <div class="codepen-preview-browser">
+                    <div class="browser-dots"><span /> <span /> <span /></div>
+
+                    <div class="browser-hero">
+                      <p class="preview-kicker q-ma-none">GSAP Weather Effects</p>
+
+                      <h3 class="q-mt-xs q-mb-sm">Atmospheric Motion System</h3>
+
+                      <p class="q-ma-none">
+                        Layered environmental effects designed to add depth and presence without
+                        weakening clarity or usability.
+                      </p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <div class="codepen-preview-footer">
+                <span>View live weather effects example</span>
+                <q-icon :name="mdiOpenInNew" size="sm" />
+              </div>
+            </a>
+          </template>
           <template #ai-chat-result>
             <div
               class="ai-chat-container q-pt-md q-pl-md q-pb-none q-pr-md"
@@ -557,9 +707,6 @@ const toContact = () => {
     tokens.$ink
   );
   border: 1px solid var(--q-accent);
-  box-shadow:
-    0 0 48px color-mix(in srgb, var(--q-accent) 26%, transparent),
-    0 20px 64px color-mix(in srgb, tokens.$ink 88%, transparent);
 }
 .case-section-card {
   border-radius: 1rem;
@@ -648,17 +795,6 @@ const toContact = () => {
   display: grid;
   place-items: center;
   padding: 1.5rem;
-  background:
-    radial-gradient(
-      circle at center,
-      color-mix(in srgb, var(--q-accent) 16%, transparent),
-      transparent 45%
-    ),
-    linear-gradient(
-      180deg,
-      color-mix(in srgb, tokens.$ink 24%, transparent),
-      color-mix(in srgb, tokens.$ink 74%, transparent)
-    );
 }
 .codepen-preview-browser {
   width: min(520px, 100%);

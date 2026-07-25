@@ -1,8 +1,7 @@
 <script lang="ts" setup>
-import { computed, ref, onMounted, onBeforeUnmount, watch, defineAsyncComponent } from 'vue';
+import { computed, ref, onMounted, onBeforeUnmount } from 'vue';
 import { useMainStore } from '../stores/main';
 import { storeToRefs } from 'pinia';
-import { Theme } from '../shared/constants/theme';
 import { getCustomCssVar } from '../shared/utils/getCustomCssVar';
 import { TopicName } from '../shared/constants/topicName';
 import { type Topic } from '../shared/types/topic';
@@ -11,12 +10,10 @@ import { useViewport } from '../shared/utils/viewWidth';
 import { mdiMenu, mdiHeart, mdiGithub, mdiLinkedin } from '@quasar/extras/mdi-v7';
 import { useCacheStore } from 'src/stores/component-cache';
 import { CacheBinding } from 'src/shared/constants/cacheBinding';
-import { syncThemeGlobals } from '../shared/utils/theme';
 
 const cacheStore = useCacheStore();
-
 const mainStore = useMainStore();
-const { activeTheme, activeTopic } = storeToRefs(mainStore);
+const { activeTopic } = storeToRefs(mainStore);
 const { height, width, lgBreakpoint } = useViewport();
 const windowWidth = ref(window.innerWidth);
 const desktopDrawerWidth = ref(window.innerWidth * 0.5);
@@ -41,40 +38,7 @@ const topics = ref<Topic[]>([
   { id: uuidv4(), name: TopicName.About, icon: '', label: TopicName.About },
   { id: uuidv4(), name: TopicName.Contact, icon: '', label: TopicName.Contact },
 ]);
-import autumn from 'src/assets/autumn-forestry.jpg?w=768;1280;1600&format=avif;webp;jpeg&quality=40&withoutEnlargement=true&as=picture';
-import winter from 'src/assets/snowy-winter-landscape.jpg?w=768;1280;1600&format=avif;webp;jpeg&quality=40&withoutEnlargement=true&as=picture';
-import spring from 'src/assets/beautiful-forest-spring-season.jpg?w=768;1280;1600&format=avif;webp;jpeg&quality=40&withoutEnlargement=true&as=picture';
-import summer from 'src/assets/beach.jpg?w=768;1280;1600&format=avif;webp;jpeg&quality=40&withoutEnlargement=true&as=picture';
-import { type Slide } from 'src/shared/types/slide';
 import { scrollToElement } from 'src/shared/utils/scrollToElement';
-const slides = ref<Slide[]>([
-  {
-    id: uuidv4(),
-    picture: autumn,
-    theme: Theme.Fall,
-    name: 'Fall Background',
-  },
-  {
-    id: uuidv4(),
-    picture: winter,
-    theme: Theme.Winter,
-    name: 'Winter Background',
-  },
-  {
-    id: uuidv4(),
-    picture: spring,
-    theme: Theme.Spring,
-    name: 'Spring Background',
-  },
-  {
-    id: uuidv4(),
-    picture: summer,
-    theme: Theme.Summer,
-    name: 'Summer Background',
-  },
-]);
-const slide = ref<Theme>(Theme.Fall);
-const showCarousel = ref<boolean>(false);
 const activeEntry = computed(() => {
   if (!activeTopic.value) return null;
   return CacheBinding[activeTopic.value];
@@ -87,10 +51,8 @@ const activeComponent = computed(() => {
   if (!cacheStore.catalog[entry]) {
     cacheStore.CACHE_COMPONENT(entry);
   }
-
   return cacheStore.catalog[entry];
 });
-const WeatherBackground = defineAsyncComponent(() => import('../components/WeatherBackground.vue'));
 
 function setAppVh() {
   const vh = window.innerHeight * 0.01;
@@ -99,90 +61,34 @@ function setAppVh() {
 
 onMounted(() => {
   setAppVh();
-  showCarousel.value = true;
   window.addEventListener('orientationchange', setAppVh);
   window.addEventListener('resize', updateWidths);
   window.addEventListener('DOMContentLoaded', () => {});
-  syncThemeGlobals(Theme.Fall);
 });
 onBeforeUnmount(() => window.removeEventListener('resize', updateWidths));
-
-watch(slide, (newVal) => mainStore.SET_ACTIVE_THEME(newVal));
 </script>
 
 <template>
   <!-- changed view: no fixed footer token needed; keep header fixed -->
   <q-layout view="hHh Lpr fff">
-    <div
-      class="carousel-background"
-      :class="{
-        'responsive-carousel-background': isResponsive,
-      }"
-      v-if="showCarousel"
-    >
-      <q-carousel
-        v-model="slide"
-        transition-prev="fade"
-        transition-next="fade"
-        animated
-        infinite
-        :autoplay="15000"
-        class="bg-dark"
-        :transition-duration="2500"
-      >
-        <q-carousel-slide
-          v-for="(slide, index) in slides"
-          :key="slide.id"
-          :name="slide.theme"
-          class="relative-position"
-        >
-          <div class="slide-bg">
-            <picture>
-              <source
-                v-for="(src, k) in slide.picture.sources"
-                :key="k"
-                :srcset="src"
-                :type="`image/${k}`"
-              />
-              <img
-                :src="slide.picture.img.src"
-                :width="slide.picture.img.w"
-                :height="slide.picture.img.h"
-                sizes="(min-width: 1440px) 1600px,
-        (min-width: 1024px) 1280px,
-        (min-width: 600px)  768px,
-        100vw"
-                :fetchpriority="index === 0 ? 'high' : 'low'"
-                :loading="index === 0 ? 'eager' : 'lazy'"
-                decoding="async"
-                :alt="slide.name"
-              />
-            </picture>
-          </div>
-        </q-carousel-slide>
-      </q-carousel>
-    </div>
-    <div v-if="!isResponsive" class="weather-layer">
-      <WeatherBackground />
-    </div>
     <q-header id="mobile-header" class="text-black">
-      <q-toolbar class="bg-dark q-pa-lg">
+      <q-toolbar class="bg-primary q-pa-lg">
         <q-toolbar-title>
           <div id="logo" class="logo row items-center">
-            <img
+            <!-- <img
               class="q-pt-sm"
               width="130"
               height="130"
               style="max-width: 65px; height: auto"
               src="../assets/glkfreelance-logo.avif"
               alt="logo"
-            />
+            /> -->
             <span class="logo-text">
-              <span class="text-secondary">glk</span><span class="text-primary">Freelance</span>
+              <span class="glk text-accent">glk</span
+              ><span class="freelance text-dark">Freelance</span>
             </span>
           </div>
         </q-toolbar-title>
-
         <q-btn
           color="primary"
           class="menu-button"
@@ -231,7 +137,6 @@ watch(slide, (newVal) => mainStore.SET_ACTIVE_THEME(newVal));
     <q-page-container>
       <!-- Your routed pages render here -->
       <router-view />
-
       <!-- ensure content exceeds viewport so footer starts off-screen -->
       <div v-if="!isResponsive" class="footer-spacer" />
     </q-page-container>
@@ -296,7 +201,7 @@ watch(slide, (newVal) => mainStore.SET_ACTIVE_THEME(newVal));
             round
             :icon="mdiGithub"
             target="_blank"
-            :class="activeTheme !== Theme.Summer ? 'text-primary' : 'text-secondary'"
+            :class="'text-primary'"
             aria-label="GitHub"
           />
         </a>
@@ -307,7 +212,7 @@ watch(slide, (newVal) => mainStore.SET_ACTIVE_THEME(newVal));
             round
             :icon="mdiLinkedin"
             target="_blank"
-            :class="activeTheme !== Theme.Summer ? 'text-primary' : 'text-secondary'"
+            :class="'text-secondary'"
             aria-label="LinkedIn"
           />
         </a>
@@ -332,63 +237,33 @@ watch(slide, (newVal) => mainStore.SET_ACTIVE_THEME(newVal));
     padding-left: 0.5rem;
     font-size: 1.5rem;
   }
+
+  .glk {
+    margin-right: 2px;
+    font-weight: 700;
+  }
+
+  .freelance {
+    font-weight: 500;
+  }
 }
 
 /* Need this for right-side transparent drawer */
 aside {
   @media (min-width: tokens.$breakpoint-sm) {
-    background-color: transparent !important;
+    background: color-mix(in srgb, $secondary 75%, white 25%);
   }
-}
-
-.carousel-background {
-  position: fixed;
-  inset: 0;
-  width: 100%;
-  height: calc(var(--app-vh, 1vh) * 100);
-  min-height: 100vh; // fallback
-  z-index: 0;
-  pointer-events: none;
-  overflow: hidden;
-  background-color: #000; // important: base layer
-
-  .q-carousel {
-    height: 100%;
-  }
-
-  .slide-bg {
-    position: absolute;
-    inset: 0;
-    width: 100%;
-    height: 100%;
-    pointer-events: none;
-    background-color: #000; // in case image is still sizing/loading
-
-    img {
-      width: 100%;
-      height: 100%;
-      object-fit: cover;
-      display: block;
-      background-color: #000; // in case image is still sizing/loading
-    }
-  }
-}
-
-.weather-layer {
-  position: fixed;
-  inset: 0;
-  z-index: 1;
-  pointer-events: none;
-  overflow: hidden;
 }
 
 .desktop-drawer {
   flex-direction: column;
-  background-color: rgba(black, 0.5);
-  border-left: solid 4px var(--q-primary);
+  background: color-mix(in srgb, $secondary 75%, white 25%);
   z-index: 2;
   height: none;
 
+  .q-scrollarea {
+    // border-left: solid 2px var(--q-dark);
+  }
   .q-scrollarea,
   .scroll-area {
     flex: 1 1 0%;
@@ -421,6 +296,7 @@ aside {
 /* spacer to guarantee the footer starts off-screen */
 .footer-spacer {
   min-height: 1rem; /* tune this so the footer is initially below the viewport */
+  background: var(--q-primary);
 }
 
 .activeTopic {

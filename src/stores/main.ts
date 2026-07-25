@@ -1,8 +1,6 @@
 import { ref } from 'vue';
 import { defineStore } from 'pinia';
 import { v4 as uuidv4 } from 'uuid';
-import { Theme } from '../shared/constants/theme';
-import { syncThemeGlobals } from '../shared/utils/theme';
 import { type TopicName } from '../shared/constants/topicName';
 import { type ChatMessage } from '../shared/types/chatMessage';
 import { useQuasar } from 'quasar';
@@ -18,7 +16,6 @@ import type { Package } from 'src/shared/constants/packages';
 
 export const useMainStore = defineStore('main', () => {
   const activeTopic = ref<TopicName | null>(null);
-  const activeTheme = ref<Theme>(Theme.Fall);
   const activeAiAssistLogo = ref<string>(
     new URL('/src/assets/ai-chat_fall.avif', import.meta.url).href,
   );
@@ -46,7 +43,7 @@ export const useMainStore = defineStore('main', () => {
   const { notifyHttp, notifyGeneric } = useErrorNotifier();
   const recaptchaWidgetId = ref<number | null>();
   const containsScrollbar = ref<boolean>(false);
-  const caseStudyActiveTab = ref<CaseStudies>(CaseStudies.WeatherAndTheme);
+  const caseStudyActiveTab = ref<CaseStudies>(CaseStudies.HeroMotion);
   const hasPainted = ref<boolean>(false);
   const packageInterestText = ref<string>('');
 
@@ -59,25 +56,25 @@ export const useMainStore = defineStore('main', () => {
   const SET_ACTIVE_TOPIC = (topicName: TopicName | null): void => {
     activeTopic.value = topicName;
   };
-  const SET_ACTIVE_THEME = (theme: Theme): void => {
-    const recaptchaBackgrounds = {
-      [Theme.Fall]: new URL('/src/assets/recaptcha-fall.avif', import.meta.url).href,
-      [Theme.Winter]: new URL('/src/assets/recaptcha-winter.avif', import.meta.url).href,
-      [Theme.Spring]: new URL('/src/assets/recaptcha-spring.avif', import.meta.url).href,
-      [Theme.Summer]: new URL('/src/assets/recaptcha-summer.avif', import.meta.url).href,
-    };
-    const aiAssistLogos = {
-      [Theme.Fall]: new URL('/src/assets/ai-chat_fall.avif', import.meta.url).href,
-      [Theme.Winter]: new URL('/src/assets/ai-chat_winter.avif', import.meta.url).href,
-      [Theme.Spring]: new URL('/src/assets/ai-chat_spring.avif', import.meta.url).href,
-      [Theme.Summer]: new URL('/src/assets/ai-chat_summer.avif', import.meta.url).href,
-    };
+  // const SET_ACTIVE_THEME = (theme: Theme): void => {
+  //   const recaptchaBackgrounds = {
+  //     [Theme.Fall]: new URL('/src/assets/recaptcha-fall.avif', import.meta.url).href,
+  //     [Theme.Winter]: new URL('/src/assets/recaptcha-winter.avif', import.meta.url).href,
+  //     [Theme.Spring]: new URL('/src/assets/recaptcha-spring.avif', import.meta.url).href,
+  //     [Theme.Summer]: new URL('/src/assets/recaptcha-summer.avif', import.meta.url).href,
+  //   };
+  //   const aiAssistLogos = {
+  //     [Theme.Fall]: new URL('/src/assets/ai-chat_fall.avif', import.meta.url).href,
+  //     [Theme.Winter]: new URL('/src/assets/ai-chat_winter.avif', import.meta.url).href,
+  //     [Theme.Spring]: new URL('/src/assets/ai-chat_spring.avif', import.meta.url).href,
+  //     [Theme.Summer]: new URL('/src/assets/ai-chat_summer.avif', import.meta.url).href,
+  //   };
 
-    activeTheme.value = theme;
-    syncThemeGlobals(theme);
-    activeAiAssistLogo.value = aiAssistLogos[theme];
-    activeRecaptchaBackground.value = recaptchaBackgrounds[theme];
-  };
+  //   activeTheme.value = theme;
+  //   syncThemeGlobals(theme);
+  //   activeAiAssistLogo.value = aiAssistLogos[theme];
+  //   activeRecaptchaBackground.value = recaptchaBackgrounds[theme];
+  // };
   const SET_CONTACT_SECTION_REF = (element: HTMLElement | null): void => {
     contactSectionRef.value = element;
   };
@@ -210,7 +207,6 @@ export const useMainStore = defineStore('main', () => {
 
   return {
     activeTopic,
-    activeTheme,
     contactSectionRef,
     mobileScrollTarget,
     activeAiAssistLogo,
@@ -227,7 +223,6 @@ export const useMainStore = defineStore('main', () => {
     packageInterestText,
     SET_RECAPTCHA_WIDGET_ID,
     SET_ACTIVE_TOPIC,
-    SET_ACTIVE_THEME,
     SET_CONTACT_SECTION_REF,
     SET_MOBILE_SCROLL_TARGET,
     SEND_OALOGS,

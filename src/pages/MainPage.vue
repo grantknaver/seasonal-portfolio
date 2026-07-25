@@ -22,7 +22,6 @@ import { CacheEntry } from 'src/shared/constants/cacheEntry';
 import { useCacheStore } from 'src/stores/component-cache';
 import { scrollToElement } from 'src/shared/utils/scrollToElement';
 import { CacheBinding } from 'src/shared/constants/cacheBinding';
-
 const mainStore = useMainStore();
 const cacheStore = useCacheStore();
 
@@ -56,15 +55,11 @@ const mobileTopics: Topic[] = [
     cachedName: CacheEntry.ContactSection,
   },
 ];
-
 const expandedPanel = ref<TopicName | null>();
 const { getScrollTarget, setVerticalScrollPosition } = scroll;
 const { activeTopic } = storeToRefs(mainStore);
-
-// const root = ref<HTMLElement | null>(null);
 const showFooter = ref<boolean>(false);
 const io = ref<IntersectionObserver | null>(null);
-
 const { lgBreakpoint, width } = useViewport();
 const isResponsive = computed(() => width.value < lgBreakpoint);
 
@@ -468,15 +463,14 @@ const toContact = () => {
 <template>
   <q-page class="page-container column items-center">
     <div class="logo">
-      <img
+      <!-- <img
         class="q-pt-sm"
-        style="max-width: 65px"
+        style="max-width: 50px"
         src="../assets/glkfreelance-logo.avif"
         alt="logo"
-      />
+      /> -->
       <span class="logo-text"
-        ><span class="text-secondary">glk</span
-        ><span class="text-primary-font text-white">Freelance</span></span
+        ><i class="glk text-accent">glk</i><span class="freelance text-dark">Freelance</span></span
       >
     </div>
     <section v-show="isResponsive" ref="mobileRootRef" class="responsive-view full-width q-pa-md">
@@ -641,6 +635,7 @@ const toContact = () => {
 .page-container {
   position: relative;
   min-height: 100vh;
+  background: color-mix(in srgb, var(--q-accent) 5%, transparent);
 
   .logo {
     display: none;
@@ -658,6 +653,15 @@ const toContact = () => {
         padding-left: 0.5rem;
         font-size: 1.5rem;
       }
+
+      .glk {
+        margin-right: 2px;
+        font-weight: 700;
+      }
+
+      .freelance {
+        font-weight: 500;
+      }
     }
   }
 
@@ -667,13 +671,11 @@ const toContact = () => {
       color-mix(in srgb, tokens.$ink-soft 90%, tokens.$ivory 10%),
       tokens.$ink
     );
-
     border: 1px solid var(--q-accent);
-
+    border-radius: 1rem;
     box-shadow:
       0 0 64px color-mix(in srgb, var(--q-accent) 38%, transparent),
-      0 28px 80px color-mix(in srgb, tokens.$ink 90%, transparent);
-    border-radius: 1rem;
+      0 28px 80px color-mix(in srgb, var(--q-accent) 38%, transparent);
 
     .kicker {
       color: tokens.$champagne;
@@ -823,6 +825,21 @@ const toContact = () => {
       bottom: 1rem;
       left: 1rem;
     }
+  }
+
+  .desktop-view::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+
+    background: url('../assets/monitor.avif');
+    background-size: cover;
+    background-position: left;
+    background-repeat: no-repeat;
+
+    opacity: 0.1;
+    z-index: -1;
+    pointer-events: none;
   }
 }
 

@@ -1,119 +1,102 @@
 <script lang="ts" setup>
-import { ref, onMounted, reactive, nextTick, computed, watch } from 'vue';
+import { ref, onMounted, reactive, nextTick, computed } from 'vue';
 import type { CSSProperties } from 'vue';
 import type { SkillNode } from '../shared/types/skillNode';
 import * as d3 from 'd3';
-import chroma from 'chroma-js';
-import { useMainStore } from 'src/stores/main';
-import { storeToRefs } from 'pinia';
-import { themeMap } from 'src/shared/utils/themeMap';
-import type { Theme } from 'src/shared/constants/theme';
-import { setSeasonClasses } from 'src/shared/utils/setSeasonColors';
-
-const mainStore = useMainStore();
-const { activeTheme } = storeToRefs(mainStore);
 const container = ref<HTMLElement | null>(null);
 const svg = ref(null);
 const initialized = ref<boolean>(false);
-const generateRandomColor = (themeColor: string) => chroma(themeColor).darken().hex();
-
-watch(activeTheme, async (newTheme) => {
-  if (!initialized.value) return;
-  skills.value = generateSkills(newTheme);
-  await redrawElement();
-});
-
-const generateSkills = (theme: Theme): SkillNode[] => [
+const skills: SkillNode[] = [
   {
     name: 'Angular',
     strength: 18,
     years: 7,
-    fillColor: generateRandomColor(themeMap[theme].dark),
+    fillColor: '#0b1f3b',
   },
   {
     name: 'Vue',
     strength: 20,
     years: 3,
-    fillColor: generateRandomColor(themeMap[theme].accent),
+    fillColor: '#0d47a1',
   },
   {
     name: 'Quasar',
     strength: 10,
     years: 3,
-    fillColor: generateRandomColor(themeMap[theme].secondary),
+    fillColor: '#bbdefb',
   },
   {
     name: 'Pinia',
     strength: 15,
     years: 3,
-    fillColor: generateRandomColor(themeMap[theme].accent),
+    fillColor: '#0d47a1',
   },
   {
     name: 'JavaScript',
     strength: 15,
     years: 8,
-    fillColor: generateRandomColor(themeMap[theme].dark),
+    fillColor: '#0b1f3b',
   },
   {
     name: 'TypeScript',
     strength: 15,
     years: 8,
-    fillColor: generateRandomColor(themeMap[theme].secondary),
+    fillColor: '#bbdefb',
   },
   {
     name: 'D3.js',
     strength: 4,
     years: 2,
-    fillColor: generateRandomColor(themeMap[theme].secondary),
+    fillColor: '#bbdefb',
   },
   {
     name: 'Highcharts',
     strength: 5,
     years: 1,
-    fillColor: generateRandomColor(themeMap[theme].accent),
+    fillColor: '#0d47a1',
   },
   {
     name: 'Chart.js',
     strength: 4,
     years: 1,
-    fillColor: generateRandomColor(themeMap[theme].dark),
+    fillColor: '#0b1f3b',
   },
   {
     name: 'Firebase',
     strength: 5,
     years: 3,
-    fillColor: generateRandomColor(themeMap[theme].secondary),
+    fillColor: '#bbdefb',
   },
   {
     name: 'MongoDB',
     strength: 9,
     years: 4,
-    fillColor: generateRandomColor(themeMap[theme].secondary),
+    fillColor: '#bbdefb',
   },
   {
     name: 'Node.js',
     strength: 8,
     years: 4,
-    fillColor: generateRandomColor(themeMap[theme].accent),
+    fillColor: '#0d47a1',
   },
-  { name: 'NgRx', strength: 10, years: 5, fillColor: generateRandomColor(themeMap[theme].dark) },
+  { name: 'NgRx', strength: 10, years: 5, fillColor: '#0b1f3b' },
   {
     name: 'Figma',
     strength: 8,
     years: 4,
-    fillColor: generateRandomColor(themeMap[theme].accent),
+    fillColor: '#0d47a1',
   },
   {
     name: 'Git',
     strength: 12,
     years: 7,
-    fillColor: generateRandomColor(themeMap[theme].secondary),
+    fillColor: '#bbdefb',
   },
   {
     name: 'WordPress',
     strength: 8,
     years: 3,
-    fillColor: generateRandomColor(themeMap[theme].dark),
+    fillColor: '#0b1f3b',
   },
   { name: 'SEO', strength: 5, years: 1, fillColor: '#FF9705' },
   { name: 'Sales', strength: 15, years: 6, fillColor: '#FF9705' },
@@ -122,11 +105,9 @@ const generateSkills = (theme: Theme): SkillNode[] => [
     name: 'DynamoDB',
     strength: 4,
     years: 1,
-    fillColor: generateRandomColor(themeMap[theme].dark),
+    fillColor: '#0b1f3b',
   },
 ];
-const skills = ref<SkillNode[]>([]);
-
 const tooltip = reactive<{
   visible: boolean;
   x: number;
@@ -138,7 +119,6 @@ const tooltip = reactive<{
   y: 0,
   data: null,
 });
-
 const tooltipStyle = computed<CSSProperties>(() => ({
   position: 'absolute',
   left: tooltip.x + 20 + 'px',
@@ -152,9 +132,8 @@ const height = container.value?.clientHeight || 600;
 
 const redrawElement = async () => {
   await nextTick();
-  skills.value = generateSkills(activeTheme.value);
   const svgEl = d3.select(svg.value).attr('viewBox', [0, 0, width, height]);
-  const data: SkillNode[] = skills.value.map((d) => ({
+  const data: SkillNode[] = skills.map((d) => ({
     ...d,
     x: Math.random() * width,
     y: Math.random() * height,
@@ -274,21 +253,7 @@ onMounted(async () => {
         <q-card-section class="section-container q-pa-lg bg-accent">
           <h1 class="q-mt-none text-primary">Skills</h1>
           <q-separator color="primary" class="full-width q-mb-md" />
-          <p
-            :class="
-              setSeasonClasses(
-                {
-                  Fall: 'text-primary',
-                  Winter: 'text-primary',
-                  Spring: 'text-dark',
-                  Summer: 'text-dark',
-                },
-                activeTheme,
-              )
-            "
-          >
-            AI tools I'm familiar with.
-          </p>
+          <p class="text-primary">AI tools I'm familiar with.</p>
         </q-card-section>
 
         <q-card-section class="section-container toolkit q-mt-md full-width bg-secondary">
@@ -305,20 +270,7 @@ onMounted(async () => {
         </q-card-section>
 
         <q-card-section class="section-container bg-accent q-mt-md q-pa-lg">
-          <p
-            class="text-center q-ma-none"
-            :class="
-              setSeasonClasses(
-                {
-                  Fall: 'text-primary',
-                  Winter: 'text-primary',
-                  Spring: 'text-dark',
-                  Summer: 'text-dark',
-                },
-                activeTheme,
-              )
-            "
-          >
+          <p class="text-center q-ma-none text-primary">
             With a background in fine arts and sales, I bring a strong creative lens and
             user-focused mindset to my work. I enjoy prototyping in Figma, am proficient with Adobe
             Creative Suite, and apply SEO best practices to help build and scale user-centric
@@ -342,22 +294,7 @@ onMounted(async () => {
         class="card full-width col flex column items-center justify-center q-pa-sm bg-transparent"
       >
         <q-card-section class="section-container q-pa-lg">
-          <h1
-            class="q-mt-none text-center"
-            :class="
-              setSeasonClasses(
-                {
-                  Fall: 'text-secondary',
-                  Winter: 'text-secondary',
-                  Spring: 'text-secondary',
-                  Summer: 'text-accent',
-                },
-                activeTheme,
-              )
-            "
-          >
-            Skills
-          </h1>
+          <h1 class="q-mt-none text-center text-secondary">Skills</h1>
           <q-separator color="primary" class="full-width q-mb-md" />
           <p class="text-primary text-center">
             I'm a full-stack JavaScript developer focused on front-end architecture and UX. I began
@@ -393,22 +330,7 @@ onMounted(async () => {
         </q-card-section>
         <q-card-section class="section-container q-pa-lg">
           <q-separator color="primary" class="full-width q-mb-lg" />
-          <h2
-            class="q-mt-none"
-            :class="
-              setSeasonClasses(
-                {
-                  Fall: 'text-secondary',
-                  Winter: 'text-secondary',
-                  Spring: 'text-secondary',
-                  Summer: 'text-accent',
-                },
-                activeTheme,
-              )
-            "
-          >
-            Coming Soon
-          </h2>
+          <h2 class="q-mt-none text-secondary">Coming Soon</h2>
 
           <p class="text-primary">
             I’m currently deepening my DynamoDB expertise, leveling up my Figma design skills, and

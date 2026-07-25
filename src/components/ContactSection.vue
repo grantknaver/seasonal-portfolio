@@ -296,9 +296,6 @@ const sendEmail = async () => {
     color-mix(in srgb, tokens.$ink-soft 90%, tokens.$ivory 10%),
     tokens.$ink
   );
-  box-shadow:
-    0 0 56px color-mix(in srgb, var(--q-accent) 30%, transparent),
-    0 24px 72px color-mix(in srgb, tokens.$ink 88%, transparent);
 }
 
 .kicker {

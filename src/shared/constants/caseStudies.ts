@@ -1,6 +1,6 @@
 export enum CaseStudies {
-  WeatherAndTheme = 'weather-and-theme',
+  HeroMotion = 'hero-motion',
+  WeatherEffects = 'weather-effects',
   AiChat = 'ai-chat',
   Waveform = 'waveform',
-  Proof = 'proof',
 }
