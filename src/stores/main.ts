@@ -35,7 +35,7 @@ export const useMainStore = defineStore('main', () => {
       content: [
         {
           type: 'input_text',
-          text: 'Introduce yourself with a season-inspired name (e.g., Snowflake, Autumn, Solstice). Speak briefly and clearly. Whenever possible, weave in light seasonal references (weather, nature, time of year) into your answers. If you are uncertain, ask a clarifying question instead of guessing.',
+          text: 'Introduce yourself with a season-inspired name (e.g., Snowflake, Autumn, Solstice). Speak briefly and clearly. Whenever possible, weave in light seasonal references (weather, nature, time of year) into your answers. If you are uncertain, ask a clarifying question instead of guessing. Be as concise as possible',
         },
       ],
     },
@@ -53,12 +53,15 @@ export const useMainStore = defineStore('main', () => {
   const SET_PACKAGE_INTEREST_TEXT = (packageName: Package | ''): void => {
     packageInterestText.value = packageName ? 'Interested in ' + packageName : '';
   };
+
   const SET_MOBILE_SCROLL_TARGET = (topicName: TopicName | null): void => {
     mobileScrollTarget.value = topicName;
   };
+
   const SET_ACTIVE_TOPIC = (topicName: TopicName | null): void => {
     activeTopic.value = topicName;
   };
+
   const SET_ACTIVE_THEME = (theme: Theme): void => {
     const recaptchaBackgrounds = {
       [Theme.Fall]: new URL('/src/assets/recaptcha-fall.avif', import.meta.url).href,
@@ -78,15 +81,17 @@ export const useMainStore = defineStore('main', () => {
     activeAiAssistLogo.value = aiAssistLogos[theme];
     activeRecaptchaBackground.value = recaptchaBackgrounds[theme];
   };
+
   const SET_CONTACT_SECTION_REF = (element: HTMLElement | null): void => {
     contactSectionRef.value = element;
   };
+
   const SET_OALOG = (logItems: OALog[]) => {
     oaLogs.value = [...oaLogs.value, ...logItems];
     isLoading.value = true;
   };
 
-  const constructChatMessage = (log: OALog): ChatMessage => {
+  const ConstructChatMessage = (log: OALog): ChatMessage => {
     const d = new Date();
     const stamp = d.toISOString();
     return {
@@ -102,19 +107,21 @@ export const useMainStore = defineStore('main', () => {
       bgColor: log.role === OARole.Assistant ? 'grey-4' : 'primary',
     };
   };
+
   const UPDATE_CHATLOG = (logItem: OALog) => {
     if (logItem.role !== OARole.System) {
-      const message = constructChatMessage(logItem);
+      const message = ConstructChatMessage(logItem);
       chatLog.value = [...chatLog.value, message];
     }
   };
+
   const SET_CASE_STUDY_ACTIVE_TAB = (tab: CaseStudies) => {
     caseStudyActiveTab.value = tab;
   };
+
   const SEND_OALOGS = async () => {
     const url = `${import.meta.env.VITE_BASE_URL}/api/openAi/submit-logs`;
     const TIMEOUT_MS = 6000;
-
     const controller = new AbortController();
     const t = setTimeout(() => controller.abort(), TIMEOUT_MS);
     try {
@@ -125,8 +132,8 @@ export const useMainStore = defineStore('main', () => {
         body: JSON.stringify([...oaLogs.value]),
         signal: controller.signal,
       });
-      const data = await safeJson(res);
 
+      const data = await safeJson(res);
       if (!res.ok) {
         throw new HttpError(res.status, data);
       }
@@ -135,8 +142,7 @@ export const useMainStore = defineStore('main', () => {
         role: OARole.Assistant,
         content: [{ type: 'output_text', text: (assistantDialog ?? '').trim() }],
       };
-
-      oaLogs.value = [...oaLogs.value, logItem];
+      SET_OALOG([logItem]);
       UPDATE_CHATLOG(logItem);
       isLoading.value = false;
     } catch (err) {
@@ -158,15 +164,14 @@ export const useMainStore = defineStore('main', () => {
       isLoading.value = false;
     }
   };
+
   const VERIFY_RECAPTCHA = async (token: string): Promise<void> => {
     const controller = new AbortController();
     const t = setTimeout(() => controller.abort(), 6000);
     try {
       const res = await fetchRetry(`${import.meta.env.VITE_BASE_URL}/api/auth/verify-recaptcha`, {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
+        headers: { 'Content-Type': 'application/json' },
         credentials: 'include',
         body: JSON.stringify({ token }),
         signal: controller.signal,
@@ -177,15 +182,26 @@ export const useMainStore = defineStore('main', () => {
         throw new HttpError(res.status, data);
       }
     } catch (err) {
-      if (err instanceof HttpError) {
-        notifyHttp(err);
-      } else {
-        notifyGeneric(err);
-      }
+      isHuman.value = false;
+
+      const message =
+        (err as Error)?.name === 'AbortError'
+          ? 'Verification timed out — please refresh the page to try again.'
+          : 'Verification failed — please refresh the page to try again.';
+
+      $q.notify({
+        type: 'negative',
+        message,
+        timeout: 0,
+        actions: [{ label: 'Refresh', color: 'white', handler: () => window.location.reload() }],
+      });
+
+      console.error('[VERIFY_RECAPTCHA]', err);
     } finally {
       clearTimeout(t);
     }
   };
+
   const VERIFY_IS_HUMAN = async () => {
     const url = new URL(`${import.meta.env.VITE_BASE_URL}/api/auth/verify-status`).toString();
     try {
@@ -193,17 +209,20 @@ export const useMainStore = defineStore('main', () => {
         credentials: 'include',
         headers: { Accept: 'application/json' },
       });
+      if (!res.ok) throw new Error(`HTTP ${res.status}`);
       const data = await res.json();
       isHuman.value = data.isHuman;
     } catch (err) {
       console.error('[VERIFY_IS_HUMAN] error:', err);
-      $q.notify({ type: 'negative', message: `500 - Server Error` });
-      return;
+      isHuman.value = false;
+      $q.notify({ type: 'negative', message: 'Verification failed. Please try again.' });
     }
   };
+
   const HAS_SCROLLBAR = (status: boolean) => {
     containsScrollbar.value = status;
   };
+
   const SET_RECAPTCHA_WIDGET_ID = (id: number | null) => (recaptchaWidgetId.value = id);
 
   const SET_PAINTED_STATUS = (status: boolean) => (hasPainted.value = status);

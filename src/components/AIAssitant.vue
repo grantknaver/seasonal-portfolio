@@ -22,41 +22,41 @@ const isResponsive = computed(() => width.value < lgBreakpoint);
 const hasDialog = ref(false);
 const RecaptchaWidget = defineAsyncComponent(() => import('../components/RecaptchaWidget.vue'));
 
-const flushLogs = debounce(async () => {
+const flushChat = debounce(async () => {
   await mainStore.SEND_OALOGS();
   chatScroll.value?.setScrollPosition('vertical', 99999, 300);
 }, 2000);
 
-const addToLog = async (): Promise<void | undefined> => {
-  await mainStore.VERIFY_IS_HUMAN();
-  if (isHuman.value) {
-    isChatting.value = true;
-    const t = text.value.trim();
-    if (!t) return;
-    const logItem: OALog = {
-      role: OARole.User,
-      content: [{ type: 'input_text', text: t }],
-    };
-    mainStore.UPDATE_CHATLOG(logItem);
-    mainStore.SET_OALOG([logItem]);
-    text.value = '';
-    flushLogs();
-  }
+const addToLog = (): void => {
+  if (!isHuman.value) return;
+
+  const t = text.value.trim();
+  if (!t) return;
+
+  isChatting.value = true;
+
+  const logItem: OALog = {
+    role: OARole.User,
+    content: [{ type: 'input_text', text: t }],
+  };
+
+  mainStore.UPDATE_CHATLOG(logItem);
+  mainStore.SET_OALOG([logItem]);
+  text.value = '';
+
+  flushChat();
 };
 
 onMounted(async () => {
   if (isHuman.value && chatLog.value.length === 0) {
-    // mainStore.SET;
+    // Sets System and generates first bot message
     await mainStore.SEND_OALOGS();
   }
 });
 
-watch(isHuman, async (newHumanStatus) => {
-  if (newHumanStatus) {
-    if (chatLog.value.length === 0) {
-      await mainStore.SEND_OALOGS();
-    }
-  }
+watch(isHuman, async (ok) => {
+  if (!ok || chatLog.value.length > 0) return;
+  await mainStore.SEND_OALOGS();
 });
 
 watch(oaLogs, async () => {
