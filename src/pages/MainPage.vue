@@ -837,7 +837,7 @@ const toContact = () => {
     background-position: left;
     background-repeat: no-repeat;
 
-    opacity: 0.1;
+    opacity: 0.15;
     z-index: -1;
     pointer-events: none;
   }
