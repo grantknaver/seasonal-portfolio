@@ -444,7 +444,9 @@ const toContact = () => {
       </span>
     </div>
 
-    <section class="clarity-background"><ClarityBackground /></section>
+    <section class="clarity-background" :class="{ 'is-collapsed': !!activeTopic }">
+      <ClarityBackground />
+    </section>
 
     <div ref="claritySectionRef" class="clarity-section full-width q-pa-md">
       <div
@@ -589,6 +591,10 @@ const toContact = () => {
     pointer-events: none;
     background: #f7f9fe;
     overflow: hidden;
+
+    &.is-collapsed {
+      filter: blur(4px);
+    }
   }
 
   /* ---------- Section wrapper ---------- */
