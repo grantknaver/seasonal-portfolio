@@ -6,23 +6,26 @@ import { v4 as uuidv4 } from 'uuid';
 import { storeToRefs } from 'pinia';
 import { TopicName } from '../shared/constants/topicName';
 import SimonMenu from '../components/SimonMenu.vue';
-import { scroll } from 'quasar';
-import gsap from 'gsap';
+// import { scroll } from 'quasar';
 import { ViewType } from '../shared/constants/viewType';
 import { useViewport } from '../shared/utils/viewWidth';
 import {
-  mdiChevronUp,
+  // mdiChevronUp,
   mdiInformationOutline,
   mdiEmailBox,
   mdiMagnify,
   mdiViewGalleryOutline,
 } from '@quasar/extras/mdi-v7';
-import { mdiChevronDown } from '@quasar/extras/mdi-v7';
+// import { mdiChevronDown } from '@quasar/extras/mdi-v7';
 import { CacheEntry } from 'src/shared/constants/cacheEntry';
 import { useCacheStore } from 'src/stores/component-cache';
 import { scrollToElement } from 'src/shared/utils/scrollToElement';
 import { CacheBinding } from 'src/shared/constants/cacheBinding';
-import AnimatedBackground from 'src/components/AnimatedBackground.vue';
+import ClarityBackground from 'src/components/ClarityBackground.vue';
+import { ScrollTrigger } from 'gsap/ScrollTrigger';
+import gsap from 'gsap';
+
+gsap.registerPlugin(ScrollTrigger);
 
 const mainStore = useMainStore();
 const cacheStore = useCacheStore();
@@ -58,7 +61,7 @@ const mobileTopics: Topic[] = [
   },
 ];
 const expandedPanel = ref<TopicName | null>();
-const { getScrollTarget, setVerticalScrollPosition } = scroll;
+// const { getScrollTarget, setVerticalScrollPosition } = scroll;
 const { activeTopic } = storeToRefs(mainStore);
 const showFooter = ref<boolean>(false);
 const io = ref<IntersectionObserver | null>(null);
@@ -168,6 +171,15 @@ onMounted(async () => {
 
   requestAnimationFrame(() => {
     applyHomeScale(false);
+    if (!isResponsive.value) {
+      ScrollTrigger.create({
+        trigger: desktopRootRef.value,
+        start: 'top top',
+        end: '+=600',
+        pin: true,
+        pinSpacing: true,
+      });
+    }
   });
 
   await mainStore.VERIFY_IS_HUMAN();
@@ -187,6 +199,7 @@ onBeforeUnmount(() => {
   } catch (e) {
     console.log('onBeforeUnmount dispose err', e);
   }
+  ScrollTrigger.getAll().forEach((st) => st.kill());
 });
 
 watch(
@@ -434,27 +447,27 @@ const buildAnimations = (mode: ViewType, animate = true) => {
   };
 };
 
-const scrollToFooter = () => {
-  if (!showFooter.value) {
-    const footerEl = document.getElementById('footer');
-    if (!footerEl) return;
+// const scrollToFooter = () => {
+//   if (!showFooter.value) {
+//     const footerEl = document.getElementById('footer');
+//     if (!footerEl) return;
 
-    const target = getScrollTarget(footerEl);
-    const y = footerEl.offsetTop;
+//     const target = getScrollTarget(footerEl);
+//     const y = footerEl.offsetTop;
 
-    setVerticalScrollPosition(target, y, 500);
-    showFooter.value = true;
-  } else {
-    const logoEl = document.getElementById('logo');
-    if (!logoEl) return;
+//     setVerticalScrollPosition(target, y, 500);
+//     showFooter.value = true;
+//   } else {
+//     const logoEl = document.getElementById('logo');
+//     if (!logoEl) return;
 
-    const target = getScrollTarget(logoEl);
-    const y = logoEl.offsetHeight;
+//     const target = getScrollTarget(logoEl);
+//     const y = logoEl.offsetHeight;
 
-    setVerticalScrollPosition(target, y, 500);
-    showFooter.value = false;
-  }
-};
+//     setVerticalScrollPosition(target, y, 500);
+//     showFooter.value = false;
+//   }
+// };
 
 const toContact = () => {
   mainStore.SET_ACTIVE_TOPIC(TopicName.Contact);
@@ -464,18 +477,12 @@ const toContact = () => {
 
 <template>
   <q-page class="page-container column items-center">
-    <div class="background"><AnimatedBackground /></div>
     <div class="logo">
-      <!-- <img
-        class="q-pt-sm"
-        style="max-width: 50px"
-        src="../assets/glkfreelance-logo.avif"
-        alt="logo"
-      /> -->
       <span class="logo-text"
         ><i class="glk text-accent">glk</i><span class="freelance text-dark">Freelance</span></span
       >
     </div>
+    <div class="clarity-background"><ClarityBackground /></div>
     <section v-show="isResponsive" ref="mobileRootRef" class="responsive-view full-width q-pa-md">
       <div
         ref="mobileHomeContainerRef"
@@ -619,15 +626,6 @@ const toContact = () => {
           </div>
         </div>
       </div>
-      <q-btn
-        id="showFooterBtn"
-        round
-        color="accent"
-        :icon="!showFooter ? mdiChevronUp : mdiChevronDown"
-        class="q-px-sm"
-        @click="scrollToFooter"
-        aria-label="Scroll to footer"
-      />
     </section>
   </q-page>
 </template>
@@ -640,20 +638,11 @@ const toContact = () => {
   min-height: 100vh;
   background: color-mix(in srgb, var(--q-accent) 5%, transparent);
 
-  .background {
-    position: fixed; // was absolute — keeps it pinned while the page scrolls
-    inset: 0;
-    z-index: 0;
-    pointer-events: none;
-    background: #f7f9fe; // matches the SVG's own #background rect
-    overflow: hidden;
-  }
-
   .logo {
     display: none;
-    position: absolute;
-    top: 3%;
-    left: 3%;
+    position: fixed;
+    top: 2%;
+    left: 2%;
     z-index: 2;
 
     @media (min-width: tokens.$breakpoint-lg) {
@@ -675,6 +664,15 @@ const toContact = () => {
         font-weight: 500;
       }
     }
+  }
+
+  .clarity-background {
+    position: fixed; // was absolute — keeps it pinned while the page scrolls
+    inset: 0;
+    z-index: 0;
+    pointer-events: none;
+    background: #f7f9fe; // matches the SVG's own #background rect
+    overflow: hidden;
   }
 
   .home-container {
@@ -838,21 +836,6 @@ const toContact = () => {
       left: 1rem;
     }
   }
-
-  // .desktop-view::before {
-  //   content: '';
-  //   position: absolute;
-  //   inset: 0;
-
-  //   background: url('../assets/monitor.avif');
-  //   background-size: cover;
-  //   background-position: left;
-  //   background-repeat: no-repeat;
-
-  //   opacity: 0.15;
-  //   z-index: -1;
-  //   pointer-events: none;
-  // }
 }
 
 .panel-skeleton {

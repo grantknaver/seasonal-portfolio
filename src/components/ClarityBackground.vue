@@ -1,70 +1,122 @@
 <script setup lang="ts">
 import { ref, onMounted, onBeforeUnmount } from 'vue';
 import gsap from 'gsap';
+import { ScrollTrigger } from 'gsap/ScrollTrigger';
+
+gsap.registerPlugin(ScrollTrigger);
 
 const svgRoot = ref<SVGSVGElement | null>(null);
 let ctx: gsap.Context | null = null;
 
-const REVEAL_ORDER = [
-  '#right-top-decoration',
+const LOAD_ORDER = [
   '#left-top-decoration',
-  '#button-card',
   '#slider-btn',
   '#content-card',
   '#graph-card',
   '#landscape',
   '#main-content',
-  '#sidebar',
 ];
+
+const STAGGER = 0.28;
+
+/** Fit the scroll range to whatever room the page actually has. */
+// const scrollDistance = (): number => {
+//   const max = document.documentElement.scrollHeight - window.innerHeight;
+//   return Math.max(120, Math.min(520, max * 0.8));
+// };
 
 onMounted(() => {
   const root = svgRoot.value;
   if (!root) return;
 
-  const targets = REVEAL_ORDER.map((sel) => root.querySelector(sel)).filter(
+  const loadTargets = LOAD_ORDER.map((sel) => root.querySelector<SVGElement>(sel)).filter(
     (el): el is SVGElement => !!el,
   );
 
-  if (!targets.length) return;
+  const topDeco = root.querySelector<SVGElement>('#right-top-decoration');
+  const sidebar = root.querySelector<SVGElement>('#sidebar');
+  const buttonCard = root.querySelector<SVGElement>('#button-card');
+  const scrollTargets = [topDeco, buttonCard].filter((el): el is SVGElement => !!el);
 
   const reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
   ctx = gsap.context(() => {
     if (reduced) {
-      gsap.set(targets, { filter: 'blur(0px)', opacity: 1, scale: 1 });
+      gsap.set([...loadTargets, ...scrollTargets], {
+        filter: 'blur(0px)',
+        opacity: 1,
+        scale: 1,
+        x: 0,
+        y: 0,
+      });
       return;
     }
 
-    gsap.set(targets, {
+    /* ---------- on load ---------- */
+
+    gsap.set(loadTargets, {
       filter: 'blur(9px)',
       opacity: 0.35,
       scale: 1,
       willChange: 'filter, opacity, transform',
     });
 
-    gsap.to(targets, {
-      keyframes: [
+    const tl = gsap.timeline();
+
+    loadTargets.forEach((el, i) => {
+      tl.to(
+        el,
         {
-          filter: 'blur(3px)',
-          opacity: 0.75,
-          scale: 1.015,
-          duration: 0.5,
-          ease: 'power2.out',
+          keyframes: [
+            { filter: 'blur(3px)', opacity: 0.75, scale: 1.035, duration: 0.5, ease: 'power2.out' },
+            { filter: 'blur(0px)', opacity: 1, scale: 1, duration: 0.55, ease: 'power2.inOut' },
+          ],
         },
-        {
-          filter: 'blur(0px)',
-          opacity: 1,
-          scale: 1,
-          duration: 0.55,
-          ease: 'power2.inOut',
-        },
-      ],
-      stagger: 0.28,
-      delay: 0.35,
-      onComplete: () => {
-        gsap.set(targets, { clearProps: 'willChange' });
+        i * STAGGER,
+      );
+    });
+
+    tl.set(loadTargets, { clearProps: 'willChange' });
+
+    /* ---------- on scroll ---------- */
+
+    const tl2 = gsap.timeline({
+      scrollTrigger: {
+        start: 0,
+        end: 350,
+        scrub: 0.6,
+        markers: true,
       },
     });
+
+    if (topDeco) {
+      tl2.fromTo(
+        topDeco,
+        { y: -300, opacity: 0, filter: 'blur(9px)' },
+        { y: 0, opacity: 1, filter: 'blur(0px)', duration: 1.5, ease: 'none' },
+        0,
+      );
+    }
+
+    if (sidebar) {
+      tl2.fromTo(
+        sidebar,
+        { x: -300, opacity: 0, filter: 'blur(9px)' },
+        { x: 0, opacity: 1, filter: 'blur(0px)', duration: 1.5, ease: 'none' },
+        1,
+      );
+    }
+
+    if (buttonCard) {
+      tl2.fromTo(
+        buttonCard,
+        { x: 480, y: 300, opacity: 0, filter: 'blur(9px)' },
+        { x: 0, y: 0, opacity: 1, filter: 'blur(0px)', duration: 1.5, ease: 'none' },
+        2,
+      );
+    }
+
+    ScrollTrigger.refresh();
   }, root);
 });
 
@@ -1299,7 +1351,8 @@ onBeforeUnmount(() => {
 </template>
 
 <style scoped lang="scss">
-$revealed: '#right-top-decoration, #left-top-decoration, #button-card, #slider-btn, #content-card, #graph-card, #landscape, #main-content, #sidebar';
+$load: '#left-top-decoration, #slider-btn, #content-card, #graph-card, #landscape, #main-content';
+$scroll: '#right-top-decoration, #sidebar, #button-card';
 
 svg {
   display: block;
@@ -1307,15 +1360,22 @@ svg {
   height: 100%;
 }
 
-#{$revealed} {
+#{$load} {
   filter: blur(9px);
   opacity: 0.35;
   transform-box: fill-box;
   transform-origin: 50% 50%;
 }
 
+#{$scroll} {
+  opacity: 0;
+  transform-box: fill-box;
+  transform-origin: 50% 50%;
+}
+
 @media (prefers-reduced-motion: reduce) {
-  #{$revealed} {
+  #{$load},
+  #{$scroll} {
     filter: none;
     opacity: 1;
   }
