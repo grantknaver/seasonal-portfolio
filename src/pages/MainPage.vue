@@ -65,6 +65,7 @@ const io = ref<IntersectionObserver | null>(null);
 const { lgBreakpoint, width } = useViewport();
 const isResponsive = computed(() => width.value < lgBreakpoint);
 const dispose = ref<() => void>(() => {});
+let pinST: ScrollTrigger | null = null;
 
 const activeEntry = computed(() => {
   if (!activeTopic.value) return null;
@@ -155,7 +156,7 @@ onMounted(async () => {
   requestAnimationFrame(() => {
     applyHomeScale(false);
     if (!isResponsive.value) {
-      ScrollTrigger.create({
+      pinST = ScrollTrigger.create({
         trigger: claritySectionRef.value,
         start: 'top top',
         end: '+=600',
@@ -211,8 +212,19 @@ watch(
   async (newTopic: TopicName | null) => {
     expandedPanel.value = newTopic;
 
-    await nextTick();
+    if (!isResponsive.value) {
+      if (newTopic) {
+        window.scrollTo(0, 0);
+        pinST?.disable(false);
+        document.body.style.overflow = 'hidden';
+      } else {
+        document.body.style.overflow = '';
+        pinST?.enable();
+        ScrollTrigger.refresh();
+      }
+    }
 
+    await nextTick();
     applyHomeScale(true);
   },
   { flush: 'post' },
@@ -748,7 +760,7 @@ const toContact = () => {
       /* ---------- Drawer open ---------- */
 
       &.is-collapsed {
-        // max-width: 250px;
+        max-width: max-content;
         padding: 1rem;
 
         .simon-copy {

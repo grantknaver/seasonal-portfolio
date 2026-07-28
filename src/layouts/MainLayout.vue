@@ -254,17 +254,14 @@ aside {
 
 .desktop-drawer {
   flex-direction: column;
-  background: color-mix(in srgb, $secondary 75%, white 25%);
+  background: color-mix(in srgb, $dark 75%, white 25%);
   z-index: 2;
-  height: none;
 
-  .q-scrollarea {
-    // border-left: solid 2px var(--q-dark);
-  }
   .q-scrollarea,
   .scroll-area {
     flex: 1 1 0%;
     height: 100dvh;
+    overscroll-behavior: contain;
   }
 }
 
