@@ -24,12 +24,9 @@ import { CacheBinding } from 'src/shared/constants/cacheBinding';
 import ClarityBackground from 'src/components/ClarityBackground.vue';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import gsap from 'gsap';
-
 gsap.registerPlugin(ScrollTrigger);
-
 const mainStore = useMainStore();
 const cacheStore = useCacheStore();
-
 const mobileTopics: Topic[] = [
   {
     id: uuidv4(),
@@ -67,12 +64,13 @@ const showFooter = ref<boolean>(false);
 const io = ref<IntersectionObserver | null>(null);
 const { lgBreakpoint, width } = useViewport();
 const isResponsive = computed(() => width.value < lgBreakpoint);
-
 const dispose = ref<() => void>(() => {});
+
 const activeEntry = computed(() => {
   if (!activeTopic.value) return null;
   return CacheBinding[activeTopic.value];
 });
+
 const activeComponent = computed(() => {
   const entry = activeEntry.value;
   if (!entry) return null;
@@ -94,33 +92,28 @@ const observer = new IntersectionObserver(
 );
 
 const applyHomeScale = (animate = true) => {
-  const el = currentHomeContainer.value;
+  const el = homeContainerRef.value;
   if (!el) return;
 
   gsap.killTweensOf(el);
 
   if (isResponsive.value) {
-    gsap.set(el, {
-      clearProps: 'transform',
-    });
+    gsap.set(el, { clearProps: 'transform' });
     return;
   }
 
-  const shouldScale = !!activeTopic.value;
-  const nextScale = shouldScale ? 0.8 : 1;
+  const open = !!activeTopic.value;
+  const x = open ? -window.innerWidth * 0.25 : 0;
 
   if (!animate) {
-    gsap.set(el, {
-      scale: nextScale,
-      transformOrigin: 'center center',
-    });
+    gsap.set(el, { x, scale: 1 });
     return;
   }
 
   gsap.to(el, {
-    scale: nextScale,
-    transformOrigin: 'center center',
-    duration: shouldScale ? 0.8 : 0.6,
+    x,
+    scale: 1,
+    duration: 0.5,
     ease: 'power2.out',
     overwrite: true,
   });
@@ -132,19 +125,9 @@ const handleResize = () => {
   });
 };
 
-const mobileRootRef = ref<HTMLElement | null>(null);
-const desktopRootRef = ref<HTMLElement | null>(null);
-
-const mobileHomeContainerRef = ref<HTMLElement | null>(null);
-const desktopHomeContainerRef = ref<HTMLElement | null>(null);
-
-const currentRoot = computed(() => {
-  return isResponsive.value ? mobileRootRef.value : desktopRootRef.value;
-});
-
-const currentHomeContainer = computed(() => {
-  return isResponsive.value ? mobileHomeContainerRef.value : desktopHomeContainerRef.value;
-});
+const claritySectionRef = ref<HTMLElement | null>(null);
+const homeContainerRef = ref<HTMLElement | null>(null);
+// const trustSectionRef = ref<HTMLElement | null>(null);
 
 onMounted(async () => {
   const footerElement = document.getElementById('footer');
@@ -173,7 +156,7 @@ onMounted(async () => {
     applyHomeScale(false);
     if (!isResponsive.value) {
       ScrollTrigger.create({
-        trigger: desktopRootRef.value,
+        trigger: claritySectionRef.value,
         start: 'top top',
         end: '+=600',
         pin: true,
@@ -183,10 +166,6 @@ onMounted(async () => {
   });
 
   await mainStore.VERIFY_IS_HUMAN();
-});
-
-onUnmounted(() => {
-  cacheStore.CLEAR_CACHE();
 });
 
 onBeforeUnmount(() => {
@@ -202,6 +181,10 @@ onBeforeUnmount(() => {
   ScrollTrigger.getAll().forEach((st) => st.kill());
 });
 
+onUnmounted(() => {
+  cacheStore.CLEAR_CACHE();
+});
+
 watch(
   isResponsive,
   async (viewNow) => {
@@ -212,7 +195,7 @@ watch(
     }
 
     await nextTick();
-    await waitForLayout(currentRoot.value);
+    await waitForLayout(homeContainerRef.value);
 
     dispose.value = buildAnimations(viewNow ? ViewType.Responsive : ViewType.Desktop, false);
 
@@ -252,7 +235,7 @@ const waitForLayout = async (el: HTMLElement | null, frames = 8): Promise<boolea
 };
 
 const buildAnimations = (mode: ViewType, animate = true) => {
-  const el = currentRoot.value;
+  const el = claritySectionRef.value;
   if (!el) return () => {};
 
   const kickerEl = el.querySelector<HTMLElement>('.kicker');
@@ -447,28 +430,6 @@ const buildAnimations = (mode: ViewType, animate = true) => {
   };
 };
 
-// const scrollToFooter = () => {
-//   if (!showFooter.value) {
-//     const footerEl = document.getElementById('footer');
-//     if (!footerEl) return;
-
-//     const target = getScrollTarget(footerEl);
-//     const y = footerEl.offsetTop;
-
-//     setVerticalScrollPosition(target, y, 500);
-//     showFooter.value = true;
-//   } else {
-//     const logoEl = document.getElementById('logo');
-//     if (!logoEl) return;
-
-//     const target = getScrollTarget(logoEl);
-//     const y = logoEl.offsetHeight;
-
-//     setVerticalScrollPosition(target, y, 500);
-//     showFooter.value = false;
-//   }
-// };
-
 const toContact = () => {
   mainStore.SET_ACTIVE_TOPIC(TopicName.Contact);
   expandedPanel.value = TopicName.Contact;
@@ -478,50 +439,53 @@ const toContact = () => {
 <template>
   <q-page class="page-container column items-center">
     <div class="logo">
-      <span class="logo-text"
-        ><i class="glk text-accent">glk</i><span class="freelance text-dark">Freelance</span></span
-      >
+      <span class="logo-text">
+        <i class="glk text-accent">glk</i><span class="freelance text-dark">Freelance</span>
+      </span>
     </div>
-    <div class="clarity-background"><ClarityBackground /></div>
-    <section v-show="isResponsive" ref="mobileRootRef" class="responsive-view full-width q-pa-md">
+
+    <section class="clarity-background"><ClarityBackground /></section>
+
+    <div ref="claritySectionRef" class="clarity-section full-width q-pa-md">
       <div
-        ref="mobileHomeContainerRef"
-        class="home-container relative-position full-width column text-primary-font q-mt-md q-mb-md q-pa-lg font-primary"
+        ref="homeContainerRef"
+        class="home-container column q-pa-lg font-primary"
+        :class="{ 'is-collapsed': !!activeTopic }"
       >
-        <div class="mobile-hero-copy text-center">
-          <p ref="kickerRef" class="text-caption kicker mobile-content q-mt-none q-mb-sm">
-            Focused UI Motion + AI Interaction
-          </p>
+        <div class="simon-copy">
+          <div class="simon"><SimonMenu /></div>
 
-          <h1 class="headline mobile-content text-h1 q-mt-none q-mb-md">
-            Build Clarity. Earn Trust. Create Momentum.
-          </h1>
+          <div class="hero-copy column justify-center">
+            <p class="text-caption kicker q-mt-none q-mb-sm">Focused UI Motion + AI Interaction</p>
 
-          <div class="subheadline mobile-content q-mt-md start-animation">
-            <p class="q-ma-none text-body-2">
-              I review websites, product surfaces, and AI interactions to identify where clarity,
-              trust, momentum, or AI legibility can be improved through focused implementation.
-            </p>
+            <h1 class="headline text-h1 q-mt-none q-mb-md">
+              Build Clarity. Earn Trust. Create Momentum.
+            </h1>
+
+            <div class="subheadline q-mt-md">
+              <p class="q-ma-none text-body-2">
+                I review websites, product surfaces, and AI interactions to identify where clarity,
+                trust, momentum, or AI legibility can be improved through focused implementation.
+              </p>
+            </div>
+
+            <div class="cta-wrap q-mt-md">
+              <q-btn class="cta" @click="toContact()" color="accent" size="lg" glossy>
+                <span class="text-body-2">LET’S TALK</span>
+              </q-btn>
+            </div>
           </div>
         </div>
 
-        <div class="u-grid u-gap-sm full-width q-mt-md mobile-content">
-          <q-btn class="cta" @click="toContact()" color="accent" size="lg" glossy>
-            <span class="text-body-2">LET’S TALK</span>
-          </q-btn>
-        </div>
-
-        <div class="proofs mobile-content full-width q-mt-lg">
+        <div class="proofs q-mt-lg">
           <div class="proof-card">
             <span class="proof-label">MORE INQUIRIES</span>
             <strong>Clearer paths from interest to contact.</strong>
           </div>
-
           <div class="proof-card">
-            <span class="proof-label">TRUST</span>
+            <span class="proof-label">BETTER DECISIONS</span>
             <strong>Help people understand, trust, and move forward.</strong>
           </div>
-
           <div class="proof-card">
             <span class="proof-label">LESS FRICTION</span>
             <strong>Smooth the moments where users hesitate, stall, or drop off.</strong>
@@ -529,7 +493,7 @@ const toContact = () => {
         </div>
       </div>
 
-      <q-list class="full-width font-primary">
+      <q-list v-if="isResponsive" class="full-width font-primary">
         <q-item
           v-for="topic in mobileTopics"
           :key="topic.id"
@@ -544,7 +508,6 @@ const toContact = () => {
             @after-show="
               () => {
                 scrollToElement(topic.name);
-                // expandedPanel = topic.name;
                 mainStore.SET_ACTIVE_TOPIC(topic.name);
               }
             "
@@ -568,7 +531,6 @@ const toContact = () => {
                 <template #default>
                   <component :is="activeComponent" />
                 </template>
-
                 <template #fallback>
                   <q-skeleton type="rect" height="100dvh" />
                 </template>
@@ -577,55 +539,10 @@ const toContact = () => {
           </q-expansion-item>
         </q-item>
       </q-list>
-    </section>
-    <section
-      v-show="!isResponsive"
-      ref="desktopRootRef"
-      class="desktop-view column justify-end items-center full-width"
-    >
-      <div ref="desktopHomeContainerRef" class="home-container q-pa-xl column">
-        <div class="simon-copy">
-          <div ref="simonRef" class="simon"><SimonMenu></SimonMenu></div>
-          <div class="column justify-center">
-            <div class="relative-position overflow-hidden">
-              <p ref="kickerRef" class="text-caption kicker q-mt-none q-mb-sm">
-                Focused UI Motion + AI Interaction
-              </p>
-              <h1 ref="headlineRef" class="headline text-h1 full-width q-mt-none q-mb-none">
-                Build Clarity. Earn Trust. Create Momentum.
-              </h1>
-              <div ref="servRef" class="text-lead subheadline q-mt-md start-animation">
-                <p class="q-ma-none text-body-2">
-                  I review websites, product surfaces, and AI interactions to identify where
-                  clarity, trust, momentum, or AI legibility can be improved through focused
-                  implementation.
-                </p>
-              </div>
-            </div>
-            <div class="u-grid u-grid-cols-2 u-gap-sm">
-              <q-btn @click="toContact()" class="cta q-mt-md" color="accent" size="lg" glossy>
-                <span class="text-body-2">LET’S TALK</span>
-              </q-btn>
-            </div>
-          </div>
-        </div>
-        <div class="proofs q-mt-xl">
-          <div class="proof-card">
-            <span class="proof-label">MORE INQUIRIES</span>
-            <strong>Clearer paths from interest to contact.</strong>
-          </div>
+    </div>
 
-          <div class="proof-card">
-            <span class="proof-label">BETTER DECISIONS</span>
-            <strong>Help people understand, trust, and move forward.</strong>
-          </div>
-
-          <div class="proof-card">
-            <span class="proof-label">LESS FRICTION</span>
-            <strong>Smooth the moments where users hesitate, stall, or drop off.</strong>
-          </div>
-        </div>
-      </div>
+    <section ref="trustSectionRef" class="trust-section">
+      <!-- trust markup, unchanged -->
     </section>
   </q-page>
 </template>
@@ -648,7 +565,6 @@ const toContact = () => {
     @media (min-width: tokens.$breakpoint-lg) {
       display: flex !important;
       align-items: center;
-      z-index: 2;
 
       .logo-text {
         padding-left: 0.5rem;
@@ -667,25 +583,56 @@ const toContact = () => {
   }
 
   .clarity-background {
-    position: fixed; // was absolute — keeps it pinned while the page scrolls
+    position: fixed;
     inset: 0;
     z-index: 0;
     pointer-events: none;
-    background: #f7f9fe; // matches the SVG's own #background rect
+    background: #f7f9fe;
     overflow: hidden;
   }
 
+  /* ---------- Section wrapper ---------- */
+
+  .clarity-section {
+    width: 100%;
+    max-width: 600px;
+
+    @media (min-width: tokens.$breakpoint-md) {
+      max-width: 800px;
+    }
+
+    @media (min-width: tokens.$breakpoint-lg) {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      height: 100dvh;
+      max-width: none;
+    }
+  }
+
+  /* ---------- Card ---------- */
+
   .home-container {
+    position: relative;
+    z-index: 2;
+    margin-inline: auto;
+    padding: 1.5rem;
+    border: 1px solid var(--q-accent);
+    border-radius: 1rem;
+    text-align: center;
     background: linear-gradient(
       135deg,
       color-mix(in srgb, tokens.$ink-soft 90%, tokens.$ivory 10%),
       tokens.$ink
     );
-    border: 1px solid var(--q-accent);
-    border-radius: 1rem;
     box-shadow:
       0 0 64px color-mix(in srgb, var(--q-accent) 38%, transparent),
       0 28px 80px color-mix(in srgb, var(--q-accent) 38%, transparent);
+
+    .simon {
+      display: none;
+    }
 
     .kicker {
       color: tokens.$champagne;
@@ -693,6 +640,8 @@ const toContact = () => {
     }
 
     h1 {
+      max-width: 26rem;
+      margin-inline: auto;
       color: tokens.$text;
       line-height: 1.16;
       letter-spacing: -0.025em;
@@ -700,140 +649,123 @@ const toContact = () => {
       text-wrap: balance;
     }
 
+    .hero-copy {
+      max-width: 34rem;
+      margin-inline: auto;
+    }
+
     .subheadline {
+      max-width: 32rem;
+      margin-inline: auto;
       color: tokens.$text-muted;
+      line-height: 1.5;
     }
 
     .proofs {
       display: grid;
-      grid-template-columns: repeat(3, minmax(0, 1fr));
+      grid-template-columns: 1fr;
       gap: 0.75rem;
+    }
 
-      .proof-card {
-        padding: 0.85rem 1rem;
-        border: 1px solid color-mix(in srgb, var(--q-accent) 38%, transparent);
+    .proof-card {
+      padding: 0.85rem 1rem;
+      border: 1px solid color-mix(in srgb, var(--q-accent) 38%, transparent);
+      border-radius: 0.75rem;
+      background: color-mix(in srgb, tokens.$ink-soft 82%, tokens.$ivory 6%);
+      box-shadow: inset 0 1px 0 color-mix(in srgb, tokens.$ivory 8%, transparent);
+      text-align: left;
 
-        border-radius: 0.75rem;
-        background: color-mix(in srgb, tokens.$ink-soft 82%, tokens.$ivory 6%);
-        box-shadow: inset 0 1px 0 color-mix(in srgb, tokens.$ivory 8%, transparent);
+      .proof-label {
+        display: block;
+        margin-bottom: 0.25rem;
+        color: tokens.$champagne;
+        font-size: 0.72rem;
+        line-height: 1;
+        letter-spacing: 0.08em;
+        text-transform: uppercase;
+        font-weight: 700;
+      }
 
-        .proof-label {
-          display: block;
-          margin-bottom: 0.25rem;
-          color: tokens.$champagne;
-          font-size: 0.72rem;
-          line-height: 1;
-          letter-spacing: 0.08em;
-          text-transform: uppercase;
-          font-weight: 700;
-        }
-
-        strong {
-          display: block;
-          color: tokens.$text-muted;
-          font-size: 0.85rem;
-          line-height: 1.25;
-          font-weight: 600;
-        }
+      strong {
+        display: block;
+        color: tokens.$text-muted;
+        font-size: 0.85rem;
+        line-height: 1.25;
+        font-weight: 600;
       }
     }
 
-    .proof-card strong {
-      display: block;
-      color: tokens.$text-muted;
-      font-size: 0.85rem;
-      line-height: 1.25;
-      font-weight: 600;
-    }
-  }
+    /* ---------- Desktop ---------- */
 
-  /* ---------- Mobile / NotDesktop ---------- */
-
-  .responsive-view {
-    height: 100%;
-    max-width: 600px;
-
-    @media (min-width: tokens.$breakpoint-md) {
-      max-width: 800px;
-    }
-
-    .home-container {
-      border-radius: 1rem;
-      padding: 1.5rem;
-
-      .mobile-hero-copy {
-        max-width: 34rem;
-        margin-inline: auto;
-      }
-
-      h1 {
-        max-width: 26rem;
-        margin-inline: auto;
-      }
-
-      .subheadline {
-        max-width: 32rem;
-        margin-inline: auto;
-        line-height: 1.5;
-      }
-
-      .proofs {
-        grid-template-columns: 1fr;
-        gap: 0.75rem;
-      }
-
-      .proof-card {
-        text-align: left;
-      }
-    }
-  }
-
-  /* ---------- Desktop ---------- */
-
-  .desktop-view {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    position: relative;
-    height: 100dvh;
-
-    .home-container {
-      position: relative;
-      z-index: 2;
-      margin-top: 3rem;
+    @media (min-width: tokens.$breakpoint-lg) {
       max-width: 760px;
+      margin-top: 3rem;
+      padding: 2rem;
+      text-align: left;
+      transition:
+        max-width 0.5s ease,
+        padding 0.5s ease;
+
+      .simon {
+        display: block;
+        min-width: 250px;
+        max-width: 250px;
+      }
 
       .simon-copy {
         display: grid;
         grid-template-columns: auto 1fr;
         column-gap: 2rem;
+      }
 
-        .simon {
-          min-width: 250px;
-          max-width: 250px;
-        }
+      .hero-copy,
+      h1,
+      .subheadline {
+        max-width: none;
+        margin-inline: 0;
       }
 
       .subheadline {
-        position: relative;
-        z-index: 1;
-        border-radius: 5px;
-        line-height: 1rem;
+        line-height: 1.35;
       }
 
-      .subheadline::before {
-        content: '';
-        position: absolute;
-        inset: 0;
-        z-index: -1;
-        margin: -10px;
+      .proofs {
+        grid-template-columns: repeat(3, minmax(0, 1fr));
       }
-    }
 
-    #showFooterBtn {
-      position: absolute;
-      bottom: 1rem;
-      left: 1rem;
+      .cta-wrap {
+        display: grid;
+        grid-template-columns: repeat(2, 1fr);
+        gap: 0.5rem;
+      }
+
+      /* ---------- Drawer open ---------- */
+
+      &.is-collapsed {
+        // max-width: 250px;
+        padding: 1rem;
+
+        .simon-copy {
+          grid-template-columns: 1fr;
+          row-gap: 1rem;
+        }
+
+        .kicker,
+        h1,
+        .subheadline,
+        .proofs {
+          display: none;
+        }
+
+        .cta-wrap {
+          grid-template-columns: 1fr;
+          margin-top: 0;
+        }
+
+        .cta {
+          width: 100%;
+        }
+      }
     }
   }
 }

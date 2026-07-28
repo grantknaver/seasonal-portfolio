@@ -36,7 +36,7 @@ onMounted(() => {
   const topDeco = root.querySelector<SVGElement>('#right-top-decoration');
   const sidebar = root.querySelector<SVGElement>('#sidebar');
   const buttonCard = root.querySelector<SVGElement>('#button-card');
-  const scrollTargets = [topDeco, buttonCard].filter((el): el is SVGElement => !!el);
+  const scrollTargets = [topDeco, sidebar, buttonCard].filter((el): el is SVGElement => !!el);
 
   const reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
@@ -85,7 +85,6 @@ onMounted(() => {
         start: 0,
         end: 350,
         scrub: 0.6,
-        markers: true,
       },
     });
 

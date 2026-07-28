@@ -7,7 +7,12 @@ import { TopicName } from '../shared/constants/topicName';
 import { type Topic } from '../shared/types/topic';
 import { v4 as uuidv4 } from 'uuid';
 import { useViewport } from '../shared/utils/viewWidth';
-import { mdiMenu, mdiHeart, mdiGithub, mdiLinkedin } from '@quasar/extras/mdi-v7';
+import {
+  mdiMenu,
+  // mdiHeart,
+  // mdiGithub,
+  // mdiLinkedin
+} from '@quasar/extras/mdi-v7';
 import { useCacheStore } from 'src/stores/component-cache';
 import { CacheBinding } from 'src/shared/constants/cacheBinding';
 
@@ -75,14 +80,6 @@ onBeforeUnmount(() => window.removeEventListener('resize', updateWidths));
       <q-toolbar class="bg-primary q-pa-lg">
         <q-toolbar-title>
           <div id="logo" class="logo row items-center">
-            <!-- <img
-              class="q-pt-sm"
-              width="130"
-              height="130"
-              style="max-width: 65px; height: auto"
-              src="../assets/glkfreelance-logo.avif"
-              alt="logo"
-            /> -->
             <span class="logo-text">
               <span class="glk text-accent">glk</span
               ><span class="freelance text-dark">Freelance</span>
@@ -175,7 +172,7 @@ onBeforeUnmount(() => window.removeEventListener('resize', updateWidths));
     </q-drawer>
   </q-layout>
   <!-- "Footer" lives in normal flow so we can scroll to it -->
-  <section id="footer" class="bg-dark text-white" aria-label="Site footer">
+  <!-- <section id="footer" class="bg-dark text-white" aria-label="Site footer">
     <q-toolbar class="justify-between">
       <q-toolbar-title class="text-subtitle2 text-weight-light">
         © {{ new Date().getFullYear() }} <span class="text-secondary">glk</span
@@ -218,7 +215,7 @@ onBeforeUnmount(() => window.removeEventListener('resize', updateWidths));
         </a>
       </div>
     </q-toolbar>
-  </section>
+  </section> -->
 </template>
 
 <style lang="scss">
