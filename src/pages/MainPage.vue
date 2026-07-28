@@ -22,6 +22,8 @@ import { CacheEntry } from 'src/shared/constants/cacheEntry';
 import { useCacheStore } from 'src/stores/component-cache';
 import { scrollToElement } from 'src/shared/utils/scrollToElement';
 import { CacheBinding } from 'src/shared/constants/cacheBinding';
+import AnimatedBackground from 'src/components/AnimatedBackground.vue';
+
 const mainStore = useMainStore();
 const cacheStore = useCacheStore();
 
@@ -462,6 +464,7 @@ const toContact = () => {
 
 <template>
   <q-page class="page-container column items-center">
+    <div class="background"><AnimatedBackground /></div>
     <div class="logo">
       <!-- <img
         class="q-pt-sm"
@@ -636,6 +639,15 @@ const toContact = () => {
   position: relative;
   min-height: 100vh;
   background: color-mix(in srgb, var(--q-accent) 5%, transparent);
+
+  .background {
+    position: fixed; // was absolute — keeps it pinned while the page scrolls
+    inset: 0;
+    z-index: 0;
+    pointer-events: none;
+    background: #f7f9fe; // matches the SVG's own #background rect
+    overflow: hidden;
+  }
 
   .logo {
     display: none;
@@ -827,20 +839,20 @@ const toContact = () => {
     }
   }
 
-  .desktop-view::before {
-    content: '';
-    position: absolute;
-    inset: 0;
+  // .desktop-view::before {
+  //   content: '';
+  //   position: absolute;
+  //   inset: 0;
 
-    background: url('../assets/monitor.avif');
-    background-size: cover;
-    background-position: left;
-    background-repeat: no-repeat;
+  //   background: url('../assets/monitor.avif');
+  //   background-size: cover;
+  //   background-position: left;
+  //   background-repeat: no-repeat;
 
-    opacity: 0.15;
-    z-index: -1;
-    pointer-events: none;
-  }
+  //   opacity: 0.15;
+  //   z-index: -1;
+  //   pointer-events: none;
+  // }
 }
 
 .panel-skeleton {
