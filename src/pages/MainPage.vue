@@ -66,6 +66,7 @@ const { lgBreakpoint, width } = useViewport();
 const isResponsive = computed(() => width.value < lgBreakpoint);
 const dispose = ref<() => void>(() => {});
 let pinST: ScrollTrigger | null = null;
+let refreshTimer: ReturnType<typeof setTimeout> | null = null;
 
 const activeEntry = computed(() => {
   if (!activeTopic.value) return null;
@@ -93,31 +94,12 @@ const observer = new IntersectionObserver(
 );
 
 const applyHomeScale = (animate = true) => {
+  console.log('animate', animate);
   const el = homeContainerRef.value;
   if (!el) return;
 
   gsap.killTweensOf(el);
-
-  if (isResponsive.value) {
-    gsap.set(el, { clearProps: 'transform' });
-    return;
-  }
-
-  const open = !!activeTopic.value;
-  const x = open ? -window.innerWidth * 0.25 : 0;
-
-  if (!animate) {
-    gsap.set(el, { x, scale: 1 });
-    return;
-  }
-
-  gsap.to(el, {
-    x,
-    scale: 1,
-    duration: 0.5,
-    ease: 'power2.out',
-    overwrite: true,
-  });
+  gsap.set(el, { clearProps: 'transform' });
 };
 
 const handleResize = () => {
@@ -180,6 +162,8 @@ onBeforeUnmount(() => {
     console.log('onBeforeUnmount dispose err', e);
   }
   ScrollTrigger.getAll().forEach((st) => st.kill());
+
+  if (refreshTimer) clearTimeout(refreshTimer);
 });
 
 onUnmounted(() => {
@@ -215,12 +199,14 @@ watch(
     if (!isResponsive.value) {
       if (newTopic) {
         window.scrollTo(0, 0);
-        pinST?.disable(false);
+        pinST?.disable(true);
         document.body.style.overflow = 'hidden';
       } else {
         document.body.style.overflow = '';
-        pinST?.enable();
-        ScrollTrigger.refresh();
+        refreshTimer = setTimeout(() => {
+          pinST?.enable();
+          ScrollTrigger.refresh();
+        }, 400);
       }
     }
 
