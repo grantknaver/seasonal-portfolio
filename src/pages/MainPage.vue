@@ -141,7 +141,7 @@ onMounted(async () => {
       pinST = ScrollTrigger.create({
         trigger: claritySectionRef.value,
         start: 'top top',
-        end: '+=600',
+        end: '+=650',
         pin: true,
         pinSpacing: true,
       });

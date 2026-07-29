@@ -19,11 +19,15 @@ import { CacheBinding } from 'src/shared/constants/cacheBinding';
 const cacheStore = useCacheStore();
 const mainStore = useMainStore();
 const { activeTopic } = storeToRefs(mainStore);
-const { height, width, lgBreakpoint } = useViewport();
+const {
+  height,
+  // width,
+  // lgBreakpoint
+} = useViewport();
 const windowWidth = ref(window.innerWidth);
 const desktopDrawerWidth = ref(window.innerWidth * 0.5);
 const showTopicBreakpoint = +`${getCustomCssVar('breakpoint-lg')}`.slice(0, -2);
-const isResponsive = computed(() => width.value < lgBreakpoint);
+// const isResponsive = computed(() => width.value < lgBreakpoint);
 const showTopicPanel = computed(
   () => !!activeTopic.value && windowWidth.value > showTopicBreakpoint,
 );
@@ -135,7 +139,7 @@ onBeforeUnmount(() => window.removeEventListener('resize', updateWidths));
       <!-- Your routed pages render here -->
       <router-view />
       <!-- ensure content exceeds viewport so footer starts off-screen -->
-      <div v-if="!isResponsive" class="footer-spacer" />
+      <!-- <div v-if="!isResponsive" class="footer-spacer" /> -->
     </q-page-container>
 
     <q-drawer
