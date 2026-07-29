@@ -110,7 +110,11 @@ const handleResize = () => {
 
 const claritySectionRef = ref<HTMLElement | null>(null);
 const homeContainerRef = ref<HTMLElement | null>(null);
-// const trustSectionRef = ref<HTMLElement | null>(null);
+const trustSectionRef = ref<HTMLElement | null>(null);
+const trustImageA = ref<HTMLElement | null>(null);
+const trustImageB = ref<HTMLElement | null>(null);
+const trustCopyA = ref<HTMLElement | null>(null);
+const trustCopyB = ref<HTMLElement | null>(null);
 
 onMounted(async () => {
   const footerElement = document.getElementById('footer');
@@ -137,15 +141,51 @@ onMounted(async () => {
 
   requestAnimationFrame(() => {
     applyHomeScale(false);
-    if (!isResponsive.value) {
-      pinST = ScrollTrigger.create({
-        trigger: claritySectionRef.value,
-        start: 'top top',
-        end: '+=650',
-        pin: true,
-        pinSpacing: true,
-      });
+
+    if (isResponsive.value) return;
+
+    pinST = ScrollTrigger.create({
+      trigger: claritySectionRef.value,
+      start: 'top top',
+      end: '+=1500',
+      pin: true,
+      pinSpacing: true,
+      anticipatePin: 1,
+    });
+
+    const section = trustSectionRef.value;
+    const imgA = trustImageA.value;
+    const imgB = trustImageB.value;
+    const copyA = trustCopyA.value;
+    const copyB = trustCopyB.value;
+
+    if (section && imgA && imgB && copyA && copyB) {
+      gsap.set(imgB, { opacity: 0 });
+      gsap.set(copyA, { yPercent: 0, scale: 1.12, opacity: 1 });
+      gsap.set(copyB, { yPercent: -140, scale: 0.85, opacity: 0 });
+
+      gsap
+        .timeline({
+          scrollTrigger: {
+            trigger: section,
+            start: 'top top',
+            end: '+=2000',
+            pin: true,
+            pinSpacing: true,
+            scrub: 0.6,
+            anticipatePin: 1,
+          },
+        })
+        // copy A shrinks and leaves out the bottom
+        .to(copyA, { yPercent: 140, scale: 0.85, opacity: 0, ease: 'none', duration: 1 }, 0.4)
+        // crossfade under its exit
+        .to(imgA, { opacity: 0, ease: 'none', duration: 0.8 }, 0.6)
+        .to(imgB, { opacity: 1, ease: 'none', duration: 0.8 }, 0.6)
+        // copy B arrives from the top and settles — no exit
+        .to(copyB, { yPercent: 0, scale: 1.12, opacity: 1, ease: 'none', duration: 1 }, 0.2);
     }
+
+    ScrollTrigger.refresh();
   });
 
   await mainStore.VERIFY_IS_HUMAN();
@@ -435,7 +475,7 @@ const toContact = () => {
 </script>
 
 <template>
-  <q-page class="page-container column items-center">
+  <q-page class="page-container">
     <div class="logo">
       <span class="logo-text">
         <i class="glk text-accent">glk</i><span class="freelance text-dark">Freelance</span>
@@ -542,7 +582,21 @@ const toContact = () => {
     </div>
 
     <section ref="trustSectionRef" class="trust-section">
-      <!-- trust markup, unchanged -->
+      <div ref="trustImageA" class="trust-image-wrap">
+        <img src="../assets/trust-breathing-in.avif" alt="" class="trust-image" />
+      </div>
+
+      <div ref="trustImageB" class="trust-image-wrap">
+        <img src="../assets/trust-breathing-out.avif" alt="" class="trust-image" />
+      </div>
+
+      <div ref="trustCopyA" class="trust-copy">
+        <p>Clarity helps people decide.</p>
+      </div>
+
+      <div ref="trustCopyB" class="trust-copy">
+        <p>Trust helps them breathe.</p>
+      </div>
     </section>
   </q-page>
 </template>
@@ -777,6 +831,60 @@ const toContact = () => {
           width: 100%;
         }
       }
+    }
+  }
+
+  /* ---------- Trust ---------- */
+
+  .trust-section {
+    position: relative;
+    align-self: stretch;
+    width: 100%;
+    height: 100dvh;
+    overflow: hidden;
+    background: tokens.$ink;
+  }
+
+  .trust-image-wrap {
+    position: absolute;
+    inset: 0;
+    will-change: opacity;
+
+    &::after {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: rgba(13, 71, 161, 0.08);
+      mix-blend-mode: soft-light;
+      pointer-events: none;
+    }
+  }
+
+  .trust-image {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    filter: saturate(0.82) contrast(0.96) brightness(0.9) hue-rotate(2deg);
+  }
+
+  .trust-copy {
+    position: absolute;
+    inset: 0;
+    z-index: 2;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding-inline: 2rem;
+    text-align: center;
+    color: tokens.$ivory;
+    font-size: clamp(1.75rem, 4vw, 3.25rem);
+    line-height: 1.2;
+    text-shadow: 0 2px 24px rgba(0, 0, 0, 0.45);
+    will-change: transform, opacity;
+
+    p {
+      margin: 0;
+      max-width: 24rem;
     }
   }
 }

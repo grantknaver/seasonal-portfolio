@@ -19,12 +19,6 @@ const LOAD_ORDER = [
 
 const STAGGER = 0.28;
 
-/** Fit the scroll range to whatever room the page actually has. */
-// const scrollDistance = (): number => {
-//   const max = document.documentElement.scrollHeight - window.innerHeight;
-//   return Math.max(120, Math.min(520, max * 0.8));
-// };
-
 onMounted(() => {
   const root = svgRoot.value;
   if (!root) return;
@@ -83,7 +77,7 @@ onMounted(() => {
     const tl2 = gsap.timeline({
       scrollTrigger: {
         start: 0,
-        end: 350,
+        end: 1400,
         scrub: 0.6,
       },
     });
