@@ -621,6 +621,7 @@ const toContact = () => {
     position: relative;
     z-index: 2;
     margin-inline: auto;
+    margin-bottom: 1rem;
     padding: 1.5rem;
     border: 1px solid var(--q-accent);
     border-radius: 1rem;
@@ -630,9 +631,7 @@ const toContact = () => {
       color-mix(in srgb, tokens.$ink-soft 90%, tokens.$ivory 10%),
       tokens.$ink
     );
-    box-shadow:
-      0 0 64px color-mix(in srgb, var(--q-accent) 38%, transparent),
-      0 28px 80px color-mix(in srgb, var(--q-accent) 38%, transparent);
+    box-shadow: none;
 
     .simon {
       display: none;
@@ -663,6 +662,11 @@ const toContact = () => {
       margin-inline: auto;
       color: tokens.$text-muted;
       line-height: 1.5;
+    }
+
+    .cta-wrap {
+      display: grid;
+      grid-template-columns: 1fr;
     }
 
     .proofs {
@@ -704,8 +708,12 @@ const toContact = () => {
     @media (min-width: tokens.$breakpoint-lg) {
       max-width: 760px;
       margin-top: 3rem;
+      margin-bottom: 0;
       padding: 2rem;
       text-align: left;
+      box-shadow:
+        0 0 64px color-mix(in srgb, var(--q-accent) 38%, transparent),
+        0 28px 80px color-mix(in srgb, var(--q-accent) 38%, transparent);
       transition:
         max-width 0.5s ease,
         padding 0.5s ease;
@@ -738,7 +746,6 @@ const toContact = () => {
       }
 
       .cta-wrap {
-        display: grid;
         grid-template-columns: repeat(2, 1fr);
         gap: 0.5rem;
       }

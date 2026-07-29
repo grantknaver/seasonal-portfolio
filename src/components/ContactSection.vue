@@ -105,8 +105,8 @@ const sendEmail = async () => {
   <section
     id="contact"
     ref="contactRef"
-    class="contactSection full-width q-pa-md"
-    :class="isResponsive ? 'responsive-view' : 'desktop-view'"
+    class="contactSection full-width"
+    :class="isResponsive ? 'responsive-view q-pa-xs' : 'desktop-view q-pa-md'"
   >
     <div class="contact-shell">
       <div class="contact-intro">

@@ -139,8 +139,8 @@ onBeforeUnmount(() => {
 
 <template>
   <section
-    class="about-section full-width column q-pa-md"
-    :class="isResponsive ? 'responsive-view' : 'desktop-view'"
+    class="about-section full-width column"
+    :class="isResponsive ? 'responsive-view q-pa-xs' : 'desktop-view q-pa-md'"
   >
     <q-card class="about-card q-pa-none">
       <q-card-section class="about-section-block about-intro q-pa-lg">

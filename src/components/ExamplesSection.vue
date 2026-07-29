@@ -348,7 +348,7 @@ const backgroundUrl = new URL('../assets/ai-bcg-winter.avif', import.meta.url).h
 </script>
 <template>
   <!-- Mobile -->
-  <section v-if="isResponsive" class="examplesSection responsive-view full-width column q-pa-md">
+  <section v-if="isResponsive" class="examplesSection responsive-view full-width column q-pa-xs">
     <div class="case-section-card q-pa-lg q-mb-md">
       <p class="text-caption kicker q-mt-none q-mb-sm">Examples</p>
       <h1 class="text-h1 q-mt-none q-mb-md">Focused Builds</h1>

@@ -145,7 +145,7 @@ const lens = ref<LensDetails[]>([
 <template>
   <section
     class="lensSection full-width column"
-    :class="isResponsive ? 'responsive-view q-pa-md' : 'desktop-view q-pa-md'"
+    :class="isResponsive ? 'responsive-view q-pa-xs' : 'desktop-view q-pa-md'"
   >
     <div class="lens-shell">
       <div class="lens-header">
