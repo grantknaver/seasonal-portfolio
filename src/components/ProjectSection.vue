@@ -154,7 +154,7 @@ const projects = ref<ProjectDetails[]>([
 </template>
 
 <style scoped lang="scss">
-@use '/src/css/_tokens.scss' as tokens;
+@use '../css/tokens' as tokens;
 
 .responsive-view {
   @media (min-width: tokens.$breakpoint-md) {

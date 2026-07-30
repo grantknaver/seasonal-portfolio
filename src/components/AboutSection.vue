@@ -323,7 +323,7 @@ onBeforeUnmount(() => {
 </template>
 
 <style lang="scss">
-@use '/src/css/_tokens.scss' as tokens;
+@use '../css/tokens' as tokens;
 
 .about-section {
   color: tokens.$text;

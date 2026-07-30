@@ -250,7 +250,7 @@ const sendEmail = async () => {
 </template>
 
 <style scoped lang="scss">
-@use '/src/css/_tokens.scss' as tokens;
+@use '../css/tokens' as tokens;
 
 .contactSection {
   color: tokens.$text;

@@ -690,7 +690,7 @@ const backgroundUrl = new URL('../assets/ai-bcg-winter.avif', import.meta.url).h
   </section>
 </template>
 <style scoped lang="scss">
-@use '/src/css/_tokens.scss' as tokens;
+@use '../css/tokens' as tokens;
 .examplesSection {
   content-visibility: auto;
   contain-intrinsic-size: 800px 1000px;

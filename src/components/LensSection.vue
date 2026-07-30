@@ -246,7 +246,7 @@ const lens = ref<LensDetails[]>([
 </template>
 
 <style scoped lang="scss">
-@use '/src/css/_tokens.scss' as tokens;
+@use '../css/tokens' as tokens;
 
 .lensSection {
   color: tokens.$text;

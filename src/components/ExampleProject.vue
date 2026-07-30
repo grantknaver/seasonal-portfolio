@@ -289,7 +289,7 @@ const props = defineProps({
 </template>
 
 <style scoped lang="scss">
-@use '/src/css/_tokens.scss' as tokens;
+@use '../css/tokens' as tokens;
 
 .case-study-component {
   color: tokens.$text;
@@ -447,7 +447,7 @@ const props = defineProps({
 </style>
 
 <style lang="scss">
-@use '/src/css/_tokens.scss' as tokens;
+@use '../css/tokens' as tokens;
 
 /* These are Quasar internal header classes passed through props.
    They are intentionally global but tightly prefixed to this component. */

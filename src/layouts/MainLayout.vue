@@ -223,7 +223,7 @@ onBeforeUnmount(() => window.removeEventListener('resize', updateWidths));
 </template>
 
 <style lang="scss">
-@use '/src/css/_tokens.scss' as tokens;
+@use '../css/tokens' as tokens;
 
 .q-header {
   background-color: rgba($color: black, $alpha: 0.5) !important;
