@@ -154,9 +154,29 @@ onMounted(() => {
   transition: transform 0.3s ease;
   transform-origin: center;
   border-radius: 10px;
-  border: solid 2px rgba($color: tokens.$ivory, $alpha: 0.5);
-  background: var(--q-dark);
+  border: solid 2px rgba($color: white, $alpha: 0.5);
+  background: var(--q-accent-soft);
   z-index: 1;
+
+  .simon-link {
+    display: flex;
+    flex-direction: column;
+  }
+
+  .q-icon {
+    color: var(--q-primary);
+  }
+
+  .label {
+    position: static;
+    opacity: 1;
+    font-size: 0.5rem;
+    letter-spacing: 0.09em;
+    text-transform: uppercase;
+    font-weight: 400;
+    color: color-mix(in srgb, var(--q-secondary) 80%, transparent);
+    text-align: center;
+  }
 
   &:hover {
     transform: scale(0.9);
@@ -166,8 +186,12 @@ onMounted(() => {
     cursor: pointer;
 
     .q-icon {
-      opacity: 0.1;
-      color: tokens.$ink;
+      color: var(--q-accent);
+    }
+
+    .label {
+      color: color-mix(in srgb, var(--q-dark) 60%, transparent);
+      font-weight: 800;
     }
   }
 
@@ -178,28 +202,13 @@ onMounted(() => {
     transition: transform 0.7s ease-in;
 
     .q-icon {
-      opacity: 0.1;
-      color: tokens.$ink;
+      color: var(--q-accent);
     }
-  }
-}
 
-.simon-link {
-  flex-direction: column;
-  gap: 0.5rem;
-
-  .q-icon {
-    opacity: 1;
-  }
-
-  .label {
-    position: static;
-    opacity: 1;
-    font-size: 0.5rem;
-    letter-spacing: 0.09em;
-    text-transform: uppercase;
-    font-weight: 400;
-    color: rgba(tokens.$ivory, 0.72);
+    .label {
+      color: color-mix(in srgb, var(--q-dark) 60%, transparent);
+      font-weight: 800;
+    }
   }
 }
 </style>
