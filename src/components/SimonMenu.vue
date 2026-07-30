@@ -16,6 +16,10 @@ const mainStore = useMainStore();
 const { activeTopic } = storeToRefs(mainStore);
 const labelsVisible = ref(false);
 
+const props = withDefaults(defineProps<{ layout?: 'grid' | 'row' }>(), {
+  layout: 'grid',
+});
+
 const topics: Topic[] = [
   {
     id: uuidv4(),
@@ -60,18 +64,17 @@ onMounted(() => {
 });
 </script>
 <template>
-  <div class="simon">
+  <div class="simon" :class="`simon--${props.layout}`">
     <div
       v-for="topic in topics"
       :key="topic.id"
       class="simon-quadrant"
       :class="[topic.name, { 'active-topic': topic.name === activeTopic }]"
       tabindex="0"
-      style="padding: 1rem"
       @click.stop="selectTopic(topic.name)"
     >
       <a class="simon-link text-body-2">
-        <q-icon :name="topic.icon" size="80px" />
+        <q-icon :name="topic.icon" />
         <span class="label" :class="{ 'labels-visible': labelsVisible }">{{ topic.label }}</span>
       </a>
     </div>
@@ -84,14 +87,67 @@ onMounted(() => {
   position: relative;
   border-radius: 10px;
   overflow: visible;
-  width: 250px;
-  height: 250px;
+
+  /* ---------- Grid (default) ---------- */
+
+  &--grid {
+    width: 250px;
+    height: 250px;
+
+    .simon-quadrant {
+      position: absolute;
+      width: 49%;
+      height: 49%;
+      padding: 1rem;
+
+      &.Lens {
+        top: 0;
+        left: 0;
+      }
+
+      &.Examples {
+        top: 0;
+        right: 0;
+      }
+
+      &.About {
+        bottom: 0;
+        left: 0;
+      }
+
+      &.Contact {
+        bottom: 0;
+        right: 0;
+      }
+    }
+
+    .simon-link .q-icon {
+      font-size: 80px;
+    }
+  }
+
+  /* ---------- Row ---------- */
+
+  &--row {
+    display: flex;
+    gap: 0.5rem;
+
+    .simon-quadrant {
+      position: static;
+      width: 104px;
+      height: 72px;
+      padding: 0.5rem;
+    }
+
+    .simon-link .q-icon {
+      font-size: 42px;
+    }
+  }
 }
 
+/* ---------- Shared tile ---------- */
+
 .simon-quadrant {
-  position: absolute;
-  width: 49%;
-  height: 49%;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -115,26 +171,6 @@ onMounted(() => {
     }
   }
 
-  &.Lens {
-    top: 0;
-    left: 0;
-  }
-
-  &.Examples {
-    top: 0;
-    right: 0;
-  }
-
-  &.About {
-    bottom: 0;
-    left: 0;
-  }
-
-  &.Contact {
-    bottom: 0;
-    right: 0;
-  }
-
   &.active-topic {
     background-color: var(--q-secondary);
     border: solid 5px var(--q-accent);
@@ -149,32 +185,21 @@ onMounted(() => {
 }
 
 .simon-link {
-  color: white;
-  text-decoration: none;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  width: 100%;
-  height: 100%;
-  text-shadow: 0 0 5px var(--q-dark);
-  position: relative;
+  flex-direction: column;
+  gap: 0.5rem;
 
-  .label {
-    position: absolute;
-    opacity: 0;
-    transition: opacity 0.8s ease-out;
-  }
-
-  .labels-visible {
+  .q-icon {
     opacity: 1;
   }
 
-  .q-icon {
-    opacity: 0.04;
-  }
-
-  &:focus {
-    outline: none;
+  .label {
+    position: static;
+    opacity: 1;
+    font-size: 0.5rem;
+    letter-spacing: 0.09em;
+    text-transform: uppercase;
+    font-weight: 400;
+    color: rgba(tokens.$ivory, 0.72);
   }
 }
 </style>

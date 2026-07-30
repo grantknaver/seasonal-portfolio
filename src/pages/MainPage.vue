@@ -66,6 +66,7 @@ const { lgBreakpoint, width } = useViewport();
 const isResponsive = computed(() => width.value < lgBreakpoint);
 const dispose = ref<() => void>(() => {});
 let pinST: ScrollTrigger | null = null;
+let trustST: ScrollTrigger | null = null;
 let refreshTimer: ReturnType<typeof setTimeout> | null = null;
 
 const activeEntry = computed(() => {
@@ -178,19 +179,24 @@ onMounted(async () => {
         });
       };
 
-      gsap
-        .timeline({
-          scrollTrigger: {
-            trigger: section,
-            start: 'top top',
-            end: '+=2500',
-            pin: true,
-            pinSpacing: true,
-            scrub: 0.6,
-            anticipatePin: 1,
-            onEnter: playIntro,
+      const trustTl = gsap.timeline({
+        scrollTrigger: {
+          trigger: section,
+          start: 'top top',
+          end: '+=2500',
+          pin: true,
+          pinSpacing: true,
+          scrub: 0.6,
+          anticipatePin: 1,
+          onUpdate: (self) => {
+            if (self.progress > 0.02) playIntro();
           },
-        })
+        },
+      });
+
+      trustST = trustTl.scrollTrigger ?? null;
+
+      trustTl
         .to(copyA, { yPercent: 140, scale: 0.85, opacity: 0, ease: 'none', duration: 1 }, 0.4)
         .to(imgA, { opacity: 0, ease: 'none', duration: 0.5 }, 0.6)
         .to(imgB, { opacity: 1, ease: 'none', duration: 0.2 }, 0.6)
@@ -250,13 +256,14 @@ watch(
 
     if (!isResponsive.value) {
       if (newTopic) {
-        window.scrollTo(0, 0);
         pinST?.disable(true);
+        trustST?.disable(true);
         document.body.style.overflow = 'hidden';
       } else {
         document.body.style.overflow = '';
         refreshTimer = setTimeout(() => {
           pinST?.enable();
+          trustST?.enable();
           ScrollTrigger.refresh();
         }, 400);
       }
@@ -618,6 +625,9 @@ const toContact = () => {
           <span class="trust-corner trust-corner--br"></span>
           <span class="trust-signal"></span>
         </div>
+      </div>
+      <div v-if="!isResponsive" class="trust-nav">
+        <SimonMenu :layout="'row'" />
       </div>
     </section>
   </q-page>
@@ -1053,6 +1063,15 @@ const toContact = () => {
         rgba(255, 255, 255, 0) 100%
       );
     }
+  }
+
+  .trust-nav {
+    position: absolute;
+    bottom: clamp(0.75rem, 2vh, 1.75rem);
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 4;
+    width: max-content;
   }
 }
 
