@@ -8,7 +8,7 @@ import {
   mdiInformation,
   mdiEmailOutline,
   mdiMagnify,
-  mdiViewGalleryOutline,
+  mdiViewDashboardOutline,
 } from '@quasar/extras/mdi-v7';
 import { onMounted, ref } from 'vue';
 
@@ -30,7 +30,7 @@ const topics: Topic[] = [
   {
     id: uuidv4(),
     name: TopicName.Examples,
-    icon: mdiViewGalleryOutline,
+    icon: mdiViewDashboardOutline,
     label: TopicName.Examples,
   },
   {
@@ -154,9 +154,13 @@ onMounted(() => {
   transition: transform 0.3s ease;
   transform-origin: center;
   border-radius: 10px;
-  border: solid 2px rgba($color: white, $alpha: 0.5);
-  background: var(--q-accent-soft);
   z-index: 1;
+  box-shadow: 2px 2px 2px 2px #888888;
+
+  background: color-mix(in srgb, #f7f9fe 8%, transparent);
+
+  backdrop-filter: blur(5px);
+  -webkit-backdrop-filter: blur(5px);
 
   .simon-link {
     display: flex;
@@ -164,18 +168,27 @@ onMounted(() => {
   }
 
   .q-icon {
-    color: var(--q-primary);
+    font-weight: 900;
+    color: color-mix(in srgb, var(--q-accent) 70%, var(--q-secondary) 30%);
+
+    :deep(svg path) {
+      stroke: tokens.$panel-strong;
+      stroke-width: 1px;
+      stroke-linejoin: round;
+      stroke-linecap: round;
+      paint-order: stroke fill;
+    }
   }
 
   .label {
     position: static;
     opacity: 1;
-    font-size: 0.5rem;
+    font-size: 0.7rem;
     letter-spacing: 0.09em;
     text-transform: uppercase;
-    font-weight: 400;
-    color: color-mix(in srgb, var(--q-secondary) 80%, transparent);
     text-align: center;
+    color: color-mix(in srgb, var(--q-dark) 60%, transparent);
+    font-weight: 700;
   }
 
   &:hover {
@@ -192,6 +205,14 @@ onMounted(() => {
     .label {
       color: color-mix(in srgb, var(--q-dark) 60%, transparent);
       font-weight: 800;
+
+      :deep(svg path) {
+        stroke: rgba(247, 249, 254, 0.9);
+        stroke-width: 1.4px;
+        stroke-linejoin: round;
+        stroke-linecap: round;
+        paint-order: stroke fill;
+      }
     }
   }
 

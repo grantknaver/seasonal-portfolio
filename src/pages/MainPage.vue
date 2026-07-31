@@ -514,17 +514,14 @@ const toContact = () => {
         <div class="simon-copy">
           <div class="simon"><SimonMenu /></div>
 
-          <div class="hero-copy column justify-center">
+          <div class="hero-copy column justify-center q-pa-lg">
             <p class="text-caption kicker q-mt-none q-mb-sm">Focused UI Motion + AI Interaction</p>
 
-            <h1 class="headline text-h1 q-mt-none q-mb-md">
-              Build Clarity. Earn Trust. Create Momentum.
-            </h1>
+            <h1 class="headline text-h1 q-mt-none q-mb-md">BRING YOUR STORY INTO FOCUS.</h1>
 
             <div class="subheadline q-mt-md">
-              <p class="q-ma-none text-body-2">
-                I review websites, product surfaces, and AI interactions to identify where clarity,
-                trust, momentum, or AI legibility can be improved through focused implementation.
+              <p class="q-ma-none">
+                Make it clear. What sets you apart. What value you bring. Why you deserve trust.
               </p>
             </div>
 
@@ -538,16 +535,13 @@ const toContact = () => {
 
         <div class="proofs q-mt-lg">
           <div class="proof-card">
-            <span class="proof-label">MORE INQUIRIES</span>
-            <strong>Clearer paths from interest to contact.</strong>
+            <span class="proof-label text-caption">VALUE UNDERSTOOD</span>
           </div>
           <div class="proof-card">
-            <span class="proof-label">BETTER DECISIONS</span>
-            <strong>Help people understand, trust, and move forward.</strong>
+            <span class="proof-label text-caption"> DIFFERENCE SEEN</span>
           </div>
           <div class="proof-card">
-            <span class="proof-label">LESS FRICTION</span>
-            <strong>Smooth the moments where users hesitate, stall, or drop off.</strong>
+            <span class="proof-label text-caption">NEXT STEP CLEAR</span>
           </div>
         </div>
       </div>
@@ -709,14 +703,9 @@ const toContact = () => {
     margin-inline: auto;
     margin-bottom: 1rem;
     padding: 1.5rem;
-    border: 1px solid var(--q-accent);
-    border-radius: 1rem;
+
     text-align: center;
-    background: linear-gradient(
-      135deg,
-      color-mix(in srgb, tokens.$ink-soft 90%, tokens.$ivory 10%),
-      tokens.$ink
-    );
+    background-color: transparent;
     box-shadow: none;
 
     .simon {
@@ -741,6 +730,12 @@ const toContact = () => {
     .hero-copy {
       max-width: 34rem;
       margin-inline: auto;
+      background: color-mix(in srgb, tokens.$ink-soft 82%, tokens.$ivory 6%);
+      box-shadow:
+        0 0 64px color-mix(in srgb, var(--q-accent) 38%, transparent),
+        0 28px 80px color-mix(in srgb, var(--q-accent) 38%, transparent);
+      border: 1px solid var(--q-accent);
+      border-radius: 1rem;
     }
 
     .subheadline {
@@ -762,22 +757,20 @@ const toContact = () => {
     }
 
     .proof-card {
-      padding: 0.85rem 1rem;
+      padding: 1.5rem;
       border: 1px solid color-mix(in srgb, var(--q-accent) 38%, transparent);
-      border-radius: 0.75rem;
       background: color-mix(in srgb, tokens.$ink-soft 82%, tokens.$ivory 6%);
       box-shadow: inset 0 1px 0 color-mix(in srgb, tokens.$ivory 8%, transparent);
       text-align: left;
 
       .proof-label {
         display: block;
-        margin-bottom: 0.25rem;
+        text-align: center;
         color: tokens.$champagne;
-        font-size: 0.72rem;
         line-height: 1;
         letter-spacing: 0.08em;
         text-transform: uppercase;
-        font-weight: 700;
+        font-weight: 300;
       }
 
       strong {
@@ -786,6 +779,10 @@ const toContact = () => {
         font-size: 0.85rem;
         line-height: 1.25;
         font-weight: 600;
+      }
+
+      @media (min-width: tokens.$breakpoint-lg) {
+        border-radius: 5px;
       }
     }
 
@@ -797,15 +794,16 @@ const toContact = () => {
       margin-bottom: 0;
       padding: 2rem;
       text-align: left;
-      box-shadow:
-        0 0 64px color-mix(in srgb, var(--q-accent) 38%, transparent),
-        0 28px 80px color-mix(in srgb, var(--q-accent) 38%, transparent);
+      // box-shadow:
+      //   0 0 64px color-mix(in srgb, var(--q-accent) 38%, transparent),
+      //   0 28px 80px color-mix(in srgb, var(--q-accent) 38%, transparent);
       transition:
         max-width 0.5s ease,
         padding 0.5s ease;
 
       .simon {
-        display: block;
+        display: flex;
+        align-items: center;
         min-width: 250px;
         max-width: 250px;
       }
