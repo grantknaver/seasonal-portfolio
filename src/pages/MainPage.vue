@@ -140,6 +140,17 @@ onMounted(async () => {
 
     if (isResponsive.value) return;
 
+    if (claritySectionRef.value) {
+      ScrollTrigger.create({
+        trigger: claritySectionRef.value,
+        start: 'top top',
+        end: '+=1500',
+        pin: true,
+        pinSpacing: true,
+        anticipatePin: 1,
+      });
+    }
+
     const section = trustSectionRef.value;
     const imgA = trustImageA.value;
     const imgB = trustImageB.value;
