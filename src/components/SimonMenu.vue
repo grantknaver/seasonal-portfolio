@@ -134,13 +134,13 @@ onMounted(() => {
 
     .simon-quadrant {
       position: static;
-      width: 104px;
-      height: 72px;
+      width: 110px;
+      height: 110px;
       padding: 0.5rem;
     }
 
     .simon-link .q-icon {
-      font-size: 42px;
+      font-size: 60px;
     }
   }
 }
@@ -156,15 +156,14 @@ onMounted(() => {
   border-radius: 10px;
   z-index: 1;
   box-shadow: 2px 2px 2px 2px #888888;
-
   background: color-mix(in srgb, #f7f9fe 8%, transparent);
-
   backdrop-filter: blur(5px);
   -webkit-backdrop-filter: blur(5px);
 
   .simon-link {
     display: flex;
     flex-direction: column;
+    align-items: center;
   }
 
   .q-icon {

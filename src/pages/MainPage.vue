@@ -1023,7 +1023,6 @@ const toContact = () => {
     }
 
     &::after {
-      // Line
       content: '';
       position: absolute;
       top: 2.5px;
