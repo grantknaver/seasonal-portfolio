@@ -157,7 +157,7 @@ onBeforeUnmount(() => {
           <component :is="activeComponent" :key="activeEntry" />
         </template>
         <template #fallback>
-          <q-skeleton type="rect" height="400px" />
+          <q-skeleton type="rect" height="95vh" />
         </template>
       </Suspense>
     </SlidePanel>
