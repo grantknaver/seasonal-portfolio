@@ -6,7 +6,6 @@ import { v4 as uuidv4 } from 'uuid';
 import { storeToRefs } from 'pinia';
 import { TopicName } from '../shared/constants/topicName';
 import SimonMenu from '../components/SimonMenu.vue';
-// import { scroll } from 'quasar';
 import { ViewType } from '../shared/constants/viewType';
 import { useViewport } from '../shared/utils/viewWidth';
 import {
@@ -58,16 +57,12 @@ const mobileTopics: Topic[] = [
   },
 ];
 const expandedPanel = ref<TopicName | null>();
-// const { getScrollTarget, setVerticalScrollPosition } = scroll;
 const { activeTopic } = storeToRefs(mainStore);
 const showFooter = ref<boolean>(false);
 const io = ref<IntersectionObserver | null>(null);
 const { lgBreakpoint, width } = useViewport();
 const isResponsive = computed(() => width.value < lgBreakpoint);
 const dispose = ref<() => void>(() => {});
-let pinST: ScrollTrigger | null = null;
-let trustST: ScrollTrigger | null = null;
-let refreshTimer: ReturnType<typeof setTimeout> | null = null;
 
 const activeEntry = computed(() => {
   if (!activeTopic.value) return null;
@@ -145,15 +140,6 @@ onMounted(async () => {
 
     if (isResponsive.value) return;
 
-    pinST = ScrollTrigger.create({
-      trigger: claritySectionRef.value,
-      start: 'top top',
-      end: '+=1500',
-      pin: true,
-      pinSpacing: true,
-      anticipatePin: 1,
-    });
-
     const section = trustSectionRef.value;
     const imgA = trustImageA.value;
     const imgB = trustImageB.value;
@@ -194,8 +180,6 @@ onMounted(async () => {
         },
       });
 
-      trustST = trustTl.scrollTrigger ?? null;
-
       trustTl
         .to(copyA, { yPercent: 140, scale: 0.85, opacity: 0, ease: 'none', duration: 1 }, 0.4)
         .to(imgA, { opacity: 0, ease: 'none', duration: 0.5 }, 0.6)
@@ -220,8 +204,6 @@ onBeforeUnmount(() => {
     console.log('onBeforeUnmount dispose err', e);
   }
   ScrollTrigger.getAll().forEach((st) => st.kill());
-
-  if (refreshTimer) clearTimeout(refreshTimer);
 });
 
 onUnmounted(() => {
@@ -253,24 +235,7 @@ watch(
   activeTopic,
   async (newTopic: TopicName | null) => {
     expandedPanel.value = newTopic;
-
-    if (!isResponsive.value) {
-      if (newTopic) {
-        pinST?.disable(true);
-        trustST?.disable(true);
-        document.body.style.overflow = 'hidden';
-      } else {
-        document.body.style.overflow = '';
-        refreshTimer = setTimeout(() => {
-          pinST?.enable();
-          trustST?.enable();
-          ScrollTrigger.refresh();
-        }, 400);
-      }
-    }
-
     await nextTick();
-    applyHomeScale(true);
   },
   { flush: 'post' },
 );
@@ -794,12 +759,11 @@ const toContact = () => {
       margin-bottom: 0;
       padding: 2rem;
       text-align: left;
-      // box-shadow:
-      //   0 0 64px color-mix(in srgb, var(--q-accent) 38%, transparent),
-      //   0 28px 80px color-mix(in srgb, var(--q-accent) 38%, transparent);
+
       transition:
         max-width 0.5s ease,
-        padding 0.5s ease;
+        padding 0.5s ease,
+        transform 0.5s ease;
 
       .simon {
         display: flex;
@@ -839,6 +803,7 @@ const toContact = () => {
       &.is-collapsed {
         max-width: max-content;
         padding: 1rem;
+        transform: translateX(calc(var(--panel-offset, 0px) / -2));
 
         .simon-copy {
           grid-template-columns: 1fr;
@@ -1066,10 +1031,11 @@ const toContact = () => {
   .trust-nav {
     position: absolute;
     bottom: clamp(0.75rem, 2vh, 1.75rem);
-    left: 50%;
+    left: calc(50% - var(--panel-offset, 0px) / 2);
     transform: translateX(-50%);
     z-index: 4;
     width: max-content;
+    transition: left 0.32s cubic-bezier(0.4, 0, 0.2, 1);
   }
 }
 

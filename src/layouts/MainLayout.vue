@@ -1,12 +1,11 @@
 <script lang="ts" setup>
-import { computed, ref, onMounted, onBeforeUnmount } from 'vue';
+import { computed, ref, onMounted, onBeforeUnmount, watch } from 'vue';
 import { useMainStore } from '../stores/main';
 import { storeToRefs } from 'pinia';
 import { getCustomCssVar } from '../shared/utils/getCustomCssVar';
 import { TopicName } from '../shared/constants/topicName';
 import { type Topic } from '../shared/types/topic';
 import { v4 as uuidv4 } from 'uuid';
-import { useViewport } from '../shared/utils/viewWidth';
 import {
   mdiMenu,
   // mdiHeart,
@@ -15,15 +14,11 @@ import {
 } from '@quasar/extras/mdi-v7';
 import { useCacheStore } from 'src/stores/component-cache';
 import { CacheBinding } from 'src/shared/constants/cacheBinding';
+import SlidePanel from '../components/SlidePanel.vue';
 
 const cacheStore = useCacheStore();
 const mainStore = useMainStore();
 const { activeTopic } = storeToRefs(mainStore);
-const {
-  height,
-  // width,
-  // lgBreakpoint
-} = useViewport();
 const windowWidth = ref(window.innerWidth);
 const desktopDrawerWidth = ref(window.innerWidth * 0.5);
 const showTopicBreakpoint = +`${getCustomCssVar('breakpoint-lg')}`.slice(0, -2);
@@ -68,13 +63,23 @@ function setAppVh() {
   document.documentElement.style.setProperty('--app-vh', `${vh}px`);
 }
 
+watch(showTopicPanel, (open) => {
+  document.documentElement.style.setProperty(
+    '--panel-offset',
+    open ? `${desktopDrawerWidth.value}px` : '0px',
+  );
+});
+
 onMounted(() => {
   setAppVh();
   window.addEventListener('orientationchange', setAppVh);
   window.addEventListener('resize', updateWidths);
   window.addEventListener('DOMContentLoaded', () => {});
 });
-onBeforeUnmount(() => window.removeEventListener('resize', updateWidths));
+
+onBeforeUnmount(() => {
+  window.removeEventListener('resize', updateWidths);
+});
 </script>
 
 <template>
@@ -142,38 +147,20 @@ onBeforeUnmount(() => window.removeEventListener('resize', updateWidths));
       <!-- <div v-if="!isResponsive" class="footer-spacer" /> -->
     </q-page-container>
 
-    <q-drawer
+    <SlidePanel
       :model-value="showTopicPanel"
-      side="right"
-      behavior="desktop"
-      :width="desktopDrawerWidth"
-      class="desktop-drawer"
-      content-class="column no-wrap"
+      :width="`${desktopDrawerWidth}px`"
+      @update:model-value="mainStore.SET_ACTIVE_TOPIC(null)"
     >
-      <q-scroll-area
-        visible
-        class="q-pa-md"
-        :bar-style="{ backgroundColor: 'white', opacity: '1' }"
-      >
-        <div v-if="!activeEntry" class="text-white q-pa-md">
-          <p>No active topic yet.</p>
-          <p>activeTopic: {{ activeTopic }}</p>
-        </div>
-
-        <!-- 2 & 3. We have an entry → let Suspense handle loading vs loaded -->
-        <Suspense v-else>
-          <template #default>
-            <!-- 3. Loaded: async component has resolved -->
-            <component :is="activeComponent" :key="activeEntry" />
-          </template>
-
-          <!-- 2. Loading: while defineAsyncComponent is resolving -->
-          <template #fallback>
-            <q-skeleton type="rect" :width="desktopDrawerWidth + 'px'" :height="height + 'px'" />
-          </template>
-        </Suspense>
-      </q-scroll-area>
-    </q-drawer>
+      <Suspense v-if="activeEntry">
+        <template #default>
+          <component :is="activeComponent" :key="activeEntry" />
+        </template>
+        <template #fallback>
+          <q-skeleton type="rect" height="400px" />
+        </template>
+      </Suspense>
+    </SlidePanel>
   </q-layout>
   <!-- "Footer" lives in normal flow so we can scroll to it -->
   <!-- <section id="footer" class="bg-dark text-white" aria-label="Site footer">
@@ -256,49 +243,40 @@ aside {
   }
 }
 
-.desktop-drawer {
-  flex-direction: column;
-  background: color-mix(in srgb, $dark 75%, white 25%);
-  z-index: 2;
-
-  .q-scrollarea,
-  .scroll-area {
-    flex: 1 1 0%;
-    height: 100dvh;
-    overscroll-behavior: contain;
-  }
-}
-
 /* Mobile drawer overlays above content */
 .drawer-mobile {
   z-index: 2;
-}
 
-/* removed fixed q-footer; style our flow footer instead */
-#footer {
-  position: relative;
-  border-top: 1px solid var(--q-primary);
-  z-index: 10;
-
-  .prefix-text {
-    font-size: 0.8rem;
-  }
-  .q-btn:hover {
-    color: var(--q-primary) !important;
+  @media (min-width: tokens.$breakpoint-sm) {
+    background: color-mix(in srgb, $secondary 75%, white 25%);
   }
 
-  /* optional: entrance animation hook if you want */
-  will-change: transform, opacity;
-}
+  /* removed fixed q-footer; style our flow footer instead */
+  #footer {
+    position: relative;
+    border-top: 1px solid var(--q-primary);
+    z-index: 10;
 
-/* spacer to guarantee the footer starts off-screen */
-.footer-spacer {
-  min-height: 1rem; /* tune this so the footer is initially below the viewport */
-  background: var(--q-primary);
-}
+    .prefix-text {
+      font-size: 0.8rem;
+    }
+    .q-btn:hover {
+      color: var(--q-primary) !important;
+    }
 
-.activeTopic {
-  color: var(--q-accent);
-  font-weight: bold;
+    /* optional: entrance animation hook if you want */
+    will-change: transform, opacity;
+  }
+
+  /* spacer to guarantee the footer starts off-screen */
+  .footer-spacer {
+    min-height: 1rem; /* tune this so the footer is initially below the viewport */
+    background: var(--q-primary);
+  }
+
+  .activeTopic {
+    color: var(--q-accent);
+    font-weight: bold;
+  }
 }
 </style>
