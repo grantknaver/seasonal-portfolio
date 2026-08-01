@@ -223,6 +223,9 @@ onMounted(async () => {
             introTl.eventCallback('onComplete', unlock);
             introTl.play();
           },
+          onUpdate: (self) => {
+            if (self.progress > 0.3 && introTl.isActive()) introTl.progress(1);
+          },
         },
       });
 
@@ -469,9 +472,8 @@ const buildAnimations = (mode: ViewType, animate = true) => {
     if (ctaEls.length) {
       tl.fromTo(
         ctaEls,
-        { x: 50, autoAlpha: 0 },
+        { autoAlpha: 0 },
         {
-          x: 0,
           autoAlpha: 1,
           ease: 'power2.out',
           duration: 1,
