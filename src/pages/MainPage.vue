@@ -469,9 +469,9 @@ const buildAnimations = (mode: ViewType, animate = true) => {
     if (ctaEls.length) {
       tl.fromTo(
         ctaEls,
-        { y: 50, autoAlpha: 0 },
+        { x: 50, autoAlpha: 0 },
         {
-          y: 0,
+          x: 0,
           autoAlpha: 1,
           ease: 'power2.out',
           duration: 1,
