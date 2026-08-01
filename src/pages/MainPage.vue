@@ -134,6 +134,7 @@ const trustCopyA = ref<HTMLElement | null>(null);
 const trustCopyB = ref<HTMLElement | null>(null);
 const clarityCueRef = ref<HTMLElement | null>(null);
 const trustCueRef = ref<HTMLElement | null>(null);
+const trustBeamRef = ref<HTMLElement | null>(null);
 
 onMounted(async () => {
   const footerElement = document.getElementById('footer');
@@ -200,6 +201,7 @@ onMounted(async () => {
       const introTl = gsap
         .timeline({ paused: true })
         .to(glow, { opacity: 1, scale: 1, duration: 1.25, ease: 'power2.out' }, 0)
+        .to(trustBeamRef.value, { opacity: 1, duration: 1.6, ease: 'power2.out' }, 0.6)
         .to(copyA, { opacity: 1, duration: 1.4, ease: 'power1.out' }, 1.4)
         .to(cue, { opacity: 1, duration: 0.6, ease: 'power1.out' }, 2.6);
 
@@ -638,6 +640,7 @@ const toContact = () => {
           <span class="trust-corner trust-corner--br"></span>
           <span class="trust-signal"></span>
         </div>
+        <div ref="trustBeamRef" class="trust-beam" aria-hidden="true"><span></span></div>
       </div>
       <div v-if="!isResponsive" class="trust-nav">
         <SimonMenu :layout="'row'" />
@@ -914,7 +917,7 @@ const toContact = () => {
     width: 100%;
     height: 100dvh;
     overflow: hidden;
-    background: url('../assets/trust-section-background.avif') center 46%;
+    background: url('../assets/trust-section-background.avif') center 46% / cover no-repeat;
 
     .trust-viewport {
       position: absolute;
@@ -1034,6 +1037,43 @@ const toContact = () => {
       border-radius: 1.25rem;
     }
 
+    .trust-beam {
+      position: absolute;
+      inset: 0;
+      z-index: 3;
+      padding: 5px;
+      border-radius: 1.25rem;
+      overflow: hidden;
+      pointer-events: none;
+      opacity: 0;
+      mask:
+        linear-gradient(#000 0 0) content-box,
+        linear-gradient(#000 0 0);
+      mask-composite: exclude;
+      -webkit-mask:
+        linear-gradient(#000 0 0) content-box,
+        linear-gradient(#000 0 0);
+      -webkit-mask-composite: xor;
+
+      span {
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        width: 170%;
+        aspect-ratio: 1;
+        translate: -50% -50%;
+        animation: beam-spin 9s linear infinite;
+        background: conic-gradient(
+          from 0deg,
+          rgb(from $primary r g b / 0) 0deg,
+          rgb(from $primary r g b / 0) 296deg,
+          rgb(from $primary r g b / 0.55) 338deg,
+          rgb(from $primary r g b / 0.95) 352deg,
+          rgb(from $primary r g b / 0) 360deg
+        );
+      }
+    }
+
     .trust-corner {
       position: absolute;
       width: 20px;
@@ -1146,6 +1186,12 @@ const toContact = () => {
   }
   58% {
     opacity: 1;
+  }
+}
+
+@keyframes beam-spin {
+  to {
+    rotate: 360deg;
   }
 }
 </style>
