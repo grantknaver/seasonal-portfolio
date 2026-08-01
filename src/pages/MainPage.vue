@@ -224,6 +224,13 @@ onMounted(async () => {
         },
       });
 
+      trustTl.fromTo(
+        section,
+        { backgroundPositionY: '46%' },
+        { backgroundPositionY: '56%', ease: 'none', duration: 4.5 },
+        0,
+      );
+
       trustTl
         .to(cue, { opacity: 0, ease: 'none', duration: 0.4 }, 1.4)
         .to(copyA, { opacity: 0, ease: 'none', duration: 0.9 }, 1.5)
@@ -907,7 +914,7 @@ const toContact = () => {
     width: 100%;
     height: 100dvh;
     overflow: hidden;
-    background: url('../assets/trust-section-background.avif');
+    background: url('../assets/trust-section-background.avif') center 46%;
 
     .trust-viewport {
       position: absolute;
@@ -1014,8 +1021,8 @@ const toContact = () => {
       will-change: opacity, transform;
       background: none;
       box-shadow:
-        inset 0 0 70px 10px rgba($dark, 0.8),
-        inset 0 0 160px 110px rgba($accent-deep, 0.4);
+        inset 0 0 70px 20px rgba($dark, 0.8),
+        inset 0 0 160px 90px rgba($accent-deep, 0.4);
     }
 
     .trust-frame {
@@ -1081,6 +1088,7 @@ const toContact = () => {
         height: 6px;
         border-radius: 50%;
         background: var(--q-accent);
+        animation: signal-blink 3.4s ease-in-out infinite;
       }
 
       &::after {
@@ -1123,5 +1131,21 @@ const toContact = () => {
 
 .panel-skeleton {
   height: clamp(320px, 60vh, 720px);
+}
+
+@keyframes signal-blink {
+  0%,
+  100% {
+    opacity: 1;
+  }
+  46% {
+    opacity: 1;
+  }
+  52% {
+    opacity: 0.25;
+  }
+  58% {
+    opacity: 1;
+  }
 }
 </style>
