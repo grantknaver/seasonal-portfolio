@@ -24,6 +24,8 @@ import ClarityBackground from 'src/components/ClarityBackground.vue';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import gsap from 'gsap';
 gsap.registerPlugin(ScrollTrigger);
+import ScrollCue from '../components/ScrollCue.vue';
+
 const mainStore = useMainStore();
 const cacheStore = useCacheStore();
 const mobileTopics: Topic[] = [
@@ -104,13 +106,34 @@ const handleResize = () => {
   });
 };
 
+const lockScroll = () => {
+  const stop = (e: Event) => e.preventDefault();
+  const stopKeys = (e: KeyboardEvent) => {
+    if (['ArrowDown', 'ArrowUp', 'PageDown', 'PageUp', 'Space', 'Home', 'End'].includes(e.code)) {
+      e.preventDefault();
+    }
+  };
+  window.addEventListener('wheel', stop, { passive: false });
+  window.addEventListener('touchmove', stop, { passive: false });
+  window.addEventListener('keydown', stopKeys);
+
+  return () => {
+    window.removeEventListener('wheel', stop);
+    window.removeEventListener('touchmove', stop);
+    window.removeEventListener('keydown', stopKeys);
+  };
+};
+
 const claritySectionRef = ref<HTMLElement | null>(null);
 const homeContainerRef = ref<HTMLElement | null>(null);
 const trustSectionRef = ref<HTMLElement | null>(null);
+const trustGlowRef = ref<HTMLElement | null>(null);
 const trustImageA = ref<HTMLElement | null>(null);
 const trustImageB = ref<HTMLElement | null>(null);
 const trustCopyA = ref<HTMLElement | null>(null);
 const trustCopyB = ref<HTMLElement | null>(null);
+const clarityCueRef = ref<HTMLElement | null>(null);
+const trustCueRef = ref<HTMLElement | null>(null);
 
 onMounted(async () => {
   const footerElement = document.getElementById('footer');
@@ -144,10 +167,18 @@ onMounted(async () => {
       ScrollTrigger.create({
         trigger: claritySectionRef.value,
         start: 'top top',
-        end: '+=1500',
+        end: '+=3000',
         pin: true,
         pinSpacing: true,
         anticipatePin: 1,
+      });
+    }
+
+    if (clarityCueRef.value) {
+      gsap.to(clarityCueRef.value, {
+        opacity: 0,
+        ease: 'none',
+        scrollTrigger: { start: 0, end: 3000, scrub: true },
       });
     }
 
@@ -156,46 +187,50 @@ onMounted(async () => {
     const imgB = trustImageB.value;
     const copyA = trustCopyA.value;
     const copyB = trustCopyB.value;
+    const glow = trustGlowRef.value;
 
-    if (section && imgA && imgB && copyA && copyB) {
+    if (section && imgA && imgB && copyA && copyB && glow) {
       gsap.set(imgB, { opacity: 0 });
-      gsap.set(copyA, { yPercent: -140, scale: 0.85, opacity: 0 });
-      gsap.set(copyB, { yPercent: -140, scale: 0.85, opacity: 0 });
+      gsap.set(glow, { opacity: 0, scale: 1.18 });
+      gsap.set([copyA, copyB], { opacity: 0 });
+
+      const cue = trustCueRef.value;
+      gsap.set(cue, { opacity: 0 });
+
+      const introTl = gsap
+        .timeline({ paused: true })
+        .to(glow, { opacity: 1, scale: 1, duration: 1.25, ease: 'power2.out' }, 0)
+        .to(copyA, { opacity: 1, duration: 1.4, ease: 'power1.out' }, 1.4)
+        .to(cue, { opacity: 1, duration: 0.6, ease: 'power1.out' }, 2.6);
 
       let introPlayed = false;
-      const playIntro = () => {
-        if (introPlayed) return;
-        introPlayed = true;
-        gsap.to(copyA, {
-          yPercent: 0,
-          scale: 1.12,
-          opacity: 1,
-          duration: 2,
-          ease: 'power3.out',
-          overwrite: 'auto',
-        });
-      };
 
       const trustTl = gsap.timeline({
         scrollTrigger: {
           trigger: section,
           start: 'top top',
-          end: '+=2500',
+          end: '+=2800',
           pin: true,
           pinSpacing: true,
           scrub: 0.6,
           anticipatePin: 1,
-          onUpdate: (self) => {
-            if (self.progress > 0.02) playIntro();
+          onEnter: () => {
+            if (introPlayed) return;
+            introPlayed = true;
+            const unlock = lockScroll();
+            introTl.eventCallback('onComplete', unlock);
+            introTl.play();
           },
         },
       });
 
       trustTl
-        .to(copyA, { yPercent: 140, scale: 0.85, opacity: 0, ease: 'none', duration: 1 }, 0.4)
-        .to(imgA, { opacity: 0, ease: 'none', duration: 0.5 }, 0.6)
-        .to(imgB, { opacity: 1, ease: 'none', duration: 0.2 }, 0.6)
-        .to(copyB, { yPercent: 0, scale: 1.12, opacity: 1, ease: 'none', duration: 1 }, 0.2);
+        .to(cue, { opacity: 0, ease: 'none', duration: 0.4 }, 1.4)
+        .to(copyA, { opacity: 0, ease: 'none', duration: 0.9 }, 1.5)
+        .to(imgA, { opacity: 0, ease: 'none', duration: 0.8 }, 2.2)
+        .to(imgB, { opacity: 1, ease: 'none', duration: 0.8 }, 2.2)
+        .to(copyB, { opacity: 1, ease: 'none', duration: 1.1 }, 2.5)
+        .to(glow, { opacity: 0, scale: 1.25, ease: 'none', duration: 0.9 }, 3.6);
     }
 
     ScrollTrigger.refresh();
@@ -521,7 +556,7 @@ const toContact = () => {
           </div>
         </div>
       </div>
-
+      <div ref="clarityCueRef" class="clarity-cue"><ScrollCue color="accent" /></div>
       <q-list v-if="isResponsive" class="full-width font-primary">
         <q-item
           v-for="topic in mobileTopics"
@@ -587,7 +622,8 @@ const toContact = () => {
         <div ref="trustCopyB" class="trust-copy">
           <p>Trust helps them breathe.</p>
         </div>
-
+        <div ref="trustGlowRef" class="trust-glow" aria-hidden="true"></div>
+        <div ref="trustCueRef" class="trust-cue"><ScrollCue color="primary" /></div>
         <div class="trust-frame" aria-hidden="true">
           <span class="trust-corner trust-corner--tl"></span>
           <span class="trust-corner trust-corner--tr"></span>
@@ -651,7 +687,7 @@ const toContact = () => {
     }
   }
 
-  /* ---------- Section wrapper ---------- */
+  /* ---------- Clarity ---------- */
 
   .clarity-section {
     width: 100%;
@@ -668,6 +704,17 @@ const toContact = () => {
       justify-content: center;
       height: 100dvh;
       max-width: none;
+    }
+
+    .clarity-cue {
+      display: none;
+      color: tokens.$text-muted;
+
+      @media (min-width: tokens.$breakpoint-lg) {
+        display: block;
+        position: relative;
+        z-index: 2;
+      }
     }
   }
 
@@ -852,6 +899,7 @@ const toContact = () => {
     );
     filter: drop-shadow(0px 3px 3px var(--q-accent));
   }
+
   /* ---------- Trust ---------- */
 
   .trust-section {
@@ -860,192 +908,216 @@ const toContact = () => {
     height: 100dvh;
     overflow: hidden;
     background: url('../assets/trust-section-background.avif');
-  }
 
-  .trust-viewport {
-    position: absolute;
-    top: clamp(5.4rem, 10.8vh, 8.4rem);
-    right: clamp(8.2rem, 13.8vw, 13.2rem);
-    bottom: clamp(4.2rem, 8.4vh, 7.2rem);
-    left: clamp(8rem, 13.8vw, 16.2rem);
-    overflow: hidden;
-    border-radius: 1.25rem;
-    background-color: var(--q-dark);
-  }
+    .trust-viewport {
+      position: absolute;
+      top: clamp(5.4rem, 10.8vh, 8.4rem);
+      right: clamp(8.2rem, 13.8vw, 13.2rem);
+      bottom: clamp(4.2rem, 8.4vh, 7.2rem);
+      left: clamp(8rem, 13.8vw, 16.2rem);
+      overflow: hidden;
+      border-radius: 1.25rem;
+      background-color: black;
+    }
 
-  .trust-image-wrap {
-    position: absolute;
-    inset: 0;
-    will-change: opacity;
+    .trust-image-wrap {
+      position: absolute;
+      inset: 0;
+      will-change: opacity;
 
-    &::before {
-      content: '';
+      &::before {
+        content: '';
+        position: absolute;
+        inset: 0;
+        z-index: 1;
+        backdrop-filter: blur(7px) saturate(0.88);
+        -webkit-backdrop-filter: blur(7px) saturate(0.88);
+        mask-image: radial-gradient(110% 82% at 58% 48%, transparent 26%, #000 76%);
+        -webkit-mask-image: radial-gradient(110% 82% at 58% 48%, transparent 26%, #000 76%);
+        pointer-events: none;
+      }
+
+      &::after {
+        content: '';
+        position: absolute;
+        inset: 0;
+        z-index: 1;
+        pointer-events: none;
+        background:
+          radial-gradient(
+            118% 90% at 60% 46%,
+            rgba(13, 71, 161, 0) 50%,
+            rgba(13, 71, 161, 0.035) 70%,
+            rgba(11, 31, 59, 0.07) 88%,
+            rgba(11, 31, 59, 0.11) 100%
+          ),
+          linear-gradient(
+            to bottom,
+            rgba(11, 31, 59, 0.12) 0%,
+            rgba(13, 71, 161, 0.07) 6%,
+            rgba(187, 222, 251, 0.04) 13%,
+            transparent 22%,
+            transparent 78%,
+            rgba(187, 222, 251, 0.04) 87%,
+            rgba(13, 71, 161, 0.07) 94%,
+            rgba(11, 31, 59, 0.12) 100%
+          ),
+          linear-gradient(
+            to right,
+            rgba(11, 31, 59, 0.12) 0%,
+            rgba(13, 71, 161, 0.07) 5%,
+            rgba(187, 222, 251, 0.035) 11%,
+            transparent 18%,
+            transparent 82%,
+            rgba(187, 222, 251, 0.035) 89%,
+            rgba(13, 71, 161, 0.07) 95%,
+            rgba(11, 31, 59, 0.12) 100%
+          );
+      }
+    }
+
+    .trust-image {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      filter: saturate(0.84) contrast(0.94) brightness(1.01) hue-rotate(3deg);
+    }
+
+    .trust-copy {
+      position: absolute;
+      inset: 0;
+      z-index: 2;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding-inline: 2rem;
+      text-align: center;
+      color: tokens.$ivory;
+      font-size: clamp(1.75rem, 4vw, 3.25rem);
+      line-height: 1.2;
+      will-change: transform, opacity;
+      text-shadow: 2px 2px 10px var(--q-dark);
+
+      p {
+        margin: 0;
+        max-width: 24rem;
+      }
+    }
+
+    .trust-glow {
       position: absolute;
       inset: 0;
       z-index: 1;
-      backdrop-filter: blur(7px) saturate(0.88);
-      -webkit-backdrop-filter: blur(7px) saturate(0.88);
-      mask-image: radial-gradient(110% 82% at 58% 48%, transparent 26%, #000 76%);
-      -webkit-mask-image: radial-gradient(110% 82% at 58% 48%, transparent 26%, #000 76%);
       pointer-events: none;
+      opacity: 0;
+      border-radius: 1.25rem;
+      will-change: opacity, transform;
+      background: none;
+      box-shadow:
+        inset 0 0 70px 10px rgba($dark, 0.8),
+        inset 0 0 160px 110px rgba($accent-deep, 0.4);
     }
 
-    &::after {
-      content: '';
+    .trust-frame {
       position: absolute;
       inset: 0;
-      z-index: 1;
+      z-index: 3;
       pointer-events: none;
-      background:
-        radial-gradient(
-          118% 90% at 60% 46%,
-          rgba(13, 71, 161, 0) 50%,
-          rgba(13, 71, 161, 0.035) 70%,
-          rgba(11, 31, 59, 0.07) 88%,
-          rgba(11, 31, 59, 0.11) 100%
-        ),
-        linear-gradient(
-          to bottom,
-          rgba(11, 31, 59, 0.12) 0%,
-          rgba(13, 71, 161, 0.07) 6%,
-          rgba(187, 222, 251, 0.04) 13%,
-          transparent 22%,
-          transparent 78%,
-          rgba(187, 222, 251, 0.04) 87%,
-          rgba(13, 71, 161, 0.07) 94%,
-          rgba(11, 31, 59, 0.12) 100%
-        ),
-        linear-gradient(
-          to right,
-          rgba(11, 31, 59, 0.12) 0%,
-          rgba(13, 71, 161, 0.07) 5%,
-          rgba(187, 222, 251, 0.035) 11%,
-          transparent 18%,
-          transparent 82%,
-          rgba(187, 222, 251, 0.035) 89%,
-          rgba(13, 71, 161, 0.07) 95%,
-          rgba(11, 31, 59, 0.12) 100%
-        );
+      border: 5px solid var(--q-accent);
+      border-radius: 1.25rem;
     }
-  }
 
-  .trust-image {
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-    filter: saturate(0.84) contrast(0.94) brightness(1.01) hue-rotate(3deg);
-  }
-
-  .trust-copy {
-    position: absolute;
-    inset: 0;
-    z-index: 2;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    padding-inline: 2rem;
-    text-align: center;
-    color: tokens.$ivory;
-    font-size: clamp(1.75rem, 4vw, 3.25rem);
-    line-height: 1.2;
-    will-change: transform, opacity;
-    text-shadow: 2px 2px 10px var(--q-dark);
-
-    p {
-      margin: 0;
-      max-width: 24rem;
-    }
-  }
-
-  .trust-frame {
-    position: absolute;
-    inset: 0;
-    z-index: 3;
-    pointer-events: none;
-    border: 5px solid var(--q-accent);
-    border-radius: 1.25rem;
-  }
-
-  .trust-corner {
-    position: absolute;
-    width: 20px;
-    height: 20px;
-    border: 0 solid rgba(255, 255, 255, 0.32);
-
-    &--tl {
-      top: -1px;
-      left: -1px;
-      border-top-width: 1.5px;
-      border-left-width: 1.5px;
-      border-top-left-radius: 1.25rem;
-    }
-    &--tr {
-      top: -1px;
-      right: -1px;
-      border-top-width: 5vw;
-      border-right-width: 5vw;
-      border-top-right-radius: 1.25rem;
-    }
-    &--bl {
-      bottom: -1px;
-      left: -1px;
-      border-bottom-width: 1.5px;
-      border-left-width: 1.5px;
-      border-bottom-left-radius: 1.25rem;
-    }
-    &--br {
-      bottom: -1px;
-      right: -1px;
-      border-bottom-width: 5vw;
-      border-left-width: 5vw;
-      // border-bottom-left-radius: 1.25rem;
-    }
-  }
-
-  .trust-signal {
-    position: absolute;
-    top: 5%;
-    left: 2%;
-    display: block;
-    width: 92px;
-    height: 6px;
-
-    &::before {
-      // Circle
-      content: '';
+    .trust-corner {
       position: absolute;
-      top: 0;
-      left: 0;
-      width: 6px;
+      width: 20px;
+      height: 20px;
+      border: 0 solid rgba(255, 255, 255, 0.32);
+
+      &--tl {
+        top: -1px;
+        left: -1px;
+        border-top-width: 1.5px;
+        border-left-width: 1.5px;
+        border-top-left-radius: 1.25rem;
+      }
+      &--tr {
+        top: -1px;
+        right: -1px;
+        border-top-width: 5vw;
+        border-right-width: 5vw;
+        border-top-right-radius: 1.25rem;
+      }
+      &--bl {
+        bottom: -1px;
+        left: -1px;
+        border-bottom-width: 1.5px;
+        border-left-width: 1.5px;
+        border-bottom-left-radius: 1.25rem;
+      }
+      &--br {
+        bottom: -1px;
+        right: -1px;
+        border-bottom-width: 5vw;
+        border-left-width: 5vw;
+        // border-bottom-left-radius: 1.25rem;
+      }
+    }
+
+    .trust-signal {
+      position: absolute;
+      top: 5%;
+      left: 2%;
+      display: block;
+      width: 92px;
       height: 6px;
-      border-radius: 50%;
-      background: var(--q-accent);
+
+      &::before {
+        // Circle
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 6px;
+        height: 6px;
+        border-radius: 50%;
+        background: var(--q-accent);
+      }
+
+      &::after {
+        content: '';
+        position: absolute;
+        top: 2.5px;
+        left: 11px;
+        width: 150px;
+        height: 1px;
+        background: linear-gradient(
+          to right,
+          rgba(255, 255, 255, 0.5) 0%,
+          rgba(255, 255, 255, 0.15) 55%,
+          rgba(255, 255, 255, 0) 100%
+        );
+      }
     }
 
-    &::after {
-      content: '';
+    .trust-nav {
       position: absolute;
-      top: 2.5px;
-      left: 11px;
-      width: 150px;
-      height: 1px;
-      background: linear-gradient(
-        to right,
-        rgba(255, 255, 255, 0.5) 0%,
-        rgba(255, 255, 255, 0.15) 55%,
-        rgba(255, 255, 255, 0) 100%
-      );
+      bottom: clamp(0.75rem, 2vh, 1.75rem);
+      left: calc(50% - var(--panel-offset, 0px) / 2);
+      transform: translateX(-50%);
+      z-index: 4;
+      width: max-content;
+      transition: left 0.32s cubic-bezier(0.4, 0, 0.2, 1);
     }
-  }
 
-  .trust-nav {
-    position: absolute;
-    bottom: clamp(0.75rem, 2vh, 1.75rem);
-    left: calc(50% - var(--panel-offset, 0px) / 2);
-    transform: translateX(-50%);
-    z-index: 4;
-    width: max-content;
-    transition: left 0.32s cubic-bezier(0.4, 0, 0.2, 1);
+    .trust-cue {
+      position: absolute;
+      bottom: 30%;
+      left: 50%;
+      transform: translateX(-50%);
+      z-index: 2;
+      opacity: 0;
+      color: tokens.$ivory;
+    }
   }
 }
 
