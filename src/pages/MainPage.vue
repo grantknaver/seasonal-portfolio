@@ -897,7 +897,7 @@ const toContact = () => {
   .section-transition {
     position: relative;
     z-index: 1;
-    height: 80px;
+    height: 28px;
     width: 100%;
     background: radial-gradient(
       120% 260% at 50% 100%,
