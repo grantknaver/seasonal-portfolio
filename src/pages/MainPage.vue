@@ -162,25 +162,25 @@ onMounted(async () => {
   requestAnimationFrame(() => {
     applyHomeScale(false);
 
-    if (isResponsive.value) return;
+    if (!isResponsive.value) {
+      if (claritySectionRef.value) {
+        ScrollTrigger.create({
+          trigger: claritySectionRef.value,
+          start: 'top top',
+          end: '+=2500',
+          pin: true,
+          pinSpacing: true,
+          anticipatePin: 1,
+        });
+      }
 
-    if (claritySectionRef.value) {
-      ScrollTrigger.create({
-        trigger: claritySectionRef.value,
-        start: 'top top',
-        end: '+=2500',
-        pin: true,
-        pinSpacing: true,
-        anticipatePin: 1,
-      });
-    }
-
-    if (clarityCueRef.value) {
-      gsap.to(clarityCueRef.value, {
-        opacity: 0,
-        ease: 'none',
-        scrollTrigger: { start: 0, end: 3000, scrub: true },
-      });
+      if (clarityCueRef.value) {
+        gsap.to(clarityCueRef.value, {
+          opacity: 0,
+          ease: 'none',
+          scrollTrigger: { start: 0, end: 3000, scrub: true },
+        });
+      }
     }
 
     const section = trustSectionRef.value;
@@ -191,63 +191,92 @@ onMounted(async () => {
     const glow = trustGlowRef.value;
 
     if (section && imgA && imgB && copyA && copyB && glow) {
+      const cue = trustCueRef.value;
+      const beam = trustBeamRef.value;
+
       gsap.set(imgB, { opacity: 0 });
       gsap.set(glow, { opacity: 0, scale: 1.18 });
       gsap.set([copyA, copyB], { opacity: 0 });
-
-      const cue = trustCueRef.value;
       gsap.set(cue, { opacity: 0 });
 
-      const introTl = gsap
-        .timeline({ paused: true })
-        .to(glow, { opacity: 1, scale: 1, duration: 1.25, ease: 'power2.out' }, 0)
-        .to(trustBeamRef.value, { opacity: 1, duration: 1.6, ease: 'power2.out' }, 0.6)
-        .to(copyA, { opacity: 1, duration: 1.4, ease: 'power1.out' }, 1.4)
-        .to(cue, { opacity: 1, duration: 0.6, ease: 'power1.out' }, 2.6);
+      if (isResponsive.value) {
+        /* ---------- Mobile: autoplay on entry ---------- */
 
-      let introPlayed = false;
+        const mobileTl = gsap
+          .timeline({ paused: true })
+          .to(glow, { opacity: 1, scale: 1, duration: 1.2, ease: 'power2.out' }, 0)
+          .to(beam, { opacity: 1, duration: 1.4, ease: 'power2.out' }, 0.5)
+          .to(copyA, { opacity: 1, duration: 1.1, ease: 'power1.out' }, 1.2)
+          .to(copyA, { opacity: 0, duration: 0.8, ease: 'power1.in' }, 4.2)
+          .to(imgA, { opacity: 0, duration: 0.9, ease: 'none' }, 4.6)
+          .to(imgB, { opacity: 1, duration: 0.9, ease: 'none' }, 4.6)
+          .to(copyB, { opacity: 1, duration: 1.1, ease: 'power1.out' }, 5.2);
 
-      const trustTl = gsap.timeline({
-        scrollTrigger: {
-          trigger: section,
-          start: 'top top',
-          end: '+=2800',
-          pin: true,
-          pinSpacing: true,
-          scrub: 0.6,
-          anticipatePin: 1,
-          onEnter: () => {
-            if (introPlayed) return;
-            introPlayed = true;
-            const unlock = lockScroll();
-            introTl.eventCallback('onComplete', unlock);
-            introTl.play();
+        const trustIo = new IntersectionObserver(
+          ([entry]) => {
+            if (entry?.isIntersecting) {
+              mobileTl.play();
+              trustIo.disconnect();
+            }
           },
-          onUpdate: (self) => {
-            if (self.progress > 0.3 && introTl.isActive()) introTl.progress(1);
+          { threshold: 0.55 },
+        );
+
+        trustIo.observe(section);
+        io.value = trustIo;
+      } else {
+        /* ---------- Desktop: pinned + scrubbed ---------- */
+
+        const introTl = gsap
+          .timeline({ paused: true })
+          .to(glow, { opacity: 1, scale: 1, duration: 1.25, ease: 'power2.out' }, 0)
+          .to(beam, { opacity: 1, duration: 1.6, ease: 'power2.out' }, 0.6)
+          .to(copyA, { opacity: 1, duration: 1.4, ease: 'power1.out' }, 1.4)
+          .to(cue, { opacity: 1, duration: 0.6, ease: 'power1.out' }, 2.6);
+
+        let introPlayed = false;
+
+        const trustTl = gsap.timeline({
+          scrollTrigger: {
+            trigger: section,
+            start: 'top top',
+            end: '+=2800',
+            pin: true,
+            pinSpacing: true,
+            scrub: 0.6,
+            anticipatePin: 1,
+            onEnter: () => {
+              if (introPlayed) return;
+              introPlayed = true;
+              const unlock = lockScroll();
+              introTl.eventCallback('onComplete', unlock);
+              introTl.play();
+            },
+            onUpdate: (self) => {
+              if (self.progress > 0.3 && introTl.isActive()) introTl.progress(1);
+            },
           },
-        },
-      });
+        });
 
-      trustTl.fromTo(
-        section,
-        { backgroundPositionY: '46%' },
-        { backgroundPositionY: '56%', ease: 'none', duration: 4.5 },
-        0,
-      );
+        trustTl.fromTo(
+          section,
+          { backgroundPositionY: '46%' },
+          { backgroundPositionY: '56%', ease: 'none', duration: 4.5 },
+          0,
+        );
 
-      trustTl
-        .to(cue, { opacity: 0, ease: 'none', duration: 0.4 }, 1.4)
-        .to(copyA, { opacity: 0, ease: 'none', duration: 0.9 }, 1.5)
-        .to(imgA, { opacity: 0, ease: 'none', duration: 0.8 }, 2.2)
-        .to(imgB, { opacity: 1, ease: 'none', duration: 0.8 }, 2.2)
-        .to(copyB, { opacity: 1, ease: 'none', duration: 1.1 }, 2.5)
-        .to(glow, { opacity: 0, scale: 1.25, ease: 'none', duration: 0.9 }, 3.6);
+        trustTl
+          .to(cue, { opacity: 0, ease: 'none', duration: 0.4 }, 1.4)
+          .to(copyA, { opacity: 0, ease: 'none', duration: 0.9 }, 1.5)
+          .to(imgA, { opacity: 0, ease: 'none', duration: 0.8 }, 2.2)
+          .to(imgB, { opacity: 1, ease: 'none', duration: 0.8 }, 2.2)
+          .to(copyB, { opacity: 1, ease: 'none', duration: 1.1 }, 2.5)
+          .to(glow, { opacity: 0, scale: 1.25, ease: 'none', duration: 0.9 }, 3.6);
+      }
     }
 
     ScrollTrigger.refresh();
   });
-
   await mainStore.VERIFY_IS_HUMAN();
 });
 
@@ -966,21 +995,31 @@ const toContact = () => {
 .trust-section {
   position: relative;
   width: 100%;
-  height: 100dvh;
+  height: calc(100dvh - 88px);
   overflow: hidden;
   background: url('../assets/trust-section-background.avif') center 46% / cover no-repeat;
 
+  @media (min-width: tokens.$breakpoint-lg) {
+    height: 100dvh;
+  }
+
   .trust-viewport {
     position: absolute;
-    top: clamp(5.4rem, 10.8vh, 8.4rem);
-    right: clamp(8.2rem, 13.8vw, 13.2rem);
-    bottom: clamp(4.2rem, 8.4vh, 7.2rem);
-    left: clamp(8rem, 13.8vw, 16.2rem);
+    top: 1.25rem;
+    right: 1rem;
+    bottom: 1.25rem;
+    left: 1rem;
     overflow: hidden;
     border-radius: 1.25rem;
     background-color: black;
-  }
 
+    @media (min-width: tokens.$breakpoint-lg) {
+      top: clamp(5.4rem, 10.8vh, 8.4rem);
+      right: clamp(8.2rem, 13.8vw, 13.2rem);
+      bottom: clamp(4.2rem, 8.4vh, 7.2rem);
+      left: clamp(8rem, 13.8vw, 16.2rem);
+    }
+  }
   .trust-image-wrap {
     position: absolute;
     inset: 0;
@@ -1054,7 +1093,7 @@ const toContact = () => {
     padding-inline: 2rem;
     text-align: center;
     color: tokens.$ivory;
-    font-size: clamp(1.75rem, 4vw, 3.25rem);
+    font-size: clamp(1.35rem, 6vw, 3.25rem);
     line-height: 1.2;
     will-change: transform, opacity;
     text-shadow: 2px 2px 10px var(--q-dark);
