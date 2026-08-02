@@ -16,12 +16,7 @@ import type { Package } from 'src/shared/constants/packages';
 
 export const useMainStore = defineStore('main', () => {
   const activeTopic = ref<TopicName | null>(null);
-  const activeAiAssistLogo = ref<string>(
-    new URL('/src/assets/ai-chat_fall.avif', import.meta.url).href,
-  );
-  const activeRecaptchaBackground = ref<string>(
-    new URL('/src/assets/recaptcha-fall.avif', import.meta.url).href,
-  );
+  const activeAiAssistLogo = ref<string>(new URL('/src/assets/ai-chat.avif', import.meta.url).href);
   const $q = useQuasar();
   const contactSectionRef = ref<HTMLElement | null>(null);
   const mobileScrollTarget = ref<TopicName | null>(null);
@@ -56,25 +51,6 @@ export const useMainStore = defineStore('main', () => {
   const SET_ACTIVE_TOPIC = (topicName: TopicName | null): void => {
     activeTopic.value = topicName;
   };
-  // const SET_ACTIVE_THEME = (theme: Theme): void => {
-  //   const recaptchaBackgrounds = {
-  //     [Theme.Fall]: new URL('/src/assets/recaptcha-fall.avif', import.meta.url).href,
-  //     [Theme.Winter]: new URL('/src/assets/recaptcha-winter.avif', import.meta.url).href,
-  //     [Theme.Spring]: new URL('/src/assets/recaptcha-spring.avif', import.meta.url).href,
-  //     [Theme.Summer]: new URL('/src/assets/recaptcha-summer.avif', import.meta.url).href,
-  //   };
-  //   const aiAssistLogos = {
-  //     [Theme.Fall]: new URL('/src/assets/ai-chat_fall.avif', import.meta.url).href,
-  //     [Theme.Winter]: new URL('/src/assets/ai-chat_winter.avif', import.meta.url).href,
-  //     [Theme.Spring]: new URL('/src/assets/ai-chat_spring.avif', import.meta.url).href,
-  //     [Theme.Summer]: new URL('/src/assets/ai-chat_summer.avif', import.meta.url).href,
-  //   };
-
-  //   activeTheme.value = theme;
-  //   syncThemeGlobals(theme);
-  //   activeAiAssistLogo.value = aiAssistLogos[theme];
-  //   activeRecaptchaBackground.value = recaptchaBackgrounds[theme];
-  // };
   const SET_CONTACT_SECTION_REF = (element: HTMLElement | null): void => {
     contactSectionRef.value = element;
   };
@@ -216,7 +192,6 @@ export const useMainStore = defineStore('main', () => {
     lastAssistantIndex,
     isLoading,
     recaptchaWidgetId,
-    activeRecaptchaBackground,
     containsScrollbar,
     caseStudyActiveTab,
     hasPainted,

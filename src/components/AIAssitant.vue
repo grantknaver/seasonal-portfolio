@@ -44,7 +44,6 @@ const addToLog = async (): Promise<void | undefined> => {
 
 onMounted(async () => {
   if (isHuman.value && chatLog.value.length === 0) {
-    // mainStore.SET;
     await mainStore.SEND_OALOGS();
   }
 });
@@ -112,7 +111,7 @@ watch(oaLogs, async () => {
 
           <q-img
             v-else
-            src="../assets/4-season-not-authorized.png"
+            src="../assets/not-authorized.avif"
             fit="cover"
             fetchpriority="high"
             class="no-overflow"
@@ -195,7 +194,7 @@ watch(oaLogs, async () => {
       </q-scroll-area>
       <q-img
         v-else
-        src="../assets/4-season-not-authorized-2.avif"
+        src="../assets/not-authorized.avif"
         fit="cover"
         class="dv-img-fill no-overflow q-mb-sm"
       />

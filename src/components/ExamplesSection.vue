@@ -344,7 +344,7 @@ const toContact = () => {
     mainStore.SET_ACTIVE_TOPIC(TopicName.Contact);
   }
 };
-const backgroundUrl = new URL('../assets/ai-bcg-winter.avif', import.meta.url).href;
+const backgroundUrl = new URL('../assets/example-background.avif', import.meta.url).href;
 </script>
 <template>
   <!-- Mobile -->

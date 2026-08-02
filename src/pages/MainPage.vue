@@ -738,10 +738,17 @@ const toContact = () => {
     margin-inline: auto;
     margin-bottom: 1rem;
     padding: 1.5rem;
-
+    min-height: calc(100dvh - 88px - 3rem);
+    justify-content: center;
+    background-color: var(--q-secondary);
     text-align: center;
-    background-color: transparent;
     box-shadow: none;
+
+    @media (min-width: tokens.$breakpoint-md) {
+      background-color: transparent;
+      min-height: 0;
+      justify-content: flex-start;
+    }
 
     .simon {
       display: none;
@@ -750,11 +757,13 @@ const toContact = () => {
     .kicker {
       color: tokens.$champagne;
       text-transform: uppercase;
+      margin-bottom: clamp(0.25rem, 0.9vh, 0.5rem);
     }
 
     h1 {
       max-width: 26rem;
       margin-inline: auto;
+      margin-bottom: clamp(0.5rem, 1.6vh, 1rem);
       color: tokens.$text;
       line-height: 1.16;
       letter-spacing: -0.025em;
@@ -765,6 +774,7 @@ const toContact = () => {
     .hero-copy {
       max-width: 34rem;
       margin-inline: auto;
+      padding: clamp(0.85rem, 2.4vh, 1.5rem);
       background: color-mix(in srgb, tokens.$ink-soft 82%, tokens.$ivory 6%);
       box-shadow:
         0 0 64px color-mix(in srgb, var(--q-accent) 38%, transparent),
@@ -774,8 +784,9 @@ const toContact = () => {
     }
 
     .subheadline {
-      max-width: 32rem;
+      max-width: 32ch;
       margin-inline: auto;
+      margin-top: clamp(0.5rem, 1.4vh, 1rem);
       color: tokens.$text-muted;
       line-height: 1.5;
     }
@@ -783,16 +794,18 @@ const toContact = () => {
     .cta-wrap {
       display: grid;
       grid-template-columns: 1fr;
+      margin-top: clamp(0.6rem, 1.6vh, 1rem);
     }
 
     .proofs {
       display: grid;
       grid-template-columns: 1fr;
-      gap: 0.75rem;
+      gap: clamp(0.4rem, 1.1vh, 0.75rem);
+      margin-top: clamp(0.6rem, 1.8vh, 1.25rem);
     }
 
     .proof-card {
-      padding: 1.5rem;
+      padding: clamp(0.55rem, 1.7vh, 1.5rem);
       border: 1px solid color-mix(in srgb, var(--q-accent) 38%, transparent);
       background: color-mix(in srgb, tokens.$ink-soft 82%, tokens.$ivory 6%);
       box-shadow: inset 0 1px 0 color-mix(in srgb, tokens.$ivory 8%, transparent);
@@ -835,6 +848,10 @@ const toContact = () => {
         padding 0.5s ease,
         transform 0.5s ease;
 
+      .kicker {
+        margin-bottom: 0.5rem;
+      }
+
       .simon {
         display: flex;
         align-items: center;
@@ -848,6 +865,10 @@ const toContact = () => {
         column-gap: 2rem;
       }
 
+      .hero-copy {
+        padding: 1.5rem;
+      }
+
       .hero-copy,
       h1,
       .subheadline {
@@ -855,17 +876,29 @@ const toContact = () => {
         margin-inline: 0;
       }
 
-      .subheadline {
-        line-height: 1.35;
+      h1 {
+        margin-bottom: 1rem;
       }
 
-      .proofs {
-        grid-template-columns: repeat(3, minmax(0, 1fr));
+      .subheadline {
+        line-height: 1.35;
+        margin-top: 1rem;
       }
 
       .cta-wrap {
         grid-template-columns: repeat(2, 1fr);
         gap: 0.5rem;
+        margin-top: 1rem;
+      }
+
+      .proofs {
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+        gap: 0.75rem;
+        margin-top: 1.5rem;
+      }
+
+      .proof-card {
+        padding: 1.5rem;
       }
 
       /* ---------- Drawer open ---------- */
