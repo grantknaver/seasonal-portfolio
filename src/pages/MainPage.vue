@@ -731,7 +731,6 @@ const toContact = () => {
   pointer-events: none;
   background: #f7f9fe;
   overflow: hidden;
-  border-top-left-radius: 25px;
 
   &.is-collapsed {
     filter: blur(4px);
