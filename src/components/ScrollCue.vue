@@ -1,26 +1,36 @@
 <script setup lang="ts">
 import { mdiChevronDoubleDown } from '@quasar/extras/mdi-v7';
-withDefaults(defineProps<{ icon?: string; size?: string; color?: string }>(), {
+withDefaults(defineProps<{ icon?: string; size?: string; isDark?: boolean }>(), {
   icon: mdiChevronDoubleDown,
-  size: '32px',
-  color: 'dark',
+  size: '48px',
+  isDark: true,
 });
 </script>
 
 <template>
   <div class="scroll-cue" aria-hidden="true">
-    <q-icon :name="icon" :size="size" class="scroll-cue__icon" :color="color" />
+    <span :style="{ color: isDark ? 'var(--q-dark)' : 'var(--q-primary)' }">Scroll Now</span>
+    <q-icon
+      :name="icon"
+      :size="size"
+      class="scroll-cue__icon"
+      :color="isDark ? 'dark' : 'primary'"
+    />
   </div>
 </template>
 
 <style scoped lang="scss">
 .scroll-cue {
   display: flex;
+  flex-direction: column;
   align-items: center;
   justify-content: center;
   pointer-events: none;
 
   &__icon {
+    animation: cue-pulse 2.2s ease-in-out infinite;
+  }
+  span {
     animation: cue-pulse 2.2s ease-in-out infinite;
   }
 }

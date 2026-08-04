@@ -644,7 +644,7 @@ const toContact = () => {
           </q-item>
         </q-list>
       </div>
-      <div ref="clarityCueRef" class="clarity-cue"><ScrollCue color="accent" /></div>
+      <div ref="clarityCueRef" class="clarity-cue"><ScrollCue /></div>
       <q-list v-if="isMobileView" class="full-width font-primary">
         <q-item
           v-for="topic in mobileTopics"
@@ -711,7 +711,7 @@ const toContact = () => {
           <p>Trust helps them breathe.</p>
         </div>
         <div ref="trustGlowRef" class="trust-glow" aria-hidden="true"></div>
-        <div ref="trustCueRef" class="trust-cue"><ScrollCue color="primary" /></div>
+        <div ref="trustCueRef" class="trust-cue"><ScrollCue :is-dark="false" /></div>
         <div class="trust-frame" aria-hidden="true">
           <span class="trust-corner trust-corner--tl"></span>
           <span class="trust-corner trust-corner--tr"></span>
@@ -1385,12 +1385,13 @@ const toContact = () => {
 
   .trust-cue {
     position: absolute;
-    bottom: 30%;
+    bottom: 25%;
     left: 50%;
     transform: translateX(-50%);
     z-index: 2;
     opacity: 0;
     color: tokens.$ivory;
+    margin-top: 1rem;
   }
 }
 
