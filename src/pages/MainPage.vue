@@ -64,6 +64,8 @@ const showFooter = ref<boolean>(false);
 const io = ref<IntersectionObserver | null>(null);
 const { lgBreakpoint, width } = useViewport();
 const isResponsive = computed(() => width.value < lgBreakpoint);
+const isMobileView = computed(() => width.value < 600);
+const isTabletView = computed(() => width.value >= 600 && width.value < lgBreakpoint);
 const dispose = ref<() => void>(() => {});
 
 const activeEntry = computed(() => {
@@ -553,7 +555,7 @@ const toContact = () => {
     </div>
 
     <section class="clarity-background" :class="{ 'is-collapsed': !!activeTopic }">
-      <ClarityBackground />
+      <ClarityBackground v-if="!isResponsive" />
     </section>
 
     <div ref="claritySectionRef" class="clarity-section full-width q-pa-md">
@@ -595,9 +597,55 @@ const toContact = () => {
             <span class="proof-label">NEXT STEP CLEAR</span>
           </div>
         </div>
+        <q-list v-if="isTabletView" class="tablet-expandable-menu full-width font-primary">
+          <q-item
+            v-for="topic in mobileTopics"
+            :key="topic.id"
+            :id="topic.name"
+            class="full-width bg-transparent q-pa-none q-mb-sm"
+          >
+            <q-expansion-item
+              group="responsive-main-menu"
+              :icon="topic.icon"
+              :label="topic.label"
+              :model-value="expandedPanel === topic.name"
+              @after-show="
+                () => {
+                  scrollToElement(topic.name);
+                  mainStore.SET_ACTIVE_TOPIC(topic.name);
+                }
+              "
+              @hide="
+                () => {
+                  if (expandedPanel === topic.name) {
+                    expandedPanel = null;
+                    mainStore.SET_ACTIVE_TOPIC(null);
+                  }
+                }
+              "
+              :header-class="['text-dark', 'bg-secondary']"
+              class="expansion-item full-width"
+              switch-toggle-side
+            >
+              <div v-if="expandedPanel === topic.name" class="anchor full-width">
+                <div v-if="!activeEntry" class="text-white q-pa-md">
+                  <p>No active Topic - Error</p>
+                </div>
+                <Suspense v-else>
+                  <template #default>
+                    <component :is="activeComponent" />
+                  </template>
+                  <template #fallback>
+                    <q-skeleton type="rect" height="100dvh" />
+                  </template>
+                </Suspense>
+              </div>
+            </q-expansion-item>
+          </q-item>
+        </q-list>
       </div>
       <div ref="clarityCueRef" class="clarity-cue"><ScrollCue color="accent" /></div>
-      <q-list v-if="isResponsive" class="full-width font-primary">
+      <q-list v-if="isMobileView" class="full-width font-primary">
         <q-item
           v-for="topic in mobileTopics"
           :key="topic.id"
@@ -687,6 +735,12 @@ const toContact = () => {
   position: relative;
   min-height: 100vh;
   background: color-mix(in srgb, var(--q-accent) 5%, transparent);
+
+  @media #{tokens.$tablet-only} {
+    display: flex;
+    align-items: center;
+    flex-direction: column;
+  }
 }
 
 .logo {
@@ -727,10 +781,18 @@ const toContact = () => {
 .clarity-background {
   position: fixed;
   inset: 0;
+  justify-content: center;
+  align-items: center;
   z-index: 0;
   pointer-events: none;
-  background: #f7f9fe;
   overflow: hidden;
+  background: url('../assets/monitor.avif') center / cover no-repeat;
+  animation: bg-fade 2500ms ease-out both;
+
+  @media (min-width: tokens.$breakpoint-lg) {
+    background: #f7f9fe;
+    animation: none;
+  }
 
   &.is-collapsed {
     filter: blur(4px);
@@ -741,8 +803,14 @@ const toContact = () => {
   width: 100%;
   max-width: 600px;
 
-  @media (min-width: tokens.$breakpoint-md) {
-    max-width: 800px;
+  @media #{tokens.$tablet-only} {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    min-height: calc(100dvh - 88px);
+    padding-block: 2rem;
+    max-width: none;
   }
 
   @media (min-width: tokens.$breakpoint-lg) {
@@ -752,6 +820,7 @@ const toContact = () => {
     justify-content: center;
     height: 100dvh;
     max-width: none;
+    background: none;
   }
 
   .clarity-cue {
@@ -764,6 +833,10 @@ const toContact = () => {
       z-index: 2;
     }
   }
+}
+
+.q-item__section--side {
+  display: none !important;
 }
 
 /* ---------- Home Container ---------- */
@@ -779,6 +852,18 @@ const toContact = () => {
   text-align: center;
   box-shadow: none;
   flex-wrap: nowrap;
+
+  @media #{tokens.$tablet-only} {
+    max-width: 640px;
+    min-height: 0;
+    justify-content: flex-start;
+    padding: 1.5rem;
+    background: color-mix(in srgb, tokens.$ink-soft 82%, tokens.$ivory 6%);
+    border: 1px solid var(--q-accent);
+    box-shadow:
+      0 0 64px color-mix(in srgb, var(--q-accent) 38%, transparent),
+      0 28px 80px color-mix(in srgb, var(--q-accent) 38%, transparent);
+  }
 
   @media (min-width: tokens.$breakpoint-lg) {
     max-width: 760px;
@@ -853,6 +938,10 @@ const toContact = () => {
     flex: 1 1 auto;
     min-height: 0;
 
+    @media #{tokens.$tablet-only} {
+      flex: 0 1 auto;
+    }
+
     @media (min-width: tokens.$breakpoint-lg) {
       display: grid;
       grid-template-columns: auto 1fr;
@@ -871,6 +960,16 @@ const toContact = () => {
         0 28px 80px color-mix(in srgb, var(--q-accent) 38%, transparent);
       border: 1px solid var(--q-accent);
       border-radius: 1rem;
+
+      @media #{tokens.$tablet-only} {
+        flex: 0 1 auto;
+        max-width: none;
+        padding: 0;
+        background: none;
+        border: none;
+        border-radius: 0;
+        box-shadow: none;
+      }
 
       @media (min-width: tokens.$breakpoint-lg) {
         flex: 0 1 auto;
@@ -938,6 +1037,14 @@ const toContact = () => {
     margin-top: clamp(0.6rem, 1.8vh, 1.25rem);
     font-size: 1rem;
 
+    @media #{tokens.$tablet-only} {
+      flex: 0 1 auto;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      grid-auto-rows: auto;
+      gap: 0.5rem;
+      margin-top: 1.25rem;
+    }
+
     @media (min-width: tokens.$breakpoint-lg) {
       grid-template-columns: repeat(3, minmax(0, 1fr));
       grid-auto-rows: auto;
@@ -949,12 +1056,16 @@ const toContact = () => {
 
     .proof-card {
       display: grid;
-      align-items: center; // vertical centering
-
+      align-items: center;
       padding: clamp(0.55rem, 1.7vh, 1.5rem);
       border: 1px solid color-mix(in srgb, var(--q-accent) 38%, transparent);
       background: color-mix(in srgb, tokens.$ink-soft 82%, tokens.$ivory 6%);
       box-shadow: inset 0 1px 0 color-mix(in srgb, tokens.$ivory 8%, transparent);
+
+      @media #{tokens.$tablet-only} {
+        padding: 0.85rem 0.5rem;
+        border-radius: 5px;
+      }
 
       @media (min-width: tokens.$breakpoint-lg) {
         display: block;
@@ -970,6 +1081,17 @@ const toContact = () => {
         text-transform: uppercase;
         font-weight: 300;
       }
+    }
+  }
+}
+
+.tablet-expandable-menu {
+  @media #{tokens.$tablet-only} {
+    margin-top: 1rem;
+
+    :deep(.q-item__section--side) {
+      min-width: 0;
+      padding-right: 0;
     }
   }
 }
@@ -1011,6 +1133,13 @@ const toContact = () => {
     overflow: hidden;
     border-radius: 1.25rem;
     background-color: black;
+
+    @media #{tokens.$tablet-only} {
+      top: 2.25rem;
+      right: 2rem;
+      bottom: 2.25rem;
+      left: 2rem;
+    }
 
     @media (min-width: tokens.$breakpoint-lg) {
       top: clamp(5.4rem, 10.8vh, 8.4rem);
@@ -1182,6 +1311,10 @@ const toContact = () => {
       border-top-width: 5vw;
       border-right-width: 5vw;
       border-top-right-radius: 1.25rem;
+      @media (min-width: tokens.$breakpoint-lg) {
+        border-top-width: 2.5vw;
+        border-right-width: 2.5vw;
+      }
     }
     &--bl {
       bottom: -1px;
@@ -1195,6 +1328,10 @@ const toContact = () => {
       right: -1px;
       border-bottom-width: 5vw;
       border-left-width: 5vw;
+      @media (min-width: tokens.$breakpoint-lg) {
+        border-bottom-width: 2.5vw;
+        border-left-width: 2.5vw;
+      }
       // border-bottom-left-radius: 1.25rem;
     }
   }
@@ -1261,6 +1398,8 @@ const toContact = () => {
   height: clamp(320px, 60vh, 720px);
 }
 
+/* ---------- Keyframes ---------- */
+
 @keyframes signal-blink {
   0%,
   100% {
@@ -1280,6 +1419,15 @@ const toContact = () => {
 @keyframes beam-spin {
   to {
     rotate: 360deg;
+  }
+}
+
+@keyframes bg-fade {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
   }
 }
 </style>

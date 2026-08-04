@@ -1,12 +1,16 @@
 <script setup lang="ts">
-import { ref, onMounted, onBeforeUnmount } from 'vue';
+import { ref, onMounted, onBeforeUnmount, computed } from 'vue';
 import gsap from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
+import { useViewport } from '../shared/utils/viewWidth';
+const { lgBreakpoint, width } = useViewport();
 
 gsap.registerPlugin(ScrollTrigger);
 
 const svgRoot = ref<SVGSVGElement | null>(null);
 let ctx: gsap.Context | null = null;
+
+const isResponsive = computed(() => width.value < lgBreakpoint);
 
 const LOAD_ORDER = [
   '#left-top-decoration',
@@ -73,40 +77,41 @@ onMounted(() => {
     tl.set(loadTargets, { clearProps: 'willChange' });
 
     /* ---------- on scroll ---------- */
+    if (!isResponsive.value) {
+      const tl2 = gsap.timeline({
+        scrollTrigger: {
+          start: 0,
+          end: 1400,
+          scrub: 0.6,
+        },
+      });
 
-    const tl2 = gsap.timeline({
-      scrollTrigger: {
-        start: 0,
-        end: 1400,
-        scrub: 0.6,
-      },
-    });
+      if (topDeco) {
+        tl2.fromTo(
+          topDeco,
+          { y: -300, opacity: 0, filter: 'blur(9px)' },
+          { y: 0, opacity: 1, filter: 'blur(0px)', duration: 1.5, ease: 'none' },
+          0,
+        );
+      }
 
-    if (topDeco) {
-      tl2.fromTo(
-        topDeco,
-        { y: -300, opacity: 0, filter: 'blur(9px)' },
-        { y: 0, opacity: 1, filter: 'blur(0px)', duration: 1.5, ease: 'none' },
-        0,
-      );
-    }
+      if (sidebar) {
+        tl2.fromTo(
+          sidebar,
+          { x: -300, opacity: 0, filter: 'blur(9px)' },
+          { x: 0, opacity: 1, filter: 'blur(0px)', duration: 1.5, ease: 'none' },
+          1,
+        );
+      }
 
-    if (sidebar) {
-      tl2.fromTo(
-        sidebar,
-        { x: -300, opacity: 0, filter: 'blur(9px)' },
-        { x: 0, opacity: 1, filter: 'blur(0px)', duration: 1.5, ease: 'none' },
-        1,
-      );
-    }
-
-    if (buttonCard) {
-      tl2.fromTo(
-        buttonCard,
-        { x: 480, y: 300, opacity: 0, filter: 'blur(9px)' },
-        { x: 0, y: 0, opacity: 1, filter: 'blur(0px)', duration: 1.5, ease: 'none' },
-        2,
-      );
+      if (buttonCard) {
+        tl2.fromTo(
+          buttonCard,
+          { x: 480, y: 300, opacity: 0, filter: 'blur(9px)' },
+          { x: 0, y: 0, opacity: 1, filter: 'blur(0px)', duration: 1.5, ease: 'none' },
+          2,
+        );
+      }
     }
 
     ScrollTrigger.refresh();
@@ -137,46 +142,6 @@ onBeforeUnmount(() => {
     xmlns:cc="http://creativecommons.org/ns#"
     xmlns:dc="http://purl.org/dc/elements/1.1/"
   >
-    <sodipodi:namedview
-      id="namedview4"
-      pagecolor="#ffffff"
-      bordercolor="#000000"
-      borderopacity="0.25"
-      inkscape:showpageshadow="2"
-      inkscape:pageopacity="0.0"
-      inkscape:pagecheckerboard="0"
-      inkscape:deskcolor="#d1d1d1"
-      showgrid="false"
-      showguides="false"
-      inkscape:zoom="0.59377855"
-      inkscape:cx="714.07093"
-      inkscape:cy="672.80975"
-      inkscape:window-width="1920"
-      inkscape:window-height="1051"
-      inkscape:window-x="-9"
-      inkscape:window-y="-9"
-      inkscape:window-maximized="1"
-      inkscape:current-layer="right-top-decoration"
-    >
-      <sodipodi:guide
-        position="1369.8587,-172.60652"
-        orientation="0,-1"
-        id="guide4"
-        inkscape:locked="false"
-      />
-      <sodipodi:guide
-        position="450.71305,126.35434"
-        orientation="0,-1"
-        id="guide2"
-        inkscape:locked="false"
-      />
-      <sodipodi:guide
-        position="561.11957,107.72608"
-        orientation="1,0"
-        id="guide3"
-        inkscape:locked="false"
-      />
-    </sodipodi:namedview>
     <title id="title">Deconstructed interface background with clarity cues</title>
     <desc id="desc">
       The supplied interface artwork with three subtle editable text cues embedded into existing
@@ -1344,6 +1309,7 @@ onBeforeUnmount(() => {
 </template>
 
 <style scoped lang="scss">
+@use '../css/tokens' as tokens;
 $load: '#left-top-decoration, #slider-btn, #content-card, #graph-card, #landscape, #main-content';
 $scroll: '#right-top-decoration, #sidebar, #button-card';
 

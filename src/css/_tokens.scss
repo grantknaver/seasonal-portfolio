@@ -6,6 +6,7 @@ $breakpoint-sm: 600px;
 $breakpoint-md: 1024px;
 $breakpoint-lg: 1440px;
 $breakpoint-xl: 1920px;
+$tablet-only: '(min-width: #{$breakpoint-sm}) and (max-width: #{$breakpoint-lg - 0.02px})';
 
 // ----------------------------
 // Font stacks
