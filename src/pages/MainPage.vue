@@ -704,14 +704,21 @@ const toContact = () => {
         </div>
 
         <div ref="trustCopyA" class="trust-copy">
-          <p>Clarity helps people decide.</p>
+          <span class="eyebrow">CLEAR PLATFORMS. LEGIBLE AI.</span>
+          <p>WHAT PEOPLE UNDERSTAND, THEY CAN TRUST.</p>
+          <p class="trust-support">
+            Make the value and behavior of any platform clear-especially AI products, where trust
+            depends on making the system’s reasoning, limits, and behavior easier to understand.
+          </p>
         </div>
 
         <div ref="trustCopyB" class="trust-copy">
-          <p>Trust helps them breathe.</p>
+          <p>TRUST GIVES PEOPLE ROOM TO MOVE FORWARD.</p>
         </div>
         <div ref="trustGlowRef" class="trust-glow" aria-hidden="true"></div>
-        <div ref="trustCueRef" class="trust-cue"><ScrollCue :is-dark="false" /></div>
+        <div ref="trustCueRef" class="trust-cue">
+          <ScrollCue :is-dark="false" :has-text="false" />
+        </div>
         <div class="trust-frame" aria-hidden="true">
           <span class="trust-corner trust-corner--tl"></span>
           <span class="trust-corner trust-corner--tr"></span>
@@ -1216,19 +1223,47 @@ const toContact = () => {
     inset: 0;
     z-index: 2;
     display: flex;
+    flex-direction: column;
     align-items: center;
     justify-content: center;
     padding-inline: 2rem;
     text-align: center;
     color: tokens.$ivory;
-    font-size: clamp(1.35rem, 6vw, 3.25rem);
+    font-size: clamp(1.4rem, 4.6vw, 1.9rem);
     line-height: 1.2;
     will-change: transform, opacity;
     text-shadow: 2px 2px 10px var(--q-dark);
 
+    @media (min-width: tokens.$breakpoint-lg) {
+      font-size: clamp(1.9rem, 2.8vw, 2.5rem);
+    }
+
+    .eyebrow {
+      font-size: 0.8rem;
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+      font-weight: 500;
+      line-height: 1.4;
+      margin-bottom: 1.1rem;
+      color: tokens.$champagne;
+      text-shadow: 1px 1px 1px var(--q-dark);
+      @media (min-width: tokens.$breakpoint-lg) {
+        font-size: 0.85rem;
+      }
+    }
+
     p {
       margin: 0;
-      max-width: 24rem;
+      max-width: 24ch;
+    }
+
+    .trust-support {
+      font-size: clamp(0.9rem, 1.1vw, 1.05rem);
+      line-height: 1.65;
+      max-width: 56ch;
+      margin-top: 1.5rem;
+      color: rgb(from tokens.$ivory r g b / 0.78);
+      text-shadow: 1px 1px 6px var(--q-dark);
     }
   }
 
@@ -1385,7 +1420,7 @@ const toContact = () => {
 
   .trust-cue {
     position: absolute;
-    bottom: 25%;
+    bottom: 16%;
     left: 50%;
     transform: translateX(-50%);
     z-index: 2;
