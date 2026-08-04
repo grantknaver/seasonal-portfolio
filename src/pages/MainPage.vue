@@ -233,7 +233,7 @@ onMounted(async () => {
           .timeline({ paused: true })
           .to(glow, { opacity: 1, scale: 1, duration: 1.25, ease: 'power2.out' }, 0)
           .to(beam, { opacity: 1, duration: 1.6, ease: 'power2.out' }, 0.6)
-          .to(copyA, { opacity: 1, duration: 1.4, ease: 'power1.out' }, 1.4)
+          .to(copyA, { opacity: 1, duration: 1.4, ease: 'power1.out' }, 0.9)
           .to(cue, { opacity: 1, duration: 0.6, ease: 'power1.out' }, 2.6);
 
         let introPlayed = false;
@@ -263,17 +263,17 @@ onMounted(async () => {
         trustTl.fromTo(
           section,
           { backgroundPositionY: '46%' },
-          { backgroundPositionY: '56%', ease: 'none', duration: 3 },
+          { backgroundPositionY: '56%', ease: 'none', duration: 2.3 },
           0,
         );
 
         trustTl
-          .to(cue, { opacity: 0, ease: 'none', duration: 0.4 }, 1.4)
-          .to(copyA, { opacity: 0, ease: 'none', duration: 0.9 }, 1.5)
-          .to(imgA, { opacity: 0, ease: 'none', duration: 0.8 }, 2.2)
-          .to(imgB, { opacity: 1, ease: 'none', duration: 0.8 }, 2.2)
-          .to(copyB, { opacity: 1, ease: 'none', duration: 1.1 }, 2.5)
-          .to(glow, { opacity: 0, scale: 1.25, ease: 'none', duration: 0.9 }, 3.6);
+          .to(cue, { opacity: 0, ease: 'none', duration: 0.4 }, 0.1)
+          .to(copyA, { opacity: 0, ease: 'none', duration: 0.9 }, 0.2)
+          .to(imgA, { opacity: 0, ease: 'none', duration: 0.8 }, 0.7)
+          .to(imgB, { opacity: 1, ease: 'none', duration: 0.8 }, 0.7)
+          .to(copyB, { opacity: 1, ease: 'none', duration: 1.1 }, 1.0)
+          .to(glow, { opacity: 0, scale: 1.25, ease: 'none', duration: 0.9 }, 1.5);
       }
     }
 
