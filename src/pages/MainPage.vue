@@ -196,13 +196,13 @@ onMounted(async () => {
       const cue = trustCueRef.value;
       const beam = trustBeamRef.value;
 
-      gsap.set(imgB, { opacity: 0 });
-      gsap.set(glow, { opacity: 0, scale: 1.18 });
-      gsap.set([copyA, copyB], { opacity: 0 });
-      gsap.set(cue, { opacity: 0 });
-
       if (isResponsive.value) {
         /* ---------- Mobile: autoplay on entry ---------- */
+
+        gsap.set(imgB, { opacity: 0 });
+        gsap.set(glow, { opacity: 0, scale: 1.18 });
+        gsap.set([copyA, copyB], { opacity: 0 });
+        gsap.set(cue, { opacity: 0 });
 
         const mobileTl = gsap
           .timeline({ paused: true })
@@ -231,10 +231,30 @@ onMounted(async () => {
 
         const introTl = gsap
           .timeline({ paused: true })
-          .to(glow, { opacity: 1, scale: 1, duration: 1.25, ease: 'power2.out' }, 0)
-          .to(beam, { opacity: 1, duration: 1.6, ease: 'power2.out' }, 0.6)
-          .to(copyA, { opacity: 1, duration: 1.4, ease: 'power1.out' }, 0.9)
-          .to(cue, { opacity: 1, duration: 0.6, ease: 'power1.out' }, 2.6);
+          .fromTo(
+            glow,
+            { opacity: 0, scale: 1.18 },
+            { opacity: 1, scale: 1, duration: 1.25, ease: 'power2.out', immediateRender: false },
+            0,
+          )
+          .fromTo(
+            beam,
+            { opacity: 0 },
+            { opacity: 1, duration: 1.6, ease: 'power2.out', immediateRender: false },
+            0.6,
+          )
+          .fromTo(
+            copyA,
+            { opacity: 0 },
+            { opacity: 1, duration: 1.4, ease: 'power1.out', immediateRender: false },
+            0.9,
+          )
+          .fromTo(
+            cue,
+            { opacity: 0 },
+            { opacity: 1, duration: 0.6, ease: 'power1.out', immediateRender: false },
+            2.6,
+          );
 
         let introPlayed = false;
 
@@ -246,7 +266,6 @@ onMounted(async () => {
             pin: true,
             pinSpacing: true,
             scrub: 0.6,
-            anticipatePin: 1,
             onEnter: () => {
               if (introPlayed) return;
               introPlayed = true;
@@ -254,26 +273,42 @@ onMounted(async () => {
               introTl.eventCallback('onComplete', unlock);
               introTl.play();
             },
-            onUpdate: (self) => {
-              if (self.progress > 0.3 && introTl.isActive()) introTl.progress(1);
-            },
           },
         });
 
-        trustTl.fromTo(
-          section,
-          { backgroundPositionY: '46%' },
-          { backgroundPositionY: '56%', ease: 'none', duration: 2.3 },
-          0,
-        );
-
         trustTl
-          .to(cue, { opacity: 0, ease: 'none', duration: 0.4 }, 0.1)
-          .to(copyA, { opacity: 0, ease: 'none', duration: 0.9 }, 0.2)
+          .fromTo(
+            section,
+            { backgroundPositionY: '46%' },
+            { backgroundPositionY: '56%', ease: 'none', duration: 2.3, immediateRender: false },
+            0,
+          )
+          .fromTo(
+            cue,
+            { opacity: 1 },
+            { opacity: 0, ease: 'none', duration: 0.4, immediateRender: false },
+            0.1,
+          )
+          .fromTo(
+            copyA,
+            { opacity: 1 },
+            { opacity: 0, ease: 'none', duration: 0.9, immediateRender: false },
+            0.2,
+          )
           .to(imgA, { opacity: 0, ease: 'none', duration: 0.8 }, 0.7)
           .to(imgB, { opacity: 1, ease: 'none', duration: 0.8 }, 0.7)
           .to(copyB, { opacity: 1, ease: 'none', duration: 1.1 }, 1.0)
-          .to(glow, { opacity: 0, scale: 1.25, ease: 'none', duration: 0.9 }, 1.5);
+          .fromTo(
+            glow,
+            { opacity: 1, scale: 1 },
+            { opacity: 0, scale: 1.25, ease: 'none', duration: 0.9, immediateRender: false },
+            1.5,
+          );
+
+        gsap.set(imgB, { opacity: 0 });
+        gsap.set(glow, { opacity: 0, scale: 1.18 });
+        gsap.set([copyA, copyB], { opacity: 0 });
+        gsap.set(cue, { opacity: 0 });
       }
     }
 
@@ -1219,6 +1254,7 @@ const toContact = () => {
   }
 
   .trust-copy {
+    opacity: 0;
     position: absolute;
     inset: 0;
     z-index: 2;

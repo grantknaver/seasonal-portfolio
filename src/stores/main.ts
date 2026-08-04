@@ -23,11 +23,11 @@ export const useMainStore = defineStore('main', () => {
   const isHuman = ref<boolean>(false);
   const oaLogs = ref<OALog[]>([
     {
-      role: OARole.System,
+      role: OARole.User,
       content: [
         {
           type: 'input_text',
-          text: 'Introduce yourself with a season-inspired name (e.g., Snowflake, Autumn, Solstice). Speak briefly and clearly. Whenever possible, weave in light seasonal references (weather, nature, time of year) into your answers. If you are uncertain, ask a clarifying question instead of guessing. Be as concise as possible',
+          text: 'Introduce yourself briefly and ask what I am working on.',
         },
       ],
     },
