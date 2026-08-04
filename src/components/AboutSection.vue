@@ -139,8 +139,8 @@ onBeforeUnmount(() => {
 
 <template>
   <section
-    class="about-section full-width column q-pa-md"
-    :class="isResponsive ? 'responsive-view' : 'desktop-view'"
+    class="about-section full-width column"
+    :class="isResponsive ? 'responsive-view q-pa-xs' : 'desktop-view q-pa-md'"
   >
     <q-card class="about-card q-pa-none">
       <q-card-section class="about-section-block about-intro q-pa-lg">
@@ -323,7 +323,7 @@ onBeforeUnmount(() => {
 </template>
 
 <style lang="scss">
-@use '/src/css/_tokens.scss' as tokens;
+@use '../css/tokens' as tokens;
 
 .about-section {
   color: tokens.$text;
@@ -345,9 +345,6 @@ onBeforeUnmount(() => {
     );
     border: 1px solid var(--q-accent);
     border-radius: 1rem;
-    box-shadow:
-      0 0 48px color-mix(in srgb, var(--q-accent) 28%, transparent),
-      0 20px 64px color-mix(in srgb, tokens.$ink 88%, transparent);
     overflow: hidden;
   }
 

@@ -3,7 +3,6 @@ import { ref, nextTick, watch, computed, onMounted } from 'vue';
 import { useMainStore } from '../stores/main';
 import { storeToRefs } from 'pinia';
 import { debounce } from 'quasar';
-import { Theme } from '../shared/constants/theme';
 import { OARole } from 'src/shared/types/oaRole';
 import type OALog from 'src/shared/types/oaLog';
 import { useViewport } from 'src/shared/utils/viewWidth';
@@ -11,8 +10,7 @@ import { mdiChat } from '@quasar/extras/mdi-v7';
 import { defineAsyncComponent } from 'vue';
 
 const mainStore = useMainStore();
-const { activeAiAssistLogo, chatLog, activeTheme, isHuman, oaLogs, isLoading } =
-  storeToRefs(mainStore);
+const { activeAiAssistLogo, chatLog, isHuman, oaLogs, isLoading } = storeToRefs(mainStore);
 const isChatting = ref(false);
 const text = ref('');
 
@@ -49,7 +47,6 @@ const addToLog = (): void => {
 
 onMounted(async () => {
   if (isHuman.value && chatLog.value.length === 0) {
-    // Sets System and generates first bot message
     await mainStore.SEND_OALOGS();
   }
 });
@@ -100,7 +97,7 @@ watch(oaLogs, async () => {
               :text="message.text"
               :sent="message.sent"
               :stamp="message.stamp"
-              :text-color="message.sent && activeTheme === Theme.Summer ? 'black' : 'primary'"
+              :text-color="'primary'"
               :bg-color="message.sent ? 'accent' : 'dark'"
             />
             <q-chat-message
@@ -114,7 +111,7 @@ watch(oaLogs, async () => {
 
           <q-img
             v-else
-            src="../assets/4-season-not-authorized.png"
+            src="../assets/not-authorized.avif"
             fit="cover"
             fetchpriority="high"
             class="no-overflow"
@@ -197,7 +194,7 @@ watch(oaLogs, async () => {
       </q-scroll-area>
       <q-img
         v-else
-        src="../assets/4-season-not-authorized-2.avif"
+        src="../assets/not-authorized.avif"
         fit="cover"
         class="dv-img-fill no-overflow q-mb-sm"
       />

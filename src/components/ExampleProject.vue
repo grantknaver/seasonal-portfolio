@@ -1,9 +1,6 @@
 <script setup lang="ts">
 import { useViewport } from '../shared/utils/viewWidth';
 import { computed } from 'vue';
-import { useMainStore } from '../stores/main';
-import { storeToRefs } from 'pinia';
-import { Theme } from 'src/shared/constants/theme';
 import { type PropType } from 'vue';
 import type {
   ExampleHeader,
@@ -11,9 +8,6 @@ import type {
   ExampleExpansionTopicGroup,
   ExampleDefaultTopicGroup,
 } from '../shared/types/example';
-
-const mainStore = useMainStore();
-const { activeTheme } = storeToRefs(mainStore);
 
 const { lgBreakpoint, width } = useViewport();
 const isResponsive = computed(() => width.value < lgBreakpoint);
@@ -40,17 +34,6 @@ const props = defineProps({
     default: '',
   },
 });
-
-const cardBackgrounds = {
-  [Theme.Fall]: new URL('../assets/case-study-fall-bcg.avif', import.meta.url).href,
-  [Theme.Winter]: new URL('../assets/case-study-winter-bcg.avif', import.meta.url).href,
-  [Theme.Spring]: new URL('../assets/case-study-spring-bcg.avif', import.meta.url).href,
-  [Theme.Summer]: new URL('../assets/case-study-summer-bcg.avif', import.meta.url).href,
-};
-
-const cardStyle = computed(() => ({
-  '--case-study-bg': `url(${cardBackgrounds[activeTheme.value]})`,
-}));
 </script>
 
 <template>
@@ -64,7 +47,7 @@ const cardStyle = computed(() => ({
       expand-icon-class="case-study-expand-icon"
       class="case-study-mobile-expansion full-width"
     >
-      <q-card class="case-study-card full-width" :style="cardStyle">
+      <q-card class="case-study-card full-width">
         <q-card-section class="case-study-header-section full-width">
           <h2 class="case-study-title text-h2 q-mt-sm q-mb-none secondary-font">
             {{ props.header.text }}
@@ -184,7 +167,7 @@ const cardStyle = computed(() => ({
 
   <!-- Desktop -->
   <div v-else class="case-study-component desktop-view full-width column">
-    <q-card class="case-study-card q-pa-lg full-width" :style="cardStyle">
+    <q-card class="case-study-card q-pa-lg full-width">
       <q-card-section class="case-study-header-section full-width">
         <h2 class="case-study-title text-h2 q-mt-sm q-mb-none secondary-font">
           {{ props.header.text }}
@@ -306,7 +289,7 @@ const cardStyle = computed(() => ({
 </template>
 
 <style scoped lang="scss">
-@use '/src/css/_tokens.scss' as tokens;
+@use '../css/tokens' as tokens;
 
 .case-study-component {
   color: tokens.$text;
@@ -464,7 +447,7 @@ const cardStyle = computed(() => ({
 </style>
 
 <style lang="scss">
-@use '/src/css/_tokens.scss' as tokens;
+@use '../css/tokens' as tokens;
 
 /* These are Quasar internal header classes passed through props.
    They are intentionally global but tightly prefixed to this component. */

@@ -12,12 +12,12 @@
 // Tip: Use the "Theme Builder" on Quasar's documentation website.
 
 // === Default Theme (Fall)
-$primary: map-get(tokens.$fall-theme, primary);
-$secondary: map-get(tokens.$fall-theme, secondary);
-$accent: map-get(tokens.$fall-theme, accent);
-$dark: map-get(tokens.$fall-theme, dark);
-$accent-deep: map-get(tokens.$fall-theme, accent-deep);
-$accent-soft: map-get(tokens.$fall-theme, accent-soft);
+$primary: #e3f2fd;
+$secondary: #bbdefb;
+$accent: #0d47a1;
+$dark: #0b1f3b;
+$accent-deep: #0d47a1;
+$accent-soft: rgba(138, 180, 248, 0.18);
 
 $positive: #21ba45;
 $negative: #c10015;

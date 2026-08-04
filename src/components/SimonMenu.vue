@@ -8,13 +8,17 @@ import {
   mdiInformation,
   mdiEmailOutline,
   mdiMagnify,
-  mdiViewGalleryOutline,
+  mdiViewDashboardOutline,
 } from '@quasar/extras/mdi-v7';
 import { onMounted, ref } from 'vue';
 
 const mainStore = useMainStore();
 const { activeTopic } = storeToRefs(mainStore);
 const labelsVisible = ref(false);
+
+const props = withDefaults(defineProps<{ layout?: 'grid' | 'row' }>(), {
+  layout: 'grid',
+});
 
 const topics: Topic[] = [
   {
@@ -26,7 +30,7 @@ const topics: Topic[] = [
   {
     id: uuidv4(),
     name: TopicName.Examples,
-    icon: mdiViewGalleryOutline,
+    icon: mdiViewDashboardOutline,
     label: TopicName.Examples,
   },
   {
@@ -60,47 +64,131 @@ onMounted(() => {
 });
 </script>
 <template>
-  <div class="simon">
+  <div class="simon" :class="`simon--${props.layout}`">
     <div
       v-for="topic in topics"
       :key="topic.id"
       class="simon-quadrant"
       :class="[topic.name, { 'active-topic': topic.name === activeTopic }]"
       tabindex="0"
-      style="padding: 1rem"
       @click.stop="selectTopic(topic.name)"
     >
       <a class="simon-link text-body-2">
-        <q-icon :name="topic.icon" size="80px" />
+        <q-icon :name="topic.icon" />
         <span class="label" :class="{ 'labels-visible': labelsVisible }">{{ topic.label }}</span>
       </a>
     </div>
   </div>
 </template>
 <style scoped lang="scss">
-@use '/src/css/_tokens.scss' as tokens;
+@use '../css/tokens' as tokens;
 
 .simon {
   position: relative;
   border-radius: 10px;
   overflow: visible;
-  width: 250px;
-  height: 250px;
+
+  /* ---------- Grid (default) ---------- */
+
+  &--grid {
+    width: 250px;
+    height: 250px;
+
+    .simon-quadrant {
+      position: absolute;
+      width: 49%;
+      height: 49%;
+      padding: 1rem;
+
+      &.Lens {
+        top: 0;
+        left: 0;
+      }
+
+      &.Examples {
+        top: 0;
+        right: 0;
+      }
+
+      &.About {
+        bottom: 0;
+        left: 0;
+      }
+
+      &.Contact {
+        bottom: 0;
+        right: 0;
+      }
+    }
+
+    .simon-link .q-icon {
+      font-size: 80px;
+    }
+  }
+
+  /* ---------- Row ---------- */
+
+  &--row {
+    display: flex;
+    gap: 0.5rem;
+
+    .simon-quadrant {
+      position: static;
+      width: 110px;
+      height: 110px;
+      padding: 0.5rem;
+    }
+
+    .simon-link .q-icon {
+      font-size: 60px;
+    }
+  }
 }
 
+/* ---------- Shared tile ---------- */
+
 .simon-quadrant {
-  position: absolute;
-  width: 49%;
-  height: 49%;
   display: flex;
   align-items: center;
   justify-content: center;
   transition: transform 0.3s ease;
   transform-origin: center;
   border-radius: 10px;
-  border: solid 2px rgba($color: tokens.$ivory, $alpha: 0.5);
-  background: var(--q-dark);
   z-index: 1;
+  box-shadow: 2px 2px 2px 2px #888888;
+  background: color-mix(in srgb, #f7f9fe 8%, transparent);
+  backdrop-filter: blur(5px);
+  -webkit-backdrop-filter: blur(5px);
+
+  .simon-link {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
+
+  .q-icon {
+    font-weight: 900;
+    color: color-mix(in srgb, var(--q-accent) 70%, var(--q-secondary) 30%);
+
+    :deep(svg path) {
+      stroke: tokens.$panel-strong;
+      stroke-width: 1px;
+      stroke-linejoin: round;
+      stroke-linecap: round;
+      paint-order: stroke fill;
+    }
+  }
+
+  .label {
+    position: static;
+    opacity: 1;
+    font-size: 0.7rem;
+    letter-spacing: 0.09em;
+    text-transform: uppercase;
+    text-align: center;
+    color: color-mix(in srgb, var(--q-dark) 60%, transparent);
+    font-weight: 700;
+  }
 
   &:hover {
     transform: scale(0.9);
@@ -110,29 +198,21 @@ onMounted(() => {
     cursor: pointer;
 
     .q-icon {
-      opacity: 0.1;
-      color: tokens.$ink;
+      color: var(--q-accent);
     }
-  }
 
-  &.Lens {
-    top: 0;
-    left: 0;
-  }
+    .label {
+      color: color-mix(in srgb, var(--q-dark) 60%, transparent);
+      font-weight: 800;
 
-  &.Examples {
-    top: 0;
-    right: 0;
-  }
-
-  &.About {
-    bottom: 0;
-    left: 0;
-  }
-
-  &.Contact {
-    bottom: 0;
-    right: 0;
+      :deep(svg path) {
+        stroke: rgba(247, 249, 254, 0.9);
+        stroke-width: 1.4px;
+        stroke-linejoin: round;
+        stroke-linecap: round;
+        paint-order: stroke fill;
+      }
+    }
   }
 
   &.active-topic {
@@ -142,39 +222,13 @@ onMounted(() => {
     transition: transform 0.7s ease-in;
 
     .q-icon {
-      opacity: 0.1;
-      color: tokens.$ink;
+      color: var(--q-accent);
     }
-  }
-}
 
-.simon-link {
-  color: white;
-  text-decoration: none;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  width: 100%;
-  height: 100%;
-  text-shadow: 0 0 5px var(--q-dark);
-  position: relative;
-
-  .label {
-    position: absolute;
-    opacity: 0;
-    transition: opacity 0.8s ease-out;
-  }
-
-  .labels-visible {
-    opacity: 1;
-  }
-
-  .q-icon {
-    opacity: 0.04;
-  }
-
-  &:focus {
-    outline: none;
+    .label {
+      color: color-mix(in srgb, var(--q-dark) 60%, transparent);
+      font-weight: 800;
+    }
   }
 }
 </style>

@@ -90,7 +90,7 @@ onBeforeUnmount(() => mainStore.SET_RECAPTCHA_WIDGET_ID(null));
 </template>
 
 <style scoped lang="scss">
-@use '/src/css/_tokens.scss' as tokens;
+@use '../css/tokens' as tokens;
 .g-recaptcha {
   width: 175px;
   max-width: 175px;

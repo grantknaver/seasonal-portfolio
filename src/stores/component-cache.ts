@@ -7,10 +7,10 @@ type CacheCatalog = Record<CacheEntry, DefineComponent | null>;
 
 export const useCacheStore = defineStore('cache', () => {
   const catalog: CacheCatalog = reactive({
-    [CacheEntry.WeatherAndTheme]: null,
+    [CacheEntry.HeroMotion]: null,
     [CacheEntry.AiChat]: null,
     [CacheEntry.Waveform]: null,
-    [CacheEntry.Proof]: null,
+    [CacheEntry.WeatherEffects]: null,
     [CacheEntry.RecaptchaWidget]: null,
     [CacheEntry.ExamplesSection]: null,
     [CacheEntry.PackageSection]: null,

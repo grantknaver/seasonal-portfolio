@@ -207,7 +207,7 @@ const packageCta = (name: Package) => `Start with ${String(name).replace(' Packa
 </template>
 
 <style scoped lang="scss">
-@use '/src/css/_tokens.scss' as tokens;
+@use '../css/tokens' as tokens;
 
 .packageSection {
   color: tokens.$text;

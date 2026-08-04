@@ -105,8 +105,8 @@ const sendEmail = async () => {
   <section
     id="contact"
     ref="contactRef"
-    class="contactSection full-width q-pa-md"
-    :class="isResponsive ? 'responsive-view' : 'desktop-view'"
+    class="contactSection full-width"
+    :class="isResponsive ? 'responsive-view q-pa-xs' : 'desktop-view q-pa-md'"
   >
     <div class="contact-shell">
       <div class="contact-intro">
@@ -250,7 +250,7 @@ const sendEmail = async () => {
 </template>
 
 <style scoped lang="scss">
-@use '/src/css/_tokens.scss' as tokens;
+@use '../css/tokens' as tokens;
 
 .contactSection {
   color: tokens.$text;
@@ -296,9 +296,6 @@ const sendEmail = async () => {
     color-mix(in srgb, tokens.$ink-soft 90%, tokens.$ivory 10%),
     tokens.$ink
   );
-  box-shadow:
-    0 0 56px color-mix(in srgb, var(--q-accent) 30%, transparent),
-    0 24px 72px color-mix(in srgb, tokens.$ink 88%, transparent);
 }
 
 .kicker {

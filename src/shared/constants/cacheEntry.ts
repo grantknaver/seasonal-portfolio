@@ -1,10 +1,10 @@
 import { CaseStudies } from './caseStudies';
 
 export enum CacheEntry {
-  WeatherAndTheme = CaseStudies.WeatherAndTheme,
+  HeroMotion = CaseStudies.HeroMotion,
   AiChat = CaseStudies.AiChat,
   Waveform = CaseStudies.Waveform,
-  Proof = CaseStudies.Proof,
+  WeatherEffects = CaseStudies.WeatherEffects,
   RecaptchaWidget = 'recaptchaWidget',
   PackageSection = 'packageSection',
   AboutSection = 'aboutSection',

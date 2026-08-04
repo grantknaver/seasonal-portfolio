@@ -2,14 +2,14 @@
 import { ref } from 'vue';
 import { v4 as uuidv4 } from 'uuid';
 import { type ProjectDetails } from '../shared/types/projectDetails';
-import { themeMap } from '../shared/constants/theme';
-import { useMainStore } from '../stores/main';
-import { storeToRefs } from 'pinia';
+// import { themeMap } from '../shared/constants/theme';
+// import { useMainStore } from '../stores/main';
+// import { storeToRefs } from 'pinia';
 import { Projects } from '../shared/constants/projects';
-import { setSeasonClasses } from '../shared/utils/setSeasonColors';
+// import { setSeasonClasses } from '../shared/utils/setSeasonColors';
 
-const mainStore = useMainStore();
-const { activeTheme } = storeToRefs(mainStore);
+// const mainStore = useMainStore();
+// const { activeTheme } = storeToRefs(mainStore);
 
 const storytaimProject = ref<ProjectDetails>({
   name: Projects.StorytAIm,
@@ -48,20 +48,7 @@ const projects = ref<ProjectDetails[]>([
     <!-- Mobile -->
     <div class="responsive-view full-width">
       <q-card class="full-width">
-        <q-card-section
-          class="section-container q-pa-lg"
-          :class="
-            setSeasonClasses(
-              {
-                Fall: 'bg-accent text-primary',
-                Winter: 'bg-accent text-primary',
-                Spring: 'bg-accent text-primary',
-                Summer: 'bg-dark text-primary',
-              },
-              activeTheme,
-            )
-          "
-        >
+        <q-card-section class="section-container bg-accent text-primary q-pa-lg">
           <h1 class="q-mt-none text-primary">Projects</h1>
           <q-separator color="primary" class="q-mb-md" />
           <p>
@@ -74,10 +61,7 @@ const projects = ref<ProjectDetails[]>([
           </p>
         </q-card-section>
 
-        <q-card-section
-          class="section-container q-mt-md q-pa-sm"
-          :style="{ backgroundColor: themeMap[activeTheme]['--q-primary'] }"
-        >
+        <q-card-section class="section-container q-mt-md q-pa-sm --q-primary">
           <div class="project-container column items-center q-pt-lg q-pb-lg">
             <div
               v-for="project in projects"
@@ -130,10 +114,7 @@ const projects = ref<ProjectDetails[]>([
           </p>
         </q-card-section>
 
-        <q-card-section
-          class="section-container q-pa-sm"
-          :style="{ backgroundColor: themeMap[activeTheme]['--q-primary'] }"
-        >
+        <q-card-section class="section-container q-pa-sm --q-primary">
           <div class="project-container row justify-around items-center q-pt-lg q-pb-lg">
             <div
               v-for="project in projects"
@@ -173,7 +154,7 @@ const projects = ref<ProjectDetails[]>([
 </template>
 
 <style scoped lang="scss">
-@use '/src/css/_tokens.scss' as tokens;
+@use '../css/tokens' as tokens;
 
 .responsive-view {
   @media (min-width: tokens.$breakpoint-md) {

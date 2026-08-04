@@ -97,11 +97,6 @@ export default defineConfig(() => {
         ],
         imagetools(),
       ],
-
-      // alias: {
-      //   src: fileURLToPath(new URL('./src', import.meta.url)),
-      //   '@': fileURLToPath(new URL('./src', import.meta.url)),
-      // },
     },
     // Full list of options: https://v2.quasar.dev/quasar-cli-vite/quasar-config-file#devserver
     devServer: {

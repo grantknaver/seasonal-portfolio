@@ -145,7 +145,7 @@ const lens = ref<LensDetails[]>([
 <template>
   <section
     class="lensSection full-width column"
-    :class="isResponsive ? 'responsive-view q-pa-md' : 'desktop-view q-pa-md'"
+    :class="isResponsive ? 'responsive-view q-pa-xs' : 'desktop-view q-pa-md'"
   >
     <div class="lens-shell">
       <div class="lens-header">
@@ -246,7 +246,7 @@ const lens = ref<LensDetails[]>([
 </template>
 
 <style scoped lang="scss">
-@use '/src/css/_tokens.scss' as tokens;
+@use '../css/tokens' as tokens;
 
 .lensSection {
   color: tokens.$text;
@@ -263,9 +263,6 @@ const lens = ref<LensDetails[]>([
     color-mix(in srgb, tokens.$ink-soft 90%, tokens.$ivory 10%),
     tokens.$ink
   );
-  box-shadow:
-    0 0 56px color-mix(in srgb, var(--q-accent) 30%, transparent),
-    0 24px 72px color-mix(in srgb, tokens.$ink 88%, transparent);
 }
 
 .lens-header {
