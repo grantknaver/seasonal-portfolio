@@ -242,7 +242,7 @@ onMounted(async () => {
           scrollTrigger: {
             trigger: section,
             start: 'top top',
-            end: '+=2800',
+            end: '+=1500',
             pin: true,
             pinSpacing: true,
             scrub: 0.6,
@@ -263,7 +263,7 @@ onMounted(async () => {
         trustTl.fromTo(
           section,
           { backgroundPositionY: '46%' },
-          { backgroundPositionY: '56%', ease: 'none', duration: 4.5 },
+          { backgroundPositionY: '56%', ease: 'none', duration: 3 },
           0,
         );
 
