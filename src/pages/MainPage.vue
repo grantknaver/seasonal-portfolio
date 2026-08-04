@@ -169,7 +169,7 @@ onMounted(async () => {
         ScrollTrigger.create({
           trigger: claritySectionRef.value,
           start: 'top top',
-          end: '+=2500',
+          end: '+=1800',
           pin: true,
           pinSpacing: true,
           anticipatePin: 1,
