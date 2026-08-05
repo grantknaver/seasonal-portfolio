@@ -310,8 +310,8 @@ onMounted(async () => {
                     },
                     1.5,
                   );
-
-                ScrollTrigger.refresh();
+                unlock();
+                // ScrollTrigger.refresh();
               });
 
               introTl.play();
