@@ -238,8 +238,8 @@ onMounted(async () => {
             0,
           )
           .fromTo(beam, { opacity: 0 }, { opacity: 1, duration: 1.6, ease: 'power2.out' }, 0.6)
-          .fromTo(copyA, { opacity: 0 }, { opacity: 1, duration: 1.4, ease: 'power1.out' }, 0.9)
-          .fromTo(cue, { opacity: 0 }, { opacity: 1, duration: 0.6, ease: 'power1.out' }, 2.6);
+          .fromTo(copyA, { opacity: 0 }, { opacity: 1, duration: 1, ease: 'power1.out' }, 0.7)
+          .fromTo(cue, { opacity: 0 }, { opacity: 1, duration: 0.6, ease: 'power1.out' }, 1.6);
 
         let introPlayed = false;
         let scrubBuilt = false;

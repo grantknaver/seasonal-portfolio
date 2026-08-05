@@ -6,12 +6,7 @@ import { getCustomCssVar } from '../shared/utils/getCustomCssVar';
 import { TopicName } from '../shared/constants/topicName';
 import { type Topic } from '../shared/types/topic';
 import { v4 as uuidv4 } from 'uuid';
-import {
-  mdiMenu,
-  // mdiHeart,
-  // mdiGithub,
-  // mdiLinkedin
-} from '@quasar/extras/mdi-v7';
+import { mdiMenu, mdiHeart, mdiGithub, mdiLinkedin } from '@quasar/extras/mdi-v7';
 import { useCacheStore } from 'src/stores/component-cache';
 import { CacheBinding } from 'src/shared/constants/cacheBinding';
 import SlidePanel from '../components/SlidePanel.vue';
@@ -22,7 +17,6 @@ const { activeTopic } = storeToRefs(mainStore);
 const windowWidth = ref(window.innerWidth);
 const desktopDrawerWidth = ref(window.innerWidth * 0.5);
 const showTopicBreakpoint = +`${getCustomCssVar('breakpoint-lg')}`.slice(0, -2);
-// const isResponsive = computed(() => width.value < lgBreakpoint);
 const showTopicPanel = computed(
   () => !!activeTopic.value && windowWidth.value > showTopicBreakpoint,
 );
@@ -163,8 +157,8 @@ onBeforeUnmount(() => {
     </SlidePanel>
   </q-layout>
   <!-- "Footer" lives in normal flow so we can scroll to it -->
-  <!-- <section id="footer" class="bg-dark text-white" aria-label="Site footer">
-    <q-toolbar class="justify-between">
+  <section id="footer" class="bg-dark text-white" aria-label="Site footer">
+    <q-toolbar class="justify-between bg-accent">
       <q-toolbar-title class="text-subtitle2 text-weight-light">
         © {{ new Date().getFullYear() }} <span class="text-secondary">glk</span
         ><span class="text-primary">Freelance</span>
@@ -206,7 +200,7 @@ onBeforeUnmount(() => {
         </a>
       </div>
     </q-toolbar>
-  </section> -->
+  </section>
 </template>
 
 <style lang="scss">
