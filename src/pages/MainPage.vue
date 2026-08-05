@@ -1081,7 +1081,7 @@ const toContact = () => {
       .subheadline {
         max-width: 100%;
         margin-top: clamp(0.5rem, 1.4vh, 1rem);
-        color: tokens.$text-muted;
+        color: var(--q-secondary);
         line-height: 1.5;
 
         @media (min-width: tokens.$breakpoint-lg) {
