@@ -561,12 +561,13 @@ const buildAnimations = (mode: ViewType, animate = true) => {
     if (ctaEls.length) {
       tl.fromTo(
         ctaEls,
-        { autoAlpha: 0 },
+        { autoAlpha: 0, x: 35 },
         {
           autoAlpha: 1,
           ease: 'power2.out',
           duration: 0.8,
           stagger: 0.25,
+          x: 0,
         },
         0.85,
       );
