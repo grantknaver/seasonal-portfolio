@@ -1,3 +1,4 @@
+claritySectionRef
 <script setup lang="ts">
 import { ref, watch, nextTick, onBeforeUnmount, computed, onMounted, onUnmounted } from 'vue';
 import { useMainStore } from '../stores/main';
@@ -393,6 +394,7 @@ const buildAnimations = (mode: ViewType, animate = true) => {
   const el = claritySectionRef.value;
   if (!el) return () => {};
 
+  const heroCopyEl = el.querySelector<HTMLElement>('.hero-copy');
   const kickerEl = el.querySelector<HTMLElement>('.kicker');
   const simonEl = el.querySelector<HTMLElement>('.simon');
   const headlineEl = el.querySelector<HTMLElement>('.headline');
@@ -501,6 +503,18 @@ const buildAnimations = (mode: ViewType, animate = true) => {
   }
 
   if (mode === ViewType.Desktop) {
+    const simonWidth = simonEl?.offsetWidth ?? 250;
+    const columnGap = 32; // 2rem from .simon-copy
+    const shift = (simonWidth + columnGap) / 2;
+
+    if (heroCopyEl) {
+      tl.fromTo(
+        heroCopyEl,
+        { x: -shift, scale: 1.2 },
+        { x: 0, duration: 2.2, scale: 1, ease: 'power2.inOut' },
+        0,
+      );
+    }
     if (kickerEl) {
       tl.fromTo(
         kickerEl,
@@ -509,7 +523,7 @@ const buildAnimations = (mode: ViewType, animate = true) => {
           y: 0,
           autoAlpha: 1,
           ease: 'power2.out',
-          duration: 0.65,
+          duration: 0.6,
           overwrite: 'auto',
         },
         0,
@@ -524,10 +538,10 @@ const buildAnimations = (mode: ViewType, animate = true) => {
           y: 0,
           autoAlpha: 1,
           ease: 'power2.out',
-          duration: 1.25,
+          duration: 0.9,
           overwrite: 'auto',
         },
-        0.15,
+        0.25,
       );
     }
 
@@ -538,9 +552,9 @@ const buildAnimations = (mode: ViewType, animate = true) => {
         {
           autoAlpha: 1,
           ease: 'power2.out',
-          duration: 1.25,
+          duration: 0.9,
         },
-        '-=0.25',
+        0.55,
       );
     }
 
@@ -551,10 +565,22 @@ const buildAnimations = (mode: ViewType, animate = true) => {
         {
           autoAlpha: 1,
           ease: 'power2.out',
-          duration: 1,
+          duration: 0.8,
           stagger: 0.25,
         },
-        '-=1',
+        0.85,
+      );
+    }
+
+    if (simonEl) {
+      tl.fromTo(
+        simonEl,
+        {
+          autoAlpha: 0,
+          x: -32,
+        },
+        { autoAlpha: 1, x: 0, duration: 0.9 },
+        1.05,
       );
     }
 
@@ -572,7 +598,7 @@ const buildAnimations = (mode: ViewType, animate = true) => {
           duration: 0.45,
           stagger: 0.18,
         },
-        '-=0.15',
+        1.3,
       );
     }
   }
