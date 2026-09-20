@@ -1,4 +1,3 @@
-claritySectionRef
 <script setup lang="ts">
 import { ref, watch, nextTick, onBeforeUnmount, computed, onMounted, onUnmounted } from 'vue';
 import { useMainStore } from '../stores/main';
@@ -10,13 +9,11 @@ import SimonMenu from '../components/SimonMenu.vue';
 import { ViewType } from '../shared/constants/viewType';
 import { useViewport } from '../shared/utils/viewWidth';
 import {
-  // mdiChevronUp,
   mdiInformationOutline,
   mdiEmailBox,
   mdiMagnify,
   mdiViewGalleryOutline,
 } from '@quasar/extras/mdi-v7';
-// import { mdiChevronDown } from '@quasar/extras/mdi-v7';
 import { CacheEntry } from 'src/shared/constants/cacheEntry';
 import { useCacheStore } from 'src/stores/component-cache';
 import { scrollToElement } from 'src/shared/utils/scrollToElement';
@@ -24,11 +21,18 @@ import { CacheBinding } from 'src/shared/constants/cacheBinding';
 import ClarityBackground from 'src/components/ClarityBackground.vue';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import gsap from 'gsap';
-gsap.registerPlugin(ScrollTrigger);
 import ScrollCue from '../components/ScrollCue.vue';
+
+gsap.registerPlugin(ScrollTrigger);
+ScrollTrigger.config({ ignoreMobileResize: true });
+
+/* Flip to true to log the exact timeline position of every dropped frame. */
+const DEBUG_JANK = false;
+if (DEBUG_JANK) gsap.ticker.lagSmoothing(0);
 
 const mainStore = useMainStore();
 const cacheStore = useCacheStore();
+
 const mobileTopics: Topic[] = [
   {
     id: uuidv4(),
@@ -59,6 +63,7 @@ const mobileTopics: Topic[] = [
     cachedName: CacheEntry.ContactSection,
   },
 ];
+
 const expandedPanel = ref<TopicName | null>();
 const { activeTopic } = storeToRefs(mainStore);
 const showFooter = ref<boolean>(false);
@@ -67,7 +72,31 @@ const { lgBreakpoint, width } = useViewport();
 const isResponsive = computed(() => width.value < lgBreakpoint);
 const isMobileView = computed(() => width.value < 600);
 const isTabletView = computed(() => width.value >= 600 && width.value < lgBreakpoint);
-const dispose = ref<() => void>(() => {});
+
+/* ---------- Refs ---------- */
+
+const claritySectionRef = ref<HTMLElement | null>(null);
+const homeContainerRef = ref<HTMLElement | null>(null);
+const trustSectionRef = ref<HTMLElement | null>(null);
+const trustViewportRef = ref<HTMLElement | null>(null);
+const trustGlowRef = ref<HTMLElement | null>(null);
+const trustImageA = ref<HTMLElement | null>(null);
+const trustImageB = ref<HTMLElement | null>(null);
+const trustCopyA = ref<HTMLElement | null>(null);
+const trustCopyB = ref<HTMLElement | null>(null);
+const clarityCueRef = ref<HTMLElement | null>(null);
+const trustCueRef = ref<HTMLElement | null>(null);
+const trustBeamRef = ref<HTMLElement | null>(null);
+
+/* ---------- Lifecycle-scoped GSAP state ---------- */
+
+let heroCtx: gsap.Context | null = null;
+let sceneCtx: gsap.Context | null = null;
+let disposed = false;
+let verified = false;
+
+const prefersReducedMotion =
+  typeof window !== 'undefined' && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
 const activeEntry = computed(() => {
   if (!activeTopic.value) return null;
@@ -77,11 +106,7 @@ const activeEntry = computed(() => {
 const activeComponent = computed(() => {
   const entry = activeEntry.value;
   if (!entry) return null;
-
-  if (!cacheStore.catalog[entry]) {
-    cacheStore.CACHE_COMPONENT(entry);
-  }
-
+  if (!cacheStore.catalog[entry]) cacheStore.CACHE_COMPONENT(entry);
   return cacheStore.catalog[entry];
 });
 
@@ -94,19 +119,84 @@ const observer = new IntersectionObserver(
   { threshold: 0.1 },
 );
 
-const applyHomeScale = (animate = true) => {
-  console.log('animate', animate);
+/* ---------- Readiness helpers ---------- */
+
+const twoFrames = () =>
+  new Promise<void>((resolve) =>
+    requestAnimationFrame(() => requestAnimationFrame(() => resolve())),
+  );
+
+const withTimeout = (p: Promise<unknown>, ms: number) =>
+  Promise.race([p, new Promise<void>((r) => setTimeout(r, ms))]);
+
+/** Decode every <img> under `root` so decode never lands mid-tween. */
+const decodeImagesIn = async (root: ParentNode | null) => {
+  if (!root) return;
+  const imgs = Array.from(root.querySelectorAll<HTMLImageElement>('img'));
+  await Promise.all(
+    imgs.map((img) =>
+      typeof img.decode === 'function' ? img.decode().catch(() => {}) : Promise.resolve(),
+    ),
+  );
+};
+
+/** Decode a CSS background-image (mobile hero uses monitor.avif as a background). */
+const decodeBackgroundOf = async (el: HTMLElement | null) => {
+  if (!el) return;
+  const raw = getComputedStyle(el).backgroundImage;
+  const match = /url\(["']?(.*?)["']?\)/.exec(raw);
+  if (!match?.[1]) return;
+  const img = new Image();
+  img.src = match[1];
+  try {
+    await img.decode();
+  } catch {
+    /* noop */
+  }
+};
+
+/**
+ * Gate the entrance on: fonts settled, hero background decoded, two clean frames.
+ * Hard-capped so a stalled font request can never leave the hero hidden.
+ */
+const heroReady = async () => {
+  const bg = document.querySelector<HTMLElement>('.clarity-background');
+  await withTimeout(
+    Promise.all([
+      document.fonts ? document.fonts.ready.catch(() => {}) : Promise.resolve(),
+      decodeBackgroundOf(bg),
+    ]),
+    1500,
+  );
+  await twoFrames();
+};
+
+/* ---------- Debug: report the timeline position of dropped frames ---------- */
+
+const watchJank = (tl: gsap.core.Timeline, label: string) => {
+  if (!DEBUG_JANK) return;
+  let last = performance.now();
+  const tick = () => {
+    const now = performance.now();
+    const dt = now - last;
+    last = now;
+    if (dt > 24) console.warn(`[${label}] jank ${dt.toFixed(0)}ms @ tl ${tl.time().toFixed(2)}s`);
+    if (tl.isActive()) requestAnimationFrame(tick);
+  };
+  requestAnimationFrame(tick);
+};
+
+/* ---------- Misc ---------- */
+
+const applyHomeScale = () => {
   const el = homeContainerRef.value;
   if (!el) return;
-
   gsap.killTweensOf(el);
   gsap.set(el, { clearProps: 'transform' });
 };
 
 const handleResize = () => {
-  requestAnimationFrame(() => {
-    applyHomeScale(false);
-  });
+  requestAnimationFrame(applyHomeScale);
 };
 
 const lockScroll = () => {
@@ -120,51 +210,216 @@ const lockScroll = () => {
   window.addEventListener('touchmove', stop, { passive: false });
   window.addEventListener('keydown', stopKeys);
 
+  let released = false;
   return () => {
+    if (released) return;
+    released = true;
     window.removeEventListener('wheel', stop);
     window.removeEventListener('touchmove', stop);
     window.removeEventListener('keydown', stopKeys);
   };
 };
 
-const claritySectionRef = ref<HTMLElement | null>(null);
-const homeContainerRef = ref<HTMLElement | null>(null);
-const trustSectionRef = ref<HTMLElement | null>(null);
-const trustGlowRef = ref<HTMLElement | null>(null);
-const trustImageA = ref<HTMLElement | null>(null);
-const trustImageB = ref<HTMLElement | null>(null);
-const trustCopyA = ref<HTMLElement | null>(null);
-const trustCopyB = ref<HTMLElement | null>(null);
-const clarityCueRef = ref<HTMLElement | null>(null);
-const trustCueRef = ref<HTMLElement | null>(null);
-const trustBeamRef = ref<HTMLElement | null>(null);
+const setBeamRunning = (running: boolean) => {
+  const span = trustBeamRef.value?.querySelector<HTMLElement>('span');
+  if (span) span.style.animationPlayState = running ? 'running' : 'paused';
+};
 
-onMounted(async () => {
-  const footerElement = document.getElementById('footer');
-
-  if (isResponsive.value) {
-    try {
-      dispose.value = buildAnimations(ViewType.Responsive);
-    } catch (e) {
-      console.log('Responsive main page animations error: ', e);
-    }
+const verifyOnce = () => {
+  if (verified || disposed) return;
+  verified = true;
+  const run = () => {
+    void mainStore.VERIFY_IS_HUMAN();
+  };
+  if ('requestIdleCallback' in window) {
+    (
+      window as Window & { requestIdleCallback: (cb: () => void, o?: object) => number }
+    ).requestIdleCallback(run, { timeout: 2000 });
   } else {
-    try {
-      dispose.value = buildAnimations(ViewType.Desktop);
-    } catch (e) {
-      console.log('Desktop main page animations error: ', e);
+    setTimeout(run, 0);
+  }
+};
+
+/* ---------- Hero entrance ---------- */
+
+const heroTargets = () => {
+  const el = claritySectionRef.value;
+  if (!el) return null;
+
+  const heroCopyEl = el.querySelector<HTMLElement>('.hero-copy');
+  const kickerEl = el.querySelector<HTMLElement>('.kicker');
+  const simonEl = el.querySelector<HTMLElement>('.simon');
+  const headlineEl = el.querySelector<HTMLElement>('.headline');
+  const subheadlineEl = el.querySelector<HTMLElement>('.subheadline');
+  const ctaEls = Array.from(el.querySelectorAll<HTMLElement>('.cta'));
+  const proofEls = Array.from(el.querySelectorAll<HTMLElement>('.proof-card'));
+
+  const els = [kickerEl, simonEl, headlineEl, subheadlineEl, ...ctaEls, ...proofEls].filter(
+    (x): x is HTMLElement => !!x,
+  );
+
+  if (!els.length) return null;
+  return { heroCopyEl, kickerEl, simonEl, headlineEl, subheadlineEl, ctaEls, proofEls, els };
+};
+
+/**
+ * Hide the animated hero elements synchronously, before anything paints,
+ * so gating the timeline on fonts/decode doesn't show a flash of final state.
+ */
+const primeHero = () => {
+  const t = heroTargets();
+  if (!t) return;
+  gsap.set(t.els, { autoAlpha: 0 });
+  if (t.heroCopyEl) gsap.set(t.heroCopyEl, { willChange: 'transform' });
+};
+
+const buildHero = (mode: ViewType, animate = true) => {
+  const t = heroTargets();
+  if (!t) return;
+
+  const { heroCopyEl, kickerEl, simonEl, headlineEl, subheadlineEl, ctaEls, proofEls, els } = t;
+
+  heroCtx?.revert();
+  heroCtx = gsap.context(() => {
+    /* Resize / breakpoint swap: no replay, just a clean visible layout. */
+    if (!animate || prefersReducedMotion) {
+      gsap.set(els, { clearProps: 'all' });
+      if (heroCopyEl) gsap.set(heroCopyEl, { clearProps: 'all' });
+      verifyOnce();
+      return;
     }
-  }
 
-  if (footerElement) {
-    observer.observe(footerElement);
-  }
+    /* Promote once, up front — not element-by-element as each tween starts. */
+    gsap.set(els, { willChange: 'transform, opacity', force3D: true });
 
-  window.addEventListener('resize', handleResize);
+    const tl = gsap.timeline({
+      onComplete: () => {
+        gsap.set(els, { willChange: 'auto' });
+        if (heroCopyEl) gsap.set(heroCopyEl, { willChange: 'auto', clearProps: 'transform' });
+        verifyOnce();
+      },
+    });
 
-  requestAnimationFrame(() => {
-    applyHomeScale(false);
+    if (mode === ViewType.Responsive) {
+      if (kickerEl) {
+        tl.fromTo(
+          kickerEl,
+          { y: 35, autoAlpha: 0 },
+          { y: 0, autoAlpha: 1, ease: 'power2.out', duration: 0.65, overwrite: 'auto' },
+          0,
+        );
+      }
 
+      if (headlineEl) {
+        tl.fromTo(
+          headlineEl,
+          { y: 75, autoAlpha: 0 },
+          { y: 0, autoAlpha: 1, ease: 'power2.out', duration: 1.25, overwrite: 'auto' },
+          0.15,
+        );
+      }
+
+      if (subheadlineEl) {
+        tl.fromTo(
+          subheadlineEl,
+          { y: 50, autoAlpha: 0 },
+          { y: 0, autoAlpha: 1, ease: 'power2.out', duration: 1.25 },
+          '-=0.25',
+        );
+      }
+
+      if (ctaEls.length) {
+        tl.fromTo(
+          ctaEls,
+          { y: 50, autoAlpha: 0 },
+          { y: 0, autoAlpha: 1, ease: 'power2.out', duration: 3, stagger: 0.25 },
+          '-=1',
+        );
+      }
+
+      if (proofEls.length) {
+        tl.fromTo(
+          proofEls,
+          { y: 32, autoAlpha: 0 },
+          { y: 0, autoAlpha: 1, ease: 'power2.out', duration: 0.5, stagger: 0.18 },
+          '-=2.25',
+        );
+      }
+    }
+
+    if (mode === ViewType.Desktop) {
+      const simonWidth = simonEl?.offsetWidth ?? 250;
+      const columnGap = 32; // 2rem from .simon-copy
+      const shift = (simonWidth + columnGap) / 2;
+
+      if (heroCopyEl) {
+        tl.fromTo(
+          heroCopyEl,
+          { x: -shift, scale: 1.2 },
+          { x: 0, scale: 1, duration: 2.2, ease: 'power2.inOut', force3D: true },
+          0,
+        );
+      }
+
+      if (kickerEl) {
+        tl.fromTo(
+          kickerEl,
+          { y: 35, autoAlpha: 0 },
+          { y: 0, autoAlpha: 1, ease: 'power2.out', duration: 0.6, overwrite: 'auto' },
+          0,
+        );
+      }
+
+      if (headlineEl) {
+        tl.fromTo(
+          headlineEl,
+          { y: 75, autoAlpha: 0 },
+          { y: 0, autoAlpha: 1, ease: 'power2.out', duration: 0.9, overwrite: 'auto' },
+          0.25,
+        );
+      }
+
+      if (subheadlineEl) {
+        tl.fromTo(
+          subheadlineEl,
+          { autoAlpha: 0 },
+          { autoAlpha: 1, ease: 'power2.out', duration: 0.9 },
+          0.55,
+        );
+      }
+
+      if (ctaEls.length) {
+        tl.fromTo(
+          ctaEls,
+          { autoAlpha: 0, x: 35 },
+          { autoAlpha: 1, x: 0, ease: 'power2.out', duration: 0.8, stagger: 0.25 },
+          0.85,
+        );
+      }
+
+      if (simonEl) {
+        tl.fromTo(simonEl, { autoAlpha: 0, x: -32 }, { autoAlpha: 1, x: 0, duration: 0.9 }, 1.05);
+      }
+
+      if (proofEls.length) {
+        tl.fromTo(
+          proofEls,
+          { x: -16, autoAlpha: 0 },
+          { x: 0, autoAlpha: 1, ease: 'power2.out', duration: 0.45, stagger: 0.18 },
+          1.3,
+        );
+      }
+    }
+
+    watchJank(tl, 'hero');
+  }, claritySectionRef.value ?? undefined);
+};
+
+/* ---------- Scroll scenes (pins + trust section) ---------- */
+
+const buildScene = () => {
+  sceneCtx?.revert();
+  sceneCtx = gsap.context(() => {
     if (!isResponsive.value) {
       if (claritySectionRef.value) {
         ScrollTrigger.create({
@@ -192,151 +447,217 @@ onMounted(async () => {
     const copyA = trustCopyA.value;
     const copyB = trustCopyB.value;
     const glow = trustGlowRef.value;
+    const cue = trustCueRef.value;
+    const beam = trustBeamRef.value;
 
-    if (section && imgA && imgB && copyA && copyB && glow) {
-      const cue = trustCueRef.value;
-      const beam = trustBeamRef.value;
+    if (!(section && imgA && imgB && copyA && copyB && glow)) return;
 
-      if (isResponsive.value) {
-        /* ---------- Mobile: autoplay on entry ---------- */
+    /* Don't burn cycles spinning the conic gradient before it's visible. */
+    setBeamRunning(false);
+    gsap.set(imgB, { opacity: 0 });
+    gsap.set(glow, { opacity: 0, scale: 1.18 });
+    gsap.set([copyA, copyB], { opacity: 0 });
+    if (cue) gsap.set(cue, { opacity: 0 });
 
-        gsap.set(imgB, { opacity: 0 });
-        gsap.set(glow, { opacity: 0, scale: 1.18 });
-        gsap.set([copyA, copyB], { opacity: 0 });
-        gsap.set(cue, { opacity: 0 });
+    if (isResponsive.value) {
+      /* ---------- Mobile: autoplay on entry ---------- */
+      const mobileTl = gsap
+        .timeline({
+          paused: true,
+          onComplete: () => gsap.set([copyA, copyB], { willChange: 'auto' }),
+        })
+        .to(glow, { opacity: 1, scale: 1, duration: 1.2, ease: 'power2.out' }, 0)
+        .to(beam, { opacity: 1, duration: 1.4, ease: 'power2.out' }, 0.5)
+        .to(copyA, { opacity: 1, duration: 1.1, ease: 'power1.out' }, 1.2)
+        .to(copyA, { opacity: 0, duration: 0.8, ease: 'power1.in' }, 4.2)
+        .to(imgA, { opacity: 0, duration: 0.9, ease: 'none' }, 4.6)
+        .to(imgB, { opacity: 1, duration: 0.9, ease: 'none' }, 4.6)
+        .to(copyB, { opacity: 1, duration: 1.1, ease: 'power1.out' }, 5.2);
 
-        const mobileTl = gsap
-          .timeline({ paused: true })
-          .to(glow, { opacity: 1, scale: 1, duration: 1.2, ease: 'power2.out' }, 0)
-          .to(beam, { opacity: 1, duration: 1.4, ease: 'power2.out' }, 0.5)
-          .to(copyA, { opacity: 1, duration: 1.1, ease: 'power1.out' }, 1.2)
-          .to(copyA, { opacity: 0, duration: 0.8, ease: 'power1.in' }, 4.2)
-          .to(imgA, { opacity: 0, duration: 0.9, ease: 'none' }, 4.6)
-          .to(imgB, { opacity: 1, duration: 0.9, ease: 'none' }, 4.6)
-          .to(copyB, { opacity: 1, duration: 1.1, ease: 'power1.out' }, 5.2);
+      const trustIo = new IntersectionObserver(
+        ([entry]) => {
+          if (!entry?.isIntersecting) return;
+          trustIo.disconnect();
 
-        const trustIo = new IntersectionObserver(
-          ([entry]) => {
-            if (entry?.isIntersecting) {
-              mobileTl.play();
-              trustIo.disconnect();
-            }
-          },
-          { threshold: 0.55 },
-        );
+          /* Decode both frames before playing — the A→B crossfade is where it used to hitch. */
+          void decodeImagesIn(section).then(() => {
+            if (disposed) return;
+            setBeamRunning(true);
+            watchJank(mobileTl, 'trust-mobile');
+            mobileTl.play();
+          });
+        },
+        { threshold: 0.55 },
+      );
 
-        trustIo.observe(section);
-        io.value = trustIo;
-      } else {
-        /* ---------- Desktop: pinned + scrubbed ---------- */
-        const introTl = gsap
-          .timeline({ paused: true })
-          .fromTo(
-            glow,
-            { opacity: 0, scale: 1.18 },
-            { opacity: 1, scale: 1, duration: 1.25, ease: 'power2.out' },
-            0,
-          )
-          .fromTo(beam, { opacity: 0 }, { opacity: 1, duration: 1.6, ease: 'power2.out' }, 0.6)
-          .fromTo(copyA, { opacity: 0 }, { opacity: 1, duration: 1, ease: 'power1.out' }, 0.7)
-          .fromTo(cue, { opacity: 0 }, { opacity: 1, duration: 0.6, ease: 'power1.out' }, 1.6);
-
-        let introPlayed = false;
-        let scrubBuilt = false;
-
-        const trustTl = gsap.timeline({
-          scrollTrigger: {
-            trigger: section,
-            start: 'top top',
-            end: '+=1500',
-            pin: true,
-            pinSpacing: true,
-            scrub: 0.6,
-            onEnter: () => {
-              if (introPlayed) return;
-              introPlayed = true;
-
-              const unlock = lockScroll();
-
-              introTl.eventCallback('onComplete', () => {
-                unlock();
-                if (scrubBuilt) return;
-                scrubBuilt = true;
-
-                trustTl
-                  .fromTo(
-                    section,
-                    { backgroundPositionY: '46%' },
-                    {
-                      backgroundPositionY: '56%',
-                      ease: 'none',
-                      duration: 2.4,
-                      immediateRender: false,
-                    },
-                    0,
-                  )
-                  .fromTo(
-                    cue,
-                    { opacity: 1 },
-                    { opacity: 0, ease: 'none', duration: 0.4, immediateRender: false },
-                    0.1,
-                  )
-                  .fromTo(
-                    copyA,
-                    { opacity: 1 },
-                    { opacity: 0, ease: 'none', duration: 0.9, immediateRender: false },
-                    0.2,
-                  )
-                  .fromTo(
-                    imgB,
-                    { opacity: 0 },
-                    { opacity: 1, ease: 'none', duration: 0.8, immediateRender: false },
-                    0.7,
-                  )
-                  .fromTo(
-                    copyB,
-                    { opacity: 0 },
-                    { opacity: 1, ease: 'none', duration: 1.1, immediateRender: false },
-                    1.0,
-                  )
-                  .fromTo(
-                    glow,
-                    { opacity: 1, scale: 1 },
-                    {
-                      opacity: 0,
-                      scale: 1.25,
-                      ease: 'none',
-                      duration: 0.9,
-                      immediateRender: false,
-                    },
-                    1.5,
-                  );
-                unlock();
-                // ScrollTrigger.refresh();
-              });
-
-              introTl.play();
-            },
-          },
-        });
-      }
+      trustIo.observe(section);
+      io.value = trustIo;
+      return;
     }
 
-    ScrollTrigger.refresh();
+    /* ---------- Desktop: pinned + scrubbed ---------- */
+    let introPlayed = false;
+    let scrubBuilt = false;
+
+    const trustTl = gsap.timeline({
+      scrollTrigger: {
+        trigger: section,
+        start: 'top top',
+        end: '+=1500',
+        pin: true,
+        pinSpacing: true,
+        scrub: 0.6,
+        onEnter: () => {
+          if (introPlayed) return;
+          introPlayed = true;
+
+          const unlock = lockScroll();
+
+          const introTl = gsap.timeline({
+            paused: true,
+            onComplete: () => {
+              unlock();
+              if (scrubBuilt) return;
+              scrubBuilt = true;
+
+              trustTl
+                .fromTo(
+                  section,
+                  { backgroundPositionY: '46%' },
+                  {
+                    backgroundPositionY: '56%',
+                    ease: 'none',
+                    duration: 2.4,
+                    immediateRender: false,
+                  },
+                  0,
+                )
+                .fromTo(
+                  cue,
+                  { opacity: 1 },
+                  { opacity: 0, ease: 'none', duration: 0.4, immediateRender: false },
+                  0.1,
+                )
+                .fromTo(
+                  copyA,
+                  { opacity: 1 },
+                  { opacity: 0, ease: 'none', duration: 0.9, immediateRender: false },
+                  0.2,
+                )
+                .fromTo(
+                  imgB,
+                  { opacity: 0 },
+                  { opacity: 1, ease: 'none', duration: 0.8, immediateRender: false },
+                  0.7,
+                )
+                .fromTo(
+                  copyB,
+                  { opacity: 0 },
+                  { opacity: 1, ease: 'none', duration: 1.1, immediateRender: false },
+                  1.0,
+                )
+                .fromTo(
+                  glow,
+                  { opacity: 1, scale: 1 },
+                  {
+                    opacity: 0,
+                    scale: 1.25,
+                    ease: 'none',
+                    duration: 0.9,
+                    immediateRender: false,
+                  },
+                  1.5,
+                );
+            },
+          });
+
+          introTl
+            .fromTo(
+              glow,
+              { opacity: 0, scale: 1.18 },
+              { opacity: 1, scale: 1, duration: 1.25, ease: 'power2.out' },
+              0,
+            )
+            .fromTo(beam, { opacity: 0 }, { opacity: 1, duration: 1.6, ease: 'power2.out' }, 0.6)
+            .fromTo(copyA, { opacity: 0 }, { opacity: 1, duration: 1, ease: 'power1.out' }, 0.7)
+            .fromTo(cue, { opacity: 0 }, { opacity: 1, duration: 0.6, ease: 'power1.out' }, 1.6);
+
+          /* Decode both trust frames + settle one frame before the intro plays. */
+          void decodeImagesIn(section)
+            .then(twoFrames)
+            .then(() => {
+              if (disposed) {
+                unlock();
+                return;
+              }
+              setBeamRunning(true);
+              watchJank(introTl, 'trust-desktop');
+              introTl.play();
+            });
+        },
+      },
+    });
   });
-  await mainStore.VERIFY_IS_HUMAN();
+};
+
+/* ---------- Lifecycle ---------- */
+
+onMounted(async () => {
+  /* 1. Hide the hero immediately so the wait below can't flash final state. */
+  primeHero();
+
+  const footerElement = document.getElementById('footer');
+  if (footerElement) observer.observe(footerElement);
+  window.addEventListener('resize', handleResize);
+
+  /* 2. Create every pin and ScrollTrigger and measure FIRST.
+        Pin-spacers reflow the hero's own container — doing this while the
+        entrance was already running was the mid-timeline hitch. */
+  await nextTick();
+  await twoFrames();
+  if (disposed) return;
+
+  applyHomeScale();
+  buildScene();
+  ScrollTrigger.refresh();
+
+  /* 3. Only now wait for fonts + hero background, then play on clean layout. */
+  await heroReady();
+  if (disposed) return;
+
+  try {
+    buildHero(isResponsive.value ? ViewType.Responsive : ViewType.Desktop);
+  } catch (e) {
+    console.log('Main page animation error: ', e);
+    heroCtx?.revert();
+    const t = heroTargets();
+    if (t) gsap.set(t.els, { clearProps: 'all' });
+    verifyOnce();
+  }
+
+  /* 4. One late refresh once every image/font has settled. Never mid-tween. */
+  if (document.readyState === 'complete') {
+    ScrollTrigger.refresh();
+  } else {
+    window.addEventListener('load', () => !disposed && ScrollTrigger.refresh(), { once: true });
+  }
 });
 
 onBeforeUnmount(() => {
+  disposed = true;
   io.value?.disconnect();
   observer.disconnect();
   window.removeEventListener('resize', handleResize);
 
   try {
-    dispose.value();
+    heroCtx?.revert();
+    sceneCtx?.revert();
   } catch (e) {
     console.log('onBeforeUnmount dispose err', e);
   }
+
+  heroCtx = null;
+  sceneCtx = null;
   ScrollTrigger.getAll().forEach((st) => st.kill());
 });
 
@@ -347,20 +668,20 @@ onUnmounted(() => {
 watch(
   isResponsive,
   async (viewNow) => {
-    try {
-      dispose.value();
-    } catch (err) {
-      console.log('view switch error: ', err);
-    }
+    heroCtx?.revert();
+    sceneCtx?.revert();
+    io.value?.disconnect();
+    io.value = null;
 
     await nextTick();
     await waitForLayout(homeContainerRef.value);
+    if (disposed) return;
 
-    dispose.value = buildAnimations(viewNow ? ViewType.Responsive : ViewType.Desktop, false);
+    buildScene();
+    ScrollTrigger.refresh();
+    buildHero(viewNow ? ViewType.Responsive : ViewType.Desktop, false);
 
-    requestAnimationFrame(() => {
-      applyHomeScale(false);
-    });
+    requestAnimationFrame(applyHomeScale);
   },
   { flush: 'post' },
 );
@@ -388,227 +709,6 @@ const waitForLayout = async (el: HTMLElement | null, frames = 8): Promise<boolea
 
   mainStore.SET_PAINTED_STATUS(false);
   return false;
-};
-
-const buildAnimations = (mode: ViewType, animate = true) => {
-  const el = claritySectionRef.value;
-  if (!el) return () => {};
-
-  const heroCopyEl = el.querySelector<HTMLElement>('.hero-copy');
-  const kickerEl = el.querySelector<HTMLElement>('.kicker');
-  const simonEl = el.querySelector<HTMLElement>('.simon');
-  const headlineEl = el.querySelector<HTMLElement>('.headline');
-  const subheadlineEl = el.querySelector<HTMLElement>('.subheadline');
-  const ctaEls = Array.from(el.querySelectorAll<HTMLElement>('.cta'));
-  const proofEls = Array.from(el.querySelectorAll<HTMLElement>('.proof-card'));
-
-  const els = [kickerEl, simonEl, headlineEl, subheadlineEl, ...ctaEls, ...proofEls].filter(
-    (x): x is HTMLElement => !!x,
-  );
-
-  if (!els.length) return () => {};
-
-  gsap.killTweensOf(els);
-  gsap.set(els, { clearProps: 'all' });
-
-  // Resize / breakpoint swap path:
-  // do not replay the entrance timeline, just clear stuck GSAP props
-  // and leave the new layout in its natural visible state.
-  if (!animate) {
-    return () => {
-      gsap.killTweensOf(els);
-      gsap.set(els, { clearProps: 'all' });
-    };
-  }
-
-  const tl = gsap.timeline();
-
-  if (mode === ViewType.Responsive) {
-    if (kickerEl) {
-      tl.fromTo(
-        kickerEl,
-        { y: 35, autoAlpha: 0 },
-        {
-          y: 0,
-          autoAlpha: 1,
-          ease: 'power2.out',
-          duration: 0.65,
-          overwrite: 'auto',
-        },
-        0,
-      );
-    }
-
-    if (headlineEl) {
-      tl.fromTo(
-        headlineEl,
-        { y: 75, autoAlpha: 0 },
-        {
-          y: 0,
-          autoAlpha: 1,
-          ease: 'power2.out',
-          duration: 1.25,
-          overwrite: 'auto',
-        },
-        0.15,
-      );
-    }
-
-    if (subheadlineEl) {
-      tl.fromTo(
-        subheadlineEl,
-        { y: 50, autoAlpha: 0 },
-        {
-          y: 0,
-          autoAlpha: 1,
-          ease: 'power2.out',
-          duration: 1.25,
-        },
-        '-=0.25',
-      );
-    }
-
-    if (ctaEls.length) {
-      tl.fromTo(
-        ctaEls,
-        { y: 50, autoAlpha: 0 },
-        {
-          y: 0,
-          autoAlpha: 1,
-          ease: 'power2.out',
-          duration: 3,
-          stagger: 0.25,
-        },
-        '-=1',
-      );
-    }
-
-    if (proofEls.length) {
-      tl.fromTo(
-        proofEls,
-        {
-          y: 32,
-          autoAlpha: 0,
-        },
-        {
-          y: 0,
-          autoAlpha: 1,
-          ease: 'power2.out',
-          duration: 0.5,
-          stagger: 0.18,
-        },
-        '-=2.25',
-      );
-    }
-  }
-
-  if (mode === ViewType.Desktop) {
-    const simonWidth = simonEl?.offsetWidth ?? 250;
-    const columnGap = 32; // 2rem from .simon-copy
-    const shift = (simonWidth + columnGap) / 2;
-
-    if (heroCopyEl) {
-      tl.fromTo(
-        heroCopyEl,
-        { x: -shift, scale: 1.2 },
-        { x: 0, duration: 2.2, scale: 1, ease: 'power2.inOut' },
-        0,
-      );
-    }
-    if (kickerEl) {
-      tl.fromTo(
-        kickerEl,
-        { y: 35, autoAlpha: 0 },
-        {
-          y: 0,
-          autoAlpha: 1,
-          ease: 'power2.out',
-          duration: 0.6,
-          overwrite: 'auto',
-        },
-        0,
-      );
-    }
-
-    if (headlineEl) {
-      tl.fromTo(
-        headlineEl,
-        { y: 75, autoAlpha: 0 },
-        {
-          y: 0,
-          autoAlpha: 1,
-          ease: 'power2.out',
-          duration: 0.9,
-          overwrite: 'auto',
-        },
-        0.25,
-      );
-    }
-
-    if (subheadlineEl) {
-      tl.fromTo(
-        subheadlineEl,
-        { autoAlpha: 0 },
-        {
-          autoAlpha: 1,
-          ease: 'power2.out',
-          duration: 0.9,
-        },
-        0.55,
-      );
-    }
-
-    if (ctaEls.length) {
-      tl.fromTo(
-        ctaEls,
-        { autoAlpha: 0, x: 35 },
-        {
-          autoAlpha: 1,
-          ease: 'power2.out',
-          duration: 0.8,
-          stagger: 0.25,
-          x: 0,
-        },
-        0.85,
-      );
-    }
-
-    if (simonEl) {
-      tl.fromTo(
-        simonEl,
-        {
-          autoAlpha: 0,
-          x: -32,
-        },
-        { autoAlpha: 1, x: 0, duration: 0.9 },
-        1.05,
-      );
-    }
-
-    if (proofEls.length) {
-      tl.fromTo(
-        proofEls,
-        {
-          x: -16,
-          autoAlpha: 0,
-        },
-        {
-          x: 0,
-          autoAlpha: 1,
-          ease: 'power2.out',
-          duration: 0.45,
-          stagger: 0.18,
-        },
-        1.3,
-      );
-    }
-  }
-
-  return () => {
-    tl.kill();
-    gsap.killTweensOf(els);
-    gsap.set(els, { clearProps: 'all' });
-  };
 };
 
 const toContact = () => {
@@ -765,7 +865,7 @@ const toContact = () => {
     </div>
     <div class="section-transition"></div>
     <section ref="trustSectionRef" class="trust-section">
-      <div class="trust-viewport">
+      <div ref="trustViewportRef" class="trust-viewport">
         <div ref="trustImageA" class="trust-image-wrap">
           <img src="../assets/trust-breathing-in.avif" alt="" class="trust-image" />
         </div>
