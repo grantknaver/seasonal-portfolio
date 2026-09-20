@@ -30,6 +30,13 @@ ScrollTrigger.config({ ignoreMobileResize: true });
 const DEBUG_JANK = false;
 if (DEBUG_JANK) gsap.ticker.lagSmoothing(0);
 
+/* ---------- Trust intro choreography (desktop) ----------
+   Tune these four numbers to retime the whole pinned entrance. */
+const VIEWPORT_DROP = 40; // px the framed viewport rests below its final position
+const NAV_AT = 0.85; // when the menu buttons start popping in
+const COPY_AT = 1.2; // when the first line of copy starts
+const COPY_STAGGER = 0.2; // gap between each line, top to bottom
+
 const mainStore = useMainStore();
 const cacheStore = useCacheStore();
 
@@ -79,6 +86,7 @@ const claritySectionRef = ref<HTMLElement | null>(null);
 const homeContainerRef = ref<HTMLElement | null>(null);
 const trustSectionRef = ref<HTMLElement | null>(null);
 const trustViewportRef = ref<HTMLElement | null>(null);
+const trustNavRef = ref<HTMLElement | null>(null);
 const trustGlowRef = ref<HTMLElement | null>(null);
 const trustImageA = ref<HTMLElement | null>(null);
 const trustImageB = ref<HTMLElement | null>(null);
@@ -442,6 +450,8 @@ const buildScene = () => {
     }
 
     const section = trustSectionRef.value;
+    const viewport = trustViewportRef.value;
+    const nav = trustNavRef.value;
     const imgA = trustImageA.value;
     const imgB = trustImageB.value;
     const copyA = trustCopyA.value;
@@ -456,15 +466,18 @@ const buildScene = () => {
     setBeamRunning(false);
     gsap.set(imgB, { opacity: 0 });
     gsap.set(glow, { opacity: 0, scale: 1.18 });
-    gsap.set([copyA, copyB], { opacity: 0 });
     if (cue) gsap.set(cue, { opacity: 0 });
 
     if (isResponsive.value) {
       /* ---------- Mobile: autoplay on entry ---------- */
+      gsap.set([copyA, copyB], { opacity: 0 });
+
       const mobileTl = gsap
         .timeline({
           paused: true,
-          onComplete: () => gsap.set([copyA, copyB], { willChange: 'auto' }),
+          onComplete: () => {
+            gsap.set([copyA, copyB], { willChange: 'auto' });
+          },
         })
         .to(glow, { opacity: 1, scale: 1, duration: 1.2, ease: 'power2.out' }, 0)
         .to(beam, { opacity: 1, duration: 1.4, ease: 'power2.out' }, 0.5)
@@ -496,6 +509,50 @@ const buildScene = () => {
     }
 
     /* ---------- Desktop: pinned + scrubbed ---------- */
+
+    /* Copy A animates line by line, top to bottom — eyebrow, headline, support.
+       The container stays at opacity 1 so the scrub can still fade the group out. */
+    const copyALines = Array.from(copyA.children).filter(
+      (n): n is HTMLElement => n instanceof HTMLElement,
+    );
+
+    /* Menu buttons. Fall back to fading the whole nav if the inner markup
+       doesn't expose individual controls — never transform .trust-nav itself,
+       its CSS translateX(-50%) centring depends on staying untouched. */
+    const navItems = nav
+      ? Array.from(nav.querySelectorAll<HTMLElement>('.q-btn, button, a, [role="button"]'))
+      : [];
+    const usesNavItems = navItems.length > 0;
+    const navTargets: HTMLElement[] = usesNavItems ? navItems : nav ? [nav] : [];
+
+    gsap.set(copyA, { opacity: 1 });
+    gsap.set(copyB, { opacity: 0 });
+
+    if (copyALines.length) {
+      gsap.set(copyALines, { autoAlpha: 0, y: 22, willChange: 'transform, opacity' });
+    } else {
+      gsap.set(copyA, { opacity: 0 });
+    }
+
+    if (viewport) {
+      gsap.set(viewport, { y: VIEWPORT_DROP, willChange: 'transform', force3D: true });
+    }
+
+    if (navTargets.length) {
+      gsap.set(
+        navTargets,
+        usesNavItems
+          ? { autoAlpha: 0, y: 14, scale: 0.94, willChange: 'transform, opacity' }
+          : { autoAlpha: 0 },
+      );
+    }
+
+    const clearIntroHints = () => {
+      if (viewport) gsap.set(viewport, { willChange: 'auto' });
+      if (copyALines.length) gsap.set(copyALines, { willChange: 'auto', clearProps: 'transform' });
+      if (usesNavItems) gsap.set(navItems, { willChange: 'auto', clearProps: 'transform,scale' });
+    };
+
     let introPlayed = false;
     let scrubBuilt = false;
 
@@ -517,6 +574,7 @@ const buildScene = () => {
             paused: true,
             onComplete: () => {
               unlock();
+              clearIntroHints();
               if (scrubBuilt) return;
               scrubBuilt = true;
 
@@ -571,6 +629,12 @@ const buildScene = () => {
             },
           });
 
+          /* 1. The framed viewport rises into its resting position. */
+          if (viewport) {
+            introTl.to(viewport, { y: 0, duration: 1.15, ease: 'power3.out', force3D: true }, 0);
+          }
+
+          /* Ambience rides along with the lift. */
           introTl
             .fromTo(
               glow,
@@ -578,9 +642,53 @@ const buildScene = () => {
               { opacity: 1, scale: 1, duration: 1.25, ease: 'power2.out' },
               0,
             )
-            .fromTo(beam, { opacity: 0 }, { opacity: 1, duration: 1.6, ease: 'power2.out' }, 0.6)
-            .fromTo(copyA, { opacity: 0 }, { opacity: 1, duration: 1, ease: 'power1.out' }, 0.7)
-            .fromTo(cue, { opacity: 0 }, { opacity: 1, duration: 0.6, ease: 'power1.out' }, 1.6);
+            .fromTo(beam, { opacity: 0 }, { opacity: 1, duration: 1.6, ease: 'power2.out' }, 0.55);
+
+          /* 2. Menu buttons pop in. */
+          if (navTargets.length) {
+            introTl.to(
+              navTargets,
+              usesNavItems
+                ? {
+                    autoAlpha: 1,
+                    y: 0,
+                    scale: 1,
+                    duration: 0.55,
+                    ease: 'back.out(1.8)',
+                    stagger: 0.08,
+                  }
+                : { autoAlpha: 1, duration: 0.6, ease: 'power2.out' },
+              NAV_AT,
+            );
+          }
+
+          /* 3. Copy comes in line by line, top to bottom. */
+          if (copyALines.length) {
+            introTl.to(
+              copyALines,
+              {
+                autoAlpha: 1,
+                y: 0,
+                duration: 0.75,
+                ease: 'power2.out',
+                stagger: COPY_STAGGER,
+              },
+              COPY_AT,
+            );
+          } else {
+            introTl.to(copyA, { opacity: 1, duration: 1, ease: 'power1.out' }, COPY_AT);
+          }
+
+          /* 4. Scroll cue last, once the frame has settled. */
+          const cueAt = COPY_AT + COPY_STAGGER * Math.max(copyALines.length - 1, 0) + 0.55;
+          if (cue) {
+            introTl.fromTo(
+              cue,
+              { opacity: 0 },
+              { opacity: 1, duration: 0.6, ease: 'power1.out' },
+              cueAt,
+            );
+          }
 
           /* Decode both trust frames + settle one frame before the intro plays. */
           void decodeImagesIn(section)
@@ -588,6 +696,7 @@ const buildScene = () => {
             .then(() => {
               if (disposed) {
                 unlock();
+                if (viewport) gsap.set(viewport, { y: 0, willChange: 'auto' });
                 return;
               }
               setBeamRunning(true);
