@@ -270,20 +270,14 @@ const heroTargets = () => {
   return { heroCopyEl, kickerEl, simonEl, headlineEl, subheadlineEl, ctaEls, proofEls, els };
 };
 
-/**
- * Hide the animated hero elements synchronously, before anything paints,
- * so gating the timeline on fonts/decode doesn't show a flash of final state.
- */
-const primeHero = () => {
-  const t = heroTargets();
-  if (!t) return;
-  gsap.set(t.els, { autoAlpha: 0 });
-  if (t.heroCopyEl) gsap.set(t.heroCopyEl, { willChange: 'transform' });
-};
+const release = () => claritySectionRef.value?.removeAttribute('data-hero');
 
 const buildHero = (mode: ViewType, animate = true) => {
   const t = heroTargets();
-  if (!t) return;
+  if (!t) {
+    release();
+    return;
+  }
 
   const { heroCopyEl, kickerEl, simonEl, headlineEl, subheadlineEl, ctaEls, proofEls, els } = t;
 
@@ -293,6 +287,7 @@ const buildHero = (mode: ViewType, animate = true) => {
     if (!animate || prefersReducedMotion) {
       gsap.set(els, { clearProps: 'all' });
       if (heroCopyEl) gsap.set(heroCopyEl, { clearProps: 'all' });
+      release();
       verifyOnce();
       return;
     }
@@ -301,6 +296,7 @@ const buildHero = (mode: ViewType, animate = true) => {
     gsap.set(els, { willChange: 'transform, opacity', force3D: true });
 
     const tl = gsap.timeline({
+      paused: true,
       onComplete: () => {
         gsap.set(els, { willChange: 'auto' });
         if (heroCopyEl) gsap.set(heroCopyEl, { willChange: 'auto', clearProps: 'transform' });
@@ -419,6 +415,8 @@ const buildHero = (mode: ViewType, animate = true) => {
       }
     }
 
+    release(); // ← curtain up, frame zero is already written
+    tl.play();
     watchJank(tl, 'hero');
   }, claritySectionRef.value ?? undefined);
 };
@@ -712,9 +710,6 @@ const buildScene = () => {
 /* ---------- Lifecycle ---------- */
 
 onMounted(async () => {
-  /* 1. Hide the hero immediately so the wait below can't flash final state. */
-  primeHero();
-
   const footerElement = document.getElementById('footer');
   if (footerElement) observer.observe(footerElement);
   window.addEventListener('resize', handleResize);
@@ -838,7 +833,7 @@ const toContact = () => {
       <ClarityBackground v-if="!isResponsive" />
     </section>
 
-    <div ref="claritySectionRef" class="clarity-section full-width q-pa-md">
+    <div ref="claritySectionRef" class="clarity-section full-width q-pa-md" data-hero="priming">
       <div
         ref="homeContainerRef"
         class="home-container column justify-start q-pa-lg font-primary"
@@ -993,7 +988,7 @@ const toContact = () => {
         </div>
 
         <div ref="trustCopyB" class="trust-copy">
-          <p>TRUST GIVES PEOPLE ROOM TO MOVE FORWARD.</p>
+          <p>TRUST GIVES PEOPLE ROOM TO MOVE <span class="forward">FORWARD</span></p>
         </div>
         <div ref="trustGlowRef" class="trust-glow" aria-hidden="true"></div>
         <div ref="trustCueRef" class="trust-cue">
@@ -1120,6 +1115,10 @@ const toContact = () => {
       z-index: 2;
     }
   }
+}
+
+.clarity-section[data-hero='priming'] {
+  visibility: hidden;
 }
 
 .q-item__section--side {
@@ -1521,6 +1520,10 @@ const toContact = () => {
 
     @media (min-width: tokens.$breakpoint-lg) {
       font-size: clamp(1.9rem, 2.8vw, 2.5rem);
+    }
+
+    .forward {
+      color: tokens.$ivory;
     }
 
     .eyebrow {
