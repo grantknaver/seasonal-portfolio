@@ -988,7 +988,7 @@ const toContact = () => {
         </div>
 
         <div ref="trustCopyB" class="trust-copy">
-          <p>TRUST GIVES PEOPLE ROOM TO MOVE <span class="forward">FORWARD</span></p>
+          <p><span class="trust-fill">TRUST GIVES PEOPLE ROOM</span> TO MOVE FORWARD</p>
         </div>
         <div ref="trustGlowRef" class="trust-glow" aria-hidden="true"></div>
         <div ref="trustCueRef" class="trust-cue">
@@ -1522,8 +1522,13 @@ const toContact = () => {
       font-size: clamp(1.9rem, 2.8vw, 2.5rem);
     }
 
-    .forward {
-      color: tokens.$ivory;
+    .trust-fill {
+      color: tokens.$champagne;
+      font-size: clamp(1.26rem, 4.14vw, 1.71rem);
+
+      @media (min-width: tokens.$breakpoint-lg) {
+        font-size: clamp(1.71rem, 2.52vw, 2.25rem);
+      }
     }
 
     .eyebrow {
