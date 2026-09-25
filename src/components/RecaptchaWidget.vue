@@ -10,8 +10,21 @@ const { recaptchaWidgetId } = storeToRefs(mainStore);
 
 const recaptchaEl = ref<HTMLElement | null>(null);
 
+/* reCAPTCHA is loaded on demand (not in index.html) so its ~300KB of JS and
+   iframes don't compete with the intro animation on a cold first visit. */
+const RECAPTCHA_SRC = 'https://www.google.com/recaptcha/api.js?render=explicit';
+const loadRecaptchaScript = () => {
+  if (window.grecaptcha || document.querySelector(`script[src="${RECAPTCHA_SRC}"]`)) return;
+  const s = document.createElement('script');
+  s.src = RECAPTCHA_SRC;
+  s.async = true;
+  s.defer = true;
+  document.head.appendChild(s);
+};
+
 const waitForGrecaptcha = () =>
   new Promise<void>((resolve) => {
+    loadRecaptchaScript();
     const tick = () =>
       typeof window !== 'undefined' && window.grecaptcha?.ready ? resolve() : setTimeout(tick, 100);
     tick();

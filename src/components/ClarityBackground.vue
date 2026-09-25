@@ -23,6 +23,12 @@ const LOAD_ORDER = [
 
 const STAGGER = 0.28;
 
+/* Animating CSS blur on big SVG groups is re-painted from scratch every frame.
+   It was dropping frames mid-intro (73ms at ~1.9s). false = opacity + scale only.
+   Flip back to true to compare. */
+const USE_BLUR = false;
+const blur = (px: number) => (USE_BLUR ? { filter: `blur(${px}px)` } : {});
+
 onMounted(() => {
   const root = svgRoot.value;
   if (!root) return;
@@ -53,11 +59,12 @@ onMounted(() => {
     /* ---------- on load ---------- */
 
     gsap.set(loadTargets, {
-      filter: 'blur(9px)',
+      filter: USE_BLUR ? 'blur(9px)' : 'none',
       opacity: 0.35,
       scale: 1,
-      willChange: 'filter, opacity, transform',
+      willChange: USE_BLUR ? 'filter, opacity, transform' : 'opacity, transform',
     });
+    if (!USE_BLUR) gsap.set(scrollTargets, { filter: 'none' });
 
     const tl = gsap.timeline();
 
@@ -66,8 +73,8 @@ onMounted(() => {
         el,
         {
           keyframes: [
-            { filter: 'blur(3px)', opacity: 0.75, scale: 1.035, duration: 0.5, ease: 'power2.out' },
-            { filter: 'blur(0px)', opacity: 1, scale: 1, duration: 0.55, ease: 'power2.inOut' },
+            { ...blur(3), opacity: 0.75, scale: 1.035, duration: 0.5, ease: 'power2.out' },
+            { ...blur(0), opacity: 1, scale: 1, duration: 0.55, ease: 'power2.inOut' },
           ],
         },
         i * STAGGER,
@@ -89,8 +96,8 @@ onMounted(() => {
       if (topDeco) {
         tl2.fromTo(
           topDeco,
-          { y: -300, opacity: 0, filter: 'blur(9px)' },
-          { y: 0, opacity: 1, filter: 'blur(0px)', duration: 1.5, ease: 'none' },
+          { y: -300, opacity: 0, ...blur(9) },
+          { y: 0, opacity: 1, ...blur(0), duration: 1.5, ease: 'none' },
           0,
         );
       }
@@ -98,8 +105,8 @@ onMounted(() => {
       if (sidebar) {
         tl2.fromTo(
           sidebar,
-          { x: -300, opacity: 0, filter: 'blur(9px)' },
-          { x: 0, opacity: 1, filter: 'blur(0px)', duration: 1.5, ease: 'none' },
+          { x: -300, opacity: 0, ...blur(9) },
+          { x: 0, opacity: 1, ...blur(0), duration: 1.5, ease: 'none' },
           1,
         );
       }
@@ -107,8 +114,8 @@ onMounted(() => {
       if (buttonCard) {
         tl2.fromTo(
           buttonCard,
-          { x: 480, y: 300, opacity: 0, filter: 'blur(9px)' },
-          { x: 0, y: 0, opacity: 1, filter: 'blur(0px)', duration: 1.5, ease: 'none' },
+          { x: 480, y: 300, opacity: 0, ...blur(9) },
+          { x: 0, y: 0, opacity: 1, ...blur(0), duration: 1.5, ease: 'none' },
           2,
         );
       }

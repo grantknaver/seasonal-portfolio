@@ -24,11 +24,34 @@ import gsap from 'gsap';
 import ScrollCue from '../components/ScrollCue.vue';
 
 gsap.registerPlugin(ScrollTrigger);
-ScrollTrigger.config({ ignoreMobileResize: true });
+/* No auto-refresh on window 'load'. On a cold (uncached) visit 'load' fires
+   while the hero is still animating, and a refresh reverts + rebuilds the
+   hero's pin-spacer mid-tween — that's the first-visit-only stutter. We
+   refresh ourselves once the hero has finished instead (see onMounted). */
+ScrollTrigger.config({
+  ignoreMobileResize: true,
+  autoRefreshEvents: 'visibilitychange,DOMContentLoaded,resize',
+});
 
 /* Flip to true to log the exact timeline position of every dropped frame. */
 const DEBUG_JANK = false;
-if (DEBUG_JANK) gsap.ticker.lagSmoothing(0);
+if (DEBUG_JANK) {
+  gsap.ticker.lagSmoothing(0);
+  const t0 = performance.now();
+  const at = () => `${((performance.now() - t0) / 1000).toFixed(2)}s`;
+  (window as Window & { __jankAt?: () => string }).__jankAt = at;
+  /* Anything that blocks the main thread for 50ms+ — this is what stutters an animation. */
+  try {
+    new PerformanceObserver((list) => {
+      list.getEntries().forEach((e) =>
+        console.warn(`[longtask] ${e.duration.toFixed(0)}ms @ ${at()}`),
+      );
+    }).observe({ type: 'longtask', buffered: true });
+  } catch {
+    /* unsupported */
+  }
+  window.addEventListener('load', () => console.warn(`[page] load event @ ${at()}`));
+}
 
 /* ---------- Trust intro choreography (desktop) ----------
    Tune these four numbers to retime the whole pinned entrance. */
@@ -102,6 +125,10 @@ let heroCtx: gsap.Context | null = null;
 let sceneCtx: gsap.Context | null = null;
 let disposed = false;
 let verified = false;
+
+/* Resolves when the hero entrance is finished (or skipped). */
+let markHeroDone: () => void = () => {};
+const heroDone = new Promise<void>((r) => (markHeroDone = r));
 
 const prefersReducedMotion =
   typeof window !== 'undefined' && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
@@ -276,6 +303,7 @@ const buildHero = (mode: ViewType, animate = true) => {
   const t = heroTargets();
   if (!t) {
     release();
+    markHeroDone();
     return;
   }
 
@@ -289,6 +317,7 @@ const buildHero = (mode: ViewType, animate = true) => {
       if (heroCopyEl) gsap.set(heroCopyEl, { clearProps: 'all' });
       release();
       verifyOnce();
+      markHeroDone();
       return;
     }
 
@@ -298,9 +327,21 @@ const buildHero = (mode: ViewType, animate = true) => {
     const tl = gsap.timeline({
       paused: true,
       onComplete: () => {
-        gsap.set(els, { willChange: 'auto' });
-        if (heroCopyEl) gsap.set(heroCopyEl, { willChange: 'auto', clearProps: 'transform' });
+        /* Dropping the layers forces a re-paint (the 32ms hitch on the last frame).
+           Do it once the browser is idle instead of on the final frame. */
+        const cleanup = () => {
+          gsap.set(els, { willChange: 'auto' });
+          if (heroCopyEl) gsap.set(heroCopyEl, { willChange: 'auto', clearProps: 'transform' });
+        };
+        if ('requestIdleCallback' in window) {
+          (
+            window as Window & { requestIdleCallback: (cb: () => void, o?: object) => number }
+          ).requestIdleCallback(cleanup, { timeout: 1500 });
+        } else {
+          setTimeout(cleanup, 500);
+        }
         verifyOnce();
+        markHeroDone();
       },
     });
 
@@ -416,6 +457,7 @@ const buildHero = (mode: ViewType, animate = true) => {
     }
 
     release(); // ← curtain up, frame zero is already written
+    if (DEBUG_JANK) console.warn(`[hero] start @ ${(window as Window & { __jankAt?: () => string }).__jankAt?.()}`);
     tl.play();
     watchJank(tl, 'hero');
   }, claritySectionRef.value ?? undefined);
@@ -737,14 +779,17 @@ onMounted(async () => {
     const t = heroTargets();
     if (t) gsap.set(t.els, { clearProps: 'all' });
     verifyOnce();
+    markHeroDone();
   }
 
-  /* 4. One late refresh once every image/font has settled. Never mid-tween. */
-  if (document.readyState === 'complete') {
-    ScrollTrigger.refresh();
-  } else {
-    window.addEventListener('load', () => !disposed && ScrollTrigger.refresh(), { once: true });
-  }
+  /* 4. One late refresh once every image/font has settled AND the hero has
+        finished. Never mid-tween — on a cold load 'load' lands during the hero. */
+  const pageLoaded =
+    document.readyState === 'complete'
+      ? Promise.resolve()
+      : new Promise<void>((r) => window.addEventListener('load', () => r(), { once: true }));
+  await Promise.all([heroDone, pageLoaded]);
+  if (!disposed) ScrollTrigger.refresh();
 });
 
 onBeforeUnmount(() => {
