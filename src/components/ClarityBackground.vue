@@ -47,7 +47,7 @@ onMounted(() => {
   const wrap = wrapRoot.value;
   const proofFor = (key: string) =>
     wrap?.querySelector<HTMLElement>(`.bg-proof[data-proof="${key}"]`) ?? null;
-  const proofTop = proofFor('clients');
+  const proofTop = proofFor('exact');
   const proofSide = proofFor('clarity');
   const proofCard = proofFor('ai');
   const proofs = [proofTop, proofSide, proofCard].filter((el): el is HTMLElement => !!el);
@@ -140,6 +140,10 @@ onMounted(() => {
           { autoAlpha: 1, y: 0, duration: 0.55, ease: 'none' },
           at,
         );
+        const snap = el.querySelector('.bg-proof__snap');
+        if (snap) {
+          tl2.fromTo(snap, { x: 14 }, { x: 0, duration: 0.45, ease: 'none' }, at + 0.15);
+        }
         const lines = el.querySelectorAll('.bg-proof__reveal');
         if (lines.length) {
           tl2.fromTo(
@@ -1168,34 +1172,35 @@ onBeforeUnmount(() => {
 
   <!-- Proof overlays. Positions are % of the 1672x941 viewBox, so they track the
        stretched SVG pieces they sit in at any desktop size. -->
-  <div class="bg-proof bg-proof--clients" data-proof="clients">
-    <span class="bg-proof__kicker">Shipped inside</span>
-    <ul class="bg-proof__names">
-      <li class="bg-proof__reveal">Labcorp</li>
-      <li class="bg-proof__reveal">Amtrak</li>
-      <li class="bg-proof__reveal">ORNL</li>
-      <li class="bg-proof__reveal">Lockheed Martin</li>
-    </ul>
+  <div class="bg-proof bg-proof--exact" data-proof="exact">
+    <span class="bg-proof__kicker">Trust</span>
+    <span class="bg-proof__align" aria-hidden="true">
+      <i class="bg-proof__guide"></i>
+      <i class="bg-proof__block"></i>
+      <i class="bg-proof__block bg-proof__snap"></i>
+      <b class="bg-proof__badge bg-proof__reveal">0px off</b>
+    </span>
+    <span class="bg-proof__caption bg-proof__reveal">Precision reads as trust.</span>
   </div>
 
   <div class="bg-proof bg-proof--clarity" data-proof="clarity">
-    <span class="bg-proof__kicker">Proof &middot; Clarity</span>
+    <span class="bg-proof__kicker">Clarity</span>
     <strong class="bg-proof__title">You&rsquo;re scrolling the case study.</strong>
-    <span class="bg-proof__line bg-proof__reveal">
-      Message, proof, next step. Each piece arrives when you need it, not before.
+    <span class="bg-proof__flow" aria-hidden="true">
+      <b class="bg-proof__reveal">Message</b><i class="bg-proof__reveal">&rarr;</i
+      ><b class="bg-proof__reveal">Proof</b><i class="bg-proof__reveal">&rarr;</i
+      ><b class="bg-proof__reveal">Next step</b>
     </span>
   </div>
 
   <div class="bg-proof bg-proof--ai" data-proof="ai">
-    <span class="bg-proof__kicker">Proof &middot; AI legibility</span>
-    <strong class="bg-proof__title">StorytAIm narration UI</strong>
-    <span class="bg-proof__wave bg-proof__reveal" aria-hidden="true">
-      <i v-for="n in 18" :key="n" :style="{ '--i': n }"></i>
-    </span>
-    <span class="bg-proof__line bg-proof__reveal">
-      A live waveform shows when the AI is speaking, so generated audio never feels like a black
-      box.
-    </span>
+    <span class="bg-proof__kicker">AI legibility</span>
+    <ul class="bg-proof__steps" aria-hidden="true">
+      <li class="bg-proof__reveal"><span class="ok">&#10003;</span> Read question</li>
+      <li class="bg-proof__reveal"><span class="ok">&#10003;</span> 3 sources checked</li>
+      <li class="bg-proof__reveal"><span class="dot"></span> Confidence: high</li>
+    </ul>
+    <span class="bg-proof__caption bg-proof__reveal">No black box.</span>
   </div>
   </div>
 </template>
@@ -1218,12 +1223,12 @@ $scroll: '#right-top-decoration, #sidebar, #button-card';
   z-index: 1;
   display: grid;
   gap: 0.3rem;
-  padding: 0.7rem 0.85rem 0.75rem;
+  padding: 0.55rem 0.7rem 0.6rem;
   border: 1px solid rgba(18, 96, 240, 0.22);
   border-radius: 0.7rem;
-  background: rgba(255, 255, 255, 0.9);
+  background: rgba(255, 255, 255, 0.86);
   box-shadow:
-    0 10px 28px rgba(10, 52, 135, 0.14),
+    0 8px 22px rgba(10, 52, 135, 0.1),
     inset 0 1px 0 rgba(255, 255, 255, 0.9);
   color: tokens.$ink-soft;
   font-family: tokens.$primary-font;
@@ -1248,33 +1253,87 @@ $scroll: '#right-top-decoration, #sidebar, #button-card';
   letter-spacing: -0.01em;
 }
 
-.bg-proof__line {
-  color: rgba(11, 31, 46, 0.72);
-  font-size: clamp(0.7rem, 0.7vw, 0.84rem);
-  line-height: 1.35;
+.bg-proof__caption {
+  color: rgba(11, 31, 46, 0.62);
+  font-size: clamp(0.66rem, 0.64vw, 0.78rem);
+  font-weight: 600;
+  line-height: 1.2;
 }
 
-/* Top-right tab: client names */
-.bg-proof--clients {
-  top: 1.4%;
-  right: 1.3%;
-  width: clamp(210px, 14.2%, 280px);
-}
-
-.bg-proof__names {
+.bg-proof__flow {
   display: flex;
   flex-wrap: wrap;
-  gap: 0.25rem 0.3rem;
-  margin: 0.15rem 0 0;
-  padding: 0;
-  list-style: none;
+  gap: 0.25rem;
+  align-items: center;
+  margin-top: 0.1rem;
 
-  li {
-    padding: 0.18rem 0.45rem;
+  b {
+    padding: 0.14rem 0.45rem;
     border-radius: 999px;
     background: #e5ecfd;
     color: #0a3487;
-    font-size: clamp(0.68rem, 0.68vw, 0.82rem);
+    font-size: clamp(0.62rem, 0.62vw, 0.74rem);
+    font-weight: 700;
+    line-height: 1.2;
+  }
+
+  b:last-child {
+    background: #1260f0;
+    color: #fff;
+  }
+
+  i {
+    color: #1260f0;
+    font-style: normal;
+    font-size: 0.75rem;
+  }
+}
+
+/* Top-right tab: exactness */
+.bg-proof--exact {
+  top: 1.4%;
+  right: 1.3%;
+  width: clamp(150px, 10%, 190px);
+}
+
+.bg-proof__align {
+  position: relative;
+  display: grid;
+  gap: 4px;
+  height: 2.1rem;
+  margin: 0.15rem 0 0.05rem;
+  padding: 3px 0;
+
+  .bg-proof__guide {
+    position: absolute;
+    top: -2px;
+    bottom: -2px;
+    left: 0;
+    border-left: 1.5px dashed #ff4d8d;
+  }
+
+  .bg-proof__block {
+    display: block;
+    width: 62%;
+    border-radius: 3px;
+    background: #d1dffc;
+
+    & + .bg-proof__block {
+      width: 44%;
+      background: #1260f0;
+    }
+  }
+
+  .bg-proof__badge {
+    position: absolute;
+    top: 50%;
+    right: 0;
+    translate: 0 -50%;
+    padding: 0.12rem 0.4rem;
+    border-radius: 999px;
+    background: #e8fbf1;
+    color: #0e8a4f;
+    font-size: clamp(0.62rem, 0.62vw, 0.74rem);
     font-weight: 700;
     line-height: 1.2;
   }
@@ -1284,7 +1343,7 @@ $scroll: '#right-top-decoration, #sidebar, #button-card';
 .bg-proof--clarity {
   top: 57.2%;
   left: 9.2%;
-  width: clamp(220px, 15.5%, 290px);
+  width: clamp(215px, 14.5%, 270px);
   transform-origin: 0 50%;
   rotate: -4deg;
 
@@ -1304,40 +1363,47 @@ $scroll: '#right-top-decoration, #sidebar, #button-card';
 
 /* Button card: sits in the slot the old word buttons used */
 .bg-proof--ai {
-  top: 78.6%;
-  left: 68.6%;
-  width: clamp(230px, 16.8%, 310px);
+  top: 79.5%;
+  left: 69.5%;
+  width: clamp(160px, 11%, 205px);
   rotate: -4.9deg;
 }
 
-.bg-proof__wave {
-  display: flex;
-  align-items: center;
-  gap: 3px;
-  height: 1.35rem;
-  margin: 0.1rem 0;
+.bg-proof__steps {
+  display: grid;
+  gap: 0.2rem;
+  margin: 0.15rem 0;
+  padding: 0.45rem 0.55rem;
+  border-radius: 0.5rem;
+  background: #f0f4fd;
+  list-style: none;
 
-  i {
-    display: block;
-    flex: 1;
-    height: 100%;
-    border-radius: 2px;
-    background: linear-gradient(180deg, #4d8bff, #1260f0);
-    transform-origin: 50% 50%;
-    animation: bg-proof-wave 1.1s ease-in-out infinite alternate;
-    animation-delay: calc(var(--i) * -0.13s);
+  li {
+    display: flex;
+    gap: 0.4rem;
+    align-items: center;
+    color: #0a3487;
+    font-size: clamp(0.66rem, 0.66vw, 0.8rem);
+    font-weight: 600;
+    line-height: 1.25;
   }
-}
 
-@keyframes bg-proof-wave {
-  0% {
-    transform: scaleY(0.18);
+  .ok {
+    display: grid;
+    place-items: center;
+    width: 0.9rem;
+    height: 0.9rem;
+    border-radius: 50%;
+    background: #1260f0;
+    color: #fff;
+    font-size: 0.55rem;
   }
-  45% {
-    transform: scaleY(0.85);
-  }
-  100% {
-    transform: scaleY(0.35);
+
+  .dot {
+    width: 0.9rem;
+    height: 0.9rem;
+    border-radius: 50%;
+    background: radial-gradient(circle, #1260f0 0 32%, #cfe0ff 36% 100%);
   }
 }
 
@@ -1370,11 +1436,6 @@ svg {
   .bg-proof {
     opacity: 1;
     visibility: visible;
-  }
-
-  .bg-proof__wave i {
-    animation: none;
-    transform: scaleY(0.55);
   }
 }
 </style>
