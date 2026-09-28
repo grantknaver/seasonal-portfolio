@@ -33,12 +33,15 @@ const fits = [
 ];
 
 const steps = [
-  { label: 'Teardown Review', text: 'A live walkthrough of the moments costing you most.' },
   {
-    label: 'One recommended path',
-    text: 'A Diagnostic if priorities need finding. Implementation if you know what to change.',
+    label: 'Teardown Review',
+    text: 'I walk you through what I found, then we dig into the friction you already know about.',
   },
-  { label: 'Scope Review', text: 'Clear scope, timeline, and investment before you decide.' },
+  {
+    label: 'Diagnostic, if needed',
+    text: 'Know something’s off but not what? A Diagnostic pinpoints it. Already know? Skip ahead.',
+  },
+  { label: 'Implementation', text: 'A clear scope and price, reviewed together, then I build it.' },
 ];
 
 /* Play the diagram once it scrolls into view. */
