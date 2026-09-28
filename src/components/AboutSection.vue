@@ -7,20 +7,11 @@ import { TopicName } from 'src/shared/constants/topicName';
 
 const mainStore = useMainStore();
 
-const emit = defineEmits<{
-  (event: 'toContact'): void;
-}>();
-
 const { lgBreakpoint, width } = useViewport();
 const isResponsive = computed(() => width.value < lgBreakpoint);
 
-const toContact = () => {
-  if (isResponsive.value) {
-    emit('toContact');
-    return;
-  }
-  mainStore.SET_ACTIVE_TOPIC(TopicName.Contact);
-};
+/* Works on every layout: MainPage syncs its mobile/tablet accordion to activeTopic. */
+const toContact = () => mainStore.SET_ACTIVE_TOPIC(TopicName.Contact);
 
 const toExamples = () => mainStore.SET_ACTIVE_TOPIC(TopicName.Examples);
 
@@ -516,12 +507,39 @@ onBeforeUnmount(() => {
       grid-template-columns: 1fr;
     }
 
+    /* Mobile: both rows become a 2x2 grid feeding down into the outcome.
+       Dashed connector = lossy handoffs, solid = one direct pass. */
     .handoff__chain {
-      flex-wrap: wrap;
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 0.4rem;
     }
 
-    .link {
-      flex: 0 0 0.9rem;
+    .link,
+    .merge-lines {
+      display: none;
+    }
+
+    .handoff__merge {
+      grid-template-columns: 1fr;
+    }
+
+    .outcome {
+      position: relative;
+      margin-top: 1.1rem;
+
+      &::before {
+        content: '';
+        position: absolute;
+        bottom: calc(100% + 0.2rem);
+        left: 50%;
+        height: 0.9rem;
+        border-left: 2px dashed rgba(11, 31, 46, 0.3);
+      }
+    }
+
+    .outcome--clear::before {
+      border-left: 2px solid #1260f0;
     }
 
     .about-grid,
