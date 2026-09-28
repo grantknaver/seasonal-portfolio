@@ -515,12 +515,12 @@ $line: rgba(18, 96, 240, 0.18);
   box-shadow: 0 8px 20px rgba(18, 96, 240, 0.3);
 }
 
-/* Readbot needs ~860px at this width before its player controls stop overflowing. */
+/* Readbot fits short viewports, so a compact frame keeps its player in view. */
 .narrator-container {
   display: flex;
   justify-content: center;
-  height: 860px;
-  min-height: 860px;
+  height: 600px;
+  min-height: 600px;
   background: #f6f5f1;
 
   .narrator {
