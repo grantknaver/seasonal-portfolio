@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { computed, onBeforeUnmount, onMounted, reactive, ref } from 'vue';
-import { mdiOpenInNew, mdiPlayCircleOutline } from '@quasar/extras/mdi-v7';
+import { mdiOpenInNew, mdiPlayCircleOutline, mdiArrowRightThin } from '@quasar/extras/mdi-v7';
 import { useViewport } from '../shared/utils/viewWidth';
 import { useMainStore } from '../stores/main';
 import { TopicName } from 'src/shared/constants/topicName';
@@ -14,6 +14,8 @@ import fizzcoA from 'src/assets/examples/fizzco-a.jpg?w=720;1200&format=avif;web
 import fizzcoB from 'src/assets/examples/fizzco-b.jpg?w=720;1200&format=avif;webp;jpg&as=picture';
 import seasonalA from 'src/assets/examples/seasonal-a.jpg?w=720;1200&format=avif;webp;jpg&as=picture';
 import seasonalB from 'src/assets/examples/seasonal-b.jpg?w=720;1200&format=avif;webp;jpg&as=picture';
+import whenthenA from 'src/assets/examples/whenthen-a.jpg?w=720;1200&format=avif;webp;jpg&as=picture';
+import whenthenB from 'src/assets/examples/whenthen-b.jpg?w=720;1200&format=avif;webp;jpg&as=picture';
 import robotA from 'src/assets/examples/robot-a.jpg?w=720;1200&format=avif;webp;jpg&as=picture';
 
 const mainStore = useMainStore();
@@ -32,6 +34,8 @@ interface ShowcaseItem {
   tags: string[];
   what: string;
   why: string;
+  /** How momentum (motion, pacing, sequence) is used to make the point stick. */
+  momentum: string;
   url: string;
   /** Before / after frames. The card resolves from a to b. */
   a: PictureData;
@@ -48,8 +52,9 @@ const items: ShowcaseItem[] = [
     title: 'AgentGate',
     kind: 'Concept build',
     tags: ['AI legibility', 'Trust'],
-    what: 'An AI governance platform for autonomous agents. Scroll, and a $1,200 refund request is checked for identity, authority, and policy before it’s allowed to execute.',
-    why: 'Every team adopting AI agents is asking the same thing: what is it allowed to do, and can we see why? This makes the answer readable at a glance.',
+    what: 'AI governance for autonomous agents. A $1,200 refund request has to clear identity, authority, and policy before it can execute.',
+    why: 'Every team adopting AI agents is asking what the agent is allowed to do, and whether they can see why. This makes the answer readable at a glance.',
+    momentum: 'Each scroll resolves one check, so trust builds in the same order the system grants it.',
     url: 'https://agentgate-bpb.pages.dev/',
     a: agentgateA,
     b: agentgateB,
@@ -58,12 +63,28 @@ const items: ShowcaseItem[] = [
     featured: true,
   },
   {
+    id: 'whenthen',
+    title: 'WhenThen',
+    kind: 'Concept build',
+    tags: ['Clarity', 'Trust'],
+    what: 'A launch page for a guide on behaviour verification: proving that software does exactly what its spec says, at massive scale.',
+    why: 'As AI writes and runs more of our software, proof becomes the trust signal. This takes a dense technical idea and makes it graspable in one screen.',
+    momentum: 'Given, when, then drift in the background, then resolve into one clear next step: get the guide.',
+    url: 'https://when-then.pages.dev/',
+    a: whenthenA,
+    b: whenthenB,
+    stateA: 'The idea',
+    stateB: 'The next step',
+    featured: true,
+  },
+  {
     id: 'futureframe',
     title: 'Futureframe',
     kind: 'Concept build',
     tags: ['AI legibility', 'Trust'],
-    what: 'AI age projection you scroll through. The face changes alongside the signals driving it, with uncertainty disclosed instead of hidden.',
-    why: 'AI feels like a black box when people only see the result. Showing the “why” is what makes it believable.',
+    what: 'AI age projection where the signals behind the result stay visible, and uncertainty is disclosed instead of hidden.',
+    why: 'AI feels like a black box when people only see the answer. Showing the “why” is what makes it believable.',
+    momentum: 'Scrolling moves you through time, so the result never arrives without its reasons.',
     url: 'https://futureframe-8ep.pages.dev/',
     a: futureframeA,
     b: futureframeB,
@@ -72,11 +93,12 @@ const items: ShowcaseItem[] = [
   },
   {
     id: 'robot',
-    title: 'Robot Narrator',
-    kind: 'Built for StorytAIm',
-    tags: ['AI legibility', 'Motion'],
-    what: 'Pick a voice and press play. The narrator’s waveform moves with the AI-generated speech.',
+    title: 'Readbot',
+    kind: 'Interactive build',
+    tags: ['AI legibility'],
+    what: 'An AI narrator that visibly reads along. Pick a voice and press play.',
     why: 'AI audio is invisible by default. Visible feedback shows the system is working, and who is speaking.',
+    momentum: 'Motion tracks the audio in real time, so you always know where the story is.',
     url: ROBOT_URL,
     a: robotA,
     stateA: 'Try it here',
@@ -86,9 +108,10 @@ const items: ShowcaseItem[] = [
     id: 'fizzco',
     title: 'Fizzco',
     kind: 'Concept build',
-    tags: ['Clarity', 'Motion'],
-    what: 'A launch page where the product assembles as you scroll, so the offer lands before the copy.',
-    why: 'When the product is the message, motion can show it faster than words can.',
+    tags: ['Clarity'],
+    what: 'A launch page where the product assembles as you scroll.',
+    why: 'When the product is the message, showing beats telling. The offer lands before a word is read.',
+    momentum: 'One scroll builds the product, so understanding arrives before the copy does.',
     url: 'https://fizzco.pages.dev/',
     a: fizzcoA,
     b: fizzcoB,
@@ -99,9 +122,10 @@ const items: ShowcaseItem[] = [
     id: 'seasonal',
     title: 'Seasons',
     kind: 'Motion study',
-    tags: ['Motion'],
+    tags: ['Clarity'],
     what: 'Four seasons, each with its own weather, pace, and palette, switchable in one tap.',
-    why: 'Atmosphere without noise: motion that adds presence but never competes with the content.',
+    why: 'Atmosphere only helps if it never competes with the content. This is the restraint behind every animation I ship.',
+    momentum: 'Each season sets its own pace, carrying mood without stealing focus.',
     url: 'https://seasonal-example.pages.dev/',
     a: seasonalA,
     b: seasonalB,
@@ -110,7 +134,7 @@ const items: ShowcaseItem[] = [
   },
 ];
 
-const featured = items.find((i) => i.featured)!;
+const featured = items.filter((i) => i.featured);
 const rest = items.filter((i) => !i.featured);
 
 /* ---------- Before → after playback ---------- */
@@ -169,13 +193,13 @@ onBeforeUnmount(() => {
         <p class="kicker q-mt-none q-mb-sm">Examples</p>
         <h1 class="q-mt-none q-mb-md">Don’t take my word for it. Scroll through these.</h1>
         <p class="lead q-ma-none">
-          Working builds that turn complex, AI-driven ideas into something people can understand,
-          trust, and act on.
+          Each build makes something complex clear, trustworthy, or legible as AI, and uses
+          momentum to make it stick.
         </p>
       </header>
 
       <!-- Featured -->
-      <template v-for="it in [featured]" :key="it.id">
+      <template v-for="it in featured" :key="it.id">
         <article
           class="ex-card ex-card--featured"
           :data-card="it.id"
@@ -195,17 +219,24 @@ onBeforeUnmount(() => {
               {{ resolved[it.id] ? it.stateB : it.stateA }}
             </span>
           </a>
-          <div class="ex-body">
-            <div class="ex-meta">
-              <span class="ex-kind">{{ it.kind }}</span>
-              <span v-for="t in it.tags" :key="t" class="ex-tag">{{ t }}</span>
+          <div class="ex-body ex-body--split">
+            <div class="ex-col">
+              <div class="ex-meta">
+                <span class="ex-kind">{{ it.kind }}</span>
+                <span v-for="t in it.tags" :key="t" class="ex-tag">{{ t }}</span>
+              </div>
+              <h2 class="q-my-none">{{ it.title }}</h2>
+              <p class="ex-what q-ma-none">{{ it.what }}</p>
+              <a class="ex-link" :href="it.url" target="_blank" rel="noopener noreferrer">
+                Open live <q-icon :name="mdiOpenInNew" size="16px" />
+              </a>
             </div>
-            <h2 class="q-my-none">{{ it.title }}</h2>
-            <p class="ex-what q-ma-none">{{ it.what }}</p>
-            <p class="ex-why q-ma-none"><b>Why it’s here</b>{{ it.why }}</p>
-            <a class="ex-link" :href="it.url" target="_blank" rel="noopener noreferrer">
-              Open live <q-icon :name="mdiOpenInNew" size="16px" />
-            </a>
+            <div class="ex-col">
+              <p class="ex-why q-ma-none"><b>Why it’s here</b>{{ it.why }}</p>
+              <p class="ex-momentum q-ma-none">
+                <q-icon :name="mdiArrowRightThin" size="18px" /><span><b>Momentum</b> {{ it.momentum }}</span>
+              </p>
+            </div>
           </div>
         </article>
       </template>
@@ -263,6 +294,9 @@ onBeforeUnmount(() => {
             <h2 class="q-my-none">{{ it.title }}</h2>
             <p class="ex-what q-ma-none">{{ it.what }}</p>
             <p class="ex-why q-ma-none"><b>Why it’s here</b>{{ it.why }}</p>
+            <p class="ex-momentum q-ma-none">
+              <q-icon :name="mdiArrowRightThin" size="18px" /><span><b>Momentum</b> {{ it.momentum }}</span>
+            </p>
             <a class="ex-link" :href="it.url" target="_blank" rel="noopener noreferrer">
               Open live <q-icon :name="mdiOpenInNew" size="16px" />
             </a>
@@ -357,26 +391,16 @@ $line: rgba(18, 96, 240, 0.18);
     aspect-ratio: 2 / 1;
   }
 
-  .ex-body {
+  .ex-body--split {
     grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
-    column-gap: 1.25rem;
+    gap: 1.25rem;
     padding: 1.2rem 1.35rem 1.35rem;
+  }
 
-    > .ex-meta,
-    > h2,
-    > .ex-what {
-      grid-column: 1;
-    }
-
-    > .ex-why {
-      grid-column: 2;
-      grid-row: 1 / span 3;
-      align-self: start;
-    }
-
-    > .ex-link {
-      grid-column: 2;
-    }
+  .ex-col {
+    display: grid;
+    align-content: start;
+    gap: 0.55rem;
   }
 
   h2 {
@@ -465,7 +489,7 @@ $line: rgba(18, 96, 240, 0.18);
   width: 100%;
   padding: 0;
   border: 0;
-  background: #fff;
+  background: #f6f5f1;
   cursor: pointer;
 
   .ex-frame img {
@@ -491,14 +515,13 @@ $line: rgba(18, 96, 240, 0.18);
   box-shadow: 0 8px 20px rgba(18, 96, 240, 0.3);
 }
 
-/* Same sizing the narrator iframe has always used. */
+/* Readbot needs ~860px at this width before its player controls stop overflowing. */
 .narrator-container {
   display: flex;
   justify-content: center;
-  height: 500px;
-  min-height: 500px;
-  padding: 1rem;
-  background: #fff;
+  height: 860px;
+  min-height: 860px;
+  background: #f6f5f1;
 
   .narrator {
     width: 100%;
@@ -573,6 +596,26 @@ $line: rgba(18, 96, 240, 0.18);
   }
 }
 
+.ex-momentum {
+  display: flex;
+  gap: 0.35rem;
+  align-items: flex-start;
+  color: $muted;
+  font-size: 0.82rem;
+  line-height: 1.4;
+
+  .q-icon {
+    flex: none;
+    margin-top: 0.05rem;
+    color: $blue;
+  }
+
+  b {
+    color: $ink;
+    font-weight: 700;
+  }
+}
+
 .ex-link {
   display: inline-flex;
   gap: 0.3rem;
@@ -629,22 +672,13 @@ $line: rgba(18, 96, 240, 0.18);
     grid-template-columns: 1fr;
   }
 
-  .ex-card--featured .ex-body {
+  .ex-card--featured .ex-body--split {
     grid-template-columns: 1fr;
-
-    > * {
-      grid-column: 1 !important;
-      grid-row: auto !important;
-    }
-  }
-
-  .ex-close {
-    flex-direction: column;
-    align-items: stretch;
   }
 
   .narrator-container {
-    padding: 0.5rem;
+    height: 600px;
+    min-height: 600px;
   }
 }
 
