@@ -33,6 +33,12 @@ const { isHuman, packageInterestText } = storeToRefs(mainStore);
 const { lgBreakpoint, width } = useViewport();
 const isResponsive = computed(() => width.value < lgBreakpoint);
 
+const steps = [
+  { label: 'Teardown Review', text: 'I walk you through the 1–2 moments costing you most.' },
+  { label: 'Diagnostic, if needed', text: 'When you know something’s off but not what.' },
+  { label: 'Implementation', text: 'Clear scope and price, then I build it.' },
+];
+
 const contactDetails = [
   {
     id: 'phone',
@@ -108,57 +114,27 @@ const sendEmail = async () => {
     class="contactSection full-width"
     :class="isResponsive ? 'responsive-view q-pa-xs' : 'desktop-view q-pa-md'"
   >
-    <div class="contact-shell">
-      <div class="contact-intro">
-        <p class="text-caption kicker q-mt-none q-mb-sm">Start the conversation</p>
-
-        <h1 class="text-h1 q-mt-none q-mb-md">Let’s talk through what you want improved.</h1>
-
-        <p class="intro-copy text-body-2 q-mt-none q-mb-lg">
-          Send the website, product surface, AI interaction, or idea you want to improve. If the
-          priority is already clear, we can talk through implementation and scope the first focused
-          build. If the priority still needs to be figured out, we can start with a diagnostic to
-          identify the strongest path.
+    <div class="contact-sheet">
+      <header class="contact-intro">
+        <p class="kicker q-mt-none q-mb-sm">Contact</p>
+        <h1 class="q-mt-none q-mb-md">Start with a Teardown Review.</h1>
+        <p class="lead q-ma-none">
+          Send a link to your site, product, or AI feature. I’ll find where it’s losing clarity,
+          trust, or momentum, then we walk through it together.
         </p>
+      </header>
 
-        <div class="contact-proof-grid q-mb-lg">
-          <div class="contact-proof-card">
-            <span>Already know what should change?</span>
-            <strong>We can align on implementation and scope the first focused build.</strong>
+      <ol class="contact-steps q-ma-none">
+        <li v-for="(st, i) in steps" :key="st.label" class="contact-step">
+          <span class="contact-step__num">{{ i + 1 }}</span>
+          <div>
+            <b>{{ st.label }}</b>
+            <span>{{ st.text }}</span>
           </div>
-
-          <div class="contact-proof-card">
-            <span>Still finding the priority?</span>
-            <strong>
-              We can use a diagnostic to find the biggest friction points, strongest opportunities,
-              and AI-supported workflow potential.
-            </strong>
-          </div>
-        </div>
-
-        <div class="contact-detail-grid">
-          <div v-for="detail in contactDetails" :key="detail.id" class="contact-detail-card">
-            <q-icon :name="detail.icon" size="1.25rem" />
-            <div>
-              <span>{{ detail.label }}</span>
-              <strong>{{ detail.value }}</strong>
-            </div>
-          </div>
-        </div>
-      </div>
+        </li>
+      </ol>
 
       <q-form @submit.prevent="sendEmail" class="contact-form column q-gutter-y-sm">
-        <div class="form-heading q-mb-sm">
-          <p class="text-caption kicker q-mt-none q-mb-xs">Project details</p>
-
-          <h2 class="text-h2 q-mt-none q-mb-xs">Send the starting point.</h2>
-
-          <p class="text-body-2 q-ma-none">
-            A link and a few sentences are enough. Tell me what you want improved, what feels
-            unclear, or what you are considering building.
-          </p>
-        </div>
-
         <input
           v-model="form._honey"
           type="text"
@@ -173,8 +149,8 @@ const sendEmail = async () => {
             v-model="form.name"
             label="Name"
             color="accent"
-            bg-color="primary"
-            filled
+            bg-color="white"
+            outlined
             required
             :disable="!isHuman"
           >
@@ -186,8 +162,8 @@ const sendEmail = async () => {
             type="email"
             label="Email"
             color="accent"
-            bg-color="primary"
-            filled
+            bg-color="white"
+            outlined
             required
             :disable="!isHuman"
           >
@@ -198,10 +174,10 @@ const sendEmail = async () => {
         <q-input
           v-model="form.subject"
           type="text"
-          label="Website, product, or project"
+          label="Link to your product or site"
           color="accent"
-          bg-color="primary"
-          filled
+          bg-color="white"
+          outlined
           required
           :disable="!isHuman"
         >
@@ -211,16 +187,18 @@ const sendEmail = async () => {
         <q-input
           v-model="form.message"
           type="textarea"
-          label="What do you want improved?"
+          label="What feels unclear or stuck?"
           class="message"
           color="accent"
-          bg-color="primary"
-          filled
+          bg-color="white"
+          outlined
           required
           autogrow
           :disable="!isHuman"
-          :input-style="{ minHeight: isResponsive ? '8rem' : '9rem' }"
+          :input-style="{ minHeight: isResponsive ? '7rem' : '8rem' }"
         />
+
+        <p class="form-hint q-ma-none">A link and a few sentences are enough.</p>
 
         <RecaptchaWidget v-show="!isHuman" class="q-mt-md" />
 
@@ -234,185 +212,142 @@ const sendEmail = async () => {
           :loading="sending"
           :disable="sending"
         >
-          <span class="text-body-2">{{ sending ? 'Sending…' : 'Send details' }}</span>
+          <span class="text-body-2">{{ sending ? 'Sending…' : 'Request a Teardown Review' }}</span>
         </q-btn>
 
         <q-banner v-if="success" class="status-banner success q-mt-sm">
-          Message sent successfully.
+          Got it. I’ll be in touch soon.
         </q-banner>
 
         <q-banner v-if="error" class="status-banner error q-mt-sm">
           Failed to send. {{ errorMsg || 'Please try again.' }}
         </q-banner>
       </q-form>
+
+      <div class="contact-details">
+        <div v-for="detail in contactDetails" :key="detail.id" class="contact-detail">
+          <q-icon :name="detail.icon" size="1.1rem" />
+          <span>{{ detail.value }}</span>
+        </div>
+      </div>
     </div>
   </section>
 </template>
 
 <style scoped lang="scss">
-@use '../css/tokens' as tokens;
+$ink: #0b1f2e;
+$muted: rgba(11, 31, 46, 0.66);
+$blue: #1260f0;
+$navy: #0a3487;
+$soft: #e5ecfd;
+$line: rgba(18, 96, 240, 0.18);
 
-.contactSection {
-  color: tokens.$text;
-
-  &.desktop-view {
-    overflow-y: hidden;
-
-    .contact-shell {
-      margin-top: 0.25rem;
-      margin-bottom: 1rem;
-    }
-  }
-
-  &.responsive-view {
-    .contact-shell {
-      grid-template-columns: 1fr;
-      max-width: 600px;
-      padding: 1.25rem;
-    }
-
-    .contact-intro {
-      text-align: center;
-    }
-
-    .field-grid {
-      grid-template-columns: 1fr;
-    }
-  }
-}
-
-.contact-shell {
+.contact-sheet {
   display: grid;
-  grid-template-columns: minmax(0, 1fr);
   gap: 1.25rem;
   width: 100%;
-  max-width: none;
-  margin-inline: 0;
-  padding: clamp(1.25rem, 2vw, 2rem);
-  border: 1px solid var(--q-accent);
+  padding: clamp(1.25rem, 2.6vw, 2.5rem);
   border-radius: 1rem;
-  background: linear-gradient(
-    135deg,
-    color-mix(in srgb, tokens.$ink-soft 90%, tokens.$ivory 10%),
-    tokens.$ink
-  );
+  background: #f7f9fe;
+  box-shadow: 0 18px 50px rgba(6, 17, 31, 0.28);
+  color: $ink;
 }
 
 .kicker {
-  color: tokens.$champagne;
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
+  color: $blue;
+  font-size: 0.74rem;
   font-weight: 700;
+  letter-spacing: 0.09em;
+  text-transform: uppercase;
 }
 
 .contact-intro {
-  min-width: 0;
-
   h1 {
-    color: tokens.$text;
-    line-height: 1.08;
-    letter-spacing: -0.025em;
+    color: $ink;
+    font-size: clamp(1.75rem, 2.4vw, 2.4rem);
     font-weight: 400;
+    line-height: 1.12;
+    letter-spacing: -0.025em;
     text-wrap: balance;
   }
 
-  .intro-copy {
-    color: tokens.$text-muted;
-    line-height: 1.55;
+  .lead {
+    color: $muted;
+    font-size: 1.02rem;
+    font-weight: 600;
+    line-height: 1.45;
   }
 }
 
-.contact-proof-grid,
-.contact-detail-grid {
+/* Process: three steps, left to right */
+.contact-steps {
   display: grid;
-  gap: 0.75rem;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 0.6rem;
+  padding: 0;
+  list-style: none;
 }
 
-.contact-proof-card,
-.contact-detail-card,
-.contact-form {
-  border: 1px solid color-mix(in srgb, var(--q-accent) 28%, transparent);
-  border-radius: 0.85rem;
-  background: color-mix(in srgb, tokens.$ink-soft 82%, transparent);
-  box-shadow: inset 0 1px 0 color-mix(in srgb, tokens.$ivory 8%, transparent);
-}
-
-.contact-proof-card {
-  padding: 0.85rem 1rem;
-
-  span {
-    display: block;
-    margin-bottom: 0.25rem;
-    color: tokens.$champagne;
-    font-size: 0.72rem;
-    line-height: 1;
-    letter-spacing: 0.08em;
-    text-transform: uppercase;
-    font-weight: 700;
-  }
-
-  strong {
-    display: block;
-    color: tokens.$text-muted;
-    font-size: 0.9rem;
-    line-height: 1.3;
-    font-weight: 600;
-  }
-}
-
-.contact-detail-card {
+.contact-step {
   display: flex;
-  align-items: center;
-  gap: 0.75rem;
-  padding: 0.85rem 1rem;
-  color: tokens.$text-muted;
+  gap: 0.6rem;
+  align-items: flex-start;
+  padding: 0.75rem 0.85rem;
+  border: 1px solid $line;
+  border-radius: 0.8rem;
+  background: #fff;
 
-  .q-icon {
-    color: var(--q-accent);
+  b {
+    display: block;
+    color: $ink;
+    font-size: 0.88rem;
+    line-height: 1.25;
   }
 
-  span {
+  span:not(.contact-step__num) {
     display: block;
-    color: tokens.$text-soft;
-    font-size: 0.72rem;
-    line-height: 1;
-    letter-spacing: 0.08em;
-    text-transform: uppercase;
-    font-weight: 700;
+    margin-top: 0.15rem;
+    color: $muted;
+    font-size: 0.8rem;
+    line-height: 1.35;
   }
 
-  strong {
-    display: block;
-    margin-top: 0.2rem;
-    color: tokens.$text-muted;
-    font-size: 0.9rem;
-    line-height: 1.3;
-    font-weight: 600;
+  &:first-child {
+    border-color: $blue;
+    box-shadow: 0 0 0 3px rgba(18, 96, 240, 0.1);
   }
 }
 
+.contact-step__num {
+  flex: none;
+  display: grid;
+  place-items: center;
+  width: 1.5rem;
+  height: 1.5rem;
+  border-radius: 50%;
+  background: $blue;
+  color: #fff;
+  font-size: 0.74rem;
+  font-weight: 700;
+}
+
+/* Form */
 .contact-form {
-  padding: 1rem;
-
-  .form-heading {
-    h2 {
-      color: tokens.$text;
-      line-height: 1.12;
-      letter-spacing: -0.02em;
-      font-weight: 400;
-    }
-
-    p:not(.kicker) {
-      color: tokens.$text-muted;
-      line-height: 1.45;
-    }
-  }
+  padding: 1.1rem;
+  border: 1px solid $line;
+  border-radius: 0.9rem;
+  background: #fff;
 }
 
 .field-grid {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
   gap: 0.75rem;
+}
+
+.form-hint {
+  color: $muted;
+  font-size: 0.8rem;
 }
 
 .submit-btn {
@@ -431,6 +366,44 @@ const sendEmail = async () => {
   &.error {
     color: #450a0a;
     background: #fecaca;
+  }
+}
+
+/* Details */
+.contact-details {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem 1.25rem;
+  justify-content: center;
+}
+
+.contact-detail {
+  display: inline-flex;
+  gap: 0.4rem;
+  align-items: center;
+  color: $muted;
+  font-size: 0.86rem;
+  font-weight: 600;
+
+  .q-icon {
+    color: $blue;
+  }
+}
+
+/* Layout variants */
+.desktop-view .contact-sheet {
+  max-width: 960px;
+  margin-inline: auto;
+}
+
+.responsive-view {
+  .contact-steps,
+  .field-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .contact-form {
+    padding: 0.85rem;
   }
 }
 
