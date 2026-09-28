@@ -1,11 +1,8 @@
-import { type PictureData } from './pictureData';
 import { type Lens } from '../constants/lens';
 
 export interface LensDetails {
   name: Lens;
   id: string;
-  img: PictureData;
-  alt: Lens;
   /** The one question this lens answers about a surface. */
   question: string;
   /** Symptoms a client can already see that point to this lens. */

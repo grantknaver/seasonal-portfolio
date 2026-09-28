@@ -33,9 +33,12 @@ const fits = [
 ];
 
 const steps = [
-  { label: 'Diagnose', text: 'Find the moment costing you attention.' },
-  { label: 'Scope one block', text: 'The smallest fix with the biggest effect.' },
-  { label: 'Build & ship', text: 'In your codebase, exactly as designed.' },
+  { label: 'Teardown Review', text: 'A live walkthrough of the moments costing you most.' },
+  {
+    label: 'One recommended path',
+    text: 'A Diagnostic if priorities need finding. Implementation if you know what to change.',
+  },
+  { label: 'Scope Review', text: 'Clear scope, timeline, and investment before you decide.' },
 ];
 
 /* Play the diagram once it scrolls into view. */
