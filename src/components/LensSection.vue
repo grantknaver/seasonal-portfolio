@@ -66,6 +66,7 @@ const lens = ref<LensDetails[]>([
     ],
     outcome:
       'Less friction between “I’m interested” and “I’m in,” which is where most conversions are won or lost.',
+    note: 'It’s also how I make the other three stick: the right motion and pacing help clarity land, build trust in order, and make AI state visible.',
   },
   {
     name: Lens.AILegibility,
@@ -233,6 +234,9 @@ onBeforeUnmount(() => io?.disconnect());
             <span class="col-label">What fixing it changes</span>
             <p class="q-ma-none">{{ active.outcome }}</p>
           </div>
+          <p v-if="active.note" class="lens-note q-ma-none">
+            <b>Also a tool</b>{{ active.note }}
+          </p>
         </article>
       </Transition>
 
@@ -720,6 +724,25 @@ $ease: cubic-bezier(0.22, 1, 0.36, 1);
     font-size: 0.95rem;
     font-weight: 600;
     line-height: 1.45;
+  }
+}
+
+.lens-note {
+  padding: 0.8rem 1rem;
+  border: 1px dashed rgba(18, 96, 240, 0.45);
+  border-radius: 0.8rem;
+  background: #fff;
+  color: $ink;
+  font-size: 0.9rem;
+  line-height: 1.45;
+
+  b {
+    display: block;
+    margin-bottom: 0.2rem;
+    color: $blue;
+    font-size: 0.7rem;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
   }
 }
 

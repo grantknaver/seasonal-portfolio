@@ -11,4 +11,6 @@ export interface LensDetails {
   checks: string[];
   /** What changes for the business once the issue is fixed. */
   outcome: string;
+  /** Optional extra role this lens plays beyond diagnosis. */
+  note?: string;
 }
