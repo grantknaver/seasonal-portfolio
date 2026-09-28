@@ -33,68 +33,54 @@ const toContact = () => {
   mainStore.SET_ACTIVE_TOPIC(TopicName.Contact);
 };
 
-const generalBullets = ref<AboutBulletPoints[]>([
+const disciplines = ref<AboutBulletPoints[]>([
   {
-    src: getImg('gsap-animation.avif'),
-    label: 'Focused implementation',
+    src: getImg('future-proof-thinking.avif'),
+    label: 'Product thinking',
     id: uuidv4(),
-    text: 'I improve websites, product interfaces, and AI interactions through focused frontend implementation instead of broad, unfocused redesign work.',
-  },
-  {
-    src: getImg('ai-integration.avif'),
-    label: 'AI interaction',
-    id: uuidv4(),
-    text: 'I build and refine AI-supported surfaces so users can understand what the system is doing, why it matters, and what to do next.',
+    text: 'Work out what the user has to understand, and what the business needs them to do next.',
   },
   {
     src: getImg('interactive-data-visualization.avif'),
-    label: 'Surface clarity',
+    label: 'Interaction design',
     id: uuidv4(),
-    text: 'I look at the parts of an experience where people need to understand, trust, decide, or act, then improve the surface around that moment.',
+    text: 'Shape each step so it answers the question the user has at that moment.',
   },
-]);
-
-const myApproachBullets = ref<AboutBulletPoints[]>([
+  {
+    src: getImg('gsap-animation.avif'),
+    label: 'Motion',
+    id: uuidv4(),
+    text: 'Use movement to direct attention, show cause and effect, and make system state visible. Never decoration.',
+  },
   {
     src: getImg('creative-engineering.avif'),
-    label: 'Find the right path',
+    label: 'Frontend engineering',
     id: uuidv4(),
-    text: 'If the priority is already clear, we can move into implementation alignment. If it is not clear yet, a diagnostic can identify the strongest opportunities first.',
-  },
-  {
-    src: getImg('future-proof-thinking.avif'),
-    label: 'Build the first focused block',
-    id: uuidv4(),
-    text: 'Once the direction is clear, I scope the smallest useful implementation block that can improve clarity, trust, momentum, or AI legibility without forcing a full rebuild.',
-  },
-  {
-    src: getImg('collaborative-mindset.avif'),
-    label: 'Keep decisions clear',
-    id: uuidv4(),
-    text: 'I keep the work understandable and decision-oriented so the path from review, to scope, to implementation does not get buried in complexity.',
+    text: 'Build it for real: responsive, performant, production code that ships the way it was designed.',
   },
 ]);
 
-const whyClientsBullets = ref<AboutBulletPoints[]>([
+const bestFits = [
+  'AI products where users need to see what the system is doing, and why',
+  'Technical, scientific, and data-heavy platforms that are hard to explain in one sentence',
+  'Enterprise and regulated products where trust has to be earned before anyone commits',
+  'Teams whose product has improved faster than their interface or site has',
+];
+
+const steps = [
   {
-    src: getImg('fast-results.avif'),
-    label: 'Less friction',
-    id: uuidv4(),
-    text: 'Focused improvements help remove the small moments where users hesitate, miss the next step, or lose confidence.',
+    label: 'Diagnose',
+    text: 'If the priority isn’t clear yet, I review the product through the four lenses and show you where it’s costing you attention and conversions.',
   },
   {
-    src: getImg('scalable-systems.avif'),
-    label: 'Clearer experiences',
-    id: uuidv4(),
-    text: 'The work is shaped around what users need to understand, what they need to trust, and what action should feel natural next.',
+    label: 'Scope one focused block',
+    text: 'We pick the smallest build that fixes the most expensive moment. No full redesign or rebuild required.',
   },
   {
-    src: getImg('memorable-experiences.avif'),
-    label: 'Stronger interaction',
-    id: uuidv4(),
-    text: 'Motion, feedback, and AI-aware UI patterns help the experience feel more responsive, legible, and considered.',
+    label: 'Build and ship',
+    text: 'I implement it in your codebase, so what we agreed on is exactly what your users see.',
   },
-]);
+];
 
 const pastClients = ref<PastClient[]>([
   {
@@ -144,44 +130,38 @@ onBeforeUnmount(() => {
   >
     <q-card class="about-card q-pa-none">
       <q-card-section class="about-section-block about-intro q-pa-lg">
-        <p class="text-caption kicker q-mt-none q-mb-sm">Focused implementation</p>
+        <p class="text-caption kicker q-mt-none q-mb-sm">About</p>
 
-        <h1 class="text-h1 q-mt-none q-mb-md">About the Work</h1>
+        <h1 class="text-h1 q-mt-none q-mb-md">
+          I make complex technical products easy to understand, trust, and act on.
+        </h1>
 
         <p class="section-lead text-body-1 q-mt-none q-mb-sm">
-          I improve websites, product interfaces, and AI interactions through targeted frontend
-          implementation.
+          I specialize in product clarity, trust, and AI legibility for complex technical products.
         </p>
 
         <p class="section-copy text-body-2 q-mt-none q-mb-md">
-          I look at surfaces through clarity, trust, momentum, and AI legibility. If the priority is
-          already clear, we can scope the first focused build. If the priority still needs to be
-          found, a diagnostic can identify the strongest path before implementation.
+          Most teams split this work across a strategist, a designer, a motion specialist, and a
+          developer, and the meaning gets diluted at every handoff. I do all four. The idea we
+          agree on is the thing that ships.
         </p>
 
-        <q-list class="about-list q-mt-lg">
-          <div v-for="bullet in generalBullets" :key="bullet.id" class="about-bullet">
-            <q-expansion-item group="about-work" header-class="about-expansion-header">
-              <template #header>
-                <q-item-section avatar>
-                  <q-avatar class="about-avatar">
-                    <img :src="bullet.src" :alt="bullet.label" />
-                  </q-avatar>
-                </q-item-section>
-
-                <q-item-section>
-                  <span class="about-expansion-label">{{ bullet.label }}</span>
-                </q-item-section>
-              </template>
-
-              <q-card class="about-expansion-body">
-                <q-card-section>
-                  <p class="q-ma-none text-body-2">{{ bullet.text }}</p>
-                </q-card-section>
-              </q-card>
-            </q-expansion-item>
+        <div class="discipline-grid q-mt-lg">
+          <div v-for="d in disciplines" :key="d.id" class="discipline">
+            <q-avatar class="about-avatar" size="44px">
+              <img :src="d.src" :alt="d.label" />
+            </q-avatar>
+            <div>
+              <span class="discipline__label">{{ d.label }}</span>
+              <p class="q-ma-none text-body-2">{{ d.text }}</p>
+            </div>
           </div>
-        </q-list>
+        </div>
+
+        <p class="discipline-sum q-mt-lg q-mb-none">
+          Together, they turn difficult concepts and workflows into experiences people can
+          understand, trust, and act on.
+        </p>
 
         <q-btn
           @click="toContact"
@@ -198,39 +178,18 @@ onBeforeUnmount(() => {
     <q-intersection transition="slide-up" transition-duration="600" :once="true">
       <q-card class="about-card q-mt-md q-pa-none">
         <q-card-section class="about-section-block q-pa-lg">
-          <p class="text-caption kicker q-mt-none q-mb-sm">How it starts</p>
+          <p class="text-caption kicker q-mt-none q-mb-sm">Best fit</p>
 
-          <h2 class="text-h2 q-mt-none q-mb-md">My Approach</h2>
+          <h2 class="text-h2 q-mt-none q-mb-md">Where I’m most useful</h2>
 
           <p class="section-copy text-body-2 q-mt-none q-mb-md">
-            The first step is understanding whether the priority is already known or whether the
-            surface needs a deeper diagnostic. From there, the work moves toward a focused
-            implementation block that improves the part of the experience that matters most.
+            The harder your product is to explain, the more clarity is worth. I do my best work
+            with:
           </p>
 
-          <q-list class="about-list q-mt-lg">
-            <div v-for="bullet in myApproachBullets" :key="bullet.id" class="about-bullet">
-              <q-expansion-item group="about-approach" header-class="about-expansion-header">
-                <template #header>
-                  <q-item-section avatar>
-                    <q-avatar class="about-avatar">
-                      <img :src="bullet.src" :alt="bullet.label" />
-                    </q-avatar>
-                  </q-item-section>
-
-                  <q-item-section>
-                    <span class="about-expansion-label">{{ bullet.label }}</span>
-                  </q-item-section>
-                </template>
-
-                <q-card class="about-expansion-body">
-                  <q-card-section>
-                    <p class="q-ma-none text-body-2">{{ bullet.text }}</p>
-                  </q-card-section>
-                </q-card>
-              </q-expansion-item>
-            </div>
-          </q-list>
+          <ul class="fit-list q-ma-none">
+            <li v-for="fit in bestFits" :key="fit">{{ fit }}</li>
+          </ul>
         </q-card-section>
       </q-card>
     </q-intersection>
@@ -238,39 +197,19 @@ onBeforeUnmount(() => {
     <q-intersection transition="slide-up" transition-duration="700" :once="true">
       <q-card class="about-card q-mt-md q-pa-none">
         <q-card-section class="about-section-block q-pa-lg">
-          <p class="text-caption kicker q-mt-none q-mb-sm">Why it works</p>
+          <p class="text-caption kicker q-mt-none q-mb-sm">How it starts</p>
 
-          <h2 class="text-h2 q-mt-none q-mb-md">Why Clients Work With Me</h2>
+          <h2 class="text-h2 q-mt-none q-mb-md">How we’d work together</h2>
 
-          <p class="section-copy text-body-2 q-mt-none q-mb-md">
-            Clients usually do not need another broad redesign conversation. They need a clearer
-            surface, a stronger interaction, or a focused build that helps users understand, trust,
-            and move forward.
-          </p>
-
-          <q-list class="about-list q-mt-lg">
-            <div v-for="bullet in whyClientsBullets" :key="bullet.id" class="about-bullet">
-              <q-expansion-item group="about-why" header-class="about-expansion-header">
-                <template #header>
-                  <q-item-section avatar>
-                    <q-avatar class="about-avatar">
-                      <img :src="bullet.src" :alt="bullet.label" />
-                    </q-avatar>
-                  </q-item-section>
-
-                  <q-item-section>
-                    <span class="about-expansion-label">{{ bullet.label }}</span>
-                  </q-item-section>
-                </template>
-
-                <q-card class="about-expansion-body">
-                  <q-card-section>
-                    <p class="q-ma-none text-body-2">{{ bullet.text }}</p>
-                  </q-card-section>
-                </q-card>
-              </q-expansion-item>
-            </div>
-          </q-list>
+          <ol class="step-list q-ma-none">
+            <li v-for="(step, i) in steps" :key="step.label" class="step">
+              <span class="step__num">{{ i + 1 }}</span>
+              <div>
+                <span class="step__label">{{ step.label }}</span>
+                <p class="q-ma-none text-body-2">{{ step.text }}</p>
+              </div>
+            </li>
+          </ol>
         </q-card-section>
       </q-card>
     </q-intersection>
@@ -278,13 +217,13 @@ onBeforeUnmount(() => {
     <q-intersection transition="slide-up" transition-duration="800" :once="true">
       <q-card class="about-card q-mt-md q-pa-none">
         <q-card-section class="about-section-block q-pa-lg">
-          <p class="text-caption kicker q-mt-none q-mb-sm">Selected experience</p>
+          <p class="text-caption kicker q-mt-none q-mb-sm">Experience</p>
 
-          <h2 class="text-h2 q-mt-none q-mb-md">Past Clients</h2>
+          <h2 class="text-h2 q-mt-none q-mb-md">Complex environments I’ve worked in</h2>
 
           <p class="section-copy text-body-2 q-mt-none q-mb-lg">
-            Selected organizations I’ve supported through frontend, product, interface, and
-            implementation work.
+            Frontend, product, and interface work for organizations where the subject matter is
+            hard and the stakes are high.
           </p>
 
           <div class="client-grid">
@@ -359,6 +298,10 @@ onBeforeUnmount(() => {
     font-weight: 700;
   }
 
+  h1 {
+    font-size: clamp(1.9rem, 2.6vw, 2.6rem);
+  }
+
   h1,
   h2 {
     color: tokens.$text;
@@ -379,46 +322,105 @@ onBeforeUnmount(() => {
     line-height: 1.55;
   }
 
-  .about-list {
-    display: grid;
-    gap: 0.75rem;
-    background: transparent;
-  }
-
-  .about-bullet {
-    border: 1px solid color-mix(in srgb, var(--q-accent) 28%, transparent);
-    border-radius: 0.75rem;
-    background: color-mix(in srgb, tokens.$ink-soft 82%, tokens.$ivory 6%);
-    box-shadow:
-      inset 0 1px 0 color-mix(in srgb, tokens.$ivory 10%, transparent),
-      0 8px 24px color-mix(in srgb, tokens.$ink 32%, transparent);
-    overflow: hidden;
-  }
-
-  .about-expansion-header {
-    color: tokens.$text;
-    background: transparent;
-    min-height: 4.25rem;
-  }
-
-  .about-expansion-header .q-item__section--avatar {
-    min-width: 3.25rem;
-  }
-
   .about-avatar {
+    flex: none;
     border: 1px solid color-mix(in srgb, var(--q-accent) 36%, transparent);
     background: color-mix(in srgb, tokens.$ink 50%, transparent);
   }
 
-  .about-expansion-label {
+  .discipline-grid {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 0.75rem;
+  }
+
+  .discipline {
+    display: flex;
+    gap: 0.85rem;
+    align-items: flex-start;
+    padding: 1rem;
+    border: 1px solid color-mix(in srgb, var(--q-accent) 28%, transparent);
+    border-radius: 0.75rem;
+    background: color-mix(in srgb, tokens.$ink-soft 82%, tokens.$ivory 6%);
+
+    p {
+      color: tokens.$text-muted;
+      line-height: 1.45;
+    }
+  }
+
+  .discipline__label,
+  .step__label {
+    display: block;
+    margin-bottom: 0.2rem;
     color: tokens.$text;
     font-weight: 700;
   }
 
-  .about-expansion-body {
-    color: tokens.$text-muted;
-    background: color-mix(in srgb, tokens.$ink 82%, tokens.$ivory 5%);
-    border-top: 1px solid color-mix(in srgb, var(--q-accent) 24%, transparent);
+  .discipline-sum {
+    color: tokens.$text;
+    font-weight: 600;
+    line-height: 1.45;
+  }
+
+  .fit-list {
+    display: grid;
+    gap: 0.6rem;
+    padding: 0;
+    list-style: none;
+
+    li {
+      position: relative;
+      padding: 0.8rem 1rem 0.8rem 2.4rem;
+      border: 1px solid color-mix(in srgb, var(--q-accent) 22%, transparent);
+      border-radius: 0.75rem;
+      background: color-mix(in srgb, tokens.$ink 72%, transparent);
+      color: tokens.$text-muted;
+      line-height: 1.4;
+
+      &::before {
+        content: '';
+        position: absolute;
+        top: 1.2rem;
+        left: 1rem;
+        width: 0.55rem;
+        height: 0.55rem;
+        border-radius: 2px;
+        background: tokens.$champagne;
+        transform: rotate(45deg);
+      }
+    }
+  }
+
+  .step-list {
+    display: grid;
+    gap: 0.75rem;
+    padding: 0;
+    list-style: none;
+  }
+
+  .step {
+    display: flex;
+    gap: 0.85rem;
+    align-items: flex-start;
+
+    p {
+      color: tokens.$text-muted;
+      line-height: 1.5;
+    }
+  }
+
+  .step__num {
+    flex: none;
+    display: grid;
+    place-items: center;
+    width: 1.9rem;
+    height: 1.9rem;
+    border: 1px solid tokens.$champagne;
+    border-radius: 50%;
+    color: tokens.$champagne;
+    font-size: 0.85rem;
+    font-weight: 700;
   }
 
   .about-cta {
@@ -485,7 +487,8 @@ onBeforeUnmount(() => {
       max-width: 48rem;
     }
 
-    .client-grid {
+    .client-grid,
+    .discipline-grid {
       grid-template-columns: repeat(2, minmax(0, 1fr));
     }
   }

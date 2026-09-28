@@ -6,12 +6,12 @@ export interface LensDetails {
   id: string;
   img: PictureData;
   alt: Lens;
-  tagline: string;
-  fitLine: string;
-  features: FeatureIcon[];
-}
-
-interface FeatureIcon {
-  featureIcon: string;
-  text: string;
+  /** The one question this lens answers about a surface. */
+  question: string;
+  /** Symptoms a client can already see that point to this lens. */
+  signals: string[];
+  /** What I actually inspect when I apply the lens. */
+  checks: string[];
+  /** What changes for the business once the issue is fixed. */
+  outcome: string;
 }

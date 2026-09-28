@@ -8,6 +8,7 @@ const { lgBreakpoint, width } = useViewport();
 gsap.registerPlugin(ScrollTrigger);
 
 const svgRoot = ref<SVGSVGElement | null>(null);
+const wrapRoot = ref<HTMLDivElement | null>(null);
 let ctx: gsap.Context | null = null;
 
 const isResponsive = computed(() => width.value < lgBreakpoint);
@@ -42,6 +43,15 @@ onMounted(() => {
   const buttonCard = root.querySelector<SVGElement>('#button-card');
   const scrollTargets = [topDeco, sidebar, buttonCard].filter((el): el is SVGElement => !!el);
 
+  /* Proof overlays: each one lands right after the UI piece it lives in. */
+  const wrap = wrapRoot.value;
+  const proofFor = (key: string) =>
+    wrap?.querySelector<HTMLElement>(`.bg-proof[data-proof="${key}"]`) ?? null;
+  const proofTop = proofFor('clients');
+  const proofSide = proofFor('clarity');
+  const proofCard = proofFor('ai');
+  const proofs = [proofTop, proofSide, proofCard].filter((el): el is HTMLElement => !!el);
+
   const reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
   ctx = gsap.context(() => {
@@ -53,6 +63,7 @@ onMounted(() => {
         x: 0,
         y: 0,
       });
+      gsap.set(proofs, { autoAlpha: 1 });
       return;
     }
 
@@ -119,10 +130,34 @@ onMounted(() => {
           2,
         );
       }
+
+      /* Proofs resolve once their piece has settled. */
+      const revealProof = (el: HTMLElement | null, at: number) => {
+        if (!el) return;
+        tl2.fromTo(
+          el,
+          { autoAlpha: 0, y: 14 },
+          { autoAlpha: 1, y: 0, duration: 0.55, ease: 'none' },
+          at,
+        );
+        const lines = el.querySelectorAll('.bg-proof__reveal');
+        if (lines.length) {
+          tl2.fromTo(
+            lines,
+            { autoAlpha: 0, y: 6 },
+            { autoAlpha: 1, y: 0, duration: 0.35, stagger: 0.12, ease: 'none' },
+            at + 0.25,
+          );
+        }
+      };
+
+      revealProof(proofTop, 1.15);
+      revealProof(proofSide, 2.15);
+      revealProof(proofCard, 3.15);
     }
 
     ScrollTrigger.refresh();
-  }, root);
+  }, wrap ?? root);
 });
 
 onBeforeUnmount(() => {
@@ -131,6 +166,7 @@ onBeforeUnmount(() => {
 </script>
 
 <template>
+  <div ref="wrapRoot" class="clarity-bg">
   <svg
     ref="svgRoot"
     viewBox="0 0 1672 941"
@@ -151,8 +187,8 @@ onBeforeUnmount(() => {
   >
     <title id="title">Deconstructed interface background with clarity cues</title>
     <desc id="desc">
-      The supplied interface artwork with three subtle editable text cues embedded into existing
-      interface controls: Defined, Aligned, and Visible.
+      Deconstructed interface artwork. As the page scrolls, three pieces of the interface slide in
+      and each one resolves into a piece of proof.
     </desc>
     <rect
       style="
@@ -1086,142 +1122,6 @@ onBeforeUnmount(() => {
         transform="matrix(0.99619955,-0.08710027,0.09356471,0.9956132,0,0)"
         inkscape:label="Btn3"
       />
-      <g id="visible-btn" inkscape:label="Visible Btn" style="display: inline">
-        <rect
-          style="
-            fill: #f7f9fe;
-            fill-opacity: 1;
-            stroke: #b3ccfa;
-            stroke-width: 1.58804;
-            stroke-dasharray: none;
-            stroke-opacity: 1;
-          "
-          id="rect17-6"
-          width="120.78915"
-          height="66.379288"
-          x="1234.2549"
-          y="925.44824"
-          ry="7.0501037"
-          transform="matrix(0.99542311,-0.09556581,0.08527368,0.99635757,0,0)"
-          inkscape:label="Btn2"
-        />
-        <text
-          xml:space="preserve"
-          style="
-            font-style: normal;
-            font-variant: normal;
-            font-weight: normal;
-            font-stretch: normal;
-            font-size: 28px;
-            font-family: 'Helvetica Neue';
-            -inkscape-font-specification: 'Helvetica Neue';
-            display: inline;
-            opacity: 0.908907;
-            fill: #1162f6;
-            fill-opacity: 1;
-            stroke: #b3ccfa;
-            stroke-width: 0;
-            stroke-dasharray: none;
-            stroke-opacity: 1;
-          "
-          x="1248.0819"
-          y="964.33344"
-          id="text17-9"
-          transform="rotate(-5.2431446)"
-          inkscape:label="Visible"
-        >
-          <tspan
-            sodipodi:role="line"
-            id="tspan17-4"
-            x="1248.0819"
-            y="964.33344"
-            style="
-              font-style: normal;
-              font-variant: normal;
-              font-weight: normal;
-              font-stretch: normal;
-              font-size: 28px;
-              font-family: 'Helvetica Neue';
-              -inkscape-font-specification: 'Helvetica Neue';
-              opacity: 0.8;
-              fill: #1162f6;
-              fill-opacity: 1;
-              stroke-width: 0;
-              stroke-dasharray: none;
-            "
-          >
-            Visible
-          </tspan>
-        </text>
-      </g>
-      <g id="defined-btn" inkscape:label="Defined Btn" style="display: inline">
-        <rect
-          style="
-            opacity: 1;
-            fill: #f7f9fe;
-            fill-opacity: 1;
-            stroke: #b3ccfa;
-            stroke-width: 1.5911;
-            stroke-dasharray: none;
-            stroke-opacity: 1;
-          "
-          id="rect17"
-          width="120.82125"
-          height="68.432289"
-          x="1099.1547"
-          y="928.46454"
-          ry="7.2681518"
-          transform="matrix(0.9951354,-0.09851665,0.0827135,0.99657337,0,0)"
-          inkscape:label="Btn1"
-        />
-        <text
-          xml:space="preserve"
-          style="
-            font-style: normal;
-            font-variant: normal;
-            font-weight: normal;
-            font-stretch: normal;
-            font-size: 28px;
-            font-family: 'Helvetica Neue';
-            -inkscape-font-specification: 'Helvetica Neue';
-            display: inline;
-            opacity: 0.808;
-            fill: #1162f6;
-            fill-opacity: 1;
-            stroke: #b3ccfa;
-            stroke-width: 0;
-            stroke-dasharray: none;
-            stroke-opacity: 1;
-          "
-          x="1103.4972"
-          y="964.63287"
-          id="text17"
-          transform="rotate(-5.2431446)"
-          inkscape:label="Defined"
-        >
-          <tspan
-            sodipodi:role="line"
-            id="tspan17"
-            x="1103.4972"
-            y="964.63287"
-            style="
-              font-style: normal;
-              font-variant: normal;
-              font-weight: normal;
-              font-stretch: normal;
-              font-size: 28px;
-              font-family: 'Helvetica Neue';
-              -inkscape-font-specification: 'Helvetica Neue';
-              fill: #1162f6;
-              fill-opacity: 1;
-              stroke-width: 0;
-              stroke-dasharray: none;
-            "
-          >
-            Defined
-          </tspan>
-        </text>
-      </g>
     </g>
     <path
       style="
@@ -1256,54 +1156,6 @@ onBeforeUnmount(() => {
         id="path6"
         inkscape:label="Decoration"
       />
-      <text
-        xml:space="preserve"
-        style="
-          font-style: normal;
-          font-variant: normal;
-          font-weight: normal;
-          font-stretch: normal;
-          font-size: 40px;
-          font-family: 'Helvetica Neue';
-          -inkscape-font-specification: 'Helvetica Neue';
-          display: inline;
-          opacity: 0.8;
-          fill: #1162f6;
-          fill-opacity: 1;
-          stroke: #b3ccfa;
-          stroke-width: 0;
-          stroke-dasharray: none;
-          stroke-opacity: 1;
-        "
-        x="1473.652"
-        y="209.59259"
-        id="text1"
-        transform="rotate(-5.3669497)"
-        inkscape:label="Aligned"
-      >
-        <tspan
-          sodipodi:role="line"
-          id="tspan1"
-          x="1473.652"
-          y="209.59259"
-          style="
-            font-style: normal;
-            font-variant: normal;
-            font-weight: normal;
-            font-stretch: normal;
-            font-size: 40px;
-            font-family: 'Helvetica Neue';
-            -inkscape-font-specification: 'Helvetica Neue';
-            opacity: 0.8;
-            fill: #1162f6;
-            fill-opacity: 1;
-            stroke-width: 0;
-            stroke-dasharray: none;
-          "
-        >
-          Aligned
-        </tspan>
-      </text>
     </g>
     <metadata id="metadata2">
       <rdf:RDF>
@@ -1313,12 +1165,181 @@ onBeforeUnmount(() => {
       </rdf:RDF>
     </metadata>
   </svg>
+
+  <!-- Proof overlays. Positions are % of the 1672x941 viewBox, so they track the
+       stretched SVG pieces they sit in at any desktop size. -->
+  <div class="bg-proof bg-proof--clients" data-proof="clients">
+    <span class="bg-proof__kicker">Shipped inside</span>
+    <ul class="bg-proof__names">
+      <li class="bg-proof__reveal">Labcorp</li>
+      <li class="bg-proof__reveal">Amtrak</li>
+      <li class="bg-proof__reveal">ORNL</li>
+      <li class="bg-proof__reveal">Lockheed Martin</li>
+    </ul>
+  </div>
+
+  <div class="bg-proof bg-proof--clarity" data-proof="clarity">
+    <span class="bg-proof__kicker">Proof &middot; Clarity</span>
+    <strong class="bg-proof__title">You&rsquo;re scrolling the case study.</strong>
+    <span class="bg-proof__line bg-proof__reveal">
+      Message, proof, next step. Each piece arrives when you need it, not before.
+    </span>
+  </div>
+
+  <div class="bg-proof bg-proof--ai" data-proof="ai">
+    <span class="bg-proof__kicker">Proof &middot; AI legibility</span>
+    <strong class="bg-proof__title">StorytAIm narration UI</strong>
+    <span class="bg-proof__wave bg-proof__reveal" aria-hidden="true">
+      <i v-for="n in 18" :key="n" :style="{ '--i': n }"></i>
+    </span>
+    <span class="bg-proof__line bg-proof__reveal">
+      A live waveform shows when the AI is speaking, so generated audio never feels like a black
+      box.
+    </span>
+  </div>
+  </div>
 </template>
 
 <style scoped lang="scss">
 @use '../css/tokens' as tokens;
 $load: '#left-top-decoration, #slider-btn, #content-card, #graph-card, #landscape, #main-content';
 $scroll: '#right-top-decoration, #sidebar, #button-card';
+
+.clarity-bg {
+  position: relative;
+  width: 100%;
+  height: 100%;
+}
+
+/* ---------- Proof overlays ---------- */
+
+.bg-proof {
+  position: absolute;
+  z-index: 1;
+  display: grid;
+  gap: 0.3rem;
+  padding: 0.7rem 0.85rem 0.75rem;
+  border: 1px solid rgba(18, 96, 240, 0.22);
+  border-radius: 0.7rem;
+  background: rgba(255, 255, 255, 0.9);
+  box-shadow:
+    0 10px 28px rgba(10, 52, 135, 0.14),
+    inset 0 1px 0 rgba(255, 255, 255, 0.9);
+  color: tokens.$ink-soft;
+  font-family: tokens.$primary-font;
+  opacity: 0;
+  visibility: hidden;
+  will-change: transform, opacity;
+}
+
+.bg-proof__kicker {
+  color: #1260f0;
+  font-size: clamp(0.62rem, 0.62vw, 0.74rem);
+  font-weight: 700;
+  letter-spacing: 0.09em;
+  line-height: 1.1;
+  text-transform: uppercase;
+}
+
+.bg-proof__title {
+  font-size: clamp(0.82rem, 0.85vw, 1rem);
+  font-weight: 700;
+  line-height: 1.2;
+  letter-spacing: -0.01em;
+}
+
+.bg-proof__line {
+  color: rgba(11, 31, 46, 0.72);
+  font-size: clamp(0.7rem, 0.7vw, 0.84rem);
+  line-height: 1.35;
+}
+
+/* Top-right tab: client names */
+.bg-proof--clients {
+  top: 1.4%;
+  right: 1.3%;
+  width: clamp(210px, 14.2%, 280px);
+}
+
+.bg-proof__names {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.25rem 0.3rem;
+  margin: 0.15rem 0 0;
+  padding: 0;
+  list-style: none;
+
+  li {
+    padding: 0.18rem 0.45rem;
+    border-radius: 999px;
+    background: #e5ecfd;
+    color: #0a3487;
+    font-size: clamp(0.68rem, 0.68vw, 0.82rem);
+    font-weight: 700;
+    line-height: 1.2;
+  }
+}
+
+/* Sidebar: pops out of the middle control like a tooltip */
+.bg-proof--clarity {
+  top: 57.2%;
+  left: 9.2%;
+  width: clamp(220px, 15.5%, 290px);
+  transform-origin: 0 50%;
+  rotate: -4deg;
+
+  &::before {
+    content: '';
+    position: absolute;
+    top: 1.1rem;
+    left: -7px;
+    width: 12px;
+    height: 12px;
+    border-left: 1px solid rgba(18, 96, 240, 0.22);
+    border-bottom: 1px solid rgba(18, 96, 240, 0.22);
+    background: inherit;
+    transform: rotate(45deg);
+  }
+}
+
+/* Button card: sits in the slot the old word buttons used */
+.bg-proof--ai {
+  top: 78.6%;
+  left: 68.6%;
+  width: clamp(230px, 16.8%, 310px);
+  rotate: -4.9deg;
+}
+
+.bg-proof__wave {
+  display: flex;
+  align-items: center;
+  gap: 3px;
+  height: 1.35rem;
+  margin: 0.1rem 0;
+
+  i {
+    display: block;
+    flex: 1;
+    height: 100%;
+    border-radius: 2px;
+    background: linear-gradient(180deg, #4d8bff, #1260f0);
+    transform-origin: 50% 50%;
+    animation: bg-proof-wave 1.1s ease-in-out infinite alternate;
+    animation-delay: calc(var(--i) * -0.13s);
+  }
+}
+
+@keyframes bg-proof-wave {
+  0% {
+    transform: scaleY(0.18);
+  }
+  45% {
+    transform: scaleY(0.85);
+  }
+  100% {
+    transform: scaleY(0.35);
+  }
+}
 
 svg {
   display: block;
@@ -1344,6 +1365,16 @@ svg {
   #{$scroll} {
     filter: none;
     opacity: 1;
+  }
+
+  .bg-proof {
+    opacity: 1;
+    visibility: visible;
+  }
+
+  .bg-proof__wave i {
+    animation: none;
+    transform: scaleY(0.55);
   }
 }
 </style>
