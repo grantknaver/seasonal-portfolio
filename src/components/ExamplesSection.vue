@@ -1,970 +1,657 @@
 <script setup lang="ts">
+import { computed, onBeforeUnmount, onMounted, reactive, ref } from 'vue';
+import { mdiOpenInNew, mdiPlayCircleOutline } from '@quasar/extras/mdi-v7';
 import { useViewport } from '../shared/utils/viewWidth';
-import { computed, defineAsyncComponent, ref, watch } from 'vue';
 import { useMainStore } from '../stores/main';
-import { type Example } from '../shared/types/example';
-import { v4 as uuidv4 } from 'uuid';
-import { CaseStudies } from 'src/shared/constants/caseStudies';
-import {
-  mdiMotionPlay,
-  mdiViewDashboard,
-  mdiBoxingGlove,
-  mdiWeatherSunny,
-  mdiAnimation,
-  mdiLayers,
-  mdiBrain,
-  mdiWhiteBalanceSunny,
-  mdiRobotOutline,
-  mdiTimeline,
-  mdiChartAreaspline,
-  mdiPalette,
-  mdiOpenInNew,
-  mdiWeatherPartlyCloudy,
-} from '@quasar/extras/mdi-v7';
 import { TopicName } from 'src/shared/constants/topicName';
-const ExampleProject = defineAsyncComponent(() => import('../components/ExampleProject.vue'));
-const AIAssitant = defineAsyncComponent(() => import('../components/AIAssitant.vue'));
+import { type PictureData } from '../shared/types/pictureData';
+
+import agentgateA from 'src/assets/examples/agentgate-a.jpg?w=720;1200&format=avif;webp;jpg&as=picture';
+import agentgateB from 'src/assets/examples/agentgate-b.jpg?w=720;1200&format=avif;webp;jpg&as=picture';
+import futureframeA from 'src/assets/examples/futureframe-a.jpg?w=720;1200&format=avif;webp;jpg&as=picture';
+import futureframeB from 'src/assets/examples/futureframe-b.jpg?w=720;1200&format=avif;webp;jpg&as=picture';
+import fizzcoA from 'src/assets/examples/fizzco-a.jpg?w=720;1200&format=avif;webp;jpg&as=picture';
+import fizzcoB from 'src/assets/examples/fizzco-b.jpg?w=720;1200&format=avif;webp;jpg&as=picture';
+import seasonalA from 'src/assets/examples/seasonal-a.jpg?w=720;1200&format=avif;webp;jpg&as=picture';
+import seasonalB from 'src/assets/examples/seasonal-b.jpg?w=720;1200&format=avif;webp;jpg&as=picture';
+import robotA from 'src/assets/examples/robot-a.jpg?w=720;1200&format=avif;webp;jpg&as=picture';
+
 const mainStore = useMainStore();
 const { lgBreakpoint, width } = useViewport();
 const isResponsive = computed(() => width.value < lgBreakpoint);
-const HERO_MOTION_CODEPEN_URL = 'https://codepen.io/GrantKnaver/pen/KwaxGwv';
-const WEATHER_EFFECTS_CODEPEN_URL = 'https://codepen.io/GrantKnaver/full/myOeOYe';
-const examples = ref<Example[]>([
+
+/* Works on every layout: MainPage syncs its mobile/tablet accordion to activeTopic. */
+const toContact = () => mainStore.SET_ACTIVE_TOPIC(TopicName.Contact);
+
+const ROBOT_URL = 'https://robot-narrator.pages.dev/';
+
+interface ShowcaseItem {
+  id: string;
+  title: string;
+  kind: string;
+  tags: string[];
+  what: string;
+  why: string;
+  url: string;
+  /** Before / after frames. The card resolves from a to b. */
+  a: PictureData;
+  b?: PictureData;
+  stateA: string;
+  stateB?: string;
+  featured?: boolean;
+  live?: boolean;
+}
+
+const items: ShowcaseItem[] = [
   {
-    id: uuidv4(),
-    name: CaseStudies.HeroMotion,
-    label: 'Hero Motion',
-    header: {
-      text: 'Animated Hero Experience',
-      subHeader: 'GSAP sequencing, atmosphere, and CTA flow in a focused hero build.',
-      icon: mdiMotionPlay,
-    },
-    expansionTopics: {
-      topics: [
-        {
-          id: uuidv4(),
-          name: 'hero-motion-overview',
-          icon: mdiViewDashboard,
-          label: 'Overview',
-          text: 'A responsive hero example using GSAP timelines, layered atmosphere, theme-driven visuals, and CTA sequencing to make the first screen feel clear, polished, and action-ready.',
-          hasSeparator: false,
-        },
-        {
-          id: uuidv4(),
-          name: 'hero-motion-challenge',
-          icon: mdiBoxingGlove,
-          label: 'Challenge',
-          text: 'A hero section has to communicate quickly without feeling static or rushed. The challenge was balancing visible motion sequencing with immediate readability and a clear next step.',
-          hasSeparator: false,
-        },
-      ],
-      hasSeparator: true,
-    },
-    listTopics: {
-      topics: [
-        {
-          id: uuidv4(),
-          name: 'hero-motion-solution',
-          header: 'Solution:',
-          list: [
-            {
-              id: uuidv4(),
-              icon: mdiMotionPlay,
-              text: 'Designed a GSAP timeline for headline, supporting copy, CTA, and ambient motion.',
-            },
-            {
-              id: uuidv4(),
-              icon: mdiWeatherSunny,
-              text: 'Built a layered visual atmosphere with theme-aware background and motion treatment.',
-            },
-            {
-              id: uuidv4(),
-              icon: mdiAnimation,
-              text: 'Tuned the animation pacing so the sequence feels intentional without delaying action.',
-            },
-            {
-              id: uuidv4(),
-              icon: mdiLayers,
-              text: 'Structured the hero as a reusable surface pattern for stronger first impressions.',
-            },
-          ],
-          hasSeparator: true,
-        },
-      ],
-      hasSeparator: true,
-    },
-    defaultTopics: {
-      topics: [
-        {
-          id: uuidv4(),
-          name: 'hero-motion-result',
-          header: 'Result:',
-          text: 'A focused hero surface that shows how motion can clarify hierarchy, guide attention, and make a first impression feel more polished without hiding the next step.',
-          hasSeparator: false,
-        },
-      ],
-      hasSeparator: false,
-    },
-    blockquote:
-      'A focused hero surface that uses GSAP motion, atmosphere, and CTA sequencing to make the first screen clearer, more polished, and easier to act on.',
+    id: 'agentgate',
+    title: 'AgentGate',
+    kind: 'Concept build',
+    tags: ['AI legibility', 'Trust'],
+    what: 'An AI governance platform for autonomous agents. Scroll, and a $1,200 refund request is checked for identity, authority, and policy before it’s allowed to execute.',
+    why: 'Every team adopting AI agents is asking the same thing: what is it allowed to do, and can we see why? This makes the answer readable at a glance.',
+    url: 'https://agentgate-bpb.pages.dev/',
+    a: agentgateA,
+    b: agentgateB,
+    stateA: 'Checks resolving',
+    stateB: 'Authorized',
+    featured: true,
   },
   {
-    id: uuidv4(),
-    name: CaseStudies.AiChat,
-    label: 'AI Chat',
-    header: {
-      text: 'AI Chat Interface',
-      subHeader: 'Conversational intelligence with motion clarity.',
-      icon: mdiBrain,
-    },
-    expansionTopics: {
-      topics: [
-        {
-          id: uuidv4(),
-          name: 'ai-chat-overview',
-          icon: mdiViewDashboard,
-          label: 'Overview:',
-          text: 'AI interfaces often feel sterile — fast responses but no sense of pacing, emotion, or engagement. The goal was to build a frontend that feels human through subtle motion cues.',
-          hasSeparator: false,
-        },
-        {
-          id: uuidv4(),
-          name: 'ai-chat-challenge',
-          icon: mdiBoxingGlove,
-          label: 'Challenge:',
-          text: 'Most animation libraries break when Vue’s reactivity and lifecycle rebuilds occur, especially on resize or layout shift. Achieving fluid, context-aware motion without memory leaks or stale timelines required deep integration between GSAP context lifecycles and Vue composables.',
-          hasSeparator: false,
-        },
-      ],
-      hasSeparator: true,
-    },
-    listTopics: {
-      topics: [
-        {
-          id: uuidv4(),
-          name: 'ai-chat-solution',
-          header: 'Solution:',
-          list: [
-            {
-              id: uuidv4(),
-              icon: mdiWhiteBalanceSunny,
-              text: 'Designed a GSAP timeline for message reveal, typing, and bounce effects.',
-            },
-            {
-              id: uuidv4(),
-              icon: mdiRobotOutline,
-              text: 'Integrated securely with an AI backend using an API and server proxy.',
-            },
-            {
-              id: uuidv4(),
-              icon: mdiLayers,
-              text: 'Built a responsive and keyboard-optimized layout with theme-aware visual states.',
-            },
-          ],
-          hasSeparator: true,
-        },
-      ],
-      hasSeparator: true,
-    },
-    defaultTopics: {
-      topics: [
-        {
-          id: uuidv4(),
-          name: 'ai-chat-result',
-          header: 'Result:',
-          text: 'An AI chat interface that uses visual rhythm, motion cues, and theme shifts to make the interaction feel more legible, responsive, and alive.',
-          hasSeparator: false,
-        },
-      ],
-      hasSeparator: false,
-    },
-    blockquote: '',
+    id: 'futureframe',
+    title: 'Futureframe',
+    kind: 'Concept build',
+    tags: ['AI legibility', 'Trust'],
+    what: 'AI age projection you scroll through. The face changes alongside the signals driving it, with uncertainty disclosed instead of hidden.',
+    why: 'AI feels like a black box when people only see the result. Showing the “why” is what makes it believable.',
+    url: 'https://futureframe-8ep.pages.dev/',
+    a: futureframeA,
+    b: futureframeB,
+    stateA: 'Age 8',
+    stateB: 'Age 67',
   },
   {
-    id: uuidv4(),
-    name: CaseStudies.Waveform,
-    label: 'Waveform',
-    header: {
-      text: 'StorytAIm Waveform Visualizer',
-      subHeader: 'Turning AI narration into living motion.',
-      icon: mdiTimeline,
-    },
-    expansionTopics: {
-      topics: [
-        {
-          id: uuidv4(),
-          name: 'waveform-overview',
-          icon: mdiViewDashboard,
-          label: 'Overview:',
-          text: 'A waveform visualizer built for the StorytAIm project, animating AI narration output so generated audio feels visible, active, and easier to understand.',
-          hasSeparator: false,
-        },
-        {
-          id: uuidv4(),
-          name: 'waveform-challenge',
-          icon: mdiBoxingGlove,
-          label: 'Challenge:',
-          text: 'Voice synthesis creates continuous audio streams, but standard waveform tools are often static or laggy. The task was to create a real-time visualization that reacts in sync with generated speech.',
-          hasSeparator: false,
-        },
-      ],
-      hasSeparator: true,
-    },
-    listTopics: {
-      topics: [
-        {
-          id: uuidv4(),
-          name: 'waveform-solution',
-          header: 'Solution:',
-          list: [
-            {
-              id: uuidv4(),
-              icon: mdiChartAreaspline,
-              text: 'Implemented GSAP-driven bar animations synced to audio amplitude data.',
-            },
-            {
-              id: uuidv4(),
-              icon: mdiAnimation,
-              text: 'Designed scalable SVG components for smooth motion across breakpoints.',
-            },
-            {
-              id: uuidv4(),
-              icon: mdiPalette,
-              text: 'Added color theming per character or emotion tag for the StorytAIm use case.',
-            },
-          ],
-          hasSeparator: true,
-        },
-      ],
-      hasSeparator: true,
-    },
-    defaultTopics: {
-      topics: [
-        {
-          id: uuidv4(),
-          name: 'waveform-result',
-          header: 'Result:',
-          text: 'A dynamic audio interface that bridges AI narration and visible feedback, demonstrating timing, motion, and audio-driven state updates.',
-          hasSeparator: true,
-        },
-      ],
-      hasSeparator: false,
-    },
-    blockquote: '',
+    id: 'robot',
+    title: 'Robot Narrator',
+    kind: 'Built for StorytAIm',
+    tags: ['AI legibility', 'Motion'],
+    what: 'Pick a voice and press play. The narrator’s waveform moves with the AI-generated speech.',
+    why: 'AI audio is invisible by default. Visible feedback shows the system is working, and who is speaking.',
+    url: ROBOT_URL,
+    a: robotA,
+    stateA: 'Try it here',
+    live: true,
   },
   {
-    id: uuidv4(),
-    name: CaseStudies.WeatherEffects,
-    label: 'Weather Effects',
-    header: {
-      text: 'Atmospheric Weather Effects',
-      subHeader:
-        'Purposeful environmental motion designed to strengthen context without competing with content.',
-      icon: mdiWeatherPartlyCloudy,
-    },
-    expansionTopics: {
-      topics: [
-        {
-          id: uuidv4(),
-          name: 'weather-effects-overview',
-          icon: mdiViewDashboard,
-          label: 'Overview:',
-          text: 'A collection of GSAP-driven weather effects created to demonstrate how atmospheric motion can give a digital experience more presence while preserving hierarchy, readability, and user focus.',
-          hasSeparator: false,
-        },
-        {
-          id: uuidv4(),
-          name: 'weather-effects-challenge',
-          icon: mdiBoxingGlove,
-          label: 'Challenge:',
-          text: 'Environmental animation can quickly become visual noise. The challenge was creating recognizable motion with enough character to shape the experience while keeping it restrained, performant, and subordinate to the platform’s content and actions.',
-          hasSeparator: false,
-        },
-      ],
-      hasSeparator: true,
-    },
-    listTopics: {
-      topics: [
-        {
-          id: uuidv4(),
-          name: 'weather-effects-solution',
-          header: 'Solution:',
-          list: [
-            {
-              id: uuidv4(),
-              icon: mdiAnimation,
-              text: 'Built reusable GSAP motion systems with controlled timing, direction, density, and variation.',
-            },
-            {
-              id: uuidv4(),
-              icon: mdiLayers,
-              text: 'Separated atmospheric effects into layered visual planes so motion could create depth without obscuring interface content.',
-            },
-            {
-              id: uuidv4(),
-              icon: mdiWeatherPartlyCloudy,
-              text: 'Matched each effect’s pacing and behavior to the atmosphere it was designed to create.',
-            },
-            {
-              id: uuidv4(),
-              icon: mdiViewDashboard,
-              text: 'Preserved clear content hierarchy by controlling contrast, placement, opacity, and the visual weight of moving elements.',
-            },
-          ],
-          hasSeparator: true,
-        },
-      ],
-      hasSeparator: true,
-    },
-    defaultTopics: {
-      topics: [
-        {
-          id: uuidv4(),
-          name: 'weather-effects-result',
-          header: 'Result:',
-          text: 'A flexible atmospheric motion system that demonstrates technical control without allowing animation to overpower the interface. The effects add context and polish while keeping important content legible, interactions predictable, and the overall experience trustworthy.',
-          hasSeparator: false,
-        },
-      ],
-      hasSeparator: false,
-    },
-    blockquote:
-      'Motion earns its place when it strengthens the atmosphere without weakening clarity, usability, or trust.',
+    id: 'fizzco',
+    title: 'Fizzco',
+    kind: 'Concept build',
+    tags: ['Clarity', 'Motion'],
+    what: 'A launch page where the product assembles as you scroll, so the offer lands before the copy.',
+    why: 'When the product is the message, motion can show it faster than words can.',
+    url: 'https://fizzco.pages.dev/',
+    a: fizzcoA,
+    b: fizzcoB,
+    stateA: 'First frame',
+    stateB: 'One scroll later',
   },
-]);
-const tab = ref(CaseStudies.HeroMotion);
-watch(tab, (newTab) => {
-  mainStore.SET_CASE_STUDY_ACTIVE_TAB(newTab);
-});
-const emit = defineEmits(['toContact']);
-const toContact = () => {
-  if (isResponsive.value) {
-    emit('toContact');
-  } else {
-    mainStore.SET_ACTIVE_TOPIC(TopicName.Contact);
-  }
+  {
+    id: 'seasonal',
+    title: 'Seasons',
+    kind: 'Motion study',
+    tags: ['Motion'],
+    what: 'Four seasons, each with its own weather, pace, and palette, switchable in one tap.',
+    why: 'Atmosphere without noise: motion that adds presence but never competes with the content.',
+    url: 'https://seasonal-example.pages.dev/',
+    a: seasonalA,
+    b: seasonalB,
+    stateA: 'Fall',
+    stateB: 'Winter',
+  },
+];
+
+const featured = items.find((i) => i.featured)!;
+const rest = items.filter((i) => !i.featured);
+
+/* ---------- Before → after playback ---------- */
+
+const resolved = reactive<Record<string, boolean>>({});
+const timers: Record<string, number> = {};
+
+const play = (id: string, delay = 700) => {
+  window.clearTimeout(timers[id]);
+  resolved[id] = false;
+  timers[id] = window.setTimeout(() => (resolved[id] = true), delay);
 };
-const backgroundUrl = new URL('../assets/example-background.avif', import.meta.url).href;
+
+const onHover = (id: string, e: PointerEvent) => {
+  if (e.pointerType === 'mouse') play(id, 450);
+};
+
+/* The robot iframe only mounts when asked for, so it never loads (or breaks) unseen. */
+const robotLive = ref(false);
+
+let io: IntersectionObserver | null = null;
+const root = ref<HTMLElement | null>(null);
+
+onMounted(() => {
+  const cards = root.value?.querySelectorAll<HTMLElement>('[data-card]') ?? [];
+  if (!('IntersectionObserver' in window)) {
+    items.forEach((i) => (resolved[i.id] = true));
+    return;
+  }
+  io = new IntersectionObserver(
+    (entries) => {
+      entries.forEach((e) => {
+        const id = (e.target as HTMLElement).dataset.card!;
+        if (e.isIntersecting && resolved[id] === undefined) play(id, 900);
+      });
+    },
+    { threshold: 0.45 },
+  );
+  cards.forEach((c) => io!.observe(c));
+});
+
+onBeforeUnmount(() => {
+  io?.disconnect();
+  Object.values(timers).forEach((t) => window.clearTimeout(t));
+});
 </script>
+
 <template>
-  <!-- Mobile -->
-  <section v-if="isResponsive" class="examplesSection responsive-view full-width column q-pa-xs">
-    <div class="case-section-card q-pa-lg q-mb-md">
-      <p class="text-caption kicker q-mt-none q-mb-sm">Examples</p>
-      <h1 class="text-h1 q-mt-none q-mb-md">Focused Builds</h1>
-      <p class="section-lead text-body-1 q-mt-none q-mb-sm">
-        Motion, AI interaction, and implementation examples you can inspect.
-      </p>
-      <p class="section-copy text-body-2 q-ma-none">
-        These examples show how focused implementation can improve first impressions, interaction
-        clarity, and AI legibility. If something like this would help your site or product, the next
-        step is a conversation about scope.
-      </p>
-    </div>
-    <div class="blockquotestack">
-      <template v-for="e in examples" :key="e.id">
-        <ExampleProject
-          class="example-instance full-width"
-          :header="e.header"
-          :expansionTopics="e.expansionTopics"
-          :listTopics="e.listTopics"
-          :defaultTopics="e.defaultTopics"
-          :blockquote="e.blockquote"
+  <section
+    ref="root"
+    class="examples-section full-width column"
+    :class="isResponsive ? 'responsive-view q-pa-xs' : 'desktop-view q-pa-md'"
+  >
+    <div class="ex-sheet">
+      <header class="ex-intro">
+        <p class="kicker q-mt-none q-mb-sm">Examples</p>
+        <h1 class="q-mt-none q-mb-md">Don’t take my word for it. Scroll through these.</h1>
+        <p class="lead q-ma-none">
+          Working builds that turn complex, AI-driven ideas into something people can understand,
+          trust, and act on.
+        </p>
+      </header>
+
+      <!-- Featured -->
+      <template v-for="it in [featured]" :key="it.id">
+        <article
+          class="ex-card ex-card--featured"
+          :data-card="it.id"
+          @pointerenter="onHover(it.id, $event)"
         >
-          <template #hero-motion-result>
-            <a
-              class="codepen-preview-card q-mt-md"
-              :href="HERO_MOTION_CODEPEN_URL"
-              target="_blank"
-              rel="noopener noreferrer"
-              aria-label="Open Hero Motion CodePen example"
-            >
-              <div
-                class="codepen-preview-media"
-                :style="{
-                  backgroundSize: 'cover',
-                  backgroundPosition: 'center',
-                }"
-              >
-                <div class="codepen-preview-overlay">
-                  <div class="codepen-preview-browser">
-                    <div class="browser-dots"><span /> <span /> <span /></div>
-                    <div class="browser-hero">
-                      <p class="preview-kicker q-ma-none">GSAP Hero Motion</p>
-                      <h3 class="q-mt-xs q-mb-sm">Animated Hero Experience</h3>
-                      <p class="q-ma-none">
-                        Timeline sequencing, atmospheric motion, and CTA focus.
-                      </p>
-                    </div>
-                  </div>
-                </div>
-              </div>
-              <div class="codepen-preview-footer">
-                <span>View live CodePen example</span> <q-icon :name="mdiOpenInNew" size="sm" />
-              </div>
+          <a class="ex-media" :href="it.url" target="_blank" rel="noopener noreferrer" :aria-label="`Open ${it.title} live`">
+            <picture class="ex-frame">
+              <source v-for="(s, k) in it.a.sources" :key="k" :srcset="s" :type="`image/${k}`" sizes="(min-width: 1440px) 900px, 95vw" />
+              <img :src="it.a.img.src" :alt="`${it.title}: ${it.stateA}`" loading="lazy" decoding="async" />
+            </picture>
+            <picture v-if="it.b" class="ex-frame ex-frame--b" :class="{ 'is-on': resolved[it.id] }">
+              <source v-for="(s, k) in it.b.sources" :key="k" :srcset="s" :type="`image/${k}`" sizes="(min-width: 1440px) 900px, 95vw" />
+              <img :src="it.b.img.src" :alt="`${it.title}: ${it.stateB}`" loading="lazy" decoding="async" />
+            </picture>
+            <span class="ex-state">
+              <i :class="{ 'is-on': resolved[it.id] }"></i>
+              {{ resolved[it.id] ? it.stateB : it.stateA }}
+            </span>
+          </a>
+          <div class="ex-body">
+            <div class="ex-meta">
+              <span class="ex-kind">{{ it.kind }}</span>
+              <span v-for="t in it.tags" :key="t" class="ex-tag">{{ t }}</span>
+            </div>
+            <h2 class="q-my-none">{{ it.title }}</h2>
+            <p class="ex-what q-ma-none">{{ it.what }}</p>
+            <p class="ex-why q-ma-none"><b>Why it’s here</b>{{ it.why }}</p>
+            <a class="ex-link" :href="it.url" target="_blank" rel="noopener noreferrer">
+              Open live <q-icon :name="mdiOpenInNew" size="16px" />
             </a>
-          </template>
-          <template #ai-chat-result>
-            <div class="q-mb-lg row justify-center full-width">
-              <Suspense>
-                <template #default> <AIAssitant /> </template>
-                <template #fallback> <q-skeleton type="QAvatar" height="400px" /> </template>
-              </Suspense>
-            </div>
-            <div
-              class="ai-chat-container q-pt-md q-pl-md q-pb-none q-pr-md full-width"
-              :style="{
-                backgroundImage: `url(${backgroundUrl})`,
-                backgroundSize: 'cover',
-                backgroundPosition: 'center',
-              }"
-            >
-              <p class="description first-description q-mt-none q-mb-md q-pa-md">
-                The <b>AI’s conversational tone</b> is dynamically randomized within those seasons.
-                One response might echo the calm focus of winter, another the optimism of spring, or
-                the playfulness of summer.
-              </p>
-              <q-separator class="slot-separator" />
-              <div class="q-mt-md column justify-center full-width">
-                <p class="description q-pa-md text-body-2">
-                  The pairing of timed visual rhythm and randomized personality creates a system
-                  that feels organic, structured, yet spontaneous.
-                </p>
-                <i class="quote q-pa-md text-center">
-                  "By blending predictable visual cycles with unpredictable tone shifts, the
-                  experience becomes quietly human: familiar in pattern, but never identical."
-                </i>
-                <p class="description q-mt-md q-pa-md">
-                  The result blurs the line between UI design and emotional storytelling. Color
-                  becomes context; timing becomes mood. Users don’t just read messages, they feel
-                  the passing of digital seasons.
-                </p>
-              </div>
-            </div>
-          </template>
-          <template #waveform-result>
-            <div class="narrator-container full-width row justify-center q-pa-md">
-              <iframe
-                id="inlineFrameExample"
-                title="Robot narrator waveform visualizer"
-                class="narrator full-width"
-                src="https://robot-narrator.pages.dev/"
-              >
-              </iframe>
-            </div>
-          </template>
-          <template #weather-effects-result>
-            <a
-              class="codepen-preview-card q-mt-md"
-              :href="WEATHER_EFFECTS_CODEPEN_URL"
-              target="_blank"
-              rel="noopener noreferrer"
-              aria-label="Open Weather Effects CodePen example"
-            >
-              <div
-                class="codepen-preview-media weather-effects-preview"
-                :style="{
-                  backgroundSize: 'cover',
-                  backgroundPosition: 'center',
-                }"
-              >
-                <div class="codepen-preview-overlay">
-                  <div class="codepen-preview-browser">
-                    <div class="browser-dots"><span /> <span /> <span /></div>
-
-                    <div class="browser-hero">
-                      <p class="preview-kicker q-ma-none">GSAP Weather Effects</p>
-
-                      <h3 class="q-mt-xs q-mb-sm">Atmospheric Motion System</h3>
-
-                      <p class="q-ma-none">
-                        Layered environmental effects designed to add depth and presence without
-                        weakening clarity or usability.
-                      </p>
-                    </div>
-                  </div>
-                </div>
-              </div>
-
-              <div class="codepen-preview-footer">
-                <span>View live weather effects example</span>
-                <q-icon :name="mdiOpenInNew" size="sm" />
-              </div>
-            </a>
-          </template>
-        </ExampleProject>
+          </div>
+        </article>
       </template>
-    </div>
-    <q-btn
-      @click="toContact"
-      class="case-contact-btn q-mt-md full-width"
-      color="accent"
-      size="lg"
-      glossy
-    >
-      <span class="text-body-2">LET’S TALK</span>
-    </q-btn>
-  </section>
-  <!-- Desktop -->
-  <section v-if="!isResponsive" class="examplesSection desktop-view full-width column q-pa-md">
-    <div class="case-section-card q-pa-xl q-mb-md">
-      <p class="text-caption kicker q-mt-none q-mb-sm">Examples</p>
-      <h1 class="text-h1 q-mt-none q-mb-md">Focused Builds</h1>
-      <p class="section-lead text-body-1 q-mt-none q-mb-sm">
-        Motion, AI interaction, and implementation examples you can inspect.
-      </p>
-      <p class="section-copy text-body-2 q-ma-none">
-        These examples show how focused implementation can improve first impressions, interaction
-        clarity, and AI legibility. If something like this would help your site or product, the next
-        step is a conversation about scope.
-      </p>
-    </div>
-    <q-tabs
-      v-model="tab"
-      align="justify"
-      dense
-      class="case-tabs q-pa-sm q-mb-md"
-      active-color="primary"
-      indicator-color="primary"
-    >
-      <q-tab
-        v-for="e in examples"
-        :key="e.id"
-        :name="e.name"
-        :label="e.label"
-        class="case-tab text-body-2 text-weight-medium"
-      />
-    </q-tabs>
-    <q-tab-panels
-      v-model="tab"
-      animated
-      transition-prev="fade"
-      transition-next="fade"
-      keep-alive
-      class="case-panels bg-transparent"
-    >
-      <q-tab-panel
-        v-for="e in examples"
-        :key="e.id"
-        :name="e.name"
-        class="case-panel no-scroll bg-transparent q-pa-none"
-      >
-        <ExampleProject
-          class="example-instance full-width"
-          :header="e.header"
-          :expansionTopics="e.expansionTopics"
-          :listTopics="e.listTopics"
-          :defaultTopics="e.defaultTopics"
-          :blockquote="e.blockquote"
+
+      <!-- The rest -->
+      <div class="ex-grid">
+        <article
+          v-for="it in rest"
+          :key="it.id"
+          class="ex-card"
+          :class="{ 'ex-card--live': it.live && robotLive }"
+          :data-card="it.id"
+          @pointerenter="onHover(it.id, $event)"
         >
-          <template #hero-motion-result>
-            <a
-              class="codepen-preview-card q-mt-md"
-              :href="HERO_MOTION_CODEPEN_URL"
-              target="_blank"
-              rel="noopener noreferrer"
-              aria-label="Open Hero Motion CodePen example"
-            >
-              <div
-                class="codepen-preview-media"
-                :style="{
-                  backgroundImage: `url(${backgroundUrl})`,
-                  backgroundSize: 'cover',
-                  backgroundPosition: 'center',
-                }"
-              >
-                <div class="codepen-preview-overlay">
-                  <div class="codepen-preview-browser">
-                    <div class="browser-dots"><span /> <span /> <span /></div>
-                    <div class="browser-hero">
-                      <p class="preview-kicker q-ma-none">GSAP Hero Motion</p>
-                      <h3 class="q-mt-xs q-mb-sm">Animated Hero Experience</h3>
-                      <p class="q-ma-none">
-                        Timeline sequencing, atmospheric motion, and CTA focus.
-                      </p>
-                    </div>
-                  </div>
-                </div>
-              </div>
-              <div class="codepen-preview-footer">
-                <span>View live CodePen example</span> <q-icon :name="mdiOpenInNew" size="sm" />
-              </div>
-            </a>
-          </template>
-          <template #weather-effects-result>
-            <a
-              class="codepen-preview-card q-mt-md"
-              :href="WEATHER_EFFECTS_CODEPEN_URL"
-              target="_blank"
-              rel="noopener noreferrer"
-              aria-label="Open Weather Effects CodePen example"
-            >
-              <div
-                class="codepen-preview-media weather-effects-preview"
-                :style="{
-                  backgroundImage: `url(${backgroundUrl})`,
-                  backgroundSize: 'cover',
-                  backgroundPosition: 'center',
-                }"
-              >
-                <div class="codepen-preview-overlay">
-                  <div class="codepen-preview-browser">
-                    <div class="browser-dots"><span /> <span /> <span /></div>
-
-                    <div class="browser-hero">
-                      <p class="preview-kicker q-ma-none">GSAP Weather Effects</p>
-
-                      <h3 class="q-mt-xs q-mb-sm">Atmospheric Motion System</h3>
-
-                      <p class="q-ma-none">
-                        Layered environmental effects designed to add depth and presence without
-                        weakening clarity or usability.
-                      </p>
-                    </div>
-                  </div>
-                </div>
-              </div>
-
-              <div class="codepen-preview-footer">
-                <span>View live weather effects example</span>
-                <q-icon :name="mdiOpenInNew" size="sm" />
-              </div>
-            </a>
-          </template>
-          <template #ai-chat-result>
-            <div
-              class="ai-chat-container q-pt-md q-pl-md q-pb-none q-pr-md"
-              :style="{
-                backgroundImage: `url(${backgroundUrl})`,
-                backgroundSize: 'cover',
-                backgroundPosition: 'center',
-              }"
-            >
-              <p class="description first-description q-mt-none q-mb-md q-pa-md">
-                The <b>AI’s conversational tone</b> is dynamically randomized within those seasons.
-                One response might echo the calm focus of winter, another the optimism of spring, or
-                the playfulness of summer.
-              </p>
-              <div class="q-mb-lg row justify-center full-width"><AIAssitant /></div>
-              <q-separator class="slot-separator" />
-              <div class="q-mt-md column justify-center full-width">
-                <p class="description q-pa-md text-body-2">
-                  The pairing of timed visual rhythm and randomized personality creates a system
-                  that feels organic, structured, yet spontaneous.
-                </p>
-                <i class="quote q-pa-md text-center">
-                  "By blending predictable visual cycles with unpredictable tone shifts, the
-                  experience becomes quietly human: familiar in pattern, but never identical."
-                </i>
-                <p class="description q-mt-md q-pa-md">
-                  The result blurs the line between UI design and emotional storytelling. Color
-                  becomes context; timing becomes mood. Users don’t just read messages, they feel
-                  the passing of digital seasons.
-                </p>
-              </div>
-            </div>
-          </template>
-          <template #waveform-result>
-            <div class="narrator-container full-width">
+          <!-- Robot narrator: poster until asked, then the real iframe -->
+          <div v-if="it.live" class="ex-media ex-media--live">
+            <div v-if="robotLive" class="narrator-container">
               <iframe
-                id="inlineFrameExample"
                 title="Robot narrator waveform visualizer"
-                class="narrator full-width"
-                src="https://robot-narrator.pages.dev/"
-              >
-              </iframe>
+                class="narrator"
+                :src="ROBOT_URL"
+              ></iframe>
             </div>
-          </template>
-        </ExampleProject>
-        <q-btn
-          @click="toContact"
-          class="case-contact-btn q-mt-md full-width"
-          color="accent"
-          size="lg"
-          glossy
-        >
-          <span class="text-body-2">LET’S TALK</span>
+            <button v-else type="button" class="ex-play" @click="robotLive = true">
+              <picture class="ex-frame">
+                <source v-for="(s, k) in it.a.sources" :key="k" :srcset="s" :type="`image/${k}`" sizes="(min-width: 1440px) 450px, 95vw" />
+                <img :src="it.a.img.src" :alt="it.title" loading="lazy" decoding="async" />
+              </picture>
+              <span class="ex-play__btn">
+                <q-icon :name="mdiPlayCircleOutline" size="22px" /> {{ it.stateA }}
+              </span>
+            </button>
+          </div>
+
+          <a v-else class="ex-media" :href="it.url" target="_blank" rel="noopener noreferrer" :aria-label="`Open ${it.title} live`">
+            <picture class="ex-frame">
+              <source v-for="(s, k) in it.a.sources" :key="k" :srcset="s" :type="`image/${k}`" sizes="(min-width: 1440px) 450px, 95vw" />
+              <img :src="it.a.img.src" :alt="`${it.title}: ${it.stateA}`" loading="lazy" decoding="async" />
+            </picture>
+            <picture v-if="it.b" class="ex-frame ex-frame--b" :class="{ 'is-on': resolved[it.id] }">
+              <source v-for="(s, k) in it.b.sources" :key="k" :srcset="s" :type="`image/${k}`" sizes="(min-width: 1440px) 450px, 95vw" />
+              <img :src="it.b.img.src" :alt="`${it.title}: ${it.stateB}`" loading="lazy" decoding="async" />
+            </picture>
+            <span v-if="it.b" class="ex-state">
+              <i :class="{ 'is-on': resolved[it.id] }"></i>
+              {{ resolved[it.id] ? it.stateB : it.stateA }}
+            </span>
+          </a>
+
+          <div class="ex-body">
+            <div class="ex-meta">
+              <span class="ex-kind">{{ it.kind }}</span>
+              <span v-for="t in it.tags" :key="t" class="ex-tag">{{ t }}</span>
+            </div>
+            <h2 class="q-my-none">{{ it.title }}</h2>
+            <p class="ex-what q-ma-none">{{ it.what }}</p>
+            <p class="ex-why q-ma-none"><b>Why it’s here</b>{{ it.why }}</p>
+            <a class="ex-link" :href="it.url" target="_blank" rel="noopener noreferrer">
+              Open live <q-icon :name="mdiOpenInNew" size="16px" />
+            </a>
+          </div>
+        </article>
+      </div>
+
+      <div class="ex-close">
+        <p class="q-ma-none"><b>Want this for your product?</b> It starts with a Teardown Review.</p>
+        <q-btn class="ex-cta" color="accent" size="lg" glossy @click="toContact">
+          <span class="text-body-2">Let’s Talk</span>
         </q-btn>
-      </q-tab-panel>
-    </q-tab-panels>
+      </div>
+    </div>
   </section>
 </template>
+
 <style scoped lang="scss">
-@use '../css/tokens' as tokens;
-.examplesSection {
-  content-visibility: auto;
-  contain-intrinsic-size: 800px 1000px;
-  color: tokens.$text;
-  @media (min-width: tokens.$breakpoint-lg) {
-    gap: 1rem;
-  }
-}
-.case-section-card,
-.case-tabs {
-  background: linear-gradient(
-    135deg,
-    color-mix(in srgb, tokens.$ink-soft 90%, tokens.$ivory 10%),
-    tokens.$ink
-  );
-  border: 1px solid var(--q-accent);
-}
-.case-section-card {
+$ink: #0b1f2e;
+$muted: rgba(11, 31, 46, 0.66);
+$blue: #1260f0;
+$navy: #0a3487;
+$soft: #e5ecfd;
+$line: rgba(18, 96, 240, 0.18);
+
+.ex-sheet {
+  display: grid;
+  gap: 1.25rem;
+  width: 100%;
+  padding: clamp(1.25rem, 2.6vw, 2.5rem);
   border-radius: 1rem;
-  text-align: center;
-  .kicker {
-    color: tokens.$champagne;
-    letter-spacing: 0.08em;
-    text-transform: uppercase;
-    font-weight: 700;
-  }
+  background: #f7f9fe;
+  box-shadow: 0 18px 50px rgba(6, 17, 31, 0.28);
+  color: $ink;
+}
+
+.kicker {
+  color: $blue;
+  font-size: 0.74rem;
+  font-weight: 700;
+  letter-spacing: 0.09em;
+  text-transform: uppercase;
+}
+
+.ex-intro {
+  margin-bottom: 0.25rem;
+
   h1 {
-    color: tokens.$text;
+    color: $ink;
+    font-size: clamp(1.75rem, 2.4vw, 2.4rem);
     font-weight: 400;
-    line-height: 1.08;
+    line-height: 1.12;
     letter-spacing: -0.025em;
     text-wrap: balance;
   }
-  .section-lead {
-    color: tokens.$text;
-    font-weight: 700;
-  }
-  .section-copy {
-    color: tokens.$text-muted;
-    max-width: 48rem;
-    margin-inline: auto;
-    line-height: 1.55;
+
+  .lead {
+    color: $muted;
+    font-size: 1.02rem;
+    font-weight: 600;
+    line-height: 1.45;
   }
 }
-.case-tabs {
-  border-radius: 0.85rem;
-  color: tokens.$text-muted;
-  overflow: hidden;
-}
-.case-tab {
-  color: tokens.$text-muted;
-  border-radius: 0.65rem;
-}
-.case-panels {
-  background: transparent;
-}
-.case-panel {
-  background: transparent;
-}
-.example-stack {
+
+/* ---------- Cards ---------- */
+
+.ex-grid {
   display: grid;
-  gap: 0.2rem;
-  @media (min-width: tokens.$breakpoint-lg) {
-    gap: 1rem;
-  }
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 1rem;
 }
-.case-contact-btn {
-  border-radius: 0.75rem;
-}
-.codepen-preview-card {
-  display: block;
+
+.ex-card {
+  display: grid;
+  align-content: start;
   overflow: hidden;
-  border-radius: 0.85rem;
-  color: tokens.$text;
-  text-decoration: none;
-  background: color-mix(in srgb, tokens.$ink-soft 88%, tokens.$ivory 6%);
-  border: 1px solid color-mix(in srgb, var(--q-accent) 34%, transparent);
-  box-shadow:
-    inset 0 1px 0 color-mix(in srgb, tokens.$ivory 8%, transparent),
-    0 16px 40px color-mix(in srgb, tokens.$ink 72%, transparent);
+  border: 1px solid $line;
+  border-radius: 0.9rem;
+  background: #fff;
   transition:
-    transform 0.22s ease,
-    border-color 0.22s ease,
-    box-shadow 0.22s ease;
-  &:hover,
-  &:focus-visible {
-    transform: translateY(-2px);
-    border-color: color-mix(in srgb, var(--q-accent) 70%, transparent);
-    box-shadow:
-      inset 0 1px 0 color-mix(in srgb, tokens.$ivory 10%, transparent),
-      0 22px 52px color-mix(in srgb, tokens.$ink 78%, transparent),
-      0 0 28px color-mix(in srgb, var(--q-accent) 24%, transparent);
+    border-color 0.2s ease,
+    box-shadow 0.2s ease;
+
+  &:hover {
+    border-color: rgba(18, 96, 240, 0.4);
+    box-shadow: 0 10px 28px rgba(10, 52, 135, 0.1);
   }
 }
-.codepen-preview-media {
-  position: relative;
-  min-height: 320px;
+
+.ex-card--featured {
+  .ex-media {
+    aspect-ratio: 2 / 1;
+  }
+
+  .ex-body {
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+    column-gap: 1.25rem;
+    padding: 1.2rem 1.35rem 1.35rem;
+
+    > .ex-meta,
+    > h2,
+    > .ex-what {
+      grid-column: 1;
+    }
+
+    > .ex-why {
+      grid-column: 2;
+      grid-row: 1 / span 3;
+      align-self: start;
+    }
+
+    > .ex-link {
+      grid-column: 2;
+    }
+  }
+
+  h2 {
+    font-size: 1.6rem;
+  }
 }
-.codepen-preview-overlay {
+
+/* When the robot is playing, give it the full row. */
+.ex-card--live {
+  grid-column: 1 / -1;
+}
+
+.ex-media {
+  position: relative;
+  display: block;
+  aspect-ratio: 16 / 10;
+  overflow: hidden;
+  border-bottom: 1px solid $line;
+  background: #eef2fb;
+}
+
+.ex-card--live .ex-media--live {
+  aspect-ratio: auto;
+}
+
+.ex-frame {
   position: absolute;
   inset: 0;
-  display: grid;
-  place-items: center;
-  padding: 1.5rem;
-}
-.codepen-preview-browser {
-  width: min(520px, 100%);
-  overflow: hidden;
-  border-radius: 1rem;
-  background: linear-gradient(
-    135deg,
-    color-mix(in srgb, tokens.$ink-soft 94%, tokens.$ivory 6%),
-    tokens.$ink
-  );
-  border: 1px solid color-mix(in srgb, var(--q-accent) 44%, transparent);
-  box-shadow:
-    0 20px 54px color-mix(in srgb, tokens.$ink 82%, transparent),
-    inset 0 1px 0 color-mix(in srgb, tokens.$ivory 8%, transparent);
-}
-.browser-dots {
-  display: flex;
-  gap: 0.4rem;
-  padding: 0.85rem 1rem;
-  border-bottom: 1px solid color-mix(in srgb, var(--q-accent) 22%, transparent);
-  span {
-    width: 0.62rem;
-    height: 0.62rem;
-    border-radius: 999px;
-    background: tokens.$champagne;
-    box-shadow: 0 0 10px color-mix(in srgb, tokens.$champagne 34%, transparent);
+
+  img {
+    display: block;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    object-position: center top;
+    transition: transform 0.6s ease;
   }
 }
-.browser-hero {
-  padding: 1.75rem;
-  text-align: center;
-  .preview-kicker {
-    color: tokens.$champagne;
-    font-size: 0.75rem;
+
+.ex-card:hover .ex-frame img {
+  transform: scale(1.02);
+}
+
+.ex-frame--b {
+  opacity: 0;
+  transition: opacity 0.9s ease;
+
+  &.is-on {
+    opacity: 1;
+  }
+}
+
+.ex-state {
+  position: absolute;
+  left: 0.6rem;
+  bottom: 0.6rem;
+  display: inline-flex;
+  gap: 0.4rem;
+  align-items: center;
+  padding: 0.25rem 0.55rem;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.92);
+  box-shadow: 0 4px 12px rgba(6, 17, 31, 0.15);
+  color: $navy;
+  font-size: 0.72rem;
+  font-weight: 700;
+
+  i {
+    width: 0.5rem;
+    height: 0.5rem;
+    border-radius: 50%;
+    background: #c9d6ef;
+    transition: background 0.3s ease;
+
+    &.is-on {
+      background: #12a15a;
+    }
+  }
+}
+
+/* Robot poster */
+.ex-play {
+  position: absolute;
+  inset: 0;
+  display: block;
+  width: 100%;
+  padding: 0;
+  border: 0;
+  background: #fff;
+  cursor: pointer;
+
+  .ex-frame img {
+    object-fit: contain;
+    object-position: center;
+  }
+}
+
+.ex-play__btn {
+  position: absolute;
+  left: 50%;
+  bottom: 0.8rem;
+  translate: -50% 0;
+  display: inline-flex;
+  gap: 0.35rem;
+  align-items: center;
+  padding: 0.4rem 0.85rem;
+  border-radius: 999px;
+  background: $blue;
+  color: #fff;
+  font-size: 0.8rem;
+  font-weight: 700;
+  box-shadow: 0 8px 20px rgba(18, 96, 240, 0.3);
+}
+
+/* Same sizing the narrator iframe has always used. */
+.narrator-container {
+  display: flex;
+  justify-content: center;
+  height: 500px;
+  min-height: 500px;
+  padding: 1rem;
+  background: #fff;
+
+  .narrator {
+    width: 100%;
+    height: 100%;
+    border: 0;
+    background: #fff;
+  }
+}
+
+/* Body */
+.ex-body {
+  display: grid;
+  gap: 0.5rem;
+  padding: 1rem 1.1rem 1.1rem;
+
+  h2 {
+    color: $ink;
+    font-size: 1.2rem;
     font-weight: 700;
+    letter-spacing: -0.01em;
+    line-height: 1.2;
+  }
+}
+
+.ex-meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.3rem;
+}
+
+.ex-kind,
+.ex-tag {
+  padding: 0.14rem 0.5rem;
+  border-radius: 999px;
+  font-size: 0.68rem;
+  font-weight: 700;
+  line-height: 1.3;
+}
+
+.ex-kind {
+  border: 1px solid rgba(11, 31, 46, 0.14);
+  color: $muted;
+}
+
+.ex-tag {
+  background: $soft;
+  color: $navy;
+}
+
+.ex-what {
+  color: $ink;
+  font-size: 0.9rem;
+  line-height: 1.45;
+}
+
+.ex-why {
+  padding: 0.6rem 0.75rem;
+  border-left: 3px solid $blue;
+  border-radius: 0.4rem;
+  background: #f3f7ff;
+  color: $muted;
+  font-size: 0.84rem;
+  line-height: 1.4;
+
+  b {
+    display: block;
+    margin-bottom: 0.1rem;
+    color: $blue;
+    font-size: 0.66rem;
     letter-spacing: 0.08em;
     text-transform: uppercase;
   }
-  h3 {
-    color: tokens.$text;
-    font-size: clamp(1.5rem, 4vw, 2rem);
-    font-weight: 500;
-    line-height: 1.1;
-  }
-  p {
-    color: tokens.$text-muted;
-    line-height: 1.5;
-  }
 }
-.codepen-preview-footer {
-  display: flex;
+
+.ex-link {
+  display: inline-flex;
+  gap: 0.3rem;
   align-items: center;
-  justify-content: center;
-  gap: 0.55rem;
-  padding: 1rem;
-  color: tokens.$text;
+  justify-self: start;
+  margin-top: 0.15rem;
+  color: $blue;
+  font-size: 0.86rem;
   font-weight: 700;
-  background: color-mix(in srgb, tokens.$ink 74%, var(--q-accent) 18%);
-  border-top: 1px solid color-mix(in srgb, var(--q-accent) 28%, transparent);
+  text-decoration: none;
+
+  &:hover {
+    text-decoration: underline;
+  }
 }
-.ai-chat-container {
-  border-radius: 0.85rem;
-  overflow: auto;
-  border: 1px solid color-mix(in srgb, var(--q-accent) 32%, transparent);
-  box-shadow:
-    inset 0 1px 0 color-mix(in srgb, tokens.$ivory 8%, transparent),
-    0 16px 40px color-mix(in srgb, tokens.$ink 72%, transparent);
+
+/* Close */
+.ex-close {
+  display: flex;
+  gap: 1rem;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0.9rem 1rem;
+  border: 1px solid $line;
+  border-radius: 0.8rem;
+  background: #fff;
+
+  p {
+    color: $muted;
+    line-height: 1.4;
+  }
+
+  b {
+    color: $ink;
+  }
 }
-.ai-chat-container::before {
-  content: '';
-  display: block;
-}
-.description,
-.quote {
-  display: block;
+
+.ex-cta {
+  flex: none;
   border-radius: 0.75rem;
-  color: tokens.$text;
-  background: color-mix(in srgb, tokens.$ink-soft 86%, tokens.$ivory 8%);
-  border: 1px solid color-mix(in srgb, var(--q-accent) 24%, transparent);
-  box-shadow: inset 0 1px 0 color-mix(in srgb, tokens.$ivory 8%, transparent);
+  white-space: nowrap;
 }
-.description {
-  line-height: 1.55;
+
+/* ---------- Layout variants ---------- */
+
+.desktop-view .ex-sheet {
+  max-width: 960px;
+  margin-inline: auto;
 }
-.quote {
-  color: tokens.$champagne;
-  line-height: 1.6;
-}
-.slot-separator {
-  background: color-mix(in srgb, var(--q-accent) 24%, transparent);
-  opacity: 1;
-}
-.narrator-container {
-  border-radius: 0.85rem;
-  overflow: hidden;
-  background: white;
-  border: 1px solid color-mix(in srgb, var(--q-accent) 28%, transparent);
-  box-shadow: 0 16px 40px color-mix(in srgb, tokens.$ink 72%, transparent);
-}
+
 .responsive-view {
-  .case-section-card {
-    border-top-left-radius: 1rem;
-    border-top-right-radius: 1rem;
-    @media (min-width: tokens.$breakpoint-lg) {
-      border-top-left-radius: 0;
-      border-top-right-radius: 0;
+  .ex-grid,
+  .ex-card--featured {
+    grid-template-columns: 1fr;
+  }
+
+  .ex-card--featured .ex-body {
+    grid-template-columns: 1fr;
+
+    > * {
+      grid-column: 1 !important;
+      grid-row: auto !important;
     }
   }
-  .codepen-preview-media {
-    min-height: 260px;
+
+  .ex-close {
+    flex-direction: column;
+    align-items: stretch;
   }
-  .browser-hero {
-    padding: 1.25rem;
-  }
-  .ai-chat-container {
-    padding-left: 0;
-    padding-right: 0;
-    .first-description {
-      font-size: 1.1rem;
-    }
-    .description,
-    .quote {
-      margin-left: 1rem;
-      margin-right: 1rem;
-    }
-  }
+
   .narrator-container {
-    height: 500px;
-    min-height: 500px;
-    background: transparent;
-    .narrator {
-      height: 100%;
-      width: 90%;
-      background-color: white;
-    }
+    padding: 0.5rem;
   }
 }
-.desktop-view {
-  .case-section-card,
-  .case-tabs,
-  .case-panels {
-    width: 100%;
-  }
-  .case-section-card {
-    max-width: 960px;
-    margin-inline: auto;
-  }
-  .ai-chat-container {
-    height: 800px;
-    .first-description {
-      font-size: 1.1rem;
-    }
-  }
-  .narrator-container {
-    height: 500px;
-    min-height: 500px;
-    .narrator {
-      height: 100%;
-    }
-  }
-}
+
 @media (prefers-reduced-motion: reduce) {
-  .case-tab,
-  .case-contact-btn,
-  .codepen-preview-card {
+  .ex-frame--b,
+  .ex-frame img {
     transition: none;
-  }
-  .codepen-preview-card:hover,
-  .codepen-preview-card:focus-visible {
-    transform: none;
   }
 }
 </style>
