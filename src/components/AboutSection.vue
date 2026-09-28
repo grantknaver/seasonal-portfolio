@@ -1,17 +1,9 @@
 <script lang="ts" setup>
 import { ref, onMounted, onBeforeUnmount, computed } from 'vue';
-import { v4 as uuidv4 } from 'uuid';
 import { useMainStore } from '../stores/main';
-import { type AboutBulletPoints } from 'src/shared/types/aboutBulletPoints';
 import { hasScrollbar } from 'src/shared/utils/hasScrollbar';
-import { type PastClient } from 'src/shared/types/pastClient';
 import { useViewport } from 'src/shared/utils/viewWidth';
 import { TopicName } from 'src/shared/constants/topicName';
-
-import labcorp from 'src/assets/labcorp.png?w=800;1280;1600&format=avif;jpg&as=picture';
-import ornl from 'src/assets/ornl.png?w=800;1280;1600&format=avif;jpg&as=picture';
-import amtrak from 'src/assets/amtrak.png?w=800;1280;1600&format=avif;jpg&as=picture';
-import lockheedMartin from 'src/assets/lockheed-martin.png?w=800;1280;1600&format=avif;png&as=picture';
 
 const mainStore = useMainStore();
 
@@ -22,92 +14,43 @@ const emit = defineEmits<{
 const { lgBreakpoint, width } = useViewport();
 const isResponsive = computed(() => width.value < lgBreakpoint);
 
-const getImg = (file: string) => new URL(`../assets/${file}`, import.meta.url).href;
-
 const toContact = () => {
   if (isResponsive.value) {
     emit('toContact');
     return;
   }
-
   mainStore.SET_ACTIVE_TOPIC(TopicName.Contact);
 };
 
-const disciplines = ref<AboutBulletPoints[]>([
-  {
-    src: getImg('future-proof-thinking.avif'),
-    label: 'Product thinking',
-    id: uuidv4(),
-    text: 'Work out what the user has to understand, and what the business needs them to do next.',
-  },
-  {
-    src: getImg('interactive-data-visualization.avif'),
-    label: 'Interaction design',
-    id: uuidv4(),
-    text: 'Shape each step so it answers the question the user has at that moment.',
-  },
-  {
-    src: getImg('gsap-animation.avif'),
-    label: 'Motion',
-    id: uuidv4(),
-    text: 'Use movement to direct attention, show cause and effect, and make system state visible. Never decoration.',
-  },
-  {
-    src: getImg('creative-engineering.avif'),
-    label: 'Frontend engineering',
-    id: uuidv4(),
-    text: 'Build it for real: responsive, performant, production code that ships the way it was designed.',
-  },
-]);
+const toExamples = () => mainStore.SET_ACTIVE_TOPIC(TopicName.Examples);
 
-const bestFits = [
-  'AI products where users need to see what the system is doing, and why',
-  'Technical, scientific, and data-heavy platforms that are hard to explain in one sentence',
-  'Enterprise and regulated products where trust has to be earned before anyone commits',
-  'Teams whose product has improved faster than their interface or site has',
+/* The four disciplines, with the one thing each contributes. */
+const disciplines = [
+  { label: 'Product thinking', role: 'What to say' },
+  { label: 'Interaction design', role: 'How it flows' },
+  { label: 'Motion', role: 'Where eyes go' },
+  { label: 'Frontend engineering', role: 'Ships exact' },
+];
+
+const team = ['Strategist', 'Designer', 'Motion designer', 'Developer'];
+
+const fits = [
+  'AI products',
+  'Technical & scientific platforms',
+  'Enterprise & regulated',
+  'Products that outgrew their UI',
 ];
 
 const steps = [
-  {
-    label: 'Diagnose',
-    text: 'If the priority isn’t clear yet, I review the product through the four lenses and show you where it’s costing you attention and conversions.',
-  },
-  {
-    label: 'Scope one focused block',
-    text: 'We pick the smallest build that fixes the most expensive moment. No full redesign or rebuild required.',
-  },
-  {
-    label: 'Build and ship',
-    text: 'I implement it in your codebase, so what we agreed on is exactly what your users see.',
-  },
+  { label: 'Diagnose', text: 'Find the moment costing you attention.' },
+  { label: 'Scope one block', text: 'The smallest fix with the biggest effect.' },
+  { label: 'Build & ship', text: 'In your codebase, exactly as designed.' },
 ];
 
-const pastClients = ref<PastClient[]>([
-  {
-    id: uuidv4(),
-    img: labcorp,
-    name: 'Labcorp',
-    url: 'https://www.labcorp.com/',
-  },
-  {
-    id: uuidv4(),
-    img: amtrak,
-    name: 'Amtrak',
-    url: 'https://www.amtrak.com/home.html',
-  },
-  {
-    id: uuidv4(),
-    img: ornl,
-    name: 'ORNL',
-    url: 'https://www.ornl.gov/',
-  },
-  {
-    id: uuidv4(),
-    img: lockheedMartin,
-    name: 'Lockheed Martin',
-    url: 'https://www.lockheedmartin.com/en-us/index.html',
-  },
-]);
+/* Play the diagram once it scrolls into view. */
+const diagramRef = ref<HTMLElement | null>(null);
+const diagramIn = ref(false);
+let io: IntersectionObserver | null = null;
 
 const updateScrollbarState = () => {
   mainStore.HAS_SCROLLBAR(hasScrollbar());
@@ -116,10 +59,26 @@ const updateScrollbarState = () => {
 onMounted(() => {
   updateScrollbarState();
   window.addEventListener('resize', updateScrollbarState);
+
+  if (!diagramRef.value || !('IntersectionObserver' in window)) {
+    diagramIn.value = true;
+    return;
+  }
+  io = new IntersectionObserver(
+    (entries) => {
+      if (entries.some((e) => e.isIntersecting)) {
+        diagramIn.value = true;
+        io?.disconnect();
+      }
+    },
+    { threshold: 0.35 },
+  );
+  io.observe(diagramRef.value);
 });
 
 onBeforeUnmount(() => {
   window.removeEventListener('resize', updateScrollbarState);
+  io?.disconnect();
 });
 </script>
 
@@ -128,136 +87,95 @@ onBeforeUnmount(() => {
     class="about-section full-width column"
     :class="isResponsive ? 'responsive-view q-pa-xs' : 'desktop-view q-pa-md'"
   >
-    <q-card class="about-card q-pa-none">
-      <q-card-section class="about-section-block about-intro q-pa-lg">
-        <p class="text-caption kicker q-mt-none q-mb-sm">About</p>
-
-        <h1 class="text-h1 q-mt-none q-mb-md">
+    <div class="about-sheet">
+      <!-- Intro -->
+      <header class="about-intro">
+        <p class="kicker q-mt-none q-mb-sm">About</p>
+        <h1 class="q-mt-none q-mb-md">
           I make complex technical products easy to understand, trust, and act on.
         </h1>
-
-        <p class="section-lead text-body-1 q-mt-none q-mb-sm">
-          I specialize in product clarity, trust, and AI legibility for complex technical products.
+        <p class="lead q-ma-none">
+          Product clarity, trust, and AI legibility, designed and built by one person.
         </p>
+      </header>
 
-        <p class="section-copy text-body-2 q-mt-none q-mb-md">
-          Most teams split this work across a strategist, a designer, a motion specialist, and a
-          developer, and the meaning gets diluted at every handoff. I do all four. The idea we
-          agree on is the thing that ships.
-        </p>
-
-        <div class="discipline-grid q-mt-lg">
-          <div v-for="d in disciplines" :key="d.id" class="discipline">
-            <q-avatar class="about-avatar" size="44px">
-              <img :src="d.src" :alt="d.label" />
-            </q-avatar>
-            <div>
-              <span class="discipline__label">{{ d.label }}</span>
-              <p class="q-ma-none text-body-2">{{ d.text }}</p>
-            </div>
+      <!-- Handoff diagram -->
+      <div ref="diagramRef" class="handoff" :class="{ 'is-in': diagramIn }">
+        <div class="handoff__row handoff__row--team">
+          <span class="handoff__tag">Typical team</span>
+          <div class="handoff__chain">
+            <template v-for="(person, i) in team" :key="person">
+              <span class="node node--team" :style="{ '--d': i }">{{ person }}</span>
+              <span v-if="i < team.length - 1" class="link link--lossy" :style="{ '--d': i }">
+                <i></i>
+              </span>
+            </template>
           </div>
+          <span class="outcome outcome--diluted">Intent diluted</span>
         </div>
 
-        <p class="discipline-sum q-mt-lg q-mb-none">
-          Together, they turn difficult concepts and workflows into experiences people can
-          understand, trust, and act on.
-        </p>
+        <div class="handoff__row handoff__row--me">
+          <span class="handoff__tag handoff__tag--me">With me</span>
+          <div class="handoff__merge">
+            <div class="merge-inputs">
+              <span
+                v-for="(d, i) in disciplines"
+                :key="d.label"
+                class="node node--me"
+                :style="{ '--d': i }"
+              >
+                {{ d.label }}
+                <small>{{ d.role }}</small>
+              </span>
+            </div>
+            <svg class="merge-lines" viewBox="0 0 60 160" preserveAspectRatio="none" aria-hidden="true">
+              <path d="M0 20 C 35 20, 30 80, 60 80" />
+              <path d="M0 60 C 30 60, 35 80, 60 80" />
+              <path d="M0 100 C 30 100, 35 80, 60 80" />
+              <path d="M0 140 C 35 140, 30 80, 60 80" />
+            </svg>
+          </div>
+          <span class="outcome outcome--clear">
+            <b>Ships as designed</b>
+            <small>Understood &middot; Trusted &middot; Acted on</small>
+          </span>
+        </div>
+      </div>
 
-        <q-btn
-          @click="toContact"
-          class="about-cta q-mt-lg full-width"
-          color="accent"
-          size="lg"
-          glossy
-        >
-          <span class="text-body-2">Let’s Talk</span>
-        </q-btn>
-      </q-card-section>
-    </q-card>
-
-    <q-intersection transition="slide-up" transition-duration="600" :once="true">
-      <q-card class="about-card q-mt-md q-pa-none">
-        <q-card-section class="about-section-block q-pa-lg">
-          <p class="text-caption kicker q-mt-none q-mb-sm">Best fit</p>
-
-          <h2 class="text-h2 q-mt-none q-mb-md">Where I’m most useful</h2>
-
-          <p class="section-copy text-body-2 q-mt-none q-mb-md">
-            The harder your product is to explain, the more clarity is worth. I do my best work
-            with:
-          </p>
-
-          <ul class="fit-list q-ma-none">
-            <li v-for="fit in bestFits" :key="fit">{{ fit }}</li>
+      <!-- Fit + steps -->
+      <div class="about-grid">
+        <div class="block">
+          <p class="kicker q-mt-none q-mb-sm">Best fit</p>
+          <p class="block__lead q-mt-none q-mb-md">The harder it is to explain, the more clarity is worth.</p>
+          <ul class="fit-tags q-ma-none">
+            <li v-for="f in fits" :key="f">{{ f }}</li>
           </ul>
-        </q-card-section>
-      </q-card>
-    </q-intersection>
+        </div>
 
-    <q-intersection transition="slide-up" transition-duration="700" :once="true">
-      <q-card class="about-card q-mt-md q-pa-none">
-        <q-card-section class="about-section-block q-pa-lg">
-          <p class="text-caption kicker q-mt-none q-mb-sm">How it starts</p>
-
-          <h2 class="text-h2 q-mt-none q-mb-md">How we’d work together</h2>
-
-          <ol class="step-list q-ma-none">
-            <li v-for="(step, i) in steps" :key="step.label" class="step">
-              <span class="step__num">{{ i + 1 }}</span>
+        <div class="block">
+          <p class="kicker q-mt-none q-mb-sm">How it starts</p>
+          <ol class="steps q-ma-none">
+            <li v-for="(s, i) in steps" :key="s.label">
+              <span class="steps__num">{{ i + 1 }}</span>
               <div>
-                <span class="step__label">{{ step.label }}</span>
-                <p class="q-ma-none text-body-2">{{ step.text }}</p>
+                <b>{{ s.label }}</b>
+                <span>{{ s.text }}</span>
               </div>
             </li>
           </ol>
-        </q-card-section>
-      </q-card>
-    </q-intersection>
+        </div>
+      </div>
 
-    <q-intersection transition="slide-up" transition-duration="800" :once="true">
-      <q-card class="about-card q-mt-md q-pa-none">
-        <q-card-section class="about-section-block q-pa-lg">
-          <p class="text-caption kicker q-mt-none q-mb-sm">Experience</p>
-
-          <h2 class="text-h2 q-mt-none q-mb-md">Complex environments I’ve worked in</h2>
-
-          <p class="section-copy text-body-2 q-mt-none q-mb-lg">
-            Frontend, product, and interface work for organizations where the subject matter is
-            hard and the stakes are high.
-          </p>
-
-          <div class="client-grid">
-            <a
-              v-for="(client, index) in pastClients"
-              :key="client.id"
-              class="client-card"
-              :href="client.url"
-              target="_blank"
-              rel="noopener noreferrer"
-              :aria-label="`Open ${client.name}`"
-            >
-              <picture class="full-width">
-                <source
-                  v-for="(src, k) in client.img.sources"
-                  :key="k"
-                  :srcset="src"
-                  :type="`image/${k}`"
-                  sizes="(min-width: 1450px) 100%"
-                />
-                <img
-                  :src="client.img.img.src"
-                  sizes="(min-width: 1024px) 25vw, 90vw"
-                  :fetchpriority="index === 0 ? 'high' : 'auto'"
-                  :loading="index === 0 ? 'eager' : 'lazy'"
-                  decoding="async"
-                  :alt="client.name"
-                />
-              </picture>
-            </a>
-          </div>
-        </q-card-section>
-      </q-card>
-    </q-intersection>
+      <!-- CTAs -->
+      <div class="about-ctas">
+        <q-btn class="about-cta" color="accent" size="lg" glossy @click="toContact">
+          <span class="text-body-2">Let’s Talk</span>
+        </q-btn>
+        <q-btn class="about-cta about-cta--ghost" flat size="lg" @click="toExamples">
+          <span class="text-body-2">See it in action &rarr;</span>
+        </q-btn>
+      </div>
+    </div>
   </section>
 </template>
 
@@ -265,254 +183,362 @@ onBeforeUnmount(() => {
 @use '../css/tokens' as tokens;
 
 .about-section {
-  color: tokens.$text;
+  $ink: #0b1f2e;
+  $muted: rgba(11, 31, 46, 0.66);
+  $blue: #1260f0;
+  $navy: #0a3487;
+  $soft: #e5ecfd;
+  $line: rgba(18, 96, 240, 0.18);
 
-  &.desktop-view {
-    overflow-y: hidden;
-  }
-
-  &.responsive-view {
-    gap: 1rem;
-  }
-
-  .about-card {
+  .about-sheet {
+    display: grid;
+    gap: 1.75rem;
     width: 100%;
-    background: linear-gradient(
-      135deg,
-      color-mix(in srgb, tokens.$ink-soft 90%, tokens.$ivory 10%),
-      tokens.$ink
-    );
-    border: 1px solid var(--q-accent);
+    padding: clamp(1.25rem, 2.6vw, 2.5rem);
     border-radius: 1rem;
-    overflow: hidden;
-  }
-
-  .about-section-block {
-    position: relative;
+    background: #f7f9fe;
+    box-shadow: 0 18px 50px rgba(6, 17, 31, 0.28);
+    color: $ink;
   }
 
   .kicker {
-    color: tokens.$champagne;
-    letter-spacing: 0.08em;
+    color: $blue;
+    font-size: 0.74rem;
+    font-weight: 700;
+    letter-spacing: 0.09em;
     text-transform: uppercase;
-    font-weight: 700;
   }
 
-  h1 {
-    font-size: clamp(1.9rem, 2.6vw, 2.6rem);
-  }
+  /* ---------- Intro ---------- */
 
-  h1,
-  h2 {
-    color: tokens.$text;
-    font-weight: 400;
-    line-height: 1.1;
-    letter-spacing: -0.025em;
-    text-wrap: balance;
-  }
+  .about-intro {
+    h1 {
+      color: $ink;
+      font-size: clamp(1.9rem, 2.6vw, 2.6rem);
+      font-weight: 400;
+      line-height: 1.1;
+      letter-spacing: -0.025em;
+      text-wrap: balance;
+    }
 
-  .section-lead {
-    color: tokens.$text;
-    font-weight: 700;
-    line-height: 1.45;
-  }
-
-  .section-copy {
-    color: tokens.$text-muted;
-    line-height: 1.55;
-  }
-
-  .about-avatar {
-    flex: none;
-    border: 1px solid color-mix(in srgb, var(--q-accent) 36%, transparent);
-    background: color-mix(in srgb, tokens.$ink 50%, transparent);
-  }
-
-  .discipline-grid {
-    display: grid;
-    grid-template-columns: 1fr;
-    gap: 0.75rem;
-  }
-
-  .discipline {
-    display: flex;
-    gap: 0.85rem;
-    align-items: flex-start;
-    padding: 1rem;
-    border: 1px solid color-mix(in srgb, var(--q-accent) 28%, transparent);
-    border-radius: 0.75rem;
-    background: color-mix(in srgb, tokens.$ink-soft 82%, tokens.$ivory 6%);
-
-    p {
-      color: tokens.$text-muted;
+    .lead {
+      color: $muted;
+      font-size: 1.05rem;
+      font-weight: 600;
       line-height: 1.45;
     }
   }
 
-  .discipline__label,
-  .step__label {
-    display: block;
-    margin-bottom: 0.2rem;
-    color: tokens.$text;
-    font-weight: 700;
-  }
+  /* ---------- Handoff diagram ---------- */
 
-  .discipline-sum {
-    color: tokens.$text;
-    font-weight: 600;
-    line-height: 1.45;
-  }
-
-  .fit-list {
+  .handoff {
     display: grid;
-    gap: 0.6rem;
+    gap: 0.9rem;
+  }
+
+  .handoff__row {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) 9.5rem;
+    gap: 0.6rem 1rem;
+    align-items: center;
+    padding: 1rem;
+    border: 1px solid $line;
+    border-radius: 0.85rem;
+    background: #fff;
+  }
+
+  .handoff__row--team {
+    background: #fbfcff;
+  }
+
+  .handoff__tag {
+    grid-column: 1 / -1;
+    color: $muted;
+    font-size: 0.72rem;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+
+    &--me {
+      color: $blue;
+    }
+  }
+
+  .node {
+    display: inline-flex;
+    flex-direction: column;
+    justify-content: center;
+    padding: 0.4rem 0.6rem;
+    border-radius: 0.5rem;
+    font-size: 0.78rem;
+    font-weight: 700;
+    line-height: 1.2;
+    opacity: 0;
+    transform: translateY(6px);
+    transition:
+      opacity 0.45s ease,
+      transform 0.45s ease;
+    transition-delay: calc(var(--d) * 0.12s);
+
+    small {
+      margin-top: 0.1rem;
+      color: $muted;
+      font-size: 0.68rem;
+      font-weight: 600;
+    }
+  }
+
+  .node--team {
+    flex: none;
+    border: 1px dashed rgba(11, 31, 46, 0.22);
+    background: #fff;
+    color: rgba(11, 31, 46, 0.72);
+    text-align: center;
+  }
+
+  .node--me {
+    border: 1px solid $line;
+    background: $soft;
+    color: $navy;
+    transition-delay: calc(0.9s + var(--d) * 0.1s);
+  }
+
+  /* Team: a chain where each handoff leaks a little */
+  .handoff__chain {
+    display: flex;
+    align-items: center;
+    gap: 0.35rem;
+    min-width: 0;
+  }
+
+  .link {
+    flex: 1;
+    min-width: 0.9rem;
+    height: 2px;
+
+    i {
+      display: block;
+      height: 100%;
+      background: repeating-linear-gradient(
+        90deg,
+        rgba(11, 31, 46, 0.35) 0 4px,
+        transparent 4px 8px
+      );
+      transform: scaleX(0);
+      transform-origin: 0 50%;
+      transition: transform 0.35s ease;
+      transition-delay: calc(0.15s + var(--d) * 0.12s);
+    }
+  }
+
+  .outcome {
+    display: grid;
+    gap: 0.1rem;
+    padding: 0.55rem 0.7rem;
+    border-radius: 0.55rem;
+    font-size: 0.82rem;
+    font-weight: 700;
+    line-height: 1.2;
+    text-align: center;
+    opacity: 0;
+    transition: opacity 0.5s ease;
+
+    small {
+      font-size: 0.66rem;
+      font-weight: 600;
+      opacity: 0.85;
+    }
+  }
+
+  .outcome--diluted {
+    border: 1px dashed rgba(11, 31, 46, 0.2);
+    color: rgba(11, 31, 46, 0.45);
+    filter: blur(0.6px);
+    transition-delay: 0.7s;
+  }
+
+  .outcome--clear {
+    background: $blue;
+    color: #fff;
+    box-shadow: 0 8px 20px rgba(18, 96, 240, 0.3);
+    transition-delay: 1.5s;
+  }
+
+  /* Me: four inputs merging into one */
+  .handoff__merge {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) 2.5rem;
+    align-items: stretch;
+    min-width: 0;
+  }
+
+  .merge-inputs {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 0.4rem;
+  }
+
+  .merge-lines {
+    width: 100%;
+    height: 100%;
+    overflow: visible;
+
+    path {
+      fill: none;
+      stroke: $blue;
+      stroke-width: 1.5;
+      vector-effect: non-scaling-stroke;
+      stroke-dasharray: 120;
+      stroke-dashoffset: 120;
+      transition: stroke-dashoffset 0.5s ease 1.25s;
+    }
+  }
+
+  .handoff.is-in {
+    .node,
+    .outcome {
+      opacity: 1;
+      transform: none;
+    }
+
+    .link i {
+      transform: scaleX(1);
+    }
+
+    .merge-lines path {
+      stroke-dashoffset: 0;
+    }
+  }
+
+  /* ---------- Fit + steps ---------- */
+
+  .about-grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 1rem;
+  }
+
+  .block {
+    padding: 1.1rem 1.2rem;
+    border: 1px solid $line;
+    border-radius: 0.85rem;
+    background: #fff;
+  }
+
+  .block__lead {
+    color: $ink;
+    font-weight: 600;
+    line-height: 1.4;
+  }
+
+  .fit-tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.4rem;
     padding: 0;
     list-style: none;
 
     li {
-      position: relative;
-      padding: 0.8rem 1rem 0.8rem 2.4rem;
-      border: 1px solid color-mix(in srgb, var(--q-accent) 22%, transparent);
-      border-radius: 0.75rem;
-      background: color-mix(in srgb, tokens.$ink 72%, transparent);
-      color: tokens.$text-muted;
-      line-height: 1.4;
-
-      &::before {
-        content: '';
-        position: absolute;
-        top: 1.2rem;
-        left: 1rem;
-        width: 0.55rem;
-        height: 0.55rem;
-        border-radius: 2px;
-        background: tokens.$champagne;
-        transform: rotate(45deg);
-      }
+      padding: 0.3rem 0.65rem;
+      border-radius: 999px;
+      background: $soft;
+      color: $navy;
+      font-size: 0.8rem;
+      font-weight: 700;
     }
   }
 
-  .step-list {
+  .steps {
     display: grid;
     gap: 0.75rem;
     padding: 0;
     list-style: none;
-  }
 
-  .step {
-    display: flex;
-    gap: 0.85rem;
-    align-items: flex-start;
+    li {
+      display: flex;
+      gap: 0.7rem;
+      align-items: flex-start;
+    }
 
-    p {
-      color: tokens.$text-muted;
-      line-height: 1.5;
+    b {
+      display: block;
+      color: $ink;
+      font-size: 0.92rem;
+    }
+
+    span:not(.steps__num) {
+      display: block;
+      color: $muted;
+      font-size: 0.85rem;
+      line-height: 1.35;
     }
   }
 
-  .step__num {
+  .steps__num {
     flex: none;
     display: grid;
     place-items: center;
-    width: 1.9rem;
-    height: 1.9rem;
-    border: 1px solid tokens.$champagne;
+    width: 1.6rem;
+    height: 1.6rem;
     border-radius: 50%;
-    color: tokens.$champagne;
-    font-size: 0.85rem;
+    background: $blue;
+    color: #fff;
+    font-size: 0.78rem;
     font-weight: 700;
   }
 
-  .about-cta {
-    border-radius: 0.75rem;
-  }
+  /* ---------- CTAs ---------- */
 
-  .client-grid {
-    display: grid;
-    grid-template-columns: 1fr;
+  .about-ctas {
+    display: flex;
     gap: 0.75rem;
   }
 
-  .client-card {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    min-height: 7rem;
-    padding: 1.25rem;
-    border: 1px solid color-mix(in srgb, var(--q-accent) 26%, transparent);
-    border-radius: 0.85rem;
-    background: color-mix(in srgb, tokens.$ivory 92%, white 8%);
-    box-shadow:
-      inset 0 1px 0 color-mix(in srgb, white 72%, transparent),
-      0 12px 32px color-mix(in srgb, tokens.$ink 42%, transparent);
-    transition:
-      transform 180ms ease,
-      border-color 180ms ease,
-      box-shadow 180ms ease;
+  .about-cta {
+    flex: 1;
+    border-radius: 0.75rem;
+
+    &--ghost {
+      border: 1px solid $line;
+      color: $navy;
+    }
   }
 
-  .client-card:hover,
-  .client-card:focus-visible {
-    transform: translateY(-0.2rem);
-    border-color: color-mix(in srgb, var(--q-accent) 52%, transparent);
-    box-shadow:
-      inset 0 1px 0 color-mix(in srgb, white 72%, transparent),
-      0 16px 42px color-mix(in srgb, tokens.$ink 54%, transparent);
-  }
+  /* ---------- Layout variants ---------- */
 
-  .client-card picture {
-    display: block;
-  }
-
-  .client-card img {
-    display: block;
-    width: 100%;
-    height: auto;
-    max-height: 4.5rem;
-    object-fit: contain;
-  }
-
-  &.desktop-view {
-    .about-card {
-      max-width: 960px;
-      margin-inline: auto;
-    }
-
-    .about-section-block {
-      padding: 2rem;
-    }
-
-    .section-copy,
-    .section-lead {
-      max-width: 48rem;
-    }
-
-    .client-grid,
-    .discipline-grid {
-      grid-template-columns: repeat(2, minmax(0, 1fr));
-    }
+  &.desktop-view .about-sheet {
+    max-width: 960px;
+    margin-inline: auto;
   }
 
   &.responsive-view {
-    .about-section-block {
-      padding: 1.25rem;
+    .handoff__row {
+      grid-template-columns: 1fr;
     }
 
-    .client-card {
-      min-height: 6rem;
+    .handoff__chain {
+      flex-wrap: wrap;
+    }
+
+    .link {
+      flex: 0 0 0.9rem;
+    }
+
+    .about-grid,
+    .about-ctas {
+      grid-template-columns: 1fr;
+      flex-direction: column;
     }
   }
 }
 
 @media (prefers-reduced-motion: reduce) {
   .about-section {
-    .client-card {
-      transition: none;
-    }
-
-    .client-card:hover,
-    .client-card:focus-visible {
-      transform: none;
+    .node,
+    .outcome,
+    .link i,
+    .merge-lines path {
+      transition: none !important;
     }
   }
 }
