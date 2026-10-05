@@ -19,18 +19,37 @@ const isResponsive = computed(() => width.value < lgBreakpoint);
 const toContact = () => mainStore.SET_ACTIVE_TOPIC(TopicName.Contact);
 const toExamples = () => mainStore.SET_ACTIVE_TOPIC(TopicName.Examples);
 
-/* In-panel jump links: the panel is one story, top to bottom. */
+/* One section open at a time keeps the panel short. "How it starts" is open by default. */
 const chapters = [
-  { id: 'lens-paths', label: 'How it starts' },
-  { id: 'lens-teardown', label: 'Teardown' },
-  { id: 'lens-lenses', label: 'The lenses' },
-  { id: 'lens-diagnostic', label: 'Sample diagnostic' },
-];
-const jump = (id: string) => {
-  const root = sheetRef.value;
-  root?.querySelector<HTMLElement>(`#${id}`)?.scrollIntoView({ behavior: 'smooth', block: 'start' });
-};
+  {
+    id: 'lens-paths',
+    title: 'How it starts',
+    sub: 'Everyone starts the same way. What happens next depends on what you already know.',
+  },
+  {
+    id: 'lens-teardown',
+    title: 'What a Teardown Review looks like',
+    sub: 'I look at one screen before we talk and bring 2–3 things I noticed. A conversation, not a pitch.',
+  },
+  {
+    id: 'lens-lenses',
+    title: 'The four lenses I look through',
+    sub: 'Each one catches a different way people get stuck.',
+  },
+  {
+    id: 'lens-diagnostic',
+    title: 'A sample Diagnostic',
+    sub: 'How “something feels off” turns into a clear list of what to fix.',
+  },
+] as const;
 const sheetRef = ref<HTMLElement | null>(null);
+
+/* After a section opens, bring its header to the top so the reader starts at the beginning. */
+const onShown = (id: string) => {
+  sheetRef.value
+    ?.querySelector<HTMLElement>(`#${id}`)
+    ?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+};
 
 const lens = ref<LensDetails[]>([
   {
@@ -173,35 +192,48 @@ onBeforeUnmount(() => io?.disconnect());
         </p>
       </header>
 
-      <nav class="chapters" aria-label="On this page">
-        <button v-for="c in chapters" :key="c.id" type="button" @click="jump(c.id)">
-          {{ c.label }}
-        </button>
-      </nav>
-
       <!-- 1. Decision tree -->
-      <section :id="chapters[0]!.id" class="chapter">
-        <div class="chapter__head">
-          <span class="chapter__n">1</span>
-          <div>
-            <h2 class="q-my-none">How it starts</h2>
-            <p class="q-ma-none">Everyone starts the same way. What happens next depends on what you already know.</p>
+      <q-expansion-item
+        :id="chapters[0].id"
+        class="chapter"
+        group="lens-chapters"
+        default-opened
+        expand-icon-class="chapter__icon"
+        @after-show="onShown(chapters[0].id)"
+      >
+        <template #header>
+          <div class="chapter__head">
+            <span class="chapter__n">1</span>
+            <div>
+              <h2 class="q-my-none">{{ chapters[0].title }}</h2>
+              <p class="q-ma-none">{{ chapters[0].sub }}</p>
+            </div>
           </div>
+        </template>
+        <div class="chapter__body">
+          <ProcessPaths />
         </div>
-        <ProcessPaths />
-      </section>
+      </q-expansion-item>
 
-      <!-- 2. Teardown -->
-      <section :id="chapters[1]!.id" class="chapter">
-        <div class="chapter__head">
-          <span class="chapter__n">2</span>
-          <div>
-            <h2 class="q-my-none">What a Teardown Review looks like</h2>
-            <p class="q-ma-none">I look at one screen before we talk and bring 2–3 things I noticed. A conversation, not a pitch.</p>
+      <!-- 2. Teardown (with what 150 of them taught me) -->
+      <q-expansion-item
+        :id="chapters[1].id"
+        class="chapter"
+        group="lens-chapters"
+        expand-icon-class="chapter__icon"
+        @after-show="onShown(chapters[1].id)"
+      >
+        <template #header>
+          <div class="chapter__head">
+            <span class="chapter__n">2</span>
+            <div>
+              <h2 class="q-my-none">{{ chapters[1].title }}</h2>
+              <p class="q-ma-none">{{ chapters[1].sub }}</p>
+            </div>
           </div>
-        </div>
-        <TeardownExample />
-      </section>
+        </template>
+        <div class="chapter__body">
+          <TeardownExample />
 
       <!-- What 150 Teardowns taught me -->
       <aside class="lesson">
@@ -226,16 +258,27 @@ onBeforeUnmount(() => io?.disconnect());
           </div>
         </div>
       </aside>
+        </div>
+      </q-expansion-item>
 
       <!-- 3. Lenses -->
-      <section :id="chapters[2]!.id" class="chapter">
-        <div class="chapter__head">
-          <span class="chapter__n">3</span>
-          <div>
-            <h2 class="q-my-none">The four lenses I look through</h2>
-            <p class="q-ma-none">Each one catches a different way people get stuck. Pick one.</p>
+      <q-expansion-item
+        :id="chapters[2].id"
+        class="chapter"
+        group="lens-chapters"
+        expand-icon-class="chapter__icon"
+        @after-show="onShown(chapters[2].id)"
+      >
+        <template #header>
+          <div class="chapter__head">
+            <span class="chapter__n">3</span>
+            <div>
+              <h2 class="q-my-none">{{ chapters[2].title }}</h2>
+              <p class="q-ma-none">{{ chapters[2].sub }}</p>
+            </div>
           </div>
-        </div>
+        </template>
+        <div class="chapter__body">
 
       <!-- Four lenses, each with a tiny demo of what it fixes -->
       <div ref="gridRef" class="lens-grid" :class="{ 'is-in': gridIn }" role="tablist">
@@ -320,23 +363,30 @@ onBeforeUnmount(() => io?.disconnect());
           </p>
         </article>
       </Transition>
-
-      </section>
+        </div>
+      </q-expansion-item>
 
       <!-- 4. Sample diagnostic -->
-      <section :id="chapters[3]!.id" class="chapter">
-        <div class="chapter__head">
-          <span class="chapter__n">4</span>
-          <div>
-            <h2 class="q-my-none">A sample Diagnostic</h2>
-            <p class="q-ma-none">
-              How “something feels off” turns into a clear list of what to fix. Each problem links to
-              a build that fixes the same kind of thing.
-            </p>
+      <q-expansion-item
+        :id="chapters[3].id"
+        class="chapter"
+        group="lens-chapters"
+        expand-icon-class="chapter__icon"
+        @after-show="onShown(chapters[3].id)"
+      >
+        <template #header>
+          <div class="chapter__head">
+            <span class="chapter__n">4</span>
+            <div>
+              <h2 class="q-my-none">{{ chapters[3].title }}</h2>
+              <p class="q-ma-none">{{ chapters[3].sub }}</p>
+            </div>
           </div>
+        </template>
+        <div class="chapter__body">
+          <SampleDiagnostic />
         </div>
-        <SampleDiagnostic />
-      </section>
+      </q-expansion-item>
 
       <div class="lens-close">
         <p class="q-ma-none">
@@ -974,44 +1024,39 @@ $ease: cubic-bezier(0.22, 1, 0.36, 1);
   font-weight: 700;
 }
 
-.chapters {
-  position: sticky;
-  top: 0;
-  z-index: 2;
-  display: flex;
-  flex-wrap: wrap;
-  gap: 0.35rem;
-  margin: -0.25rem calc(-1 * clamp(1.25rem, 2.6vw, 2.5rem)) 0;
-  padding: 0.55rem clamp(1.25rem, 2.6vw, 2.5rem);
-  border-bottom: 1px solid transparent;
-  background: rgba(247, 249, 254, 0.96);
-  backdrop-filter: blur(6px);
+.chapter {
+  border: 1px solid $line;
+  border-radius: 0.9rem;
+  background: #fff;
+  scroll-margin-top: 0.75rem;
+  overflow: hidden;
 
-  button {
-    padding: 0.3rem 0.7rem;
-    border: 1px solid $line;
-    border-radius: 999px;
-    background: #fff;
-    color: $navy;
-    font: inherit;
-    font-size: 0.78rem;
-    font-weight: 700;
-    cursor: pointer;
+  :deep(.q-item) {
+    align-items: center;
+    padding: 0.9rem 1rem;
+  }
 
-    &:hover {
-      border-color: $blue;
-    }
+  :deep(.q-expansion-item__content) {
+    padding: 0 1rem 1rem;
   }
 }
 
-.chapter {
+/* Phones: clear the sticky site header and the open Lens bar when scrolling to a section. */
+.responsive-view .chapter {
+  scroll-margin-top: 7rem;
+}
+
+.chapter__body {
   display: grid;
-  gap: 0.9rem;
-  padding-top: 0.75rem;
-  scroll-margin-top: 3rem;
+  gap: 1.25rem;
+}
+
+:deep(.chapter__icon) {
+  color: $blue;
 }
 
 .chapter__head {
+  flex: 1;
   display: flex;
   gap: 0.7rem;
   align-items: flex-start;
@@ -1125,10 +1170,8 @@ $ease: cubic-bezier(0.22, 1, 0.36, 1);
     grid-template-columns: 1fr;
   }
 
-  .chapters {
-    position: static;
-    background: transparent;
-    backdrop-filter: none;
+  .chapter :deep(.q-expansion-item__content) {
+    padding: 0 0.6rem 0.8rem;
   }
 }
 
