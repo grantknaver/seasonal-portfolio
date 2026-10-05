@@ -7,6 +7,9 @@ import { type LensDetails } from '../shared/types/lensDetails';
 import { useViewport } from '../shared/utils/viewWidth';
 import { useMainStore } from '../stores/main';
 import { TopicName } from '../shared/constants/topicName';
+import ProcessPaths from './ProcessPaths.vue';
+import TeardownExample from './TeardownExample.vue';
+import SampleDiagnostic from './SampleDiagnostic.vue';
 
 const mainStore = useMainStore();
 const { lgBreakpoint, width } = useViewport();
@@ -14,12 +17,26 @@ const isResponsive = computed(() => width.value < lgBreakpoint);
 
 /* Works on every layout: MainPage syncs its mobile/tablet accordion to activeTopic. */
 const toContact = () => mainStore.SET_ACTIVE_TOPIC(TopicName.Contact);
+const toExamples = () => mainStore.SET_ACTIVE_TOPIC(TopicName.Examples);
+
+/* In-panel jump links: the panel is one story, top to bottom. */
+const chapters = [
+  { id: 'lens-paths', label: 'How it starts' },
+  { id: 'lens-teardown', label: 'Teardown' },
+  { id: 'lens-lenses', label: 'The lenses' },
+  { id: 'lens-diagnostic', label: 'Sample diagnostic' },
+];
+const jump = (id: string) => {
+  const root = sheetRef.value;
+  root?.querySelector<HTMLElement>(`#${id}`)?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+};
+const sheetRef = ref<HTMLElement | null>(null);
 
 const lens = ref<LensDetails[]>([
   {
     name: Lens.Clarity,
     id: uuidv4(),
-    question: 'Can a new visitor tell what this is, and why it matters, from the first screen?',
+    question: 'Can the user understand what the product is, what matters, and what’s being asked of them?',
     signals: [
       'Visitors leave the first screen without scrolling or clicking',
       'Sales calls start with “so what exactly does it do?”',
@@ -36,7 +53,7 @@ const lens = ref<LensDetails[]>([
   {
     name: Lens.Trust,
     id: uuidv4(),
-    question: 'Once they understand it, do they believe it enough to act?',
+    question: 'Is there enough evidence, feedback, control, and consistency to feel confident moving forward?',
     signals: [
       'Healthy time on page, but weak demo, signup, or contact rates',
       'Prospects ask for proof or security details before engaging',
@@ -53,7 +70,7 @@ const lens = ref<LensDetails[]>([
   {
     name: Lens.Momentum,
     id: uuidv4(),
-    question: 'When someone is ready, is the next step obvious and easy?',
+    question: 'Does the experience help people progress, or create hesitation, dead ends, and doubt about the next step?',
     signals: [
       'People click the CTA, then drop off in the form or onboarding',
       'Visitors reach the end of a page with nowhere clear to go',
@@ -66,12 +83,12 @@ const lens = ref<LensDetails[]>([
     ],
     outcome:
       'Less friction between “I’m interested” and “I’m in,” which is where most conversions are won or lost.',
-    note: 'It’s also how I make the other three stick: the right motion and pacing help clarity land, build trust in order, and make AI state visible.',
+    note: 'It’s also how I make the other three stick: the right motion and pacing help clarity land, build confidence step by step, and make AI state visible.',
   },
   {
     name: Lens.AILegibility,
     id: uuidv4(),
-    question: 'Can users tell what the AI is doing, why, and how far to trust it?',
+    question: 'Can the user see what the AI is doing, what informed its output, its limits, and what they can do next?',
     signals: [
       'Users re-run prompts or ignore output they don’t understand',
       'Support tickets asking what the AI did or where an answer came from',
@@ -144,17 +161,81 @@ onBeforeUnmount(() => io?.disconnect());
     class="lens-section full-width column"
     :class="isResponsive ? 'responsive-view q-pa-xs' : 'desktop-view q-pa-md'"
   >
-    <div class="lens-sheet">
+    <div ref="sheetRef" class="lens-sheet">
       <header class="lens-intro">
         <p class="kicker q-mt-none q-mb-sm">Lens</p>
         <h1 class="q-mt-none q-mb-md">
           Complex products don’t lose people all at once. They lose them at specific moments.
         </h1>
         <p class="lead q-ma-none">
-          Four lenses find those moments. Fix the surface where it happens, and more of your
-          attention turns into action.
+          Usually it’s where people are left guessing. Here’s how I find those spots, and what that
+          looks like.
         </p>
       </header>
+
+      <nav class="chapters" aria-label="On this page">
+        <button v-for="c in chapters" :key="c.id" type="button" @click="jump(c.id)">
+          {{ c.label }}
+        </button>
+      </nav>
+
+      <!-- 1. Decision tree -->
+      <section :id="chapters[0]!.id" class="chapter">
+        <div class="chapter__head">
+          <span class="chapter__n">1</span>
+          <div>
+            <h2 class="q-my-none">How it starts</h2>
+            <p class="q-ma-none">Everyone starts the same way. What happens next depends on what you already know.</p>
+          </div>
+        </div>
+        <ProcessPaths />
+      </section>
+
+      <!-- 2. Teardown -->
+      <section :id="chapters[1]!.id" class="chapter">
+        <div class="chapter__head">
+          <span class="chapter__n">2</span>
+          <div>
+            <h2 class="q-my-none">What a Teardown Review looks like</h2>
+            <p class="q-ma-none">I look at one screen before we talk and bring 2–3 things I noticed. A conversation, not a pitch.</p>
+          </div>
+        </div>
+        <TeardownExample />
+      </section>
+
+      <!-- What 150 Teardowns taught me -->
+      <aside class="lesson">
+        <p class="lesson__label q-ma-none">What 150 Teardowns taught me</p>
+        <p class="lesson__big q-ma-none">Most products tell too much and show too little.</p>
+        <p class="lesson__body q-ma-none">
+          The most common problem I find is leaning on copy to explain things the product could just
+          show. Words alone make people stop and work it out. Show it and tell it, and people get it
+          faster, and more completely, with less to think about.
+        </p>
+        <div class="lesson__vs" aria-hidden="true">
+          <div class="lesson__col">
+            <em>Just telling</em>
+            <span class="lesson__text">“Your order is being processed and will ship soon.”</span>
+          </div>
+          <div class="lesson__col lesson__col--show">
+            <em>Showing and telling</em>
+            <span class="lesson__track">
+              <i class="on">Paid</i><b></b><i class="on">Packed</i><b class="dim"></b><i>Shipped</i>
+            </span>
+            <span class="lesson__note">Ships Thursday</span>
+          </div>
+        </div>
+      </aside>
+
+      <!-- 3. Lenses -->
+      <section :id="chapters[2]!.id" class="chapter">
+        <div class="chapter__head">
+          <span class="chapter__n">3</span>
+          <div>
+            <h2 class="q-my-none">The four lenses I look through</h2>
+            <p class="q-ma-none">Each one catches a different way people get stuck. Pick one.</p>
+          </div>
+        </div>
 
       <!-- Four lenses, each with a tiny demo of what it fixes -->
       <div ref="gridRef" class="lens-grid" :class="{ 'is-in': gridIn }" role="tablist">
@@ -240,13 +321,36 @@ onBeforeUnmount(() => io?.disconnect());
         </article>
       </Transition>
 
+      </section>
+
+      <!-- 4. Sample diagnostic -->
+      <section :id="chapters[3]!.id" class="chapter">
+        <div class="chapter__head">
+          <span class="chapter__n">4</span>
+          <div>
+            <h2 class="q-my-none">A sample Diagnostic</h2>
+            <p class="q-ma-none">
+              How “something feels off” turns into a clear list of what to fix. Each problem links to
+              a build that fixes the same kind of thing.
+            </p>
+          </div>
+        </div>
+        <SampleDiagnostic />
+      </section>
+
       <div class="lens-close">
         <p class="q-ma-none">
-          <b>Not sure which lens applies?</b> A Teardown Review shows you, live.
+          <b>Find the problem. Plan the fix. Build it.</b> See the builds, or start with a free
+          Teardown Review.
         </p>
-        <q-btn class="lens-cta" color="accent" size="lg" glossy @click="toContact">
-          <span class="text-body-2">Let’s Talk</span>
-        </q-btn>
+        <div class="lens-close__btns">
+          <q-btn class="lens-cta lens-cta--ghost" flat size="lg" @click="toExamples">
+            <span class="text-body-2">See the fixes</span>
+          </q-btn>
+          <q-btn class="lens-cta" color="accent" size="lg" glossy @click="toContact">
+            <span class="text-body-2">Start with a Teardown</span>
+          </q-btn>
+        </div>
       </div>
     </div>
   </section>
@@ -762,6 +866,197 @@ $ease: cubic-bezier(0.22, 1, 0.36, 1);
 
 /* ---------- Close ---------- */
 
+.lesson {
+  display: grid;
+  gap: 0.6rem;
+  padding: 1.2rem 1.25rem;
+  border-radius: 0.9rem;
+  background: $ink;
+  color: #fff;
+}
+
+.lesson__label {
+  color: #9ec0ff;
+  font-size: 0.7rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.lesson__big {
+  font-size: clamp(1.25rem, 1.8vw, 1.6rem);
+  font-weight: 600;
+  letter-spacing: -0.01em;
+  line-height: 1.25;
+}
+
+.lesson__body {
+  max-width: 44rem;
+  color: rgba(255, 255, 255, 0.78);
+  font-size: 0.92rem;
+  line-height: 1.5;
+}
+
+.lesson__vs {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0.6rem;
+  margin-top: 0.3rem;
+}
+
+.lesson__col {
+  display: grid;
+  gap: 0.45rem;
+  align-content: start;
+  padding: 0.8rem 0.9rem;
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  border-radius: 0.7rem;
+  background: rgba(255, 255, 255, 0.05);
+
+  em {
+    color: rgba(255, 255, 255, 0.6);
+    font-size: 0.66rem;
+    font-style: normal;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+  }
+
+  &--show {
+    border-color: rgba(158, 192, 255, 0.5);
+    background: rgba(18, 96, 240, 0.18);
+  }
+}
+
+.lesson__text {
+  color: rgba(255, 255, 255, 0.85);
+  font-size: 0.88rem;
+  font-style: italic;
+  line-height: 1.4;
+}
+
+.lesson__track {
+  display: flex;
+  gap: 0.35rem;
+  align-items: center;
+
+  i {
+    padding: 0.15rem 0.5rem;
+    border: 1px solid rgba(255, 255, 255, 0.25);
+    border-radius: 999px;
+    color: rgba(255, 255, 255, 0.55);
+    font-size: 0.72rem;
+    font-style: normal;
+    font-weight: 700;
+
+    &.on {
+      border-color: #5fd39a;
+      background: rgba(95, 211, 154, 0.15);
+      color: #8ff0bf;
+    }
+  }
+
+  b {
+    flex: 1;
+    min-width: 0.6rem;
+    height: 2px;
+    background: #5fd39a;
+
+    &.dim {
+      background: rgba(255, 255, 255, 0.25);
+    }
+  }
+}
+
+.lesson__note {
+  color: #fff;
+  font-size: 0.86rem;
+  font-weight: 700;
+}
+
+.chapters {
+  position: sticky;
+  top: 0;
+  z-index: 2;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.35rem;
+  margin: -0.25rem calc(-1 * clamp(1.25rem, 2.6vw, 2.5rem)) 0;
+  padding: 0.55rem clamp(1.25rem, 2.6vw, 2.5rem);
+  border-bottom: 1px solid transparent;
+  background: rgba(247, 249, 254, 0.96);
+  backdrop-filter: blur(6px);
+
+  button {
+    padding: 0.3rem 0.7rem;
+    border: 1px solid $line;
+    border-radius: 999px;
+    background: #fff;
+    color: $navy;
+    font: inherit;
+    font-size: 0.78rem;
+    font-weight: 700;
+    cursor: pointer;
+
+    &:hover {
+      border-color: $blue;
+    }
+  }
+}
+
+.chapter {
+  display: grid;
+  gap: 0.9rem;
+  padding-top: 0.75rem;
+  scroll-margin-top: 3rem;
+}
+
+.chapter__head {
+  display: flex;
+  gap: 0.7rem;
+  align-items: flex-start;
+
+  h2 {
+    color: $ink;
+    font-size: 1.3rem;
+    font-weight: 700;
+    letter-spacing: -0.01em;
+    line-height: 1.25;
+  }
+
+  p {
+    margin-top: 0.2rem !important;
+    color: $muted;
+    font-size: 0.9rem;
+    line-height: 1.4;
+  }
+}
+
+.chapter__n {
+  flex: none;
+  display: grid;
+  place-items: center;
+  width: 1.75rem;
+  height: 1.75rem;
+  margin-top: 0.05rem;
+  border-radius: 50%;
+  background: $ink;
+  color: #fff;
+  font-size: 0.8rem;
+  font-weight: 700;
+}
+
+.lens-close__btns {
+  display: flex;
+  flex: none;
+  gap: 0.5rem;
+}
+
+.lens-cta--ghost {
+  border: 1px solid $line;
+  color: $navy;
+}
+
 .lens-close {
   display: flex;
   gap: 1rem;
@@ -820,6 +1115,20 @@ $ease: cubic-bezier(0.22, 1, 0.36, 1);
   .lens-close {
     flex-direction: column;
     align-items: stretch;
+  }
+
+  .lens-close__btns {
+    flex-direction: column;
+  }
+
+  .lesson__vs {
+    grid-template-columns: 1fr;
+  }
+
+  .chapters {
+    position: static;
+    background: transparent;
+    backdrop-filter: none;
   }
 }
 

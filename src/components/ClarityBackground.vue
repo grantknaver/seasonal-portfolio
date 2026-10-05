@@ -64,6 +64,8 @@ onMounted(() => {
         y: 0,
       });
       gsap.set(proofs, { autoAlpha: 1 });
+      (window as Window & { __heroBgDone?: boolean }).__heroBgDone = true;
+      window.dispatchEvent(new Event('hero:bg-done'));
       return;
     }
 
@@ -77,7 +79,28 @@ onMounted(() => {
     });
     if (!USE_BLUR) gsap.set(scrollTargets, { filter: 'none' });
 
-    const tl = gsap.timeline();
+    /* Wait for the page's 'hero:copy-in' event so these pieces arrive after the hero copy. */
+    const tl = gsap.timeline({
+      paused: true,
+      onComplete: () => {
+        /* Lets the page do its one layout refresh after these pieces settle. */
+        (window as Window & { __heroBgDone?: boolean }).__heroBgDone = true;
+        window.dispatchEvent(new Event('hero:bg-done'));
+      },
+    });
+    let started = false;
+    const go = () => {
+      if (started) return;
+      started = true;
+      window.removeEventListener('hero:copy-in', go);
+      tl.play();
+    };
+    if ((window as Window & { __heroCopyIn?: boolean }).__heroCopyIn) go();
+    else {
+      window.addEventListener('hero:copy-in', go);
+      /* Safety net: never leave the background unfinished. */
+      window.setTimeout(go, 5000);
+    }
 
     loadTargets.forEach((el, i) => {
       tl.to(
@@ -99,17 +122,19 @@ onMounted(() => {
       const tl2 = gsap.timeline({
         scrollTrigger: {
           start: 0,
-          end: 1400,
+          end: 1700,
           scrub: 0.6,
         },
       });
+      /* The page's caption takes the first stretch of scroll; these cards follow it. */
+      const D = 0.8;
 
       if (topDeco) {
         tl2.fromTo(
           topDeco,
           { y: -300, opacity: 0, ...blur(9) },
           { y: 0, opacity: 1, ...blur(0), duration: 1.5, ease: 'none' },
-          0,
+          D,
         );
       }
 
@@ -118,7 +143,7 @@ onMounted(() => {
           sidebar,
           { x: -300, opacity: 0, ...blur(9) },
           { x: 0, opacity: 1, ...blur(0), duration: 1.5, ease: 'none' },
-          1,
+          D + 1,
         );
       }
 
@@ -127,7 +152,7 @@ onMounted(() => {
           buttonCard,
           { x: 480, y: 300, opacity: 0, ...blur(9) },
           { x: 0, y: 0, opacity: 1, ...blur(0), duration: 1.5, ease: 'none' },
-          2,
+          D + 2,
         );
       }
 
@@ -155,9 +180,9 @@ onMounted(() => {
         }
       };
 
-      revealProof(proofTop, 1.15);
-      revealProof(proofSide, 2.15);
-      revealProof(proofCard, 3.15);
+      revealProof(proofTop, D + 1.15);
+      revealProof(proofSide, D + 2.15);
+      revealProof(proofCard, D + 3.15);
     }
 
     ScrollTrigger.refresh();

@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { watch, onBeforeUnmount } from 'vue';
+import { ref, watch, onBeforeUnmount } from 'vue';
 
 const props = withDefaults(
   defineProps<{
@@ -11,24 +11,50 @@ const props = withDefaults(
 
 const emit = defineEmits<{ 'update:modelValue': [boolean] }>();
 
+const panelRef = ref<HTMLElement | null>(null);
+const SCROLL_KEYS = ['ArrowDown', 'ArrowUp', 'PageDown', 'PageUp', 'Space', 'Home', 'End'];
+
+const inPanel = (t: EventTarget | null) => t instanceof Node && !!panelRef.value?.contains(t);
+
 const onKeydown = (e: KeyboardEvent) => {
-  if (e.key === 'Escape') emit('update:modelValue', false);
+  if (e.key === 'Escape') {
+    emit('update:modelValue', false);
+    return;
+  }
+  /* While open, the page behind stays put: keys only scroll the panel. */
+  if (SCROLL_KEYS.includes(e.code) && !inPanel(document.activeElement)) e.preventDefault();
+};
+
+/* Wheel / touch outside the panel must not move the page underneath. */
+const blockOutside = (e: Event) => {
+  if (!inPanel(e.target)) e.preventDefault();
+};
+
+const lock = () => {
+  window.addEventListener('keydown', onKeydown);
+  window.addEventListener('wheel', blockOutside, { passive: false });
+  window.addEventListener('touchmove', blockOutside, { passive: false });
+};
+
+const unlock = () => {
+  window.removeEventListener('keydown', onKeydown);
+  window.removeEventListener('wheel', blockOutside);
+  window.removeEventListener('touchmove', blockOutside);
 };
 
 watch(
   () => props.modelValue,
-  (open) => {
-    if (open) window.addEventListener('keydown', onKeydown);
-    else window.removeEventListener('keydown', onKeydown);
-  },
+  (open) => (open ? lock() : unlock()),
+  { immediate: true },
 );
 
-onBeforeUnmount(() => window.removeEventListener('keydown', onKeydown));
+onBeforeUnmount(unlock);
 </script>
 
 <template>
   <Teleport to="body">
     <aside
+      ref="panelRef"
       class="slide-panel"
       :class="{ 'is-open': modelValue }"
       :style="{ width }"

@@ -6,7 +6,7 @@ import { getCustomCssVar } from '../shared/utils/getCustomCssVar';
 import { TopicName } from '../shared/constants/topicName';
 import { type Topic } from '../shared/types/topic';
 import { v4 as uuidv4 } from 'uuid';
-import { mdiMenu, mdiHeart, mdiGithub, mdiLinkedin } from '@quasar/extras/mdi-v7';
+import { mdiMenu, mdiGithub, mdiLinkedin } from '@quasar/extras/mdi-v7';
 import { useCacheStore } from 'src/stores/component-cache';
 import { CacheBinding } from 'src/shared/constants/cacheBinding';
 import SlidePanel from '../components/SlidePanel.vue';
@@ -18,7 +18,7 @@ const windowWidth = ref(window.innerWidth);
 const desktopDrawerWidth = ref(window.innerWidth * 0.5);
 const showTopicBreakpoint = +`${getCustomCssVar('breakpoint-lg')}`.slice(0, -2);
 const showTopicPanel = computed(
-  () => !!activeTopic.value && windowWidth.value > showTopicBreakpoint,
+  () => !!activeTopic.value && windowWidth.value >= showTopicBreakpoint,
 );
 const updateWidths = () => {
   desktopDrawerWidth.value = window.innerWidth * 0.5;
@@ -80,7 +80,7 @@ onBeforeUnmount(() => {
   <!-- changed view: no fixed footer token needed; keep header fixed -->
   <q-layout view="hHh Lpr fff">
     <q-header id="mobile-header" class="text-black">
-      <q-toolbar class="bg-primary q-pa-lg">
+      <q-toolbar class="bg-primary q-px-md q-py-xs mobile-toolbar">
         <q-toolbar-title>
           <div id="logo" class="logo row items-center">
             <span class="logo-text">
@@ -90,7 +90,7 @@ onBeforeUnmount(() => {
           </div>
         </q-toolbar-title>
         <q-btn
-          color="primary"
+          color="accent"
           class="menu-button"
           flat
           dense
@@ -203,9 +203,14 @@ onBeforeUnmount(() => {
     display: none;
   }
 
+  /* Slim bar: 56px tall, so it covers less of the page on phones. */
+  .mobile-toolbar {
+    min-height: 54px;
+  }
+
   .logo-text {
-    padding-left: 0.5rem;
-    font-size: 1.5rem;
+    padding-left: 0.25rem;
+    font-size: 1.3rem;
   }
 
   .glk {

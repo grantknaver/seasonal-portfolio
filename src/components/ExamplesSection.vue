@@ -54,7 +54,7 @@ const items: ShowcaseItem[] = [
     tags: ['AI legibility', 'Trust'],
     what: 'AI governance for autonomous agents. A $1,200 refund request has to clear identity, authority, and policy before it can execute.',
     why: 'Every team adopting AI agents is asking what the agent is allowed to do, and whether they can see why. This makes the answer readable at a glance.',
-    momentum: 'Each scroll resolves one check, so trust builds in the same order the system grants it.',
+    momentum: 'Each scroll resolves one check, so confidence builds in the same order the system grants permission.',
     url: 'https://agentgate-bpb.pages.dev/',
     a: agentgateA,
     b: agentgateB,
@@ -66,9 +66,9 @@ const items: ShowcaseItem[] = [
     id: 'whenthen',
     title: 'WhenThen',
     kind: 'Concept build',
-    tags: ['Clarity', 'Trust'],
+    tags: ['Clarity'],
     what: 'A launch page for a guide on behaviour verification: proving that software does exactly what its spec says, at massive scale.',
-    why: 'As AI writes and runs more of our software, proof becomes the trust signal. This takes a dense technical idea and makes it graspable in one screen.',
+    why: 'As AI writes and runs more of our software, proof is what people rely on. This takes a dense technical idea and makes it graspable in one screen.',
     momentum: 'Given, when, then drift in the background, then resolve into one clear next step: get the guide.',
     url: 'https://when-then.pages.dev/',
     a: whenthenA,
@@ -81,7 +81,7 @@ const items: ShowcaseItem[] = [
     id: 'futureframe',
     title: 'Futureframe',
     kind: 'Concept build',
-    tags: ['AI legibility', 'Trust'],
+    tags: ['AI legibility'],
     what: 'AI age projection where the signals behind the result stay visible, and uncertainty is disclosed instead of hidden.',
     why: 'AI feels like a black box when people only see the answer. Showing the “why” is what makes it believable.',
     momentum: 'Scrolling moves you through time, so the result never arrives without its reasons.',
@@ -135,6 +135,20 @@ const items: ShowcaseItem[] = [
 ];
 
 const featured = items.filter((i) => i.featured);
+
+/* The same kinds of problems the sample Diagnostic (AegisFlow) finds, each matched to a real build. */
+const bridge = [
+  { id: 'agentgate', lens: 'Trust', finding: '“Ready” shows before the work is actually done', build: 'AgentGate' },
+  { id: 'futureframe', lens: 'AI legibility', finding: 'The AI gives an answer, but not the why', build: 'Futureframe' },
+  { id: 'robot', lens: 'Momentum', finding: 'You can’t see what the system is doing', build: 'Readbot' },
+  { id: 'whenthen', lens: 'Clarity', finding: 'A big idea that takes too long to get', build: 'WhenThen' },
+];
+
+const jumpTo = (id: string) => {
+  root.value
+    ?.querySelector<HTMLElement>(`[data-card="${id}"]`)
+    ?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+};
 const rest = items.filter((i) => !i.featured);
 
 /* ---------- Before → after playback ---------- */
@@ -191,12 +205,34 @@ onBeforeUnmount(() => {
     <div class="ex-sheet">
       <header class="ex-intro">
         <p class="kicker q-mt-none q-mb-sm">Examples</p>
-        <h1 class="q-mt-none q-mb-md">Don’t take my word for it. Scroll through these.</h1>
+        <h1 class="q-mt-none q-mb-md">Find the problem. Plan the fix. Build it.</h1>
         <p class="lead q-ma-none">
-          Each build makes something complex clear, trustworthy, or legible as AI, and uses
-          momentum to make it stick.
+          Finding the problem is half the work. Building the fix is the other half, and it’s most of
+          what I do: animation, visuals, and interface work that show people what’s happening
+          instead of telling them.
+        </p>
+        <p class="quality q-mt-md q-mb-none">
+          <span class="quality__mark" aria-hidden="true">&#10003;</span>
+          Clients consistently point out the quality and polish of the finished work.
         </p>
       </header>
+
+      <!-- Bridge: the kind of finding → the build that fixes it -->
+      <div class="bridge">
+        <p class="bridge__label q-ma-none">From problem to fix</p>
+        <button
+          v-for="b in bridge"
+          :key="b.id"
+          type="button"
+          class="bridge__row"
+          @click="jumpTo(b.id)"
+        >
+          <span class="bridge__lens">{{ b.lens }}</span>
+          <span class="bridge__finding">{{ b.finding }}</span>
+          <span class="bridge__arrow" aria-hidden="true">&rarr;</span>
+          <span class="bridge__build">{{ b.build }}</span>
+        </button>
+      </div>
 
       <!-- Featured -->
       <template v-for="it in featured" :key="it.id">
@@ -305,7 +341,7 @@ onBeforeUnmount(() => {
       </div>
 
       <div class="ex-close">
-        <p class="q-ma-none"><b>Want this for your product?</b> It starts with a Teardown Review.</p>
+        <p class="q-ma-none"><b>Know what needs fixing?</b> Let’s talk about building it. <b>Not sure yet?</b> Start with a free Teardown Review.</p>
         <q-btn class="ex-cta" color="accent" size="lg" glossy @click="toContact">
           <span class="text-body-2">Let’s Talk</span>
         </q-btn>
@@ -362,6 +398,100 @@ $line: rgba(18, 96, 240, 0.18);
 }
 
 /* ---------- Cards ---------- */
+
+.quality {
+  display: inline-flex;
+  gap: 0.5rem;
+  align-items: center;
+  padding: 0.45rem 0.85rem;
+  border: 1px solid $line;
+  border-radius: 999px;
+  background: #fff;
+  color: $ink;
+  font-size: 0.86rem;
+  font-weight: 600;
+}
+
+.quality__mark {
+  display: grid;
+  place-items: center;
+  width: 1.2rem;
+  height: 1.2rem;
+  border-radius: 50%;
+  background: $blue;
+  color: #fff;
+  font-size: 0.7rem;
+}
+
+.bridge {
+  display: grid;
+  gap: 0.4rem;
+  padding: 0.9rem;
+  border: 1px solid $line;
+  border-radius: 0.9rem;
+  background: #fff;
+}
+
+.bridge__label {
+  margin-bottom: 0.2rem !important;
+  color: $blue;
+  font-size: 0.7rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.bridge__row {
+  display: grid;
+  grid-template-columns: 6.6rem minmax(0, 1fr) auto 6.2rem;
+  gap: 0.6rem;
+  align-items: center;
+  padding: 0.5rem 0.6rem;
+  border: 1px solid #e6ecf8;
+  border-radius: 0.6rem;
+  background: #f7f9fe;
+  color: $ink;
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+  transition:
+    border-color 0.2s ease,
+    background 0.2s ease;
+
+  &:hover {
+    border-color: $blue;
+    background: #f0f5ff;
+  }
+}
+
+.bridge__lens {
+  justify-self: start;
+  padding: 0.1rem 0.5rem;
+  border-radius: 999px;
+  background: $soft;
+  color: $navy;
+  font-size: 0.68rem;
+  font-weight: 700;
+}
+
+.bridge__finding {
+  font-size: 0.86rem;
+  line-height: 1.3;
+}
+
+.bridge__arrow {
+  color: $blue;
+}
+
+.bridge__build {
+  color: $blue;
+  font-size: 0.86rem;
+  font-weight: 700;
+}
+
+.ex-card {
+  scroll-margin-top: 1rem;
+}
 
 .ex-grid {
   display: grid;
@@ -679,6 +809,23 @@ $line: rgba(18, 96, 240, 0.18);
   .narrator-container {
     height: 600px;
     min-height: 600px;
+  }
+
+  .ex-close {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .bridge__row {
+    grid-template-columns: minmax(0, 1fr) auto;
+
+    .bridge__lens {
+      grid-column: 1 / -1;
+    }
+
+    .bridge__arrow {
+      display: none;
+    }
   }
 }
 

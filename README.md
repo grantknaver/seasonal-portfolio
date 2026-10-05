@@ -1,6 +1,6 @@
-# 4 Seasons Portfolio
+# glkFreelance Portfolio
 
-4 seasons portfolio
+glkFreelance portfolio site: product clarity, trust, and AI legibility for technical founders.
 
 ## Install the dependencies
 

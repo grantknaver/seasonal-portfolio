@@ -35,13 +35,13 @@ const fits = [
 const steps = [
   {
     label: 'Teardown Review',
-    text: 'I walk you through what I found, then we dig into the friction you already know about.',
+    text: 'Free. I review one surface before we talk and bring 2–3 observations.',
   },
   {
-    label: 'Diagnostic, if needed',
-    text: 'Know something’s off but not what? A Diagnostic pinpoints it. Already know? Skip ahead.',
+    label: 'Diagnostic, only if needed',
+    text: 'Not sure what’s wrong? We find out. Already know? Skip straight to the fix.',
   },
-  { label: 'Implementation', text: 'A clear scope and price, reviewed together, then I build it.' },
+  { label: 'Implementation', text: 'A clear scope and price, then I build it, end to end.' },
 ];
 
 /* Play the diagram once it scrolls into view. */
@@ -92,7 +92,14 @@ onBeforeUnmount(() => {
           I make complex technical products easy to understand, trust, and act on.
         </h1>
         <p class="lead q-ma-none">
-          Product clarity, trust, and AI legibility, designed and built by one person.
+          I find where people get stuck in your product, and fix it. Designed and built by one
+          person.
+        </p>
+        <p class="lead-sub q-mt-sm q-mb-none">
+          I find where people are left guessing, then build the fix myself: product thinking, design,
+          motion, and code. Most of that is momentum work, meaning animation and visuals that show
+          people what’s happening instead of telling them. Clients consistently point out the
+          quality and polish of the finished work.
         </p>
       </header>
 
@@ -108,7 +115,7 @@ onBeforeUnmount(() => {
               </span>
             </template>
           </div>
-          <span class="outcome outcome--diluted">Intent diluted</span>
+          <span class="outcome outcome--diluted">More handoffs, more room for intent to drift</span>
         </div>
 
         <div class="handoff__row handoff__row--me">
@@ -216,6 +223,13 @@ onBeforeUnmount(() => {
       line-height: 1.1;
       letter-spacing: -0.025em;
       text-wrap: balance;
+    }
+
+    .lead-sub {
+      color: $muted;
+      font-size: 0.95rem;
+      line-height: 1.5;
+      max-width: 44rem;
     }
 
     .lead {
@@ -349,8 +363,10 @@ onBeforeUnmount(() => {
 
   .outcome--diluted {
     border: 1px dashed rgba(11, 31, 46, 0.2);
-    color: rgba(11, 31, 46, 0.45);
-    filter: blur(0.6px);
+    color: rgba(11, 31, 46, 0.55);
+    font-size: 0.74rem;
+    font-weight: 600;
+    line-height: 1.3;
     transition-delay: 0.7s;
   }
 

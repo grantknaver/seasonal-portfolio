@@ -10,6 +10,7 @@ import {
   mdiTextBoxOutline,
 } from '@quasar/extras/mdi-v7';
 import { useViewport } from 'src/shared/utils/viewWidth';
+import { TEARDOWN_BOOKING_URL } from 'src/shared/constants/booking';
 
 const form = reactive({
   name: '',
@@ -33,11 +34,18 @@ const { isHuman, packageInterestText } = storeToRefs(mainStore);
 const { lgBreakpoint, width } = useViewport();
 const isResponsive = computed(() => width.value < lgBreakpoint);
 
-const steps = [
-  { label: 'Teardown Review', text: 'I walk you through the 1–2 moments costing you most.' },
-  { label: 'Diagnostic, if needed', text: 'When you know something’s off but not what.' },
-  { label: 'Implementation', text: 'Clear scope and price, then I build it.' },
-];
+/* One way to start: book a free Teardown. Scope (Diagnostic or build) gets discussed there.
+   Anyone who already knows what they want can send a message instead. */
+const BOOKING_URL = TEARDOWN_BOOKING_URL;
+const formRef = ref<HTMLElement | null>(null);
+const bookTeardown = () => {
+  if (BOOKING_URL) {
+    window.open(BOOKING_URL, '_blank', 'noopener');
+    return;
+  }
+  /* No booking link configured yet: fall back to the message form. */
+  formRef.value?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+};
 
 const contactDetails = [
   {
@@ -116,23 +124,34 @@ const sendEmail = async () => {
   >
     <div class="contact-sheet">
       <header class="contact-intro">
-        <p class="kicker q-mt-none q-mb-sm">Contact</p>
-        <h1 class="q-mt-none q-mb-md">Start with a Teardown Review.</h1>
+        <p class="kicker q-mt-none q-mb-sm">I find where people get stuck in your product, and fix it.</p>
+        <h1 class="q-mt-none q-mb-md">Start with a free Teardown.</h1>
         <p class="lead q-ma-none">
-          Send a link to your site, product, or AI feature. I’ll find where it’s losing clarity,
-          trust, or momentum, then we walk through it together.
+          I look at one screen of your product before we talk and bring 2–3 things I noticed. On the
+          call, we figure out together whether you need a Diagnostic, a build, or neither. I’ve done
+          150 of these.
         </p>
       </header>
 
-      <ol class="contact-steps q-ma-none">
-        <li v-for="(st, i) in steps" :key="st.label" class="contact-step">
-          <span class="contact-step__num">{{ i + 1 }}</span>
-          <div>
-            <b>{{ st.label }}</b>
-            <span>{{ st.text }}</span>
-          </div>
-        </li>
-      </ol>
+      <div class="book">
+        <q-btn class="book__btn" color="accent" size="lg" glossy @click="bookTeardown">
+          <span class="text-body-2">Book a free Teardown</span>
+        </q-btn>
+        <span class="book__meta">Free · 20 minutes · no prep needed</span>
+      </div>
+
+      <p class="bonus q-ma-none">
+        <b>Bonus:</b> bring one current product or AI decision you’re wrestling with, and we’ll spend
+        a few minutes pressure-testing it on the same call.
+      </p>
+
+      <div ref="formRef" class="or-write">
+        <span class="or-write__line" aria-hidden="true"></span>
+        <p class="q-ma-none">
+          <b>Already know you want a Diagnostic or a build?</b> Send me a message instead.
+        </p>
+        <span class="or-write__line" aria-hidden="true"></span>
+      </div>
 
       <q-form @submit.prevent="sendEmail" class="contact-form column q-gutter-y-sm">
         <input
@@ -174,7 +193,7 @@ const sendEmail = async () => {
         <q-input
           v-model="form.subject"
           type="text"
-          label="Link to your product or site"
+          :label="'Link to your product or site'"
           color="accent"
           bg-color="white"
           outlined
@@ -187,7 +206,7 @@ const sendEmail = async () => {
         <q-input
           v-model="form.message"
           type="textarea"
-          label="What feels unclear or stuck?"
+          :label="'What do you need help with?'"
           class="message"
           color="accent"
           bg-color="white"
@@ -212,7 +231,7 @@ const sendEmail = async () => {
           :loading="sending"
           :disable="sending"
         >
-          <span class="text-body-2">{{ sending ? 'Sending…' : 'Request a Teardown Review' }}</span>
+          <span class="text-body-2">{{ sending ? 'Sending…' : 'Send message' }}</span>
         </q-btn>
 
         <q-banner v-if="success" class="status-banner success q-mt-sm">
@@ -279,56 +298,62 @@ $line: rgba(18, 96, 240, 0.18);
   }
 }
 
-/* Process: three steps, left to right */
-.contact-steps {
-  display: grid;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
-  gap: 0.6rem;
-  padding: 0;
-  list-style: none;
-}
-
-.contact-step {
-  display: flex;
-  gap: 0.6rem;
-  align-items: flex-start;
-  padding: 0.75rem 0.85rem;
-  border: 1px solid $line;
-  border-radius: 0.8rem;
+.bonus {
+  padding: 0.7rem 0.9rem;
+  border: 1px dashed rgba(18, 96, 240, 0.45);
+  border-radius: 0.7rem;
   background: #fff;
+  color: $ink;
+  font-size: 0.9rem;
+  line-height: 1.45;
 
   b {
-    display: block;
-    color: $ink;
-    font-size: 0.88rem;
-    line-height: 1.25;
-  }
-
-  span:not(.contact-step__num) {
-    display: block;
-    margin-top: 0.15rem;
-    color: $muted;
-    font-size: 0.8rem;
-    line-height: 1.35;
-  }
-
-  &:first-child {
-    border-color: $blue;
-    box-shadow: 0 0 0 3px rgba(18, 96, 240, 0.1);
+    color: $blue;
   }
 }
 
-.contact-step__num {
-  flex: none;
-  display: grid;
-  place-items: center;
-  width: 1.5rem;
-  height: 1.5rem;
-  border-radius: 50%;
-  background: $blue;
-  color: #fff;
-  font-size: 0.74rem;
-  font-weight: 700;
+/* Book */
+.book {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.6rem 1rem;
+  align-items: center;
+}
+
+.book__btn {
+  border-radius: 0.75rem;
+}
+
+.book__meta {
+  color: $muted;
+  font-size: 0.86rem;
+  font-weight: 600;
+}
+
+.or-write {
+  display: flex;
+  gap: 0.75rem;
+  align-items: center;
+  margin-top: 0.25rem;
+
+  p {
+    flex: none;
+    max-width: 75%;
+    color: $muted;
+    font-size: 0.88rem;
+    line-height: 1.4;
+    text-align: center;
+  }
+
+  b {
+    color: $ink;
+  }
+}
+
+.or-write__line {
+  flex: 1;
+  height: 1px;
+  background: $line;
 }
 
 /* Form */
@@ -397,9 +422,16 @@ $line: rgba(18, 96, 240, 0.18);
 }
 
 .responsive-view {
-  .contact-steps,
   .field-grid {
     grid-template-columns: 1fr;
+  }
+
+  .book__btn {
+    width: 100%;
+  }
+
+  .or-write p {
+    max-width: 85%;
   }
 
   .contact-form {

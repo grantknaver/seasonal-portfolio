@@ -22,6 +22,7 @@ import ClarityBackground from 'src/components/ClarityBackground.vue';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import gsap from 'gsap';
 import ScrollCue from '../components/ScrollCue.vue';
+import { openTeardownBooking } from 'src/shared/constants/booking';
 
 gsap.registerPlugin(ScrollTrigger);
 /* No auto-refresh on window 'load'. On a cold (uncached) visit 'load' fires
@@ -116,8 +117,22 @@ const trustImageB = ref<HTMLElement | null>(null);
 const trustCopyA = ref<HTMLElement | null>(null);
 const trustCopyB = ref<HTMLElement | null>(null);
 const clarityCueRef = ref<HTMLElement | null>(null);
+/* Tells the background artwork the hero copy is in. A plain DOM event, not reactive state:
+   flipping a prop mid-animation re-renders the ~1000-line SVG and drops frames. */
+const signalHeroCopyIn = () => {
+  (window as Window & { __heroCopyIn?: boolean }).__heroCopyIn = true;
+  window.dispatchEvent(new Event('hero:copy-in'));
+};
 const trustCueRef = ref<HTMLElement | null>(null);
 const trustBeamRef = ref<HTMLElement | null>(null);
+/* Small order card: vague on the first screen, clear on the second. */
+const trustCardRef = ref<HTMLElement | null>(null);
+const trustCardA = ref<HTMLElement | null>(null);
+const trustCardB = ref<HTMLElement | null>(null);
+/* Second card (sign-up error), upper right. */
+const trustCard2Ref = ref<HTMLElement | null>(null);
+const trustCard2A = ref<HTMLElement | null>(null);
+const trustCard2B = ref<HTMLElement | null>(null);
 
 /* ---------- Lifecycle-scoped GSAP state ---------- */
 
@@ -287,7 +302,7 @@ const heroTargets = () => {
   const headlineEl = el.querySelector<HTMLElement>('.headline');
   const subheadlineEl = el.querySelector<HTMLElement>('.subheadline');
   const ctaEls = Array.from(el.querySelectorAll<HTMLElement>('.cta'));
-  const proofEls = Array.from(el.querySelectorAll<HTMLElement>('.proof-card'));
+  const proofEls = Array.from(el.querySelectorAll<HTMLElement>('.proof-card, .proofs-caption'));
 
   const els = [kickerEl, simonEl, headlineEl, subheadlineEl, ...ctaEls, ...proofEls].filter(
     (x): x is HTMLElement => !!x,
@@ -307,12 +322,15 @@ const buildHero = (mode: ViewType, animate = true) => {
     return;
   }
 
-  const { heroCopyEl, kickerEl, simonEl, headlineEl, subheadlineEl, ctaEls, proofEls, els } = t;
+  const { heroCopyEl, kickerEl, simonEl, headlineEl, subheadlineEl, ctaEls, proofEls } = t;
+  /* Desktop: the caption is revealed by the first scroll (see buildScene), not on load. */
+  const els = mode === ViewType.Desktop ? t.els.filter((e) => !proofEls.includes(e)) : t.els;
 
   heroCtx?.revert();
   heroCtx = gsap.context(() => {
     /* Resize / breakpoint swap: no replay, just a clean visible layout. */
     if (!animate || prefersReducedMotion) {
+      signalHeroCopyIn();
       gsap.set(els, { clearProps: 'all' });
       if (heroCopyEl) gsap.set(heroCopyEl, { clearProps: 'all' });
       release();
@@ -390,6 +408,10 @@ const buildHero = (mode: ViewType, animate = true) => {
           '-=2.25',
         );
       }
+      tl.call(signalHeroCopyIn);
+      if (clarityCueRef.value) {
+        tl.fromTo(clarityCueRef.value, { opacity: 0 }, { opacity: 1, duration: 0.6 }, '>');
+      }
     }
 
     if (mode === ViewType.Desktop) {
@@ -442,17 +464,17 @@ const buildHero = (mode: ViewType, animate = true) => {
         );
       }
 
+      /* Sequence: card copy → menu tiles → background → scroll cue.
+         The caption and the background's cards follow on the first scroll. */
       if (simonEl) {
-        tl.fromTo(simonEl, { autoAlpha: 0, x: -32 }, { autoAlpha: 1, x: 0, duration: 0.9 }, 1.05);
+        tl.fromTo(simonEl, { autoAlpha: 0, x: -32 }, { autoAlpha: 1, x: 0, duration: 0.9 }, 1.6);
       }
 
-      if (proofEls.length) {
-        tl.fromTo(
-          proofEls,
-          { x: -16, autoAlpha: 0 },
-          { x: 0, autoAlpha: 1, ease: 'power2.out', duration: 0.45, stagger: 0.18 },
-          1.3,
-        );
+      /* After the card has finished settling (its move/scale ends at 2.2s). */
+      tl.call(signalHeroCopyIn, undefined, 2.2);
+
+      if (clarityCueRef.value) {
+        tl.fromTo(clarityCueRef.value, { opacity: 0 }, { opacity: 1, duration: 0.6 }, 2.9);
       }
     }
 
@@ -480,6 +502,21 @@ const buildScene = () => {
         });
       }
 
+      /* First thing the scroll reveals; the background cards follow (ClarityBackground). */
+      const caption = claritySectionRef.value?.querySelector<HTMLElement>('.proofs-caption');
+      if (caption) {
+        gsap.fromTo(
+          caption,
+          { autoAlpha: 0, y: 12 },
+          {
+            autoAlpha: 1,
+            y: 0,
+            ease: 'none',
+            scrollTrigger: { start: 0, end: 260, scrub: 0.6 },
+          },
+        );
+      }
+
       if (clarityCueRef.value) {
         gsap.to(clarityCueRef.value, {
           opacity: 0,
@@ -499,6 +536,16 @@ const buildScene = () => {
     const glow = trustGlowRef.value;
     const cue = trustCueRef.value;
     const beam = trustBeamRef.value;
+    const isEl = (el: HTMLElement | null): el is HTMLElement => !!el;
+    const cards = [trustCardRef.value, trustCard2Ref.value].filter(isEl);
+    const cardAs = [trustCardA.value, trustCard2A.value].filter(isEl);
+    const cardBs = [trustCardB.value, trustCard2B.value].filter(isEl);
+    const hasCards = cards.length > 0 && cardAs.length > 0 && cardBs.length > 0;
+    if (hasCards) {
+      /* Like a window opening: starts slightly small and low, settles with a soft bounce. */
+      gsap.set(cards, { opacity: 0, y: 10, scale: 0.9, transformOrigin: '50% 100%' });
+      gsap.set(cardBs, { opacity: 0 });
+    }
 
     if (!(section && imgA && imgB && copyA && copyB && glow)) return;
 
@@ -526,6 +573,17 @@ const buildScene = () => {
         .to(imgA, { opacity: 0, duration: 0.9, ease: 'none' }, 4.6)
         .to(imgB, { opacity: 1, duration: 0.9, ease: 'none' }, 4.6)
         .to(copyB, { opacity: 1, duration: 1.1, ease: 'power1.out' }, 5.2);
+
+      if (hasCards) {
+        mobileTl
+          .to(
+            cards,
+            { opacity: 1, y: 0, scale: 1, duration: 0.6, ease: 'back.out(1.6)', stagger: 0.25 },
+            2.0,
+          )
+          .to(cardAs, { opacity: 0, duration: 0.6, ease: 'none', stagger: 0.15 }, 4.6)
+          .to(cardBs, { opacity: 1, duration: 0.6, ease: 'none', stagger: 0.15 }, 4.9);
+      }
 
       const trustIo = new IntersectionObserver(
         ([entry]) => {
@@ -654,6 +712,19 @@ const buildScene = () => {
                   { opacity: 1, ease: 'none', duration: 1.1, immediateRender: false },
                   1.0,
                 )
+                /* The card clears up in step with the copy. */
+                .fromTo(
+                  cardAs,
+                  { opacity: 1 },
+                  { opacity: 0, ease: 'none', duration: 0.5, stagger: 0.12, immediateRender: false },
+                  0.6,
+                )
+                .fromTo(
+                  cardBs,
+                  { opacity: 0 },
+                  { opacity: 1, ease: 'none', duration: 0.6, stagger: 0.12, immediateRender: false },
+                  0.95,
+                )
                 .fromTo(
                   glow,
                   { opacity: 1, scale: 1 },
@@ -721,6 +792,13 @@ const buildScene = () => {
 
           /* 4. Scroll cue last, once the frame has settled. */
           const cueAt = COPY_AT + COPY_STAGGER * Math.max(copyALines.length - 1, 0) + 0.55;
+          if (hasCards) {
+            introTl.to(
+              cards,
+              { opacity: 1, y: 0, scale: 1, duration: 0.6, ease: 'back.out(1.6)', stagger: 0.22 },
+              cueAt - 0.2,
+            );
+          }
           if (cue) {
             introTl.fromTo(
               cue,
@@ -789,6 +867,17 @@ onMounted(async () => {
       ? Promise.resolve()
       : new Promise<void>((r) => window.addEventListener('load', () => r(), { once: true }));
   await Promise.all([heroDone, pageLoaded]);
+  /* Desktop: the background pieces animate after the hero copy. Refreshing while they move
+     is a ~50ms hitch, so wait until they've settled (capped, so it always happens). */
+  if (!isResponsive.value) {
+    const w = window as Window & { __heroBgDone?: boolean };
+    if (!w.__heroBgDone) {
+      await withTimeout(
+        new Promise<void>((r) => window.addEventListener('hero:bg-done', () => r(), { once: true })),
+        4000,
+      );
+    }
+  }
   if (!disposed) ScrollTrigger.refresh();
 });
 
@@ -831,6 +920,10 @@ watch(
     buildHero(viewNow ? ViewType.Responsive : ViewType.Desktop, false);
 
     requestAnimationFrame(applyHomeScale);
+    /* Quasar updates the header offset a beat after a breakpoint switch; re-measure then. */
+    window.setTimeout(() => {
+      if (!disposed) ScrollTrigger.refresh();
+    }, 350);
   },
   { flush: 'post' },
 );
@@ -864,6 +957,11 @@ const toContact = () => {
   mainStore.SET_ACTIVE_TOPIC(TopicName.Contact);
   expandedPanel.value = TopicName.Contact;
 };
+
+const toExamples = () => {
+  mainStore.SET_ACTIVE_TOPIC(TopicName.Examples);
+  expandedPanel.value = TopicName.Examples;
+};
 </script>
 
 <template>
@@ -888,35 +986,33 @@ const toContact = () => {
           <div class="simon"><SimonMenu /></div>
 
           <div class="hero-copy column justify-center q-pa-lg">
-            <p class="text-caption kicker q-mt-none q-mb-sm">Focused UI Motion + AI Interaction</p>
+            <p class="text-caption kicker q-mt-none q-mb-sm">150 Teardowns for technical founders</p>
 
-            <h1 class="headline text-h1 q-mt-none q-mb-md">BRING YOUR STORY INTO FOCUS.</h1>
+            <h1 class="headline text-h1 q-mt-none q-mb-md">LESS TO FIGURE OUT. MORE TO ACT ON.</h1>
 
             <div class="subheadline q-mt-md">
               <p class="q-ma-none">
-                Make it clear. What sets you apart. What value you bring. Why you deserve trust.
+                I find where people get stuck in your product,
+                <b class="fix-it">and fix it.</b>
               </p>
             </div>
 
             <div class="cta-wrap q-mt-md">
-              <q-btn class="cta" @click="toContact()" color="accent" size="lg" glossy>
-                <span class="text-body-2">LET’S TALK</span>
+              <q-btn class="cta" @click="openTeardownBooking()" color="accent" size="lg" glossy>
+                <span class="text-body-2">BOOK A FREE TEARDOWN</span>
               </q-btn>
+              <button type="button" class="cta cta--message" @click="toContact()">
+                or send me a message &rarr;
+              </button>
             </div>
           </div>
         </div>
 
-        <div class="proofs q-mt-lg">
-          <div class="proof-card">
-            <span class="proof-label">VALUE UNDERSTOOD</span>
-          </div>
-          <div class="proof-card">
-            <span class="proof-label"> DIFFERENCE SEEN</span>
-          </div>
-          <div class="proof-card">
-            <span class="proof-label">NEXT STEP CLEAR</span>
-          </div>
-        </div>
+        <p class="proofs-caption q-mb-none">
+          I find the gaps in clarity and trust, then close them by showing and telling: clear
+          words, backed by visuals and motion.
+          <button type="button" class="see-work" @click="toExamples()">See the work &rarr;</button>
+        </p>
         <q-list v-if="isTabletView" class="tablet-expandable-menu full-width font-primary">
           <q-item
             v-for="topic in mobileTopics"
@@ -964,7 +1060,9 @@ const toContact = () => {
           </q-item>
         </q-list>
       </div>
-      <div ref="clarityCueRef" class="clarity-cue"><ScrollCue /></div>
+      <div ref="clarityCueRef" class="clarity-cue" :class="{ 'is-hidden': !!activeTopic }">
+        <ScrollCue :has-text="false" minimal />
+      </div>
       <q-list v-if="isMobileView" class="full-width font-primary">
         <q-item
           v-for="topic in mobileTopics"
@@ -1024,20 +1122,54 @@ const toContact = () => {
         </div>
 
         <div ref="trustCopyA" class="trust-copy">
-          <span class="eyebrow">CLEAR PLATFORMS. LEGIBLE AI.</span>
-          <p>WHAT PEOPLE UNDERSTAND, THEY CAN TRUST.</p>
+          <span class="eyebrow">WHY PEOPLE HESITATE</span>
+          <p>PEOPLE HESITATE WHEN THEY HAVE TO GUESS.</p>
           <p class="trust-support">
-            Make the value and behavior of any platform clear-especially AI products, where trust
-            depends on making the system’s reasoning, limits, and behavior easier to understand.
+            Every visitor is trusting you with their time and attention. Each question your
+            product leaves open (what is this, what is it doing, what happens next) spends some of
+            it.
           </p>
         </div>
 
         <div ref="trustCopyB" class="trust-copy">
-          <p><span class="trust-fill">TRUST GIVES PEOPLE ROOM</span> TO MOVE FORWARD</p>
+          <span class="eyebrow">WHERE TRUST COMES FROM</span>
+          <p>TRUST ISN’T CLAIMED.</p>
+          <p><span class="trust-fill">IT’S ESTABLISHED.</span></p>
+          <p class="trust-support">
+            Say clearly who you are and what you do. Then show it. When what you say and what the
+            product does line up, there’s nothing left to guess and nothing in the way.
+          </p>
+        </div>
+        <div ref="trustCardRef" class="trust-card" aria-hidden="true">
+          <div ref="trustCardA" class="trust-card__state">
+            <div class="tc-row"><b>Order #4821</b></div>
+            <div class="tc-row"><span class="tc-status">Processing&hellip;</span><em class="tc-q">?</em></div>
+            <p class="tc-guess">Did it go through? When will it arrive?</p>
+          </div>
+          <div ref="trustCardB" class="trust-card__state">
+            <div class="tc-row"><b>Order #4821</b></div>
+            <div class="tc-row"><span class="tc-paid">&#10003; Paid $86.00</span></div>
+            <p class="tc-src">Arrives Thursday</p>
+            <div class="tc-row"><span class="tc-btn tc-btn--on">Track package</span></div>
+          </div>
+        </div>
+        <div ref="trustCard2Ref" class="trust-card trust-card--top" aria-hidden="true">
+          <div ref="trustCard2A" class="trust-card__state">
+            <div class="tc-row"><b>Sign up failed.</b><em class="tc-q">?</em></div>
+            <div class="tc-row"><span class="tc-btn">Try again</span></div>
+            <p class="tc-guess">What went wrong? What do I fix?</p>
+          </div>
+          <div ref="trustCard2B" class="trust-card__state">
+            <div class="tc-row"><b>Almost there</b></div>
+            <p class="tc-src">Add one number to your password</p>
+            <div class="tc-checks">
+              <span>&#10003; 8+ characters</span><span>&#10003; Email looks good</span>
+            </div>
+          </div>
         </div>
         <div ref="trustGlowRef" class="trust-glow" aria-hidden="true"></div>
         <div ref="trustCueRef" class="trust-cue">
-          <ScrollCue :is-dark="false" :has-text="false" />
+          <ScrollCue :is-dark="false" :has-text="false" minimal />
         </div>
         <div class="trust-frame" aria-hidden="true">
           <span class="trust-corner trust-corner--tl"></span>
@@ -1105,6 +1237,71 @@ const toContact = () => {
 
 /* ---------- Clarity ---------- */
 
+/* Phones: center the hero in the space instead of leaving a gap below it. */
+@media (max-width: 599.98px) {
+  .home-container {
+    justify-content: center !important;
+  }
+}
+
+.clarity-cue.is-hidden {
+  visibility: hidden;
+}
+
+.see-work {
+  margin-left: 0.35rem;
+  padding: 0;
+  border: 0;
+  background: none;
+  color: var(--q-accent);
+  font: inherit;
+  font-weight: 700;
+  white-space: nowrap;
+  cursor: pointer;
+
+  &:hover {
+    text-decoration: underline;
+  }
+}
+
+.cta--message {
+  padding: 0.4rem 0;
+  border: 0;
+  background: none;
+  color: var(--q-primary);
+  font: inherit;
+  font-size: 0.92rem;
+  font-weight: 600;
+  text-align: left;
+  cursor: pointer;
+  opacity: 0.85;
+
+  &:hover {
+    opacity: 1;
+    text-decoration: underline;
+  }
+
+  @media (max-width: calc(#{tokens.$breakpoint-lg} - 0.02px)) {
+    text-align: center;
+  }
+}
+
+.proofs-caption {
+  margin-top: 1.5rem;
+  color: var(--q-dark);
+  font-size: clamp(0.9rem, 1vw, 1.02rem);
+  font-weight: 500;
+  line-height: 1.45;
+  text-align: center;
+  text-wrap: balance;
+
+  i {
+    color: var(--q-accent);
+    font-style: normal;
+    font-weight: 700;
+  }
+}
+
 .clarity-background {
   position: fixed;
   inset: 0;
@@ -1135,7 +1332,7 @@ const toContact = () => {
     flex-direction: column;
     justify-content: center;
     align-items: center;
-    min-height: calc(100dvh - 88px);
+    min-height: calc(100dvh - 56px);
     padding-block: 2rem;
     max-width: none;
   }
@@ -1178,7 +1375,7 @@ const toContact = () => {
   margin-inline: auto;
   margin-bottom: 1rem;
   padding: 1.5rem;
-  min-height: calc(100dvh - 88px - 3rem);
+  min-height: calc(100dvh - 56px - 3rem);
   background-color: var(--q-secondary);
   text-align: center;
   box-shadow: none;
@@ -1222,6 +1419,12 @@ const toContact = () => {
     &.is-collapsed {
       max-width: max-content;
       padding: 1rem;
+
+      /* Card matches the 250px tile grid exactly: no stray gap on the right. */
+      .hero-copy {
+        width: 250px;
+        padding: 0.75rem !important; /* beats Quasar's q-pa-lg */
+      }
       transform: translateX(calc(var(--panel-offset, 0px) / -2));
 
       .simon-copy {
@@ -1243,10 +1446,16 @@ const toContact = () => {
           .cta {
             width: 100%;
           }
+
+          /* Keep the collapsed hero compact: just the menu and the booking button. */
+          .cta--message {
+            display: none;
+          }
         }
       }
 
-      .proofs {
+      .proofs,
+      .proofs-caption {
         display: none;
       }
     }
@@ -1266,7 +1475,7 @@ const toContact = () => {
   .simon-copy {
     display: flex;
     flex-direction: column;
-    flex: 1 1 auto;
+    flex: 0 1 auto; /* don't stretch the card to fill the screen */
     min-height: 0;
 
     @media #{tokens.$tablet-only} {
@@ -1281,7 +1490,7 @@ const toContact = () => {
     }
 
     .hero-copy {
-      flex: 1 1 auto;
+      flex: 0 1 auto;
       min-height: 0;
       max-width: 34rem;
       padding: clamp(0.85rem, 2.4vh, 1.5rem);
@@ -1332,10 +1541,19 @@ const toContact = () => {
         }
       }
 
+      /* Intentional break: the promise lands on its own line. */
+      .fix-it {
+        font-weight: 700;
+
+        @media (min-width: tokens.$breakpoint-lg) {
+          display: block;
+        }
+      }
+
       .subheadline {
         max-width: 100%;
         margin-top: clamp(0.5rem, 1.4vh, 1rem);
-        color: var(--q-secondary);
+        color: var(--q-primary);
         line-height: 1.5;
 
         @media (min-width: tokens.$breakpoint-lg) {
@@ -1350,9 +1568,15 @@ const toContact = () => {
         margin-top: clamp(0.6rem, 1.6vh, 1rem);
 
         @media (min-width: tokens.$breakpoint-lg) {
-          grid-template-columns: repeat(2, 1fr);
-          gap: 0.5rem;
+          grid-template-columns: auto;
+          justify-content: start;
+          justify-items: start;
+          gap: 0.35rem;
           margin-top: 1rem;
+
+          .cta {
+            white-space: nowrap;
+          }
         }
       }
     }
@@ -1386,12 +1610,14 @@ const toContact = () => {
     }
 
     .proof-card {
-      display: grid;
+      display: flex;
       align-items: center;
-      padding: clamp(0.55rem, 1.7vh, 1.5rem);
-      border: 1px solid color-mix(in srgb, var(--q-accent) 38%, transparent);
-      background: color-mix(in srgb, tokens.$ink-soft 82%, tokens.$ivory 6%);
-      box-shadow: inset 0 1px 0 color-mix(in srgb, tokens.$ivory 8%, transparent);
+      justify-content: center;
+      /* Open layout: no box, so the main card stays the focal point. */
+      padding: clamp(0.35rem, 1vh, 0.75rem) 0.5rem;
+      border: 0;
+      background: transparent;
+      box-shadow: none;
 
       @media #{tokens.$tablet-only} {
         padding: 0.85rem 0.5rem;
@@ -1399,18 +1625,42 @@ const toContact = () => {
       }
 
       @media (min-width: tokens.$breakpoint-lg) {
-        display: block;
+        display: grid;
+        justify-items: center;
+        gap: 0.4rem;
+        padding: 0.85rem 0.6rem 0.8rem;
         border-radius: 5px;
+      }
+
+      /* Small icon so the message lands before the words are read. */
+      .proof-icon {
+        color: var(--q-accent);
+        font-size: 1.5rem;
+
+        @media (max-width: calc(#{tokens.$breakpoint-lg} - 0.02px)) {
+          margin-right: 0.6rem;
+        }
       }
 
       .proof-label {
         display: block;
         text-align: center;
-        color: tokens.$champagne;
-        line-height: 1;
-        letter-spacing: 0.08em;
+        color: var(--q-dark);
+        line-height: 1.35;
+        letter-spacing: 0.05em;
         text-transform: uppercase;
-        font-weight: 300;
+        font-weight: 600;
+
+        @media (max-width: calc(#{tokens.$breakpoint-lg} - 0.02px)) {
+          font-size: 0.9rem;
+          letter-spacing: 0.04em;
+        }
+
+        @media (min-width: tokens.$breakpoint-lg) {
+          font-size: 0.74rem;
+          letter-spacing: 0.04em;
+          white-space: nowrap;
+        }
       }
     }
   }
@@ -1447,12 +1697,159 @@ const toContact = () => {
 .trust-section {
   position: relative;
   width: 100%;
-  height: calc(100dvh - 88px);
+  height: calc(100dvh - 56px);
   overflow: hidden;
   background: url('../assets/trust-section-background.avif') center 46% / cover no-repeat;
 
   @media (min-width: tokens.$breakpoint-lg) {
     height: 100dvh;
+  }
+
+  /* ---------- AI card inside the trust frame ---------- */
+  /* Centered with margin, not CSS translate: GSAP animates transform on these cards and
+     would otherwise keep the narrow-screen centering after a resize. */
+  .trust-card {
+    position: absolute;
+    left: 0;
+    right: 0;
+    margin-inline: auto;
+    bottom: 5%;
+    z-index: 3;
+    display: grid;
+    width: min(84%, 270px);
+    padding: 0.8rem 0.9rem;
+    border: 1px solid rgb(255 255 255 / 0.55);
+    border-radius: 0.8rem;
+    background: rgb(255 255 255 / 0.92);
+    box-shadow: 0 14px 34px rgb(0 0 0 / 0.35);
+    color: #0b1f2e;
+    font-family: tokens.$primary-font;
+    text-align: left;
+    opacity: 0;
+    backdrop-filter: blur(6px);
+
+    @media (min-width: tokens.$breakpoint-lg) {
+      left: 3.5%;
+      right: auto;
+      margin-inline: 0;
+      bottom: 5%; /* below the copy block, clear of the text */
+      width: clamp(220px, 17%, 260px);
+    }
+  }
+
+  .trust-card--top {
+    top: 9%;
+    bottom: auto;
+
+    @media (min-width: tokens.$breakpoint-lg) {
+      top: 7%;
+      right: 3.5%;
+      bottom: auto;
+      left: auto;
+    }
+  }
+
+  .tc-checks {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.25rem 0.75rem;
+    color: #0e8a4f;
+    font-size: 0.74rem;
+    font-weight: 700;
+  }
+
+  .trust-card__state {
+    grid-area: 1 / 1;
+    display: grid;
+    gap: 0.45rem;
+    align-content: start;
+  }
+
+  .tc-row {
+    display: flex;
+    gap: 0.45rem;
+    align-items: center;
+
+    b {
+      font-size: 0.9rem;
+      line-height: 1.25;
+    }
+  }
+
+  .tc-status {
+    color: rgb(11 31 46 / 0.7);
+    font-size: 0.86rem;
+  }
+
+  .tc-paid {
+    color: #0e8a4f;
+    font-size: 0.86rem;
+    font-weight: 700;
+  }
+
+  .tc-q {
+    display: grid;
+    place-items: center;
+    width: 1.1rem;
+    height: 1.1rem;
+    margin-left: auto;
+    border-radius: 50%;
+    background: #e8590c;
+    color: #fff;
+    font-size: 0.68rem;
+    font-style: normal;
+    font-weight: 700;
+    animation: tc-pulse 1.6s ease-in-out infinite;
+  }
+
+  .tc-btn {
+    padding: 0.25rem 0.7rem;
+    border: 1px solid #c9d6ef;
+    border-radius: 0.4rem;
+    background: #f3f6fc;
+    color: #0a3487;
+    font-size: 0.78rem;
+    font-weight: 700;
+
+    &--on {
+      border-color: #1260f0;
+      background: #1260f0;
+      color: #fff;
+    }
+  }
+
+  .tc-guess {
+    margin: 0;
+    color: #e8590c;
+    font-size: 0.76rem;
+    font-style: italic;
+    line-height: 1.35;
+  }
+
+  .tc-src {
+    margin: 0;
+    padding: 0.3rem 0.5rem;
+    border-radius: 0.35rem;
+    background: #eef3fc;
+    color: rgb(11 31 46 / 0.75);
+    font-size: 0.74rem;
+    line-height: 1.35;
+  }
+
+  @keyframes tc-pulse {
+    0%,
+    100% {
+      transform: scale(1);
+    }
+    50% {
+      transform: scale(1.18);
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .tc-q {
+      animation: none;
+    }
   }
 
   .trust-viewport {
@@ -1598,7 +1995,7 @@ const toContact = () => {
     .trust-support {
       font-size: clamp(0.9rem, 1.1vw, 1.05rem);
       line-height: 1.65;
-      max-width: 56ch;
+      max-width: 50ch;
       margin-top: 1.5rem;
       color: rgb(from tokens.$ivory r g b / 0.78);
       text-shadow: 1px 1px 6px var(--q-dark);
