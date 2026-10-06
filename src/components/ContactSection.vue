@@ -138,7 +138,12 @@ const sendEmail = async () => {
         <q-btn class="book__btn" color="accent" size="lg" glossy @click="bookTeardown">
           <span class="text-body-2">Book a free Teardown</span>
         </q-btn>
-        <span class="book__meta">Free · 20 minutes · no prep needed</span>
+        <div class="book__info">
+          <span class="book__meta">Free · 20 minutes · just send one link</span>
+          <span class="book__note">
+            When you book, add the page, screen, or URL you’d like me to focus on.
+          </span>
+        </div>
       </div>
 
       <div class="bonus">
@@ -155,7 +160,8 @@ const sendEmail = async () => {
       <div ref="formRef" class="or-write">
         <span class="or-write__line" aria-hidden="true"></span>
         <p class="q-ma-none">
-          <b>Already know you want a Diagnostic or a build?</b> Send me a message instead.
+          <b>Already know you want a Diagnostic or a build?</b> Book the same call to scope it, or
+          send me a message.
         </p>
         <span class="or-write__line" aria-hidden="true"></span>
       </div>
@@ -342,6 +348,17 @@ $line: rgba(18, 96, 240, 0.18);
 
 .book__btn {
   border-radius: 0.75rem;
+}
+
+.book__info {
+  display: grid;
+  gap: 0.15rem;
+}
+
+.book__note {
+  color: $muted;
+  font-size: 0.82rem;
+  line-height: 1.35;
 }
 
 .book__meta {
