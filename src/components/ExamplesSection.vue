@@ -17,6 +17,7 @@ import seasonalB from 'src/assets/examples/seasonal-b.jpg?w=720;1200&format=avif
 import whenthenA from 'src/assets/examples/whenthen-a.jpg?w=720;1200&format=avif;webp;jpg&as=picture';
 import whenthenB from 'src/assets/examples/whenthen-b.jpg?w=720;1200&format=avif;webp;jpg&as=picture';
 import robotA from 'src/assets/examples/robot-a.jpg?w=720;1200&format=avif;webp;jpg&as=picture';
+import PatternIndexLink from './PatternIndexLink.vue';
 
 const mainStore = useMainStore();
 const { lgBreakpoint, width } = useViewport();
@@ -232,6 +233,11 @@ onBeforeUnmount(() => {
           <span class="bridge__arrow" aria-hidden="true">&rarr;</span>
           <span class="bridge__build">{{ b.build }}</span>
         </button>
+        <!-- Finding → direction → build: the middle step lives in the Pattern Index. -->
+        <p class="bridge__between q-ma-none">
+          Between the finding and the build, there’s usually a direction to explore.
+          <PatternIndexLink path="/problems" text="See the problems I solve" />
+        </p>
       </div>
 
       <!-- Featured -->
@@ -430,6 +436,19 @@ $line: rgba(18, 96, 240, 0.18);
   border: 1px solid $line;
   border-radius: 0.9rem;
   background: #fff;
+}
+
+.bridge__between {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.25rem 0.6rem;
+  align-items: baseline;
+  margin-top: 0.35rem !important;
+  padding-top: 0.7rem;
+  border-top: 1px solid $line;
+  color: rgba(11, 31, 46, 0.66);
+  font-size: 0.84rem;
+  line-height: 1.4;
 }
 
 .bridge__label {

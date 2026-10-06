@@ -10,6 +10,7 @@ import { mdiMenu, mdiGithub, mdiLinkedin } from '@quasar/extras/mdi-v7';
 import { useCacheStore } from 'src/stores/component-cache';
 import { CacheBinding } from 'src/shared/constants/cacheBinding';
 import SlidePanel from '../components/SlidePanel.vue';
+import { PATTERN_INDEX_URL } from 'src/shared/constants/patternIndex';
 
 const cacheStore = useCacheStore();
 const mainStore = useMainStore();
@@ -129,6 +130,19 @@ onBeforeUnmount(() => {
             >
               <q-item-section>{{ topic.label }}</q-item-section>
             </q-item>
+            <q-separator class="menu-sep" />
+            <q-item
+              class="menu-item menu-item--external text-dark"
+              clickable
+              tag="a"
+              :href="PATTERN_INDEX_URL"
+              target="_blank"
+              rel="noopener"
+              @click="mobileMenu = false"
+            >
+              <q-item-section>Pattern Index</q-item-section>
+              <q-item-section side class="text-accent" aria-hidden="true">&#8599;</q-item-section>
+            </q-item>
           </q-list>
         </q-drawer>
       </q-toolbar>
@@ -164,7 +178,14 @@ onBeforeUnmount(() => {
         ><span class="text-primary">Freelance</span>
       </q-toolbar-title>
 
-      <div>
+      <div class="footer-links row items-center no-wrap">
+        <a
+          class="footer-pi text-primary"
+          :href="PATTERN_INDEX_URL"
+          target="_blank"
+          rel="noopener"
+          >Pattern Index <span aria-hidden="true">&#8599;</span></a
+        >
         <a href="https://github.com/grantknaver">
           <q-btn
             flat
@@ -223,6 +244,18 @@ onBeforeUnmount(() => {
   }
 }
 
+/* Footer link to the Pattern Index (top level so it applies outside the drawer). */
+#footer .footer-pi {
+  margin-right: 0.75rem;
+  font-size: 0.85rem;
+  font-weight: 600;
+  text-decoration: none;
+
+  &:hover {
+    text-decoration: underline;
+  }
+}
+
 /* Need this for right-side transparent drawer */
 aside {
   @media (min-width: tokens.$breakpoint-sm) {
@@ -239,6 +272,11 @@ aside {
   }
 
   /* removed fixed q-footer; style our flow footer instead */
+  .menu-sep {
+    margin: 0.35rem 1rem;
+    opacity: 0.35;
+  }
+
   #footer {
     position: relative;
     border-top: 1px solid var(--q-primary);

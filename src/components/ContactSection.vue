@@ -11,6 +11,7 @@ import {
 } from '@quasar/extras/mdi-v7';
 import { useViewport } from 'src/shared/utils/viewWidth';
 import { TEARDOWN_BOOKING_URL } from 'src/shared/constants/booking';
+import PatternIndexLink from './PatternIndexLink.vue';
 
 const form = reactive({
   name: '',
@@ -140,10 +141,16 @@ const sendEmail = async () => {
         <span class="book__meta">Free · 20 minutes · no prep needed</span>
       </div>
 
-      <p class="bonus q-ma-none">
-        <b>Bonus:</b> bring one current product or AI decision you’re wrestling with, and we’ll spend
-        a few minutes pressure-testing it on the same call.
-      </p>
+      <div class="bonus">
+        <p class="q-ma-none">
+          <b>Bonus:</b> bring one current product or AI decision you’re wrestling with, and we’ll
+          spend a few minutes pressure-testing it on the same call.
+        </p>
+        <p class="bonus__more q-ma-none">
+          Saw an interaction direction that fits something you’re wrestling with? Bring it.
+          <PatternIndexLink text="Browse the Pattern Index" />
+        </p>
+      </div>
 
       <div ref="formRef" class="or-write">
         <span class="or-write__line" aria-hidden="true"></span>
@@ -298,7 +305,20 @@ $line: rgba(18, 96, 240, 0.18);
   }
 }
 
+.bonus__more {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.2rem 0.6rem;
+  align-items: baseline;
+  padding-top: 0.45rem;
+  border-top: 1px solid rgba(18, 96, 240, 0.14);
+  color: rgba(11, 31, 46, 0.7);
+  font-size: 0.85rem;
+}
+
 .bonus {
+  display: grid;
+  gap: 0.45rem;
   padding: 0.7rem 0.9rem;
   border: 1px dashed rgba(18, 96, 240, 0.45);
   border-radius: 0.7rem;

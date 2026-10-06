@@ -10,6 +10,8 @@ import { TopicName } from '../shared/constants/topicName';
 import ProcessPaths from './ProcessPaths.vue';
 import TeardownExample from './TeardownExample.vue';
 import SampleDiagnostic from './SampleDiagnostic.vue';
+import PatternIndexLink from './PatternIndexLink.vue';
+import { PATTERN_INDEX_LENS } from '../shared/constants/patternIndex';
 
 const mainStore = useMainStore();
 const { lgBreakpoint, width } = useViewport();
@@ -257,6 +259,12 @@ onBeforeUnmount(() => io?.disconnect());
             <span class="lesson__note">Ships Thursday</span>
           </div>
         </div>
+        <PatternIndexLink
+          class="lesson__more"
+          tone="dark"
+          kicker="Pattern Index"
+          text="More ways to show instead of tell"
+        />
       </aside>
         </div>
       </q-expansion-item>
@@ -361,6 +369,14 @@ onBeforeUnmount(() => io?.disconnect());
           <p v-if="active.note" class="lens-note q-ma-none">
             <b>Also a tool</b>{{ active.note }}
           </p>
+          <!-- Going deeper: the chosen lens opens onto its page in the Pattern Index. -->
+          <div class="lens-deeper">
+            <PatternIndexLink
+              kicker="Pattern Index"
+              :path="PATTERN_INDEX_LENS[active.name].path"
+              :text="PATTERN_INDEX_LENS[active.name].text"
+            />
+          </div>
         </article>
       </Transition>
         </div>
@@ -900,6 +916,11 @@ $ease: cubic-bezier(0.22, 1, 0.36, 1);
   }
 }
 
+.lens-deeper {
+  padding-top: 0.8rem;
+  border-top: 1px solid $line;
+}
+
 .lens-detail-enter-active,
 .lens-detail-leave-active {
   transition:
@@ -938,6 +959,10 @@ $ease: cubic-bezier(0.22, 1, 0.36, 1);
   font-weight: 600;
   letter-spacing: -0.01em;
   line-height: 1.25;
+}
+
+.lesson__more {
+  margin-top: 0.35rem;
 }
 
 .lesson__body {

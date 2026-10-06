@@ -1,6 +1,7 @@
 <script lang="ts" setup>
 import { useMainStore } from '../stores/main';
 import { TopicName } from '../shared/constants/topicName';
+import PatternIndexLink from './PatternIndexLink.vue';
 
 /* Mirrors the sample Diagnostic PDF (AegisFlow). The full 8-page version is linked below.
    Each problem links to a real build that fixes the same kind of thing. */
@@ -163,6 +164,12 @@ const firstSteps = [
           Whenever the AI makes a call, people should see what it decided, what it used, how sure it
           is, and where a person takes over.
         </p>
+        <!-- The direction step: related interaction directions, not a one-to-one fix. -->
+        <PatternIndexLink
+          kicker="Pattern Index"
+          path="/lenses/ai-legibility"
+          text="Explore directions like this one"
+        />
       </div>
     </section>
 
