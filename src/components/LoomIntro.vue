@@ -1,6 +1,11 @@
 <script setup lang="ts">
 import { computed, onBeforeUnmount, onMounted, ref } from 'vue';
-import { INTRO_LOOM_DURATION, INTRO_LOOM_URL, loomEmbedUrl } from '../shared/constants/loom';
+import {
+  INTRO_LOOM_ASPECT,
+  INTRO_LOOM_DURATION,
+  INTRO_LOOM_URL,
+  loomEmbedUrl,
+} from '../shared/constants/loom';
 
 /* The glue between the hero ("what I do") and the trust section ("why people hesitate"):
    the business cost of friction, in Grant's own voice. */
@@ -60,7 +65,7 @@ onBeforeUnmount(() => io?.disconnect());
       </div>
 
       <div class="loom-intro__media" style="--i: 2">
-        <div class="video">
+        <div class="video" :style="{ aspectRatio: INTRO_LOOM_ASPECT }">
           <iframe
             v-if="playing && hasVideo"
             class="video__frame"
