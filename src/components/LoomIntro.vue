@@ -1,17 +1,14 @@
 <script setup lang="ts">
 import { computed, onBeforeUnmount, onMounted, ref } from 'vue';
-import {
-  INTRO_LOOM_ASPECT,
-  INTRO_LOOM_DURATION,
-  INTRO_LOOM_URL,
-  loomEmbedUrl,
-} from '../shared/constants/loom';
+import { INTRO_LOOM_ASPECT, INTRO_LOOM_URL, loomEmbedUrl } from '../shared/constants/loom';
 
 /* The glue between the hero ("what I do") and the trust section ("why people hesitate"):
    the business cost of friction, in Grant's own voice. */
 const embedUrl = computed(() => loomEmbedUrl(INTRO_LOOM_URL));
 const hasVideo = computed(() => !!embedUrl.value);
-const playing = ref(false);
+/* Mount Loom's player only when the section is about to be seen, so its scripts never load
+   during the hero animation (native lazy-loading starts far too early). */
+const loadPlayer = ref(false);
 
 const costs = ['Signups that stall', 'Demos that need explaining', 'Support tickets that shouldn’t exist'];
 
@@ -23,12 +20,14 @@ let io: IntersectionObserver | null = null;
 onMounted(() => {
   if (!rootRef.value || !('IntersectionObserver' in window)) {
     isIn.value = true;
+    loadPlayer.value = true;
     return;
   }
   io = new IntersectionObserver(
     (entries) => {
       if (entries.some((e) => e.isIntersecting)) {
         isIn.value = true;
+        loadPlayer.value = true;
         io?.disconnect();
       }
     },
@@ -66,8 +65,10 @@ onBeforeUnmount(() => io?.disconnect());
 
       <div class="loom-intro__media" style="--i: 2">
         <div class="video" :style="{ aspectRatio: INTRO_LOOM_ASPECT }">
+          <!-- Loom's own player, so one click plays it (a custom poster needed a second click,
+               since browsers block autoplay with sound inside an embed). -->
           <iframe
-            v-if="playing && hasVideo"
+            v-if="hasVideo && loadPlayer"
             class="video__frame"
             :src="embedUrl"
             title="60 seconds with Grant"
@@ -75,13 +76,14 @@ onBeforeUnmount(() => io?.disconnect());
             allowfullscreen
           ></iframe>
 
+          <!-- Branded placeholder: sits under the player while it loads (and stands in for the
+               video in dev until a Loom link is set). -->
           <button
             v-else
             type="button"
             class="video__poster"
-            :disabled="!hasVideo"
-            :aria-label="hasVideo ? 'Play: 60 seconds with Grant' : 'Video coming soon'"
-            @click="playing = true"
+            disabled
+            :aria-label="hasVideo ? 'Loading video' : 'Video coming soon'"
           >
             <span class="video__grid" aria-hidden="true"></span>
             <span class="video__brand" aria-hidden="true">
@@ -92,7 +94,7 @@ onBeforeUnmount(() => io?.disconnect());
             </span>
             <span class="video__caption">
               <b>Why friction costs more than it looks</b>
-              <small>{{ hasVideo ? INTRO_LOOM_DURATION || 'Watch' : 'Video coming soon' }}</small>
+              <small>{{ hasVideo ? 'Loading…' : 'Video coming soon' }}</small>
             </span>
           </button>
         </div>
