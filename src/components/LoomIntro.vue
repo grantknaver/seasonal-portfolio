@@ -8,7 +8,7 @@ const embedUrl = computed(() => loomEmbedUrl(INTRO_LOOM_URL));
 const hasVideo = computed(() => !!embedUrl.value);
 const playing = ref(false);
 
-const costs = ['Signups that stall', 'Demos spent explaining', 'Support tickets that shouldn’t exist'];
+const costs = ['Signups that stall', 'Demos that need explaining', 'Support tickets that shouldn’t exist'];
 
 /* One gentle reveal as the section scrolls in, like the panels. */
 const rootRef = ref<HTMLElement | null>(null);
