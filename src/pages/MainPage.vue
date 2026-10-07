@@ -1332,7 +1332,8 @@ const toExamples = () => {
     flex-direction: column;
     justify-content: center;
     align-items: center;
-    min-height: calc(100dvh - 56px);
+    min-height: calc(100vh - 56px);
+    min-height: calc(100svh - 56px);
     padding-block: 2rem;
     max-width: none;
   }
@@ -1342,7 +1343,8 @@ const toExamples = () => {
     flex-direction: column;
     align-items: center;
     justify-content: center;
-    height: 100dvh;
+    height: 100vh;
+    height: 100svh;
     max-width: none;
     background: none;
   }
@@ -1375,7 +1377,8 @@ const toExamples = () => {
   margin-inline: auto;
   margin-bottom: 1rem;
   padding: 1.5rem;
-  min-height: calc(100dvh - 56px - 3rem);
+  min-height: calc(100vh - 56px - 3rem);
+  min-height: calc(100svh - 56px - 3rem);
   background-color: var(--q-secondary);
   text-align: center;
   box-shadow: none;
@@ -1694,15 +1697,21 @@ const toExamples = () => {
 
 /* ---------- Trust ---------- */
 
+/* Stable viewport units, not dvh: dvh changes as a phone's address bar hides mid-scroll, which
+   resized the hero and this section and shifted everything.
+   On phones and tablets this is the last section (not pinned), so it fits exactly between the
+   fixed header and the footer: you never land with its top hidden under the header. */
 .trust-section {
   position: relative;
   width: 100%;
-  height: calc(100dvh - 56px);
+  height: calc(100vh - 56px - 50px);
+  height: calc(100svh - 56px - 50px);
   overflow: hidden;
   background: url('../assets/trust-section-background.avif') center 46% / cover no-repeat;
 
   @media (min-width: tokens.$breakpoint-lg) {
-    height: 100dvh;
+    height: 100vh;
+    height: 100svh;
   }
 
   /* ---------- AI card inside the trust frame ---------- */
@@ -1715,6 +1724,12 @@ const toExamples = () => {
     margin-inline: auto;
     bottom: 5%;
     z-index: 3;
+
+    /* Short phones (iPhone SE): tighter cards that sit closer to the edges. */
+    @media (max-height: 760px) and (max-width: tokens.$breakpoint-lg) {
+      bottom: 3%;
+      padding: 0.6rem 0.75rem;
+    }
     display: grid;
     width: min(84%, 270px);
     padding: 0.8rem 0.9rem;
@@ -1740,6 +1755,10 @@ const toExamples = () => {
   .trust-card--top {
     top: 9%;
     bottom: auto;
+
+    @media (max-height: 760px) and (max-width: tokens.$breakpoint-lg) {
+      top: 3.5%;
+    }
 
     @media (min-width: tokens.$breakpoint-lg) {
       top: 7%;
@@ -1999,6 +2018,23 @@ const toExamples = () => {
       margin-top: 1.5rem;
       color: rgb(from tokens.$ivory r g b / 0.78);
       text-shadow: 1px 1px 6px var(--q-dark);
+    }
+
+    /* Short phones: a more compact block so it clears both cards. */
+    @media (max-height: 760px) and (max-width: tokens.$breakpoint-lg) {
+      font-size: clamp(1.25rem, 4.2vw, 1.6rem);
+      padding-bottom: 2rem; /* centers the block between the two cards */
+
+      .eyebrow {
+        margin-bottom: 0.6rem;
+        font-size: 0.72rem;
+      }
+
+      .trust-support {
+        margin-top: 0.8rem;
+        font-size: 0.85rem;
+        line-height: 1.5;
+      }
     }
   }
 
