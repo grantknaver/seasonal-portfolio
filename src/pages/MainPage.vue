@@ -22,6 +22,8 @@ import ClarityBackground from 'src/components/ClarityBackground.vue';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import gsap from 'gsap';
 import ScrollCue from '../components/ScrollCue.vue';
+import LoomIntro from '../components/LoomIntro.vue';
+import { INTRO_LOOM_URL } from '../shared/constants/loom';
 import { openTeardownBooking } from 'src/shared/constants/booking';
 
 gsap.registerPlugin(ScrollTrigger);
@@ -44,9 +46,9 @@ if (DEBUG_JANK) {
   /* Anything that blocks the main thread for 50ms+ — this is what stutters an animation. */
   try {
     new PerformanceObserver((list) => {
-      list.getEntries().forEach((e) =>
-        console.warn(`[longtask] ${e.duration.toFixed(0)}ms @ ${at()}`),
-      );
+      list
+        .getEntries()
+        .forEach((e) => console.warn(`[longtask] ${e.duration.toFixed(0)}ms @ ${at()}`));
     }).observe({ type: 'longtask', buffered: true });
   } catch {
     /* unsupported */
@@ -117,6 +119,8 @@ const trustImageB = ref<HTMLElement | null>(null);
 const trustCopyA = ref<HTMLElement | null>(null);
 const trustCopyB = ref<HTMLElement | null>(null);
 const clarityCueRef = ref<HTMLElement | null>(null);
+/* The intro Loom shows once its link is set; until then only in dev, so the live site never shows an empty video. */
+const showLoomIntro = !!INTRO_LOOM_URL || import.meta.env.DEV;
 /* Tells the background artwork the hero copy is in. A plain DOM event, not reactive state:
    flipping a prop mid-animation re-renders the ~1000-line SVG and drops frames. */
 const signalHeroCopyIn = () => {
@@ -479,7 +483,10 @@ const buildHero = (mode: ViewType, animate = true) => {
     }
 
     release(); // ← curtain up, frame zero is already written
-    if (DEBUG_JANK) console.warn(`[hero] start @ ${(window as Window & { __jankAt?: () => string }).__jankAt?.()}`);
+    if (DEBUG_JANK)
+      console.warn(
+        `[hero] start @ ${(window as Window & { __jankAt?: () => string }).__jankAt?.()}`,
+      );
     tl.play();
     watchJank(tl, 'hero');
   }, claritySectionRef.value ?? undefined);
@@ -498,7 +505,6 @@ const buildScene = () => {
           end: '+=1800',
           pin: true,
           pinSpacing: true,
-          anticipatePin: 1,
         });
       }
 
@@ -716,13 +722,25 @@ const buildScene = () => {
                 .fromTo(
                   cardAs,
                   { opacity: 1 },
-                  { opacity: 0, ease: 'none', duration: 0.5, stagger: 0.12, immediateRender: false },
+                  {
+                    opacity: 0,
+                    ease: 'none',
+                    duration: 0.5,
+                    stagger: 0.12,
+                    immediateRender: false,
+                  },
                   0.6,
                 )
                 .fromTo(
                   cardBs,
                   { opacity: 0 },
-                  { opacity: 1, ease: 'none', duration: 0.6, stagger: 0.12, immediateRender: false },
+                  {
+                    opacity: 1,
+                    ease: 'none',
+                    duration: 0.6,
+                    stagger: 0.12,
+                    immediateRender: false,
+                  },
                   0.95,
                 )
                 .fromTo(
@@ -873,7 +891,9 @@ onMounted(async () => {
     const w = window as Window & { __heroBgDone?: boolean };
     if (!w.__heroBgDone) {
       await withTimeout(
-        new Promise<void>((r) => window.addEventListener('hero:bg-done', () => r(), { once: true })),
+        new Promise<void>((r) =>
+          window.addEventListener('hero:bg-done', () => r(), { once: true }),
+        ),
         4000,
       );
     }
@@ -986,7 +1006,9 @@ const toExamples = () => {
           <div class="simon"><SimonMenu /></div>
 
           <div class="hero-copy column justify-center q-pa-lg">
-            <p class="text-caption kicker q-mt-none q-mb-sm">150 Teardowns for technical founders</p>
+            <p class="text-caption kicker q-mt-none q-mb-sm">
+              150 Teardowns for technical founders
+            </p>
 
             <h1 class="headline text-h1 q-mt-none q-mb-md">LESS TO FIGURE OUT. MORE TO ACT ON.</h1>
 
@@ -1009,8 +1031,8 @@ const toExamples = () => {
         </div>
 
         <p class="proofs-caption q-mb-none">
-          I find the gaps in clarity and trust, then close them by showing and telling: clear
-          words, backed by visuals and motion.
+          I find the gaps in clarity and trust, then close them by showing and telling: clear words,
+          backed by visuals and motion.
           <button type="button" class="see-work" @click="toExamples()">See the work &rarr;</button>
         </p>
         <q-list v-if="isTabletView" class="tablet-expandable-menu full-width font-primary">
@@ -1110,6 +1132,8 @@ const toExamples = () => {
         </q-item>
       </q-list>
     </div>
+    <!-- Glue between "what I do" and "why people hesitate": the cost of friction, in my voice. -->
+    <LoomIntro v-if="showLoomIntro" />
     <div class="section-transition"></div>
     <section ref="trustSectionRef" class="trust-section">
       <div ref="trustViewportRef" class="trust-viewport">
@@ -1125,9 +1149,8 @@ const toExamples = () => {
           <span class="eyebrow">WHY PEOPLE HESITATE</span>
           <p>PEOPLE HESITATE WHEN THEY HAVE TO GUESS.</p>
           <p class="trust-support">
-            Every visitor is trusting you with their time and attention. Each question your
-            product leaves open (what is this, what is it doing, what happens next) spends some of
-            it.
+            Every visitor is trusting you with their time and attention. Each question your product
+            leaves open (what is this, what is it doing, what happens next) spends some of it.
           </p>
         </div>
 
@@ -1143,7 +1166,9 @@ const toExamples = () => {
         <div ref="trustCardRef" class="trust-card" aria-hidden="true">
           <div ref="trustCardA" class="trust-card__state">
             <div class="tc-row"><b>Order #4821</b></div>
-            <div class="tc-row"><span class="tc-status">Processing&hellip;</span><em class="tc-q">?</em></div>
+            <div class="tc-row">
+              <span class="tc-status">Processing&hellip;</span><em class="tc-q">?</em>
+            </div>
             <p class="tc-guess">Did it go through? When will it arrive?</p>
           </div>
           <div ref="trustCardB" class="trust-card__state">
