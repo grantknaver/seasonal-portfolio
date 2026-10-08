@@ -660,6 +660,18 @@ const buildScene = () => {
     let introPlayed = false;
     let scrubBuilt = false;
 
+    /* Decode the two trust photos a screen before the pin, not at it: decoding large images
+       right as the pin engages was part of the hitch on a fast scroll. */
+    const preIo = new IntersectionObserver(
+      ([entry]) => {
+        if (!entry?.isIntersecting) return;
+        preIo.disconnect();
+        void decodeImagesIn(section);
+      },
+      { rootMargin: '0px 0px 100% 0px' },
+    );
+    preIo.observe(section);
+
     const trustTl = gsap.timeline({
       scrollTrigger: {
         trigger: section,
@@ -668,9 +680,13 @@ const buildScene = () => {
         pin: true,
         pinSpacing: true,
         scrub: 0.6,
-        onEnter: () => {
+        onEnter: (self) => {
           if (introPlayed) return;
           introPlayed = true;
+
+          /* A fast scroll overshoots the pin start before this fires. Put it back at the start
+             (invisible, since the section is pinned) so the intro and the scrub begin at 0. */
+          if (window.scrollY > self.start + 1) window.scrollTo(0, self.start);
 
           const unlock = lockScroll();
 
