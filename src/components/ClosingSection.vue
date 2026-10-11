@@ -1,11 +1,16 @@
 <script setup lang="ts">
 import { computed, nextTick, onBeforeUnmount, onMounted, ref } from 'vue';
 import gsap from 'gsap';
+import { ScrollTrigger } from 'gsap/ScrollTrigger';
+import { useViewport } from 'src/shared/utils/viewWidth';
 import { openTeardownBooking } from '../shared/constants/booking';
 
 /* The close of the page: one question ("where are you now?") and the route that answer takes.
    Everyone starts with a free Teardown; what follows depends on what we find. */
 const emit = defineEmits<{ message: [] }>();
+
+gsap.registerPlugin(ScrollTrigger);
+const { lgBreakpoint } = useViewport();
 
 type Mode = 'unclear' | 'clear' | 'opinion';
 type NodeState = 'on' | 'maybe' | 'skip' | 'off';
@@ -51,11 +56,14 @@ const choose = async (m: Mode) => {
   if (m === mode.value) return;
   mode.value = m;
   await nextTick();
-  const lit = nodesRef.value?.querySelectorAll<HTMLElement>('.node.is-on, .node.is-maybe');
+  /* On the dots, so it never collides with the node's scroll-driven entrance. */
+  const lit = nodesRef.value?.querySelectorAll<HTMLElement>(
+    '.node.is-on .node__dot, .node.is-maybe .node__dot',
+  );
   if (!lit?.length || window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
   gsap.fromTo(
     lit,
-    { scale: 0.92 },
+    { scale: 0.8 },
     { scale: 1, duration: 0.6, ease: 'back.out(2.6)', stagger: 0.08, overwrite: 'auto' },
   );
 };
@@ -70,21 +78,111 @@ const measureLogo = () => {
 };
 
 let ctx: gsap.Context | null = null;
+let mm: gsap.MatchMedia | null = null;
 let enterIo: IntersectionObserver | null = null;
-let topIo: IntersectionObserver | null = null;
-let midIo: IntersectionObserver | null = null;
 
-/* While this dark band sits behind the fixed logo (top strip) or the side rail (middle line),
-   flag it on <body> so both switch to their light treatment. */
-const watchDarkZones = (root: HTMLElement) => {
-  const flag = (cls: string) => (entries: IntersectionObserverEntry[]) => {
-    const e = entries[0];
-    if (e) document.body.classList.toggle(cls, e.isIntersecting);
-  };
-  topIo = new IntersectionObserver(flag('glk-dark-top'), { rootMargin: '0px 0px -94% 0px' });
-  midIo = new IntersectionObserver(flag('glk-dark-mid'), { rootMargin: '-48% 0px -48% 0px' });
-  topIo.observe(root);
-  midIo.observe(root);
+/* Desktop: the entrance follows the scroll. The main copy comes first (eyebrow, headline,
+   lead, button), then the card slides in from the right and its route draws. While the section
+   is on screen, the card, grid and glow drift at different speeds for a little depth. */
+const buildScrub = (root: HTMLElement) => {
+  const enter = gsap.timeline({
+    defaults: { ease: 'power2.out' },
+    scrollTrigger: {
+      trigger: root,
+      start: 'top 85%',
+      end: 'top 15%',
+      scrub: 0.8,
+      refreshPriority: -3, // measured after every pin above it
+    },
+  });
+  enter
+    .fromTo(
+      '.closing__copy > *',
+      { autoAlpha: 0, y: 44 },
+      { autoAlpha: 1, y: 0, duration: 0.4, stagger: 0.1 },
+      0,
+    )
+    .fromTo(
+      '.closing__panel',
+      { autoAlpha: 0, x: 140, rotate: 1.5 },
+      { autoAlpha: 1, x: 0, rotate: 0, duration: 0.55 },
+      0.45,
+    )
+    .fromTo(
+      '.node',
+      { autoAlpha: 0, scale: 0.8 },
+      { autoAlpha: 1, scale: 1, duration: 0.25, stagger: 0.1, ease: 'back.out(2)' },
+      0.85,
+    )
+    .fromTo(
+      '.link__fill',
+      { scaleX: 0 },
+      { scaleX: 1, duration: 0.2, stagger: 0.1, ease: 'power1.inOut' },
+      0.95,
+    );
+
+  /* Parallax across the section's whole arrival. */
+  const drift = gsap.timeline({
+    defaults: { ease: 'none' },
+    scrollTrigger: {
+      trigger: root,
+      start: 'top bottom',
+      end: 'bottom bottom',
+      scrub: true,
+      refreshPriority: -3,
+    },
+  });
+  drift
+    .fromTo('.closing__panel', { yPercent: 14 }, { yPercent: -4 }, 0)
+    .fromTo('.closing__grid', { y: 70 }, { y: -30 }, 0)
+    .fromTo('.closing__glow', { translate: '0px 120px' }, { translate: '0px -40px' }, 0);
+};
+
+/* Phones (and if the scroll trigger can't run): a one-time entrance when it's on screen, in
+   the same order. */
+const buildOnce = (root: HTMLElement) => {
+  const tl = gsap.timeline({ paused: true, defaults: { ease: 'power3.out' } });
+  tl.fromTo(
+    '.closing__copy > *',
+    { autoAlpha: 0, y: 26 },
+    { autoAlpha: 1, y: 0, duration: 0.8, stagger: 0.1, clearProps: 'transform' },
+  )
+    .fromTo(
+      '.closing__panel',
+      { autoAlpha: 0, y: 30 },
+      { autoAlpha: 1, y: 0, duration: 0.8, clearProps: 'transform' },
+      0.45,
+    )
+    .fromTo(
+      '.node',
+      { autoAlpha: 0, scale: 0.8 },
+      {
+        autoAlpha: 1,
+        scale: 1,
+        duration: 0.6,
+        ease: 'back.out(2)',
+        stagger: 0.14,
+        clearProps: 'opacity,visibility,transform',
+      },
+      0.8,
+    )
+    .fromTo(
+      '.link__fill',
+      { scaleX: 0 },
+      { scaleX: 1, duration: 0.5, ease: 'power2.inOut', stagger: 0.14 },
+      1,
+    );
+
+  enterIo = new IntersectionObserver(
+    (entries) => {
+      if (entries.some((e) => e.isIntersecting)) {
+        enterIo?.disconnect();
+        tl.play();
+      }
+    },
+    { threshold: 0.2 },
+  );
+  enterIo.observe(root);
 };
 
 onMounted(() => {
@@ -93,59 +191,21 @@ onMounted(() => {
   if ('fonts' in document) void document.fonts.ready.then(measureLogo);
 
   const root = rootRef.value;
-  if (!root || !('IntersectionObserver' in window)) return;
-  watchDarkZones(root);
-  if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+  if (!root || window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
 
-  /* Entrance, once it's a quarter on screen: the copy rises in, then the route draws left to
-     right. An IntersectionObserver (not a scroll trigger) so it fires on every layout. */
   ctx = gsap.context(() => {
-    const tl = gsap.timeline({ paused: true, defaults: { ease: 'power3.out' } });
-    tl.fromTo(
-      '.closing__copy > *',
-      { autoAlpha: 0, y: 26 },
-      { autoAlpha: 1, y: 0, duration: 0.8, stagger: 0.1, clearProps: 'transform' },
-    )
-      .fromTo(
-        '.closing__panel',
-        { autoAlpha: 0, y: 30, scale: 0.97 },
-        { autoAlpha: 1, y: 0, scale: 1, duration: 0.8, clearProps: 'transform' },
-        0.2,
-      )
-      .fromTo(
-        '.node',
-        { autoAlpha: 0, scale: 0.8 },
-        {
-          autoAlpha: 1,
-          scale: 1,
-          duration: 0.6,
-          ease: 'back.out(2)',
-          stagger: 0.14,
-          clearProps: 'opacity,visibility,transform',
-        },
-        0.55,
-      )
-      .from('.link__fill', { scaleX: 0, duration: 0.5, ease: 'power2.inOut', stagger: 0.14 }, 0.75);
-
-    enterIo = new IntersectionObserver(
-      (entries) => {
-        if (entries.some((e) => e.isIntersecting)) {
-          enterIo?.disconnect();
-          tl.play();
-        }
-      },
-      { threshold: 0.25 },
-    );
-    enterIo.observe(root);
+    mm = gsap.matchMedia();
+    mm.add(`(min-width: ${lgBreakpoint}px)`, () => buildScrub(root));
+    mm.add(`(max-width: ${lgBreakpoint - 0.02}px)`, () => {
+      if ('IntersectionObserver' in window) buildOnce(root);
+    });
   }, root);
 });
 
 onBeforeUnmount(() => {
   window.removeEventListener('resize', measureLogo);
   enterIo?.disconnect();
-  topIo?.disconnect();
-  midIo?.disconnect();
-  document.body.classList.remove('glk-dark-top', 'glk-dark-mid');
+  mm?.revert();
   ctx?.revert();
 });
 </script>
@@ -240,23 +300,23 @@ onBeforeUnmount(() => {
 <style scoped lang="scss">
 @use '../css/tokens' as tokens;
 
-$ink: #06111f;
-$navy: #0b1f2e;
+$ink: #0b1f2e;
+$navy: #0a3487;
 $blue: #1260f0;
-$sky: #9ec0ff;
-$white: #f7f9fe;
-$muted: rgba(247, 249, 254, 0.68);
-$line: rgba(158, 192, 255, 0.22);
+$sky: #5b93ff;
+$white: #0b1f2e; /* main text */
+$muted: rgba(11, 31, 46, 0.66);
+$line: rgba(18, 96, 240, 0.18);
 $ease: cubic-bezier(0.22, 1, 0.36, 1);
 $bounce: cubic-bezier(0.34, 1.56, 0.64, 1);
 
-/* A dark band to end on, in the same world as the video cover: navy, a faint grid, one glow. */
+/* The close, in the same light family as the Loom section: pale blue, a faint grid, one soft glow. */
 .closing {
   position: relative;
   z-index: 1;
   overflow: hidden;
   padding: clamp(4rem, 10vh, 6rem) 1rem;
-  background: linear-gradient(170deg, $navy 0%, $ink 100%);
+  background: linear-gradient(180deg, #f2f6fe 0%, #e6eefc 100%);
   color: $white;
   font-family: tokens.$primary-font;
 
@@ -274,8 +334,8 @@ $bounce: cubic-bezier(0.34, 1.56, 0.64, 1);
   position: absolute;
   inset: 0;
   background-image:
-    linear-gradient(rgba(255, 255, 255, 0.045) 1px, transparent 1px),
-    linear-gradient(90deg, rgba(255, 255, 255, 0.045) 1px, transparent 1px);
+    linear-gradient(rgba(18, 96, 240, 0.06) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(18, 96, 240, 0.06) 1px, transparent 1px);
   background-size: 56px 56px;
   mask-image: radial-gradient(80% 70% at 60% 50%, #000 20%, transparent 100%);
   pointer-events: none;
@@ -288,7 +348,7 @@ $bounce: cubic-bezier(0.34, 1.56, 0.64, 1);
   width: 70%;
   aspect-ratio: 1;
   border-radius: 50%;
-  background: radial-gradient(closest-side, rgba(18, 96, 240, 0.4), transparent);
+  background: radial-gradient(closest-side, rgba(18, 96, 240, 0.14), transparent);
   filter: blur(10px);
   pointer-events: none;
   animation: drift 14s ease-in-out infinite alternate;
@@ -327,7 +387,7 @@ $bounce: cubic-bezier(0.34, 1.56, 0.64, 1);
 }
 
 .closing__eyebrow {
-  color: $sky;
+  color: $blue;
   font-size: 0.72rem;
   font-weight: 700;
   letter-spacing: 0.14em;
@@ -369,7 +429,7 @@ $bounce: cubic-bezier(0.34, 1.56, 0.64, 1);
   font-weight: 700;
   cursor: pointer;
   box-shadow:
-    0 10px 30px rgba(18, 96, 240, 0.45),
+    0 10px 26px rgba(18, 96, 240, 0.32),
     inset 0 1px 0 rgba(255, 255, 255, 0.25);
   transition:
     transform 0.35s $bounce,
@@ -383,7 +443,7 @@ $bounce: cubic-bezier(0.34, 1.56, 0.64, 1);
   &:hover {
     transform: translateY(-2px) scale(1.03);
     box-shadow:
-      0 16px 38px rgba(18, 96, 240, 0.55),
+      0 14px 32px rgba(18, 96, 240, 0.42),
       inset 0 1px 0 rgba(255, 255, 255, 0.25);
 
     span {
@@ -392,7 +452,7 @@ $bounce: cubic-bezier(0.34, 1.56, 0.64, 1);
   }
 
   &:focus-visible {
-    outline: 2px solid $sky;
+    outline: 2px solid $blue;
     outline-offset: 3px;
   }
 }
@@ -406,7 +466,7 @@ $bounce: cubic-bezier(0.34, 1.56, 0.64, 1);
   font-size: 0.95rem;
   cursor: pointer;
   text-decoration: underline;
-  text-decoration-color: rgba(247, 249, 254, 0.3);
+  text-decoration-color: rgba(11, 31, 46, 0.3);
   text-underline-offset: 3px;
 
   &:hover {
@@ -414,14 +474,14 @@ $bounce: cubic-bezier(0.34, 1.56, 0.64, 1);
   }
 
   &:focus-visible {
-    outline: 2px solid $sky;
+    outline: 2px solid $blue;
     outline-offset: 3px;
     border-radius: 3px;
   }
 }
 
 .closing__meta {
-  color: rgba(247, 249, 254, 0.5);
+  color: rgba(11, 31, 46, 0.5);
   font-size: 0.82rem;
 }
 
@@ -433,13 +493,14 @@ $bounce: cubic-bezier(0.34, 1.56, 0.64, 1);
   padding: clamp(1.25rem, 2.5vw, 2rem);
   border: 1px solid $line;
   border-radius: 1.1rem;
-  background: rgba(255, 255, 255, 0.04);
-  backdrop-filter: blur(8px);
-  box-shadow: 0 30px 60px rgba(0, 0, 0, 0.35);
+  background: #fff;
+  box-shadow:
+    0 24px 60px rgba(10, 52, 135, 0.12),
+    0 2px 6px rgba(10, 52, 135, 0.05);
 }
 
 .closing__q {
-  color: $sky;
+  color: $blue;
   font-size: 0.72rem;
   font-weight: 700;
   letter-spacing: 0.12em;
@@ -470,7 +531,7 @@ $bounce: cubic-bezier(0.34, 1.56, 0.64, 1);
 
   &:hover {
     color: $white;
-    border-color: rgba(158, 192, 255, 0.5);
+    border-color: rgba(18, 96, 240, 0.5);
     transform: translateY(-1px);
   }
 
@@ -478,11 +539,11 @@ $bounce: cubic-bezier(0.34, 1.56, 0.64, 1);
     border-color: $blue;
     background: $blue;
     color: #fff;
-    box-shadow: 0 6px 18px rgba(18, 96, 240, 0.4);
+    box-shadow: 0 6px 16px rgba(18, 96, 240, 0.28);
   }
 
   &:focus-visible {
-    outline: 2px solid $sky;
+    outline: 2px solid $blue;
     outline-offset: 2px;
   }
 }
@@ -537,9 +598,9 @@ $bounce: cubic-bezier(0.34, 1.56, 0.64, 1);
   width: 2.6rem;
   height: 2.6rem;
   margin-bottom: 0.2rem;
-  border: 2px solid rgba(158, 192, 255, 0.35);
+  border: 2px solid rgba(18, 96, 240, 0.28);
   border-radius: 50%;
-  background: rgba(255, 255, 255, 0.03);
+  background: #fff;
   transition:
     background 0.3s ease,
     border-color 0.3s ease,
@@ -558,13 +619,13 @@ $bounce: cubic-bezier(0.34, 1.56, 0.64, 1);
     border-color: $blue;
     background: $blue;
     box-shadow:
-      0 0 0 6px rgba(18, 96, 240, 0.18),
-      0 8px 22px rgba(18, 96, 240, 0.5);
+      0 0 0 6px rgba(18, 96, 240, 0.12),
+      0 8px 18px rgba(18, 96, 240, 0.32);
   }
 
   .is-maybe & {
     border-style: dashed;
-    border-color: $sky;
+    border-color: $blue;
   }
 
   .is-skip & {
@@ -576,8 +637,8 @@ $bounce: cubic-bezier(0.34, 1.56, 0.64, 1);
   margin-top: 0.25rem;
   padding: 0.2rem 0.6rem;
   border-radius: 999px;
-  background: rgba(158, 192, 255, 0.16);
-  color: $sky;
+  background: rgba(18, 96, 240, 0.1);
+  color: $navy;
   font-size: 0.72rem;
   font-weight: 700;
   white-space: nowrap;
@@ -588,7 +649,7 @@ $bounce: cubic-bezier(0.34, 1.56, 0.64, 1);
   position: relative;
   height: 2px;
   margin-top: 1.3rem;
-  background: rgba(158, 192, 255, 0.18);
+  background: rgba(18, 96, 240, 0.14);
   border-radius: 2px;
 
   @media (max-width: 599px) {
@@ -613,7 +674,7 @@ $bounce: cubic-bezier(0.34, 1.56, 0.64, 1);
 
   .link.is-maybe & {
     opacity: 0.55;
-    background: repeating-linear-gradient(90deg, $sky 0 6px, transparent 6px 11px);
+    background: repeating-linear-gradient(90deg, $blue 0 6px, transparent 6px 11px);
   }
 }
 
@@ -662,23 +723,6 @@ $bounce: cubic-bezier(0.34, 1.56, 0.64, 1);
   .closing__book,
   .bypass {
     transition: none;
-  }
-}
-</style>
-
-<style lang="scss">
-@use '../css/tokens' as tokens;
-
-/* Desktop: the fixed logo and side rail sit over this dark band at the end of the page. */
-@media (min-width: tokens.$breakpoint-lg) {
-  body.glk-dark-top .logo-text .freelance {
-    color: #f7f9fe !important;
-    transition: color 0.3s ease;
-  }
-
-  body.glk-dark-mid .side-rail .simon-quadrant {
-    background: rgba(247, 249, 254, 0.94);
-    box-shadow: 0 6px 18px rgba(0, 0, 0, 0.4);
   }
 }
 </style>
