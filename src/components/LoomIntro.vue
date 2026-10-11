@@ -195,7 +195,7 @@ $ease: cubic-bezier(0.22, 1, 0.36, 1);
 
     /* Wide and short: the content spans most of the width, and the video's height is set from
        the screen height, so there's more room above and below than at the sides. */
-    --content-w: min(86vw, 1680px);
+    --content-w: min(84.6vw, 1680px);
     --vid-h: clamp(15rem, calc(100vh - 34rem), 27rem);
     --vid-h: clamp(15rem, calc(100svh - 34rem), 27rem);
   }
