@@ -138,6 +138,25 @@ const trustCard2Ref = ref<HTMLElement | null>(null);
 const trustCard2A = ref<HTMLElement | null>(null);
 const trustCard2B = ref<HTMLElement | null>(null);
 
+/* Phones: after the trust section autoplays, two small arrows let people go back to the first
+   message ("why people hesitate") and forward again. 0 = still autoplaying. */
+const trustStep = ref<0 | 1 | 2>(0);
+const goTrust = (step: 1 | 2) => {
+  if (trustStep.value === 0 || trustStep.value === step) return;
+  trustStep.value = step;
+  const first = step === 1;
+  const fade = { duration: 0.6, ease: 'power1.inOut', overwrite: 'auto' as const };
+  const on = (el: HTMLElement | null, visible: boolean) => {
+    if (el) gsap.to(el, { ...fade, opacity: visible ? 1 : 0 });
+  };
+  on(trustCopyA.value, first);
+  on(trustCopyB.value, !first);
+  on(trustImageA.value, first);
+  on(trustImageB.value, !first);
+  [trustCardA.value, trustCard2A.value].forEach((el) => on(el, first));
+  [trustCardB.value, trustCard2B.value].forEach((el) => on(el, !first));
+};
+
 /* ---------- Lifecycle-scoped GSAP state ---------- */
 
 let heroCtx: gsap.Context | null = null;
@@ -565,11 +584,13 @@ const buildScene = () => {
       /* ---------- Mobile: autoplay on entry ---------- */
       gsap.set([copyA, copyB], { opacity: 0 });
 
+      trustStep.value = 0;
       const mobileTl = gsap
         .timeline({
           paused: true,
           onComplete: () => {
             gsap.set([copyA, copyB], { willChange: 'auto' });
+            trustStep.value = 2; // autoplay done: show the back/forward arrows
           },
         })
         .to(glow, { opacity: 1, scale: 1, duration: 1.2, ease: 'power2.out' }, 0)
@@ -1209,6 +1230,36 @@ const toExamples = () => {
           </div>
         </div>
         <div ref="trustGlowRef" class="trust-glow" aria-hidden="true"></div>
+        <!-- Phones: step back to the first message and forward again once autoplay is done. -->
+        <div
+          v-if="isResponsive"
+          class="trust-steps"
+          :class="{ 'is-on': trustStep > 0 }"
+          role="group"
+          aria-label="Trust section messages"
+        >
+          <button
+            type="button"
+            class="trust-steps__btn"
+            :disabled="trustStep !== 2"
+            aria-label="Show the first message: why people hesitate"
+            @click="goTrust(1)"
+          >
+            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 15l6-6 6 6" /></svg>
+          </button>
+          <span class="trust-steps__dots" aria-hidden="true">
+            <i :class="{ on: trustStep === 1 }"></i><i :class="{ on: trustStep === 2 }"></i>
+          </span>
+          <button
+            type="button"
+            class="trust-steps__btn"
+            :disabled="trustStep !== 1"
+            aria-label="Show the second message: where trust comes from"
+            @click="goTrust(2)"
+          >
+            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 9l6 6 6-6" /></svg>
+          </button>
+        </div>
         <div ref="trustCueRef" class="trust-cue">
           <ScrollCue :is-dark="false" :has-text="false" minimal />
         </div>
@@ -2015,6 +2066,12 @@ const toExamples = () => {
     padding-inline: 2rem;
     text-align: center;
     color: tokens.$ivory;
+
+    /* Phones: leave room on both sides for the back/forward arrows (kept symmetric so the
+       copy stays centered). */
+    @media (max-width: tokens.$breakpoint-lg) {
+      padding-inline: 3.6rem;
+    }
     font-size: clamp(1.4rem, 4.6vw, 1.9rem);
     line-height: 1.2;
     will-change: transform, opacity;
@@ -2228,6 +2285,97 @@ const toExamples = () => {
     z-index: 4;
     width: max-content;
     transition: left 0.32s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+
+  /* Frosted pill on the right edge; fades in once the autoplay finishes. */
+  .trust-steps {
+    position: absolute;
+    top: 50%;
+    right: 0.5rem;
+    z-index: 4;
+    display: grid;
+    justify-items: center;
+    gap: 0.35rem;
+    padding: 0.35rem;
+    border: 1px solid rgb(255 255 255 / 0.22);
+    border-radius: 999px;
+    background: rgb(6 17 31 / 0.5);
+    backdrop-filter: blur(8px);
+    opacity: 0;
+    pointer-events: none;
+    transform: translateY(-50%) translateX(6px);
+    transition:
+      opacity 0.5s ease,
+      transform 0.5s cubic-bezier(0.22, 1, 0.36, 1);
+
+    &.is-on {
+      opacity: 1;
+      pointer-events: auto;
+      transform: translateY(-50%);
+    }
+  }
+
+  .trust-steps__btn {
+    display: grid;
+    place-items: center;
+    width: 2.25rem;
+    height: 2.25rem;
+    padding: 0;
+    border: 0;
+    border-radius: 50%;
+    background: rgb(255 255 255 / 0.14);
+    color: tokens.$ivory;
+    cursor: pointer;
+    transition:
+      background 0.2s ease,
+      opacity 0.2s ease;
+
+    svg {
+      width: 1.1rem;
+      height: 1.1rem;
+      fill: none;
+      stroke: currentColor;
+      stroke-width: 2.2;
+      stroke-linecap: round;
+      stroke-linejoin: round;
+    }
+
+    &:disabled {
+      opacity: 0.3;
+      cursor: default;
+    }
+
+    &:not(:disabled):active {
+      background: rgb(255 255 255 / 0.28);
+    }
+
+    &:focus-visible {
+      outline: 2px solid tokens.$champagne;
+      outline-offset: 2px;
+    }
+  }
+
+  .trust-steps__dots {
+    display: grid;
+    gap: 0.3rem;
+
+    i {
+      width: 0.35rem;
+      height: 0.35rem;
+      border-radius: 50%;
+      background: rgb(255 255 255 / 0.35);
+      transition: background 0.3s ease;
+
+      &.on {
+        background: tokens.$champagne;
+      }
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .trust-steps {
+      transition: none;
+    }
   }
 
   .trust-cue {

@@ -12,6 +12,7 @@ import TeardownExample from './TeardownExample.vue';
 import SampleDiagnostic from './SampleDiagnostic.vue';
 import PatternIndexLink from './PatternIndexLink.vue';
 import { PATTERN_INDEX_LENS } from '../shared/constants/patternIndex';
+import { CLIENT_RESULTS, CLIENT_RESULTS_NOTE } from '../shared/constants/clientResults';
 
 const mainStore = useMainStore();
 const { lgBreakpoint, width } = useViewport();
@@ -36,7 +37,7 @@ const chapters = [
   {
     id: 'lens-lenses',
     title: 'The four lenses I look through',
-    sub: 'Each one catches a different way people get stuck.',
+    sub: 'How I evaluate a surface. Each lens catches a different way people get stuck.',
   },
   {
     id: 'lens-diagnostic',
@@ -44,6 +45,46 @@ const chapters = [
     sub: 'How “something feels off” turns into a clear list of what to fix.',
   },
 ] as const;
+
+const clientResults = CLIENT_RESULTS;
+
+/* External evidence for why the lenses matter. Public case studies and design research:
+   context-specific, never presented as outcomes of Grant's work. Figures checked against
+   each source. */
+const evidenceCards = [
+  {
+    label: 'Clarity',
+    stat: '89.97%',
+    text: 'more purchases were reported in a VWO case study after Movexa added the word “supplement” to its headline.',
+    takeaway: 'Clearer first-screen meaning can change how quickly people understand what they’re looking at.',
+    source: 'VWO / Movexa',
+    url: 'https://vwo.com/success-stories/movexa/',
+  },
+  {
+    label: 'Trust',
+    stat: '58.29%',
+    text: 'more purchases were reported in a VWO case study after Express Watches added stronger Trustpilot proof right below the buy button.',
+    takeaway: 'Visible proof near a decision point can reduce hesitation.',
+    source: 'VWO / Express Watches',
+    url: 'https://vwo.com/success-stories/express-watches/',
+  },
+  {
+    label: 'Momentum',
+    stat: '8%',
+    text: 'more sales were reported in a web.dev case study after Vodafone improved its page’s LCP (how fast the main content appears) by 31%.',
+    takeaway: 'Faster, smoother flows can help more people continue toward action.',
+    source: 'web.dev / Vodafone',
+    url: 'https://web.dev/case-studies/vodafone',
+  },
+  {
+    label: 'AI legibility',
+    stat: '18',
+    text: 'guidelines make up Microsoft’s Human-AI Interaction Guidelines. The first: “Make clear what the system can do.”',
+    takeaway: 'AI interfaces need to make capability, behavior, and limits easier to understand.',
+    source: 'Microsoft HAX Toolkit',
+    url: 'https://www.microsoft.com/en-us/haxtoolkit/ai-guidelines/',
+  },
+];
 const sheetRef = ref<HTMLElement | null>(null);
 
 /* After a section opens, bring its header to the top so the reader starts at the beginning. */
@@ -189,8 +230,8 @@ onBeforeUnmount(() => io?.disconnect());
           Complex products don’t lose people all at once. They lose them at specific moments.
         </h1>
         <p class="lead q-ma-none">
-          Usually it’s where people are left guessing. Here’s how I find those spots, and what that
-          looks like.
+          I look for where the experience is unclear, where trust needs support, where momentum
+          slows down, and where AI needs to feel more legible, grounded, and useful.
         </p>
       </header>
 
@@ -379,6 +420,62 @@ onBeforeUnmount(() => io?.disconnect());
           </div>
         </article>
       </Transition>
+
+          <!-- From my client work: client-reported, anonymous, kept visibly separate from the
+               public evidence below. -->
+          <section class="lens-results" aria-labelledby="lens-results-title">
+            <header class="lens-results__head">
+              <p class="lens-results__kicker q-ma-none">From my client work</p>
+              <h3 id="lens-results-title" class="q-ma-none">What clients have reported</h3>
+              <p class="lens-results__lead q-ma-none">
+                Small surface improvements can create measurable movement. These are results clients
+                reported back after changes I made, shared without names.
+              </p>
+            </header>
+            <ul class="lens-results__grid">
+              <li v-for="r in clientResults" :key="r.label" class="res-card">
+                <span class="res-card__label">{{ r.label }}</span>
+                <p class="res-card__stat q-ma-none">
+                  <b>{{ r.stat }}</b> <span>{{ r.text }}</span>
+                </p>
+                <span class="res-card__src">Client-reported</span>
+              </li>
+            </ul>
+            <p class="lens-results__note q-ma-none">{{ CLIENT_RESULTS_NOTE }}</p>
+          </section>
+
+          <!-- Why these lenses matter: outside evidence, carefully hedged. -->
+          <section class="lens-evidence" aria-labelledby="lens-evidence-title">
+            <header class="lens-evidence__head">
+              <p class="lens-evidence__kicker q-ma-none">Why these lenses matter</p>
+              <h3 id="lens-evidence-title" class="q-ma-none">Evidence behind the lenses</h3>
+              <p class="lens-evidence__lead q-ma-none">
+                Clarity, trust, momentum, and AI legibility aren’t just design preferences. Public
+                case studies and design research have tied clearer messaging, stronger trust cues,
+                faster flows, and better AI interaction patterns to measurable improvements.
+              </p>
+            </header>
+
+            <ul class="lens-evidence__grid">
+              <li v-for="e in evidenceCards" :key="e.label" class="ev-card">
+                <span class="ev-card__label">{{ e.label }}</span>
+                <p class="ev-card__stat q-ma-none">
+                  <b>{{ e.stat }}</b> <span>{{ e.text }}</span>
+                </p>
+                <p class="ev-card__takeaway q-ma-none">{{ e.takeaway }}</p>
+                <a class="ev-card__source" :href="e.url" target="_blank" rel="noopener noreferrer">
+                  {{ e.source }} <span aria-hidden="true">&#8599;</span>
+                  <span class="sr-only">(opens in a new tab)</span>
+                </a>
+              </li>
+            </ul>
+
+            <p class="lens-evidence__note q-ma-none">
+              Examples are from public case studies and design research. Results are
+              context-specific and not guarantees. They show why clarity, trust, momentum, and AI
+              legibility are worth taking seriously before deciding what to improve or build.
+            </p>
+          </section>
         </div>
       </q-expansion-item>
 
@@ -406,12 +503,12 @@ onBeforeUnmount(() => io?.disconnect());
 
       <div class="lens-close">
         <p class="q-ma-none">
-          <b>Find the problem. Plan the fix. Build it.</b> See the builds, or start with a free
-          Teardown Review.
+          <b>Priority clear? I build the fix.</b> Not sure yet? A Diagnostic finds it first. Either
+          way, it starts with a free Teardown.
         </p>
         <div class="lens-close__btns">
           <q-btn class="lens-cta lens-cta--ghost" flat size="lg" @click="toExamples">
-            <span class="text-body-2">See the fixes</span>
+            <span class="text-body-2">See the builds</span>
           </q-btn>
           <q-btn class="lens-cta" color="accent" size="lg" glossy @click="toContact">
             <span class="text-body-2">Start with a Teardown</span>
@@ -935,6 +1032,221 @@ $ease: cubic-bezier(0.22, 1, 0.36, 1);
   opacity: 0;
 }
 
+/* ---------- Client results (light, to stay distinct from the public evidence) ---------- */
+
+.lens-results {
+  display: grid;
+  gap: 0.9rem;
+  padding: 1.2rem 1.25rem;
+  border: 1px solid $line;
+  border-radius: 0.9rem;
+  background: $soft;
+}
+
+.lens-results__head {
+  display: grid;
+  gap: 0.45rem;
+
+  h3 {
+    color: $ink;
+    font-size: clamp(1.2rem, 1.7vw, 1.45rem);
+    font-weight: 600;
+    letter-spacing: -0.01em;
+    line-height: 1.25;
+  }
+}
+
+.lens-results__kicker,
+.res-card__label {
+  color: $blue;
+  font-size: 0.7rem;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+
+.lens-results__lead {
+  max-width: 46rem;
+  color: $muted;
+  font-size: 0.9rem;
+  line-height: 1.5;
+}
+
+.lens-results__grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0.5rem 0.6rem;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.res-card {
+  display: grid;
+  grid-template-rows: auto 1fr auto;
+  gap: 0.45rem;
+  grid-row: span 3;
+  min-width: 0;
+  padding: 0.9rem 1rem;
+  border: 1px solid $line;
+  border-radius: 0.7rem;
+  background: #fff;
+
+  @supports (grid-template-rows: subgrid) {
+    grid-template-rows: subgrid;
+  }
+}
+
+.res-card__stat {
+  color: $muted;
+  font-size: 0.88rem;
+  line-height: 1.45;
+
+  b {
+    color: $ink;
+    font-size: 1.35rem;
+    font-weight: 600;
+    letter-spacing: -0.01em;
+    font-variant-numeric: tabular-nums;
+  }
+}
+
+.res-card__src {
+  color: $muted;
+  font-size: 0.72rem;
+  font-weight: 600;
+}
+
+.lens-results__note {
+  color: $muted;
+  font-size: 0.76rem;
+  line-height: 1.45;
+}
+
+/* ---------- Evidence ---------- */
+
+$champagne: #d8bd7a;
+
+.lens-evidence {
+  display: grid;
+  gap: 1rem;
+  padding: 1.2rem 1.25rem;
+  border-radius: 0.9rem;
+  background: $ink;
+  color: #fff;
+}
+
+.lens-evidence__head {
+  display: grid;
+  gap: 0.45rem;
+
+  h3 {
+    font-size: clamp(1.2rem, 1.7vw, 1.45rem);
+    font-weight: 600;
+    letter-spacing: -0.01em;
+    line-height: 1.25;
+  }
+}
+
+.lens-evidence__kicker,
+.ev-card__label {
+  color: $champagne;
+  font-size: 0.7rem;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+
+.lens-evidence__lead {
+  max-width: 46rem;
+  color: rgba(255, 255, 255, 0.74);
+  font-size: 0.9rem;
+  line-height: 1.5;
+}
+
+.lens-evidence__grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0.5rem 0.6rem;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+/* Proof, not a dashboard: one quiet figure per card, the source always visible. */
+.ev-card {
+  display: grid;
+  grid-template-rows: auto 1fr auto auto;
+  gap: 0.5rem;
+  /* Line up label, figure, takeaway and source across cards in the same row. */
+  grid-row: span 4;
+
+  @supports (grid-template-rows: subgrid) {
+    grid-template-rows: subgrid;
+  }
+  min-width: 0;
+  padding: 0.9rem 1rem;
+  border: 1px solid rgba(158, 192, 255, 0.22);
+  border-left: 2px solid rgba(216, 189, 122, 0.7);
+  border-radius: 0.7rem;
+  background: rgba(255, 255, 255, 0.04);
+}
+
+.ev-card__stat {
+  color: rgba(255, 255, 255, 0.82);
+  font-size: 0.88rem;
+  line-height: 1.45;
+
+  b {
+    color: #fff;
+    font-size: 1.35rem;
+    font-weight: 600;
+    letter-spacing: -0.01em;
+    font-variant-numeric: tabular-nums;
+  }
+}
+
+.ev-card__takeaway {
+  padding-top: 0.5rem;
+  border-top: 1px solid rgba(255, 255, 255, 0.1);
+  color: rgba(255, 255, 255, 0.6);
+  font-size: 0.82rem;
+  line-height: 1.4;
+}
+
+.ev-card__source {
+  justify-self: start;
+  color: #9ec0ff;
+  font-size: 0.76rem;
+  font-weight: 700;
+  text-decoration: none;
+
+  &:hover {
+    text-decoration: underline;
+  }
+
+  &:focus-visible {
+    outline: 2px solid #9ec0ff;
+    outline-offset: 2px;
+    border-radius: 3px;
+  }
+}
+
+.lens-evidence__note {
+  color: rgba(255, 255, 255, 0.5);
+  font-size: 0.76rem;
+  line-height: 1.45;
+}
+
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
+}
+
 /* ---------- Close ---------- */
 
 .lesson {
@@ -1193,6 +1505,19 @@ $ease: cubic-bezier(0.22, 1, 0.36, 1);
 
   .lesson__vs {
     grid-template-columns: 1fr;
+  }
+
+  .lens-evidence {
+    padding: 1rem;
+  }
+
+  .lens-evidence__grid,
+  .lens-results__grid {
+    grid-template-columns: 1fr;
+  }
+
+  .lens-results {
+    padding: 1rem;
   }
 
   .chapter :deep(.q-expansion-item__content) {

@@ -1,14 +1,38 @@
 <script setup lang="ts">
 import { computed, onBeforeUnmount, onMounted, ref } from 'vue';
 import { INTRO_LOOM_ASPECT, INTRO_LOOM_URL, loomEmbedUrl } from '../shared/constants/loom';
+import ClientResultsStrip from './ClientResultsStrip.vue';
 
 /* The glue between the hero ("what I do") and the trust section ("why people hesitate"):
    the business cost of friction, in Grant's own voice. */
 const embedUrl = computed(() => loomEmbedUrl(INTRO_LOOM_URL));
 const hasVideo = computed(() => !!embedUrl.value);
-/* Mount Loom's player only when the section is about to be seen, so its scripts never load
-   during the hero animation (native lazy-loading starts far too early). */
+/* Mount Loom's player about a screen before the section arrives, so it's ready by the time
+   someone presses play, but never during the hero animation. */
 const loadPlayer = ref(false);
+let nearScreen = false;
+let heroDone = false;
+const maybeLoad = () => {
+  if (nearScreen && heroDone) loadPlayer.value = true;
+};
+/* Open the connections to Loom early (cheap), so the player starts faster once it mounts. */
+let warmed = false;
+const warmLoom = () => {
+  if (warmed || !hasVideo.value) return;
+  warmed = true;
+  ['https://www.loom.com', 'https://cdn.loom.com'].forEach((href) => {
+    const link = document.createElement('link');
+    link.rel = 'preconnect';
+    link.href = href;
+    link.crossOrigin = 'anonymous';
+    document.head.appendChild(link);
+  });
+};
+const onHeroIn = () => {
+  heroDone = true;
+  warmLoom();
+  maybeLoad();
+};
 
 const costs = ['Signups that stall', 'Demos that need explaining', 'Support tickets that shouldn’t exist'];
 
@@ -16,6 +40,7 @@ const costs = ['Signups that stall', 'Demos that need explaining', 'Support tick
 const rootRef = ref<HTMLElement | null>(null);
 const isIn = ref(false);
 let io: IntersectionObserver | null = null;
+let nearIo: IntersectionObserver | null = null;
 
 onMounted(() => {
   if (!rootRef.value || !('IntersectionObserver' in window)) {
@@ -27,16 +52,38 @@ onMounted(() => {
     (entries) => {
       if (entries.some((e) => e.isIntersecting)) {
         isIn.value = true;
-        loadPlayer.value = true;
+        nearScreen = true;
+        maybeLoad();
         io?.disconnect();
       }
     },
     { threshold: 0.25 },
   );
   io.observe(rootRef.value);
+
+  nearIo = new IntersectionObserver(
+    (entries) => {
+      if (entries.some((e) => e.isIntersecting)) {
+        nearScreen = true;
+        maybeLoad();
+        nearIo?.disconnect();
+      }
+    },
+    { rootMargin: '0px 0px 100% 0px' },
+  );
+  nearIo.observe(rootRef.value);
+
+  /* The hero signals when its intro has played (MainPage: 'hero:copy-in'). */
+  if ((window as Window & { __heroCopyIn?: boolean }).__heroCopyIn) onHeroIn();
+  else window.addEventListener('hero:copy-in', onHeroIn, { once: true });
+  window.setTimeout(onHeroIn, 6000); // never wait forever
 });
 
-onBeforeUnmount(() => io?.disconnect());
+onBeforeUnmount(() => {
+  io?.disconnect();
+  nearIo?.disconnect();
+  window.removeEventListener('hero:copy-in', onHeroIn);
+});
 </script>
 
 <template>
@@ -100,6 +147,9 @@ onBeforeUnmount(() => io?.disconnect());
         </div>
       </div>
     </div>
+
+    <!-- The payoff: what clients reported once that friction was fixed. -->
+    <ClientResultsStrip class="loom-intro__results" />
   </section>
 </template>
 
@@ -136,6 +186,12 @@ $ease: cubic-bezier(0.22, 1, 0.36, 1);
   @media (min-width: tokens.$breakpoint-md) {
     grid-template-columns: minmax(0, 0.9fr) minmax(0, 1.1fr);
   }
+}
+
+.loom-intro__results {
+  width: 100%;
+  max-width: 1180px;
+  margin: clamp(2rem, 5vh, 3.25rem) auto 0;
 }
 
 .loom-intro__copy {

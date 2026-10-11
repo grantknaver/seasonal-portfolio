@@ -12,6 +12,7 @@ import {
 import { useViewport } from 'src/shared/utils/viewWidth';
 import { TEARDOWN_BOOKING_URL } from 'src/shared/constants/booking';
 import PatternIndexLink from './PatternIndexLink.vue';
+import ClientResultsStrip from './ClientResultsStrip.vue';
 
 const form = reactive({
   name: '',
@@ -145,6 +146,8 @@ const sendEmail = async () => {
           </span>
         </div>
       </div>
+
+      <ClientResultsStrip variant="compact" title="What clients have reported" />
 
       <div class="bonus">
         <p class="q-ma-none">
