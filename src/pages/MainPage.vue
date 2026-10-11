@@ -1100,15 +1100,15 @@ const toExamples = () => {
                 or send me a message &rarr;
               </button>
               <p class="cta cta--def q-ma-none">
-                A focused review of one screen of your product, plus a one-page takeaway.
+                Free. I review one screen of your product and send you a one-page summary of what to
+                fix first.
               </p>
             </div>
           </div>
         </div>
 
         <p class="proofs-caption q-mb-none">
-          I find the gaps in clarity and trust, then close them by showing and telling: clear words,
-          backed by visuals and motion.
+          Clear words, backed by visuals and motion that show people how your product works.
           <button type="button" class="see-work" @click="toExamples()">See the work &rarr;</button>
         </p>
         <q-list v-if="isTabletView" class="tablet-expandable-menu full-width font-primary">
