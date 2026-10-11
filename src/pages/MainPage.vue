@@ -32,6 +32,7 @@ import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import gsap from 'gsap';
 import ScrollCue from '../components/ScrollCue.vue';
 import LoomIntro from '../components/LoomIntro.vue';
+import ClosingSection from '../components/ClosingSection.vue';
 import { INTRO_LOOM_URL } from '../shared/constants/loom';
 import { openTeardownBooking } from 'src/shared/constants/booking';
 
@@ -1408,6 +1409,9 @@ const toExamples = () => {
       </div>
     </section>
 
+    <!-- The close: where to start, and the route your answer takes. -->
+    <ClosingSection @message="toContact()" />
+
     <!-- Desktop: after the hero, the menu moves to a rail under the logo and stays there. -->
     <nav
       v-if="!isResponsive"
@@ -2004,7 +2008,9 @@ const toExamples = () => {
     /* Large screens: two different sizes, each hanging off a different edge of the frame. */
     @media (min-width: tokens.$breakpoint-lg) {
       .trust-card--bottom {
-        left: calc(-1 * clamp(1.25rem, 2vw, 2.5rem));
+        left: calc(
+          -1 * clamp(0rem, 0.5vw, 0.75rem)
+        ); /* hangs mostly below the frame, clear of the side rail */
         bottom: calc(-1 * clamp(1.5rem, 3.2vh, 2.75rem));
         width: clamp(250px, 18.5vw, 300px);
         padding: 0.95rem 1.05rem;
