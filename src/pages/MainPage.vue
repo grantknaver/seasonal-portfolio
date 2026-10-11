@@ -2031,11 +2031,33 @@ const toExamples = () => {
 
     .trust-card {
       pointer-events: auto;
+      /* Supporting cast, not the headline: frosted and a little translucent, with softer text.
+         Hover brings them back to full strength. */
+      --tc-dim: 0.72;
+      border-color: rgb(255 255 255 / 0.6);
+      background: rgb(255 255 255 / 0.74);
+      backdrop-filter: blur(10px) saturate(1.1);
       /* Hover lift uses the CSS scale property, separate from GSAP's transform. */
-      transition: scale 0.35s cubic-bezier(0.34, 1.56, 0.64, 1);
+      transition:
+        scale 0.35s cubic-bezier(0.34, 1.56, 0.64, 1),
+        background 0.3s ease;
+
+      .tc-row,
+      .tc-guess,
+      .tc-src,
+      .tc-checks {
+        opacity: var(--tc-dim);
+        transition: opacity 0.3s ease;
+      }
+
+      .tc-q {
+        animation-duration: 2.6s;
+      }
 
       &:hover,
       &:focus-within {
+        --tc-dim: 1;
+        background: rgb(255 255 255 / 0.95);
         scale: 1.06;
       }
     }
@@ -2043,30 +2065,29 @@ const toExamples = () => {
     /* Large screens: two different sizes, each hanging off a different edge of the frame. */
     @media (min-width: tokens.$breakpoint-lg) {
       .trust-card--bottom {
-        left: calc(
-          -1 * clamp(0rem, 0.5vw, 0.75rem)
-        ); /* hangs mostly below the frame, clear of the side rail */
-        bottom: calc(-1 * clamp(1.5rem, 3.2vh, 2.75rem));
-        width: clamp(250px, 18.5vw, 300px);
-        padding: 0.95rem 1.05rem;
+        /* Sits on the frame's bottom-left corner, mirroring the top-right card. */
+        left: calc(-1 * clamp(2rem, 3.4vw, 4rem));
+        bottom: calc(-1 * clamp(1.25rem, 2.8vh, 2.25rem));
+        width: clamp(220px, 16vw, 260px);
+        padding: 0.85rem 0.95rem;
         box-shadow:
           0 10px 24px rgb(10 30 60 / 0.16),
           0 2px 6px rgb(10 30 60 / 0.1);
 
         .tc-row b {
-          font-size: 1rem;
+          font-size: 0.92rem;
         }
 
         .tc-status,
         .tc-paid {
-          font-size: 0.92rem;
+          font-size: 0.86rem;
         }
       }
 
       .trust-card--top {
         top: calc(-1 * clamp(1.25rem, 2.8vh, 2.25rem));
         right: calc(-1 * clamp(2rem, 3.4vw, 4rem));
-        width: clamp(200px, 13.5vw, 232px);
+        width: clamp(190px, 12.5vw, 220px);
         padding: 0.7rem 0.8rem;
         box-shadow:
           0 8px 20px rgb(10 30 60 / 0.15),

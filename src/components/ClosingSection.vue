@@ -15,14 +15,10 @@ const { lgBreakpoint } = useViewport();
 type Mode = 'unclear' | 'clear' | 'opinion';
 type NodeState = 'on' | 'maybe' | 'skip' | 'off';
 
-const modes: { key: Mode; label: string; sub: string }[] = [
-  { key: 'unclear', label: 'Something feels off', sub: 'People drop off, and I’m not sure why' },
-  {
-    key: 'clear',
-    label: 'I know what’s broken',
-    sub: 'I know what needs fixing and want it built',
-  },
-  { key: 'opinion', label: 'I want a second opinion', sub: 'Show me what you see before I decide' },
+const modes: { key: Mode; label: string }[] = [
+  { key: 'unclear', label: 'Something feels off' },
+  { key: 'clear', label: 'I know what’s broken' },
+  { key: 'opinion', label: 'I want a second opinion' },
 ];
 
 const nodes = [
@@ -215,6 +211,18 @@ const buildScrub = (root: HTMLElement) => {
       1.1,
     )
     .fromTo('.link__fill', { scaleX: 0 }, { scaleX: 1, duration: 0.18, stagger: 0.1 }, 1.2)
+    .fromTo(
+      '.try-note__text',
+      { autoAlpha: 0, x: -8 },
+      { autoAlpha: 1, x: 0, duration: 0.15 },
+      1.28,
+    )
+    .fromTo(
+      '.try-note__line, .try-note__head',
+      { strokeDashoffset: 1 },
+      { strokeDashoffset: 0, duration: 0.15, stagger: 0.08 },
+      1.3,
+    )
     .call(startHint, undefined, 1.4)
     .to({}, { duration: 0.35 }); // rest on the finished state
 
@@ -354,26 +362,16 @@ onBeforeUnmount(() => {
       </div>
 
       <div ref="panelRef" class="closing__panel" @pointerdown="stopDemo">
-        <div class="closing__qrow">
-          <h3 id="closing-q" class="closing__q q-ma-none">Where are you now?</h3>
-          <p class="closing__hint q-ma-none" :class="{ 'is-turn': hinting && !interacted }">
-            <svg class="closing__hint-icon" viewBox="0 0 24 24" aria-hidden="true">
-              <path
-                d="M9 11V5.5a1.5 1.5 0 0 1 3 0V10m0-1.5a1.5 1.5 0 0 1 3 0V11m0-1a1.5 1.5 0 0 1 3 0v4.5a6 6 0 0 1-6 6h-.6a6 6 0 0 1-4.9-2.5L4.6 14.4a1.5 1.5 0 0 1 2.4-1.8L9 15"
-              />
-            </svg>
-            {{
-              hinting && !interacted
-                ? 'Your turn: pick the one that fits.'
-                : 'Pick one to see your route.'
-            }}
-          </p>
+        <!-- Outside the card: a quiet hand-drawn note pointing into the answers. -->
+        <div class="try-note" aria-hidden="true">
+          <span class="try-note__text">Try it: pick where you are</span>
+          <svg class="try-note__arrow" viewBox="0 0 60 50">
+            <path class="try-note__line" pathLength="1" d="M52 6 C 34 4, 14 12, 12 40" />
+            <path class="try-note__head" pathLength="1" d="M4 32 L12 42 L20 33" />
+          </svg>
         </div>
-        <div
-          class="modes"
-          role="radiogroup"
-          aria-labelledby="closing-q"
-        >
+        <h3 id="closing-q" class="closing__q q-ma-none">Where are you now?</h3>
+        <div class="modes" role="radiogroup" aria-labelledby="closing-q">
           <button
             v-for="m in modes"
             :key="m.key"
@@ -385,11 +383,7 @@ onBeforeUnmount(() => {
             @click="choose(m.key)"
           >
             <span class="mode__dot" aria-hidden="true"></span>
-            <span class="mode__text">
-              <b>{{ m.label }}</b>
-              <small>{{ m.sub }}</small>
-            </span>
-            <span class="mode__arrow" aria-hidden="true">&rarr;</span>
+            {{ m.label }}
           </button>
         </div>
         <!-- Demo pointer (decorative). -->
@@ -493,6 +487,16 @@ $bounce: cubic-bezier(0.34, 1.56, 0.64, 1);
   filter: blur(10px);
   pointer-events: none;
   animation: drift 14s ease-in-out infinite alternate;
+}
+
+@keyframes sweep {
+  0%,
+  70% {
+    left: -60%;
+  }
+  100% {
+    left: 130%;
+  }
 }
 
 @keyframes drift {
@@ -677,6 +681,8 @@ $bounce: cubic-bezier(0.34, 1.56, 0.64, 1);
 }
 
 .closing__book {
+  position: relative;
+  overflow: hidden;
   padding: 0.95rem 1.4rem;
   border: 0;
   border-radius: 0.6rem;
@@ -696,6 +702,25 @@ $bounce: cubic-bezier(0.34, 1.56, 0.64, 1);
   span {
     display: inline-block;
     transition: transform 0.3s $bounce;
+  }
+
+  /* A soft light sweep every few seconds keeps the eye coming back to the main action. */
+  &::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    left: -60%;
+    width: 45%;
+    background: linear-gradient(
+      100deg,
+      transparent 0%,
+      rgba(255, 255, 255, 0.35) 50%,
+      transparent 100%
+    );
+    transform: skewX(-18deg);
+    animation: sweep 5.5s ease-in-out 2s infinite;
+    pointer-events: none;
   }
 
   &:hover {
@@ -758,61 +783,33 @@ $bounce: cubic-bezier(0.34, 1.56, 0.64, 1);
     0 2px 6px rgba(10, 52, 135, 0.05);
 }
 
-.closing__qrow {
-  display: grid;
-  gap: 0.25rem;
-}
-
-.closing__hint {
-  display: inline-flex;
-  gap: 0.4rem;
-  align-items: center;
-  color: $muted;
-  font-size: 0.86rem;
-  transition: color 0.3s ease;
-
-  &.is-turn {
-    color: $blue;
-    font-weight: 700;
-  }
-}
-
-.closing__hint-icon {
-  width: 1.05rem;
-  height: 1.05rem;
-  fill: none;
-  stroke: currentColor;
-  stroke-width: 1.8;
-  stroke-linecap: round;
-  stroke-linejoin: round;
-}
-
 .closing__q {
   color: $ink;
-  font-size: clamp(1.2rem, 1.5vw, 1.4rem);
+  font-size: 1.05rem;
   font-weight: 700;
   letter-spacing: -0.01em;
   line-height: 1.2;
 }
 
 .modes {
-  display: grid;
-  gap: 0.5rem;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.45rem;
 }
 
-/* Each answer is a full-width option row: radio, label + situation, arrow. */
+/* Compact pills with a radio dot, so each answer reads as a choice. */
 .mode {
-  display: flex;
-  gap: 0.8rem;
+  display: inline-flex;
+  gap: 0.5rem;
   align-items: center;
-  width: 100%;
-  padding: 0.75rem 0.9rem;
-  border: 1.5px solid rgba(18, 96, 240, 0.2);
-  border-radius: 0.8rem;
+  padding: 0.55rem 0.95rem 0.55rem 0.75rem;
+  border: 1.5px solid rgba(18, 96, 240, 0.22);
+  border-radius: 999px;
   background: #fff;
   color: $ink;
   font: inherit;
-  text-align: left;
+  font-size: 0.88rem;
+  font-weight: 600;
   cursor: pointer;
   transition:
     background 0.25s ease,
@@ -821,30 +818,20 @@ $bounce: cubic-bezier(0.34, 1.56, 0.64, 1);
     transform 0.3s $bounce;
 
   &:hover {
-    border-color: rgba(18, 96, 240, 0.55);
+    border-color: rgba(18, 96, 240, 0.6);
     background: #f5f8ff;
-    box-shadow: 0 6px 16px rgba(18, 96, 240, 0.12);
-    transform: translateX(3px);
-
-    .mode__arrow {
-      opacity: 1;
-      transform: translateX(2px);
-    }
+    box-shadow: 0 6px 14px rgba(18, 96, 240, 0.14);
+    transform: translateY(-2px);
   }
 
   &.is-active {
     border-color: $blue;
     background: #eef4ff;
     box-shadow: 0 0 0 3px rgba(18, 96, 240, 0.12);
-
-    .mode__arrow {
-      opacity: 1;
-      color: $blue;
-    }
   }
 
   &.is-pressed {
-    transform: scale(0.98);
+    transform: scale(0.96);
   }
 
   &:focus-visible {
@@ -853,34 +840,48 @@ $bounce: cubic-bezier(0.34, 1.56, 0.64, 1);
   }
 }
 
-.mode__text {
-  display: grid;
-  flex: 1;
-  gap: 0.1rem;
-  min-width: 0;
+/* The note outside the card's top-left: text, then a hand-drawn arrow curving into the answers. */
+.try-note {
+  position: absolute;
+  top: -2.4rem;
+  left: -0.5rem;
+  display: flex;
+  align-items: flex-start;
+  gap: 0.2rem;
+  pointer-events: none;
 
-  b {
-    font-size: 0.95rem;
-    font-weight: 700;
-    line-height: 1.25;
-  }
-
-  small {
-    color: $muted;
-    font-size: 0.8rem;
-    line-height: 1.3;
+  @media (max-width: 599px) {
+    top: -2rem;
+    left: 0.25rem;
   }
 }
 
-.mode__arrow {
-  flex: none;
-  color: rgba(11, 31, 46, 0.4);
-  font-weight: 700;
-  opacity: 0.55;
-  transition:
-    opacity 0.25s ease,
-    transform 0.25s ease,
-    color 0.25s ease;
+.try-note__text {
+  order: 2;
+  margin-top: -0.2rem;
+  color: $blue;
+  font-size: 0.86rem;
+  font-style: italic;
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+.try-note__arrow {
+  order: 1;
+  width: 44px;
+  height: 38px;
+  margin-top: 0.2rem;
+  transform: scaleX(-1); /* curves from the text down into the card */
+
+  path {
+    fill: none;
+    stroke: $blue;
+    stroke-width: 2.2;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+    stroke-dasharray: 1;
+    stroke-dashoffset: 0;
+  }
 }
 
 /* Demo pointer. */
@@ -1103,7 +1104,8 @@ $bounce: cubic-bezier(0.34, 1.56, 0.64, 1);
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .closing__glow {
+  .closing__glow,
+  .closing__book::after {
     animation: none;
   }
 
