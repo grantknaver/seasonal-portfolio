@@ -1,40 +1,32 @@
 <script setup lang="ts">
-import { computed, onBeforeUnmount, onMounted, ref } from 'vue';
-import { INTRO_LOOM_ASPECT, INTRO_LOOM_URL, loomEmbedUrl } from '../shared/constants/loom';
+import { onBeforeUnmount, onMounted, ref } from 'vue';
+import { INTRO_LOOM_ASPECT, INTRO_VIDEO_SRC } from '../shared/constants/loom';
 import ClientResultsStrip from './ClientResultsStrip.vue';
 import { openTeardownBooking } from '../shared/constants/booking';
 
 /* The glue between the hero ("what I do") and the trust section ("why people hesitate"):
    the business cost of friction, in Grant's own voice. */
-const embedUrl = computed(() => loomEmbedUrl(INTRO_LOOM_URL));
-const hasVideo = computed(() => !!embedUrl.value);
-/* Mount Loom's player about a screen before the section arrives, so it's ready by the time
-   someone presses play, but never during the hero animation. */
-const loadPlayer = ref(false);
+const hasVideo = !!INTRO_VIDEO_SRC;
 /* The next-step line follows the results' reveal. */
 const resultsIn = ref(false);
-let nearScreen = false;
-let heroDone = false;
-const maybeLoad = () => {
-  if (nearScreen && heroDone) loadPlayer.value = true;
-};
-/* Open the connections to Loom early (cheap), so the player starts faster once it mounts. */
-let warmed = false;
-const warmLoom = () => {
-  if (warmed || !hasVideo.value) return;
-  warmed = true;
-  ['https://www.loom.com', 'https://cdn.loom.com'].forEach((href) => {
-    const link = document.createElement('link');
-    link.rel = 'preconnect';
-    link.href = href;
-    link.crossOrigin = 'anonymous';
-    document.head.appendChild(link);
+
+/* Self-hosted video behind a branded cover: only the first frame's details load, nothing plays until someone clicks,
+   and that one click starts it with sound. */
+const videoRef = ref<HTMLVideoElement | null>(null);
+const started = ref(false);
+const watched = ref(false);
+const play = () => {
+  const v = videoRef.value;
+  if (!v) return;
+  started.value = true;
+  if (v.ended) v.currentTime = 0;
+  void v.play().catch(() => {
+    /* If the browser still refuses, leave the native controls showing so it's one more tap. */
   });
 };
-const onHeroIn = () => {
-  heroDone = true;
-  warmLoom();
-  maybeLoad();
+const onEnded = () => {
+  started.value = false;
+  watched.value = true;
 };
 
 const costs = ['Signups that stall', 'Demos that need explaining', 'Support tickets that shouldn’t exist'];
@@ -43,7 +35,6 @@ const costs = ['Signups that stall', 'Demos that need explaining', 'Support tick
 const rootRef = ref<HTMLElement | null>(null);
 const isIn = ref(false);
 let io: IntersectionObserver | null = null;
-let nearIo: IntersectionObserver | null = null;
 
 /* Desktop: the content starts where the glkFreelance logo ends, with the same space on the
    right. The logo is fixed, so measure its right edge and keep it in sync on resize. */
@@ -61,45 +52,23 @@ onMounted(() => {
   if ("fonts" in document) void document.fonts.ready.then(measureLogo);
   if (!rootRef.value || !('IntersectionObserver' in window)) {
     isIn.value = true;
-    loadPlayer.value = true;
     return;
   }
   io = new IntersectionObserver(
     (entries) => {
       if (entries.some((e) => e.isIntersecting)) {
         isIn.value = true;
-        nearScreen = true;
-        maybeLoad();
         io?.disconnect();
       }
     },
     { threshold: 0.25 },
   );
   io.observe(rootRef.value);
-
-  nearIo = new IntersectionObserver(
-    (entries) => {
-      if (entries.some((e) => e.isIntersecting)) {
-        nearScreen = true;
-        maybeLoad();
-        nearIo?.disconnect();
-      }
-    },
-    { rootMargin: '0px 0px 100% 0px' },
-  );
-  nearIo.observe(rootRef.value);
-
-  /* The hero signals when its intro has played (MainPage: 'hero:copy-in'). */
-  if ((window as Window & { __heroCopyIn?: boolean }).__heroCopyIn) onHeroIn();
-  else window.addEventListener('hero:copy-in', onHeroIn, { once: true });
-  window.setTimeout(onHeroIn, 6000); // never wait forever
 });
 
 onBeforeUnmount(() => {
   window.removeEventListener('resize', measureLogo);
   io?.disconnect();
-  nearIo?.disconnect();
-  window.removeEventListener('hero:copy-in', onHeroIn);
 });
 </script>
 
@@ -130,25 +99,27 @@ onBeforeUnmount(() => {
 
       <div class="loom-intro__media" style="--i: 2">
         <div class="video" :style="{ aspectRatio: INTRO_LOOM_ASPECT }">
-          <!-- Loom's own player, so one click plays it (a custom poster needed a second click,
-               since browsers block autoplay with sound inside an embed). -->
-          <iframe
-            v-if="hasVideo && loadPlayer"
+          <video
+            v-if="hasVideo"
+            ref="videoRef"
             class="video__frame"
-            :src="embedUrl"
+            :src="INTRO_VIDEO_SRC"
+            preload="metadata"
+            playsinline
+            :controls="started"
             title="60 seconds with Grant"
-            allow="autoplay; fullscreen; picture-in-picture"
-            allowfullscreen
-          ></iframe>
+            @ended="onEnded"
+          ></video>
 
-          <!-- Branded placeholder: sits under the player while it loads (and stands in for the
-               video in dev until a Loom link is set). -->
+          <!-- Branded cover: just the brand and a play button, no preview of the recording.
+               One click starts the video with sound. -->
           <button
-            v-else
+            v-show="!started"
             type="button"
             class="video__poster"
-            disabled
-            :aria-label="hasVideo ? 'Loading video' : 'Video coming soon'"
+            :disabled="!hasVideo"
+            :aria-label="hasVideo ? (watched ? 'Watch the video again' : 'Play the 60-second video') : 'Video coming soon'"
+            @click="play"
           >
             <span class="video__grid" aria-hidden="true"></span>
             <span class="video__brand" aria-hidden="true">
@@ -157,9 +128,9 @@ onBeforeUnmount(() => {
             <span class="video__play" aria-hidden="true">
               <svg viewBox="0 0 24 24"><path d="M8 5.5v13l11-6.5z" /></svg>
             </span>
-            <span class="video__caption">
+            <span class="video__caption" aria-hidden="true">
               <b>Why friction costs more than it looks</b>
-              <small>{{ hasVideo ? 'Loading…' : 'Video coming soon' }}</small>
+              <small>{{ hasVideo ? (watched ? 'Watch again' : '1 min') : 'Video coming soon' }}</small>
             </span>
           </button>
         </div>
@@ -401,6 +372,8 @@ $ease: cubic-bezier(0.22, 1, 0.36, 1);
   width: 100%;
   height: 100%;
   border: 0;
+  object-fit: cover;
+  background: #06111f;
 }
 
 .video__poster {
