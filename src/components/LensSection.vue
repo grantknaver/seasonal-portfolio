@@ -32,7 +32,7 @@ const chapters = [
   {
     id: 'lens-teardown',
     title: 'What a Teardown Review looks like',
-    sub: 'I look at one screen before we talk and bring 2–3 things I noticed. A conversation, not a pitch.',
+    sub: 'I study one screen before we talk, bring 2–3 things I noticed, and send a one-page Decision Snapshot after.',
   },
   {
     id: 'lens-lenses',

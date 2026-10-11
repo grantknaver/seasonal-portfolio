@@ -13,6 +13,7 @@ import { useViewport } from 'src/shared/utils/viewWidth';
 import { TEARDOWN_BOOKING_URL } from 'src/shared/constants/booking';
 import PatternIndexLink from './PatternIndexLink.vue';
 import ClientResultsStrip from './ClientResultsStrip.vue';
+import DecisionSnapshot from './DecisionSnapshot.vue';
 
 const form = reactive({
   name: '',
@@ -129,9 +130,9 @@ const sendEmail = async () => {
         <p class="kicker q-mt-none q-mb-sm">I find where people get stuck in your product, and fix it.</p>
         <h1 class="q-mt-none q-mb-md">Start with a free Teardown.</h1>
         <p class="lead q-ma-none">
-          I look at one screen of your product before we talk and bring 2–3 things I noticed. On the
-          call, we figure out together whether you need a Diagnostic, a build, or neither. I’ve done
-          150 of these.
+          I study one screen of your product before we talk and bring 2–3 things I noticed. On the
+          call, we figure out together whether you need a Diagnostic, a build, or neither. If I
+          don’t see anything worth pursuing, I’ll tell you. I’ve done 150 of these.
         </p>
       </header>
 
@@ -147,18 +148,24 @@ const sendEmail = async () => {
         </div>
       </div>
 
-      <ClientResultsStrip variant="compact" title="What clients have reported" />
-
-      <div class="bonus">
-        <p class="q-ma-none">
-          <b>Bonus:</b> bring one current product or AI decision you’re wrestling with, and we’ll
-          spend a few minutes pressure-testing it on the same call.
-        </p>
-        <p class="bonus__more q-ma-none">
-          Saw an interaction direction that fits something you’re wrestling with? Bring it.
-          <PatternIndexLink text="Browse the Pattern Index" />
-        </p>
+      <!-- What every attendee leaves with. -->
+      <div class="takeaway">
+        <div class="takeaway__copy">
+          <p class="takeaway__title q-ma-none">You leave with a Decision Snapshot</p>
+          <p class="q-ma-none">
+            One page, sent after the call: the key issues, an annotated view of where they show up,
+            a few directions from the Pattern Index, and the next decision I think matters most.
+            Yours to share with your team, whether or not we work together.
+          </p>
+          <PatternIndexLink class="takeaway__link" text="Browse the Pattern Index" />
+        </div>
+        <!-- A small, inert preview of the real one-pager (the full sample lives in Lens). -->
+        <div class="takeaway__thumb" aria-hidden="true" inert>
+          <DecisionSnapshot />
+        </div>
       </div>
+
+      <ClientResultsStrip variant="compact" title="What clients have reported" />
 
       <div ref="formRef" class="or-write">
         <span class="or-write__line" aria-hidden="true"></span>
@@ -314,31 +321,66 @@ $line: rgba(18, 96, 240, 0.18);
   }
 }
 
-.bonus__more {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 0.2rem 0.6rem;
-  align-items: baseline;
-  padding-top: 0.45rem;
-  border-top: 1px solid rgba(18, 96, 240, 0.14);
-  color: rgba(11, 31, 46, 0.7);
-  font-size: 0.85rem;
-}
-
-.bonus {
+.takeaway {
   display: grid;
-  gap: 0.45rem;
-  padding: 0.7rem 0.9rem;
-  border: 1px dashed rgba(18, 96, 240, 0.45);
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: 1.1rem;
+  align-items: center;
+  padding: 0.8rem 0.95rem;
+  border: 1px solid rgba(18, 96, 240, 0.22);
+  border-left: 3px solid $blue;
   border-radius: 0.7rem;
   background: #fff;
-  color: $ink;
+  color: rgba(11, 31, 46, 0.78);
   font-size: 0.9rem;
   line-height: 1.45;
+}
 
-  b {
-    color: $blue;
+.takeaway__copy {
+  display: grid;
+  gap: 0.35rem;
+}
+
+/* The full Snapshot, rendered at 640px and scaled to a thumbnail, tilted slightly like a page
+   on a desk. */
+.takeaway__thumb {
+  position: relative;
+  width: 166px;
+  height: 186px;
+  overflow: hidden;
+  border-radius: 0.35rem;
+  transform: rotate(1.5deg);
+  box-shadow: 0 10px 24px rgba(10, 52, 135, 0.16);
+  pointer-events: none;
+
+  > * {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 640px;
+    transform: scale(0.26);
+    transform-origin: top left;
   }
+
+  @media (max-width: 599px) {
+    display: none;
+  }
+}
+
+@media (max-width: 599px) {
+  .takeaway {
+    grid-template-columns: 1fr;
+  }
+}
+
+.takeaway__title {
+  color: $ink;
+  font-size: 0.98rem;
+  font-weight: 700;
+}
+
+.takeaway__link {
+  margin-top: 0.15rem;
 }
 
 /* Book */

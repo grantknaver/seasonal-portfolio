@@ -1,6 +1,9 @@
 <script lang="ts" setup>
+import DecisionSnapshot from './DecisionSnapshot.vue';
+
 /* Mirrors the sample Teardown PDF (Cairnwell Atlas): one screen,
-   two things I noticed, one simple idea, then what we talk about on the call. */
+   two things I noticed, one simple idea, what we talk about on the call, then the
+   Decision Snapshot every attendee gets afterward. */
 const PDF = '/samples/sample-teardown-cairnwell-atlas.pdf';
 
 const context = ['Canada', 'Healthcare', 'Ontario', 'Moderate AI usage'];
@@ -94,13 +97,12 @@ const rules = [
           <li>Do you already know the fix, or do we need a closer look?</li>
         </ul>
       </div>
-      <div class="bring">
-        <p class="mini-label q-ma-none">Bonus</p>
-        <p class="q-ma-none">
-          Bring one current product or AI decision you’re wrestling with. We’ll spend a few minutes
-          pressure-testing it during the same review.
-        </p>
-      </div>
+    </div>
+
+    <!-- What every attendee leaves with. -->
+    <div class="after">
+      <p class="mini-label q-ma-none">After the call, you get a Decision Snapshot</p>
+      <DecisionSnapshot />
     </div>
 
     <div class="heard">
@@ -348,7 +350,6 @@ $warn: #e8590c;
 
 .teardown__live {
   display: grid;
-  grid-template-columns: 1.4fr 1fr;
   gap: 0.6rem;
 
   > div {
@@ -366,17 +367,11 @@ $warn: #e8590c;
     font-size: 0.85rem;
     line-height: 1.4;
   }
+}
 
-  .bring {
-    border-style: dashed;
-    border-color: rgba(18, 96, 240, 0.45);
-
-    p:not(.mini-label) {
-      color: $ink;
-      font-size: 0.85rem;
-      line-height: 1.4;
-    }
-  }
+.after {
+  display: grid;
+  margin-top: 0.35rem;
 }
 
 .mini-label {
@@ -442,10 +437,6 @@ $warn: #e8590c;
 }
 
 @media (max-width: 599px) {
-  .teardown__live {
-    grid-template-columns: 1fr;
-  }
-
   .compare {
     grid-template-columns: 1fr;
 

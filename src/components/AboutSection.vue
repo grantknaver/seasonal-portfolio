@@ -35,13 +35,16 @@ const fits = [
 const steps = [
   {
     label: 'Teardown Review',
-    text: 'Free. I review one surface before we talk and bring 2–3 observations.',
+    text: 'Free. I review one surface before we talk, bring 2–3 observations, and send a one-page Decision Snapshot after.',
   },
   {
     label: 'Diagnostic, only if needed',
     text: 'Not sure what’s wrong? We find out. Already know? Skip straight to the fix.',
   },
-  { label: 'Implementation', text: 'A clear scope and price, then I build it, end to end.' },
+  {
+    label: 'Implementation',
+    text: 'I build the fix: UI and interaction work, motion, frontend, workflow improvements, trust and control states, AI legibility. Scope, timeline, and price agreed before we start.',
+  },
 ];
 
 /* Play the diagram once it scrolls into view. */
