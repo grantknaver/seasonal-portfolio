@@ -15,10 +15,14 @@ const { lgBreakpoint } = useViewport();
 type Mode = 'unclear' | 'clear' | 'opinion';
 type NodeState = 'on' | 'maybe' | 'skip' | 'off';
 
-const modes: { key: Mode; label: string }[] = [
-  { key: 'unclear', label: 'Something feels off' },
-  { key: 'clear', label: 'I know what’s broken' },
-  { key: 'opinion', label: 'I want a second opinion' },
+const modes: { key: Mode; label: string; sub: string }[] = [
+  { key: 'unclear', label: 'Something feels off', sub: 'People drop off, and I’m not sure why' },
+  {
+    key: 'clear',
+    label: 'I know what’s broken',
+    sub: 'I know what needs fixing and want it built',
+  },
+  { key: 'opinion', label: 'I want a second opinion', sub: 'Show me what you see before I decide' },
 ];
 
 const nodes = [
@@ -46,25 +50,72 @@ const routes: Record<Mode, { states: [NodeState, NodeState, NodeState]; caption:
 };
 
 const mode = ref<Mode>('unclear');
-/* Signal that the card is interactive: once it has arrived, the other answers give a gentle
-   nudge a few times, until someone picks one. */
+/* Signal that the card is interactive: option rows that look like choices, a "your turn" hint,
+   and a one-time pointer demo when the card first lands. */
 const interacted = ref(false);
 const hinting = ref(false);
+const panelRef = ref<HTMLElement | null>(null);
+const cursorRef = ref<HTMLElement | null>(null);
+let demoTl: gsap.core.Timeline | null = null;
+let demoPlayed = false;
+
+/* Show, don't tell: when the card first lands, a pointer picks two answers so people see the
+   route react, then hands over. Stops the moment someone interacts. */
+const setMode = (m: Mode) => {
+  mode.value = m;
+  void nextTick(() => bounceLit());
+};
 const startHint = () => {
   hinting.value = true;
+  if (demoPlayed || interacted.value) return;
+  if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+  const panel = panelRef.value;
+  const cursor = cursorRef.value;
+  const opts = panel?.querySelectorAll<HTMLElement>('.mode');
+  if (!panel || !cursor || !opts || opts.length < 3) return;
+  demoPlayed = true;
+  const at = (i: number) => {
+    const p = panel.getBoundingClientRect();
+    const r = opts[i]!.getBoundingClientRect();
+    return { x: r.left - p.left + r.width * 0.72, y: r.top - p.top + r.height * 0.55 };
+  };
+  const press = (i: number) =>
+    gsap
+      .timeline()
+      .to(cursor, { scale: 0.82, duration: 0.12, ease: 'power2.in' })
+      .call(() => {
+        opts[i]!.classList.add('is-pressed');
+        setMode(modes[i]!.key);
+      })
+      .to(cursor, { scale: 1, duration: 0.25, ease: 'back.out(3)' })
+      .call(() => opts[i]!.classList.remove('is-pressed'), undefined, '+=0.1');
+  const start = at(1);
+  demoTl = gsap
+    .timeline({ delay: 0.5 })
+    .set(cursor, { x: start.x + 60, y: start.y + 70, autoAlpha: 0, scale: 1 })
+    .to(cursor, { autoAlpha: 1, duration: 0.3 })
+    .to(cursor, { x: start.x, y: start.y, duration: 0.7, ease: 'power3.inOut' }, '<')
+    .add(press(1))
+    .to(cursor, { x: at(2).x, y: at(2).y, duration: 0.7, ease: 'power3.inOut' }, '+=1.1')
+    .add(press(2))
+    .to(cursor, { x: at(0).x, y: at(0).y, duration: 0.7, ease: 'power3.inOut' }, '+=1.1')
+    .add(press(0))
+    .to(cursor, { autoAlpha: 0, y: '+=20', duration: 0.4 }, '+=0.6');
+};
+const stopDemo = () => {
+  if (!demoTl) return;
+  demoTl.kill();
+  demoTl = null;
+  if (cursorRef.value) gsap.to(cursorRef.value, { autoAlpha: 0, duration: 0.2 });
 };
 const route = computed(() => routes[mode.value]);
 
 const rootRef = ref<HTMLElement | null>(null);
 const nodesRef = ref<HTMLElement | null>(null);
 
-/* A small bounce on the nodes that light up when the answer changes. */
-const choose = async (m: Mode) => {
-  interacted.value = true;
-  if (m === mode.value) return;
-  mode.value = m;
-  await nextTick();
-  /* On the dots, so it never collides with the node's scroll-driven entrance. */
+/* A small bounce on the steps that light up when the answer changes. On the dots, so it never
+   collides with the node's scroll-driven entrance. */
+const bounceLit = () => {
   const lit = nodesRef.value?.querySelectorAll<HTMLElement>(
     '.node.is-on .node__dot, .node.is-maybe .node__dot',
   );
@@ -74,6 +125,14 @@ const choose = async (m: Mode) => {
     { scale: 0.8 },
     { scale: 1, duration: 0.6, ease: 'back.out(2.6)', stagger: 0.08, overwrite: 'auto' },
   );
+};
+const choose = async (m: Mode) => {
+  interacted.value = true;
+  stopDemo();
+  if (m === mode.value) return;
+  mode.value = m;
+  await nextTick();
+  bounceLit();
 };
 
 /* Line up with the glkFreelance logo on desktop, like the Loom section. */
@@ -249,6 +308,7 @@ onMounted(() => {
 onBeforeUnmount(() => {
   window.removeEventListener('resize', measureLogo);
   enterIo?.disconnect();
+  demoTl?.kill();
   mm?.revert();
   ctx?.revert();
 });
@@ -293,14 +353,24 @@ onBeforeUnmount(() => {
         <p class="closing__meta q-ma-none">Free · 20 minutes · just send one link</p>
       </div>
 
-      <div class="closing__panel">
+      <div ref="panelRef" class="closing__panel" @pointerdown="stopDemo">
         <div class="closing__qrow">
-          <p id="closing-q" class="closing__q q-ma-none">Where are you now?</p>
-          <p class="closing__hint q-ma-none">Pick one. Your route updates below.</p>
+          <h3 id="closing-q" class="closing__q q-ma-none">Where are you now?</h3>
+          <p class="closing__hint q-ma-none" :class="{ 'is-turn': hinting && !interacted }">
+            <svg class="closing__hint-icon" viewBox="0 0 24 24" aria-hidden="true">
+              <path
+                d="M9 11V5.5a1.5 1.5 0 0 1 3 0V10m0-1.5a1.5 1.5 0 0 1 3 0V11m0-1a1.5 1.5 0 0 1 3 0v4.5a6 6 0 0 1-6 6h-.6a6 6 0 0 1-4.9-2.5L4.6 14.4a1.5 1.5 0 0 1 2.4-1.8L9 15"
+              />
+            </svg>
+            {{
+              hinting && !interacted
+                ? 'Your turn: pick the one that fits.'
+                : 'Pick one to see your route.'
+            }}
+          </p>
         </div>
         <div
           class="modes"
-          :class="{ 'is-hinting': hinting && !interacted }"
           role="radiogroup"
           aria-labelledby="closing-q"
         >
@@ -315,9 +385,17 @@ onBeforeUnmount(() => {
             @click="choose(m.key)"
           >
             <span class="mode__dot" aria-hidden="true"></span>
-            {{ m.label }}
+            <span class="mode__text">
+              <b>{{ m.label }}</b>
+              <small>{{ m.sub }}</small>
+            </span>
+            <span class="mode__arrow" aria-hidden="true">&rarr;</span>
           </button>
         </div>
+        <!-- Demo pointer (decorative). -->
+        <span ref="cursorRef" class="demo-cursor" aria-hidden="true">
+          <svg viewBox="0 0 24 24"><path d="M5 3l14 8-6.2 1.6L10 19z" /></svg>
+        </span>
 
         <!-- The route: three steps, joined. A skipped Diagnostic gets a bypass arc. -->
         <div
@@ -668,6 +746,7 @@ $bounce: cubic-bezier(0.34, 1.56, 0.64, 1);
 /* ---------- Panel ---------- */
 
 .closing__panel {
+  position: relative;
   display: grid;
   gap: 1.1rem;
   padding: clamp(1.25rem, 2.5vw, 2rem);
@@ -685,59 +764,145 @@ $bounce: cubic-bezier(0.34, 1.56, 0.64, 1);
 }
 
 .closing__hint {
+  display: inline-flex;
+  gap: 0.4rem;
+  align-items: center;
   color: $muted;
-  font-size: 0.82rem;
+  font-size: 0.86rem;
+  transition: color 0.3s ease;
+
+  &.is-turn {
+    color: $blue;
+    font-weight: 700;
+  }
+}
+
+.closing__hint-icon {
+  width: 1.05rem;
+  height: 1.05rem;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1.8;
+  stroke-linecap: round;
+  stroke-linejoin: round;
 }
 
 .closing__q {
-  color: $blue;
-  font-size: 0.72rem;
+  color: $ink;
+  font-size: clamp(1.2rem, 1.5vw, 1.4rem);
   font-weight: 700;
-  letter-spacing: 0.12em;
-  text-transform: uppercase;
+  letter-spacing: -0.01em;
+  line-height: 1.2;
 }
 
 .modes {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 0.45rem;
+  display: grid;
+  gap: 0.5rem;
 }
 
+/* Each answer is a full-width option row: radio, label + situation, arrow. */
 .mode {
-  display: inline-flex;
-  gap: 0.5rem;
+  display: flex;
+  gap: 0.8rem;
   align-items: center;
-  padding: 0.55rem 0.95rem 0.55rem 0.75rem;
-  border: 1px solid $line;
-  border-radius: 999px;
-  background: transparent;
-  color: $muted;
+  width: 100%;
+  padding: 0.75rem 0.9rem;
+  border: 1.5px solid rgba(18, 96, 240, 0.2);
+  border-radius: 0.8rem;
+  background: #fff;
+  color: $ink;
   font: inherit;
-  font-size: 0.88rem;
-  font-weight: 600;
+  text-align: left;
   cursor: pointer;
   transition:
     background 0.25s ease,
-    color 0.25s ease,
     border-color 0.25s ease,
-    transform 0.35s $bounce;
+    box-shadow 0.25s ease,
+    transform 0.3s $bounce;
 
   &:hover {
-    color: $white;
-    border-color: rgba(18, 96, 240, 0.5);
-    transform: translateY(-1px);
+    border-color: rgba(18, 96, 240, 0.55);
+    background: #f5f8ff;
+    box-shadow: 0 6px 16px rgba(18, 96, 240, 0.12);
+    transform: translateX(3px);
+
+    .mode__arrow {
+      opacity: 1;
+      transform: translateX(2px);
+    }
   }
 
   &.is-active {
     border-color: $blue;
-    background: $blue;
-    color: #fff;
-    box-shadow: 0 6px 16px rgba(18, 96, 240, 0.28);
+    background: #eef4ff;
+    box-shadow: 0 0 0 3px rgba(18, 96, 240, 0.12);
+
+    .mode__arrow {
+      opacity: 1;
+      color: $blue;
+    }
+  }
+
+  &.is-pressed {
+    transform: scale(0.98);
   }
 
   &:focus-visible {
     outline: 2px solid $blue;
     outline-offset: 2px;
+  }
+}
+
+.mode__text {
+  display: grid;
+  flex: 1;
+  gap: 0.1rem;
+  min-width: 0;
+
+  b {
+    font-size: 0.95rem;
+    font-weight: 700;
+    line-height: 1.25;
+  }
+
+  small {
+    color: $muted;
+    font-size: 0.8rem;
+    line-height: 1.3;
+  }
+}
+
+.mode__arrow {
+  flex: none;
+  color: rgba(11, 31, 46, 0.4);
+  font-weight: 700;
+  opacity: 0.55;
+  transition:
+    opacity 0.25s ease,
+    transform 0.25s ease,
+    color 0.25s ease;
+}
+
+/* Demo pointer. */
+.demo-cursor {
+  position: absolute;
+  top: 0;
+  left: 0;
+  z-index: 3;
+  width: 26px;
+  height: 26px;
+  opacity: 0;
+  visibility: hidden;
+  pointer-events: none;
+  filter: drop-shadow(0 3px 5px rgba(10, 30, 60, 0.3));
+
+  svg {
+    width: 100%;
+    height: 100%;
+    fill: $ink;
+    stroke: #fff;
+    stroke-width: 1.5;
+    stroke-linejoin: round;
   }
 }
 
@@ -763,39 +928,11 @@ $bounce: cubic-bezier(0.34, 1.56, 0.64, 1);
   }
 
   .mode.is-active & {
-    border-color: #fff;
+    border-color: $blue;
 
     &::after {
-      background: #fff;
       transform: scale(1);
     }
-  }
-}
-
-/* The nudge: unselected answers lift and ring softly, one after another, three times. */
-.modes.is-hinting .mode:not(.is-active) {
-  animation: nudge 1.8s ease-in-out 3;
-
-  &:nth-child(2) {
-    animation-delay: 0.25s;
-  }
-
-  &:nth-child(3) {
-    animation-delay: 0.5s;
-  }
-}
-
-@keyframes nudge {
-  0%,
-  60%,
-  100% {
-    transform: none;
-    box-shadow: 0 0 0 0 rgba(18, 96, 240, 0);
-  }
-  20% {
-    transform: translateY(-3px);
-    box-shadow: 0 0 0 5px rgba(18, 96, 240, 0.16);
-    border-color: rgba(18, 96, 240, 0.6);
   }
 }
 
@@ -974,10 +1111,6 @@ $bounce: cubic-bezier(0.34, 1.56, 0.64, 1);
   .closing__book,
   .bypass {
     transition: none;
-  }
-
-  .modes.is-hinting .mode {
-    animation: none;
   }
 }
 </style>

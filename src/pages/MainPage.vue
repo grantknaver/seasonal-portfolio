@@ -2021,10 +2021,12 @@ const toExamples = () => {
     }
 
     @media (min-width: tokens.$breakpoint-lg) {
-      top: clamp(5.4rem, 10.8vh, 8.4rem);
-      right: clamp(8.2rem, 13.8vw, 13.2rem);
-      bottom: clamp(4.2rem, 8.4vh, 7.2rem);
-      left: clamp(8rem, 13.8vw, 16.2rem);
+      /* Smaller than the screen on purpose: room to breathe around the photo, like the rest
+         of the site. (Kept identical for .trust-viewport and .trust-cards.) */
+      top: clamp(7rem, 15vh, 10.5rem);
+      right: clamp(11rem, 19vw, 22rem);
+      bottom: clamp(6rem, 13vh, 9.5rem);
+      left: clamp(11rem, 19vw, 22rem);
     }
 
     .trust-card {
@@ -2048,8 +2050,8 @@ const toExamples = () => {
         width: clamp(250px, 18.5vw, 300px);
         padding: 0.95rem 1.05rem;
         box-shadow:
-          0 24px 50px rgb(0 0 0 / 0.38),
-          0 4px 12px rgb(0 0 0 / 0.18);
+          0 10px 24px rgb(10 30 60 / 0.16),
+          0 2px 6px rgb(10 30 60 / 0.1);
 
         .tc-row b {
           font-size: 1rem;
@@ -2067,8 +2069,8 @@ const toExamples = () => {
         width: clamp(200px, 13.5vw, 232px);
         padding: 0.7rem 0.8rem;
         box-shadow:
-          0 18px 40px rgb(0 0 0 / 0.32),
-          0 3px 10px rgb(0 0 0 / 0.16);
+          0 8px 20px rgb(10 30 60 / 0.15),
+          0 2px 5px rgb(10 30 60 / 0.1);
 
         .tc-row b {
           font-size: 0.84rem;
@@ -2145,7 +2147,7 @@ const toExamples = () => {
     border: 1px solid rgb(255 255 255 / 0.55);
     border-radius: 0.8rem;
     background: rgb(255 255 255 / 0.92);
-    box-shadow: 0 14px 34px rgb(0 0 0 / 0.35);
+    box-shadow: 0 10px 24px rgb(10 30 60 / 0.18);
     color: #0b1f2e;
     font-family: tokens.$primary-font;
     text-align: left;
@@ -2286,7 +2288,7 @@ const toExamples = () => {
       width: min(66%, 224px);
       padding: 0.5rem 0.65rem;
       border-radius: 0.65rem;
-      box-shadow: 0 10px 24px rgb(0 0 0 / 0.3);
+      box-shadow: 0 8px 18px rgb(10 30 60 / 0.16);
     }
 
     .trust-card__state {
@@ -2346,10 +2348,12 @@ const toExamples = () => {
     }
 
     @media (min-width: tokens.$breakpoint-lg) {
-      top: clamp(5.4rem, 10.8vh, 8.4rem);
-      right: clamp(8.2rem, 13.8vw, 13.2rem);
-      bottom: clamp(4.2rem, 8.4vh, 7.2rem);
-      left: clamp(8rem, 13.8vw, 16.2rem);
+      /* Smaller than the screen on purpose: room to breathe around the photo, like the rest
+         of the site. (Kept identical for .trust-viewport and .trust-cards.) */
+      top: clamp(7rem, 15vh, 10.5rem);
+      right: clamp(11rem, 19vw, 22rem);
+      bottom: clamp(6rem, 13vh, 9.5rem);
+      left: clamp(11rem, 19vw, 22rem);
     }
   }
   .trust-image-wrap {
