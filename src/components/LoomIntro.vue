@@ -45,7 +45,20 @@ const isIn = ref(false);
 let io: IntersectionObserver | null = null;
 let nearIo: IntersectionObserver | null = null;
 
+/* Desktop: the content starts where the glkFreelance logo ends, with the same space on the
+   right. The logo is fixed, so measure its right edge and keep it in sync on resize. */
+const logoGutter = ref<string | undefined>(undefined);
+const measureLogo = () => {
+  const logo = [...document.querySelectorAll<HTMLElement>('.logo-text')].find(
+    (el) => el.getBoundingClientRect().width > 0,
+  );
+  logoGutter.value = logo ? `${Math.round(logo.getBoundingClientRect().right)}px` : undefined;
+};
+
 onMounted(() => {
+  measureLogo();
+  window.addEventListener('resize', measureLogo);
+  if ("fonts" in document) void document.fonts.ready.then(measureLogo);
   if (!rootRef.value || !('IntersectionObserver' in window)) {
     isIn.value = true;
     loadPlayer.value = true;
@@ -83,6 +96,7 @@ onMounted(() => {
 });
 
 onBeforeUnmount(() => {
+  window.removeEventListener('resize', measureLogo);
   io?.disconnect();
   nearIo?.disconnect();
   window.removeEventListener('hero:copy-in', onHeroIn);
@@ -92,6 +106,7 @@ onBeforeUnmount(() => {
 <template>
   <section
     ref="rootRef"
+    :style="logoGutter ? { '--logo-x': logoGutter } : undefined"
     class="loom-intro"
     :class="{ 'is-in': isIn }"
     aria-labelledby="loom-intro-title"
@@ -197,9 +212,9 @@ $ease: cubic-bezier(0.22, 1, 0.36, 1);
 
     /* Wide and short: the content spans most of the width, and the video's height is set from
        the screen height, so there's more room above and below than at the sides. */
-    /* Content lines up with the glkFreelance logo (fixed at 2% from the left edge) and keeps
-       the same distance on the right. */
-    padding-inline: var(--logo-x, 2vw);
+    /* Content starts where the glkFreelance logo ends (measured in script), with the same
+       distance on the right. Fallback: roughly the logo's width plus its 2% offset. */
+    padding-inline: var(--logo-x, calc(2vw + 11.5rem));
     --content-w: 100%;
     --vid-h: clamp(16rem, calc(100vh - 29rem), 32rem);
     --vid-h: clamp(16rem, calc(100svh - 29rem), 32rem);
