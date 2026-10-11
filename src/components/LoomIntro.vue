@@ -191,7 +191,14 @@ $ease: cubic-bezier(0.22, 1, 0.36, 1);
     justify-content: center;
     height: 100vh;
     height: 100svh;
-    padding-block: clamp(3rem, 9vh, 6rem);
+    padding-block: clamp(3.5rem, 11vh, 7.5rem);
+
+    /* One content width for the copy + video row, the results and the next step, so they
+       share edges and there's no dead gap between copy and video. */
+    --copy-w: 23rem;
+    --vid-w: min(46rem, calc((100vh - 30rem) * 4 / 3));
+    --vid-w: min(46rem, calc((100svh - 30rem) * 4 / 3));
+    --content-w: min(1180px, calc(var(--copy-w) + 2.5rem + var(--vid-w)));
   }
 }
 
@@ -206,17 +213,33 @@ $ease: cubic-bezier(0.22, 1, 0.36, 1);
   @media (min-width: tokens.$breakpoint-md) {
     grid-template-columns: minmax(0, 0.9fr) minmax(0, 1.1fr);
   }
+
+  @media (min-width: tokens.$breakpoint-lg) {
+    grid-template-columns: var(--copy-w) var(--vid-w);
+    gap: 2.5rem;
+    max-width: var(--content-w);
+  }
 }
 
 .loom-intro__results {
   width: 100%;
   max-width: 1180px;
+
+  @media (min-width: tokens.$breakpoint-lg) {
+    max-width: var(--content-w);
+  }
+
   margin: clamp(1.25rem, 3.5vh, 2.25rem) auto 0;
 }
 
 .loom-intro__next {
   width: 100%;
   max-width: 1180px;
+
+  @media (min-width: tokens.$breakpoint-lg) {
+    max-width: var(--content-w);
+  }
+
   margin: clamp(0.9rem, 2vh, 1.25rem) auto 0;
   color: $muted;
   font-size: 0.95rem;
@@ -269,8 +292,8 @@ $ease: cubic-bezier(0.22, 1, 0.36, 1);
   }
 
   @media (min-width: tokens.$breakpoint-lg) {
-    width: min(100%, calc((100vh - 28.5rem) * 4 / 3), 640px);
-    width: min(100%, calc((100svh - 28.5rem) * 4 / 3), 640px);
+    justify-self: stretch;
+    width: 100%;
   }
 }
 
@@ -284,7 +307,7 @@ $ease: cubic-bezier(0.22, 1, 0.36, 1);
 
 .loom-intro__title {
   max-width: 18ch;
-  font-size: clamp(1.75rem, 2.8vw, 2.4rem);
+  font-size: clamp(1.7rem, 2.3vw, 2.15rem);
   font-weight: 600;
   letter-spacing: -0.02em;
   line-height: 1.12;
