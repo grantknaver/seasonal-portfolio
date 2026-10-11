@@ -81,45 +81,50 @@ let ctx: gsap.Context | null = null;
 let mm: gsap.MatchMedia | null = null;
 let enterIo: IntersectionObserver | null = null;
 
-/* Desktop: the entrance follows the scroll. The main copy comes first (eyebrow, headline,
-   lead, button), then the card slides in from the right and its route draws. While the section
+/* Desktop: once the section is mostly on screen, the main copy plays in first (eyebrow,
+   headline, lead, button), then the card slides in from the right and its route draws. While the section
    is on screen, the card, grid and glow drift at different speeds for a little depth. */
 const buildScrub = (root: HTMLElement) => {
-  const enter = gsap.timeline({
-    defaults: { ease: 'power2.out' },
-    scrollTrigger: {
-      trigger: root,
-      start: 'top 85%',
-      end: 'top 15%',
-      scrub: 0.8,
-      refreshPriority: -3, // measured after every pin above it
-    },
-  });
+  /* Plays once the section is mostly on screen, in a clear order: the copy rises in and
+     settles, then (only then) the card slides in from the right and its route draws. */
+  /* Start hidden explicitly: a paused timeline doesn't apply its starting values on its own. */
+  gsap.set('.closing__copy > *', { autoAlpha: 0, y: 40 });
+  gsap.set('.closing__panel', { autoAlpha: 0, x: 160, rotate: 2 });
+  gsap.set('.node', { autoAlpha: 0, scale: 0.8 });
+  gsap.set('.link__fill', { scaleX: 0 });
+  const enter = gsap.timeline({ paused: true, defaults: { ease: 'power3.out' } });
   enter
     .fromTo(
       '.closing__copy > *',
-      { autoAlpha: 0, y: 44 },
-      { autoAlpha: 1, y: 0, duration: 0.4, stagger: 0.1 },
+      { autoAlpha: 0, y: 40 },
+      { autoAlpha: 1, y: 0, duration: 0.75, stagger: 0.14 },
       0,
     )
     .fromTo(
       '.closing__panel',
-      { autoAlpha: 0, x: 140, rotate: 1.5 },
-      { autoAlpha: 1, x: 0, rotate: 0, duration: 0.55 },
-      0.45,
+      { autoAlpha: 0, x: 160, rotate: 2 },
+      { autoAlpha: 1, x: 0, rotate: 0, duration: 0.9, ease: 'back.out(1.2)' },
+      '+=0.25',
     )
     .fromTo(
       '.node',
       { autoAlpha: 0, scale: 0.8 },
-      { autoAlpha: 1, scale: 1, duration: 0.25, stagger: 0.1, ease: 'back.out(2)' },
-      0.85,
+      { autoAlpha: 1, scale: 1, duration: 0.5, stagger: 0.14, ease: 'back.out(2)' },
+      '-=0.3',
     )
     .fromTo(
       '.link__fill',
       { scaleX: 0 },
-      { scaleX: 1, duration: 0.2, stagger: 0.1, ease: 'power1.inOut' },
-      0.95,
+      { scaleX: 1, duration: 0.4, stagger: 0.14, ease: 'power1.inOut' },
+      '-=0.45',
     );
+  ScrollTrigger.create({
+    trigger: root,
+    start: 'top 30%', // nearly all of the section is on screen
+    once: true,
+    refreshPriority: -3, // measured after every pin above it
+    onEnter: () => enter.play(),
+  });
 
   /* Parallax across the section's whole arrival. */
   const drift = gsap.timeline({
@@ -132,10 +137,17 @@ const buildScrub = (root: HTMLElement) => {
       refreshPriority: -3,
     },
   });
+  /* Nearer things move more: the card most, then the shapes, the grid least. */
   drift
-    .fromTo('.closing__panel', { yPercent: 14 }, { yPercent: -4 }, 0)
-    .fromTo('.closing__grid', { y: 70 }, { y: -30 }, 0)
-    .fromTo('.closing__glow', { translate: '0px 120px' }, { translate: '0px -40px' }, 0);
+    .fromTo('.closing__panel', { y: 240 }, { y: 0 }, 0)
+    .fromTo('.closing__copy', { y: 80 }, { y: 0 }, 0)
+    .fromTo('.shape--card', { y: 320, rotate: -9 }, { y: 0, rotate: -3 }, 0)
+    .fromTo('.shape--bar', { y: 420, rotate: -7 }, { y: 0, rotate: -2 }, 0)
+    .fromTo('.shape--bar2', { y: 260 }, { y: 0 }, 0)
+    .fromTo('.shape--orb', { y: 460, scale: 0.8 }, { y: 0, scale: 1 }, 0)
+    .fromTo('.shape--mini', { y: 200, rotate: 7 }, { y: 0, rotate: 2 }, 0)
+    .fromTo('.closing__grid', { y: 120 }, { y: 0 }, 0)
+    .fromTo('.closing__glow', { translate: '0px 240px' }, { translate: '0px 0px' }, 0);
 };
 
 /* Phones (and if the scroll trigger can't run): a one-time entrance when it's on screen, in
@@ -219,6 +231,14 @@ onBeforeUnmount(() => {
   >
     <span class="closing__grid" aria-hidden="true"></span>
     <span class="closing__glow" aria-hidden="true"></span>
+    <!-- Depth: shapes from the hero's background, each drifting at its own speed. -->
+    <div class="closing__depth" aria-hidden="true">
+      <span class="shape shape--card"><i></i><i></i><i></i></span>
+      <span class="shape shape--bar"></span>
+      <span class="shape shape--bar2"></span>
+      <span class="shape shape--orb"></span>
+      <span class="shape shape--mini"><i></i><i></i></span>
+    </div>
 
     <div class="closing__inner">
       <div class="closing__copy">
@@ -360,8 +380,127 @@ $bounce: cubic-bezier(0.34, 1.56, 0.64, 1);
   }
 }
 
+/* ---------- Depth shapes (desktop) ---------- */
+
+.closing__depth {
+  position: absolute;
+  inset: 0;
+  display: none;
+  pointer-events: none;
+
+  @media (min-width: tokens.$breakpoint-lg) {
+    display: block;
+  }
+}
+
+.shape {
+  position: absolute;
+  display: block;
+  will-change: transform;
+}
+
+/* A pale UI card behind the headline's top-left. */
+.shape--card {
+  top: 8%;
+  left: calc(var(--logo-x, 12rem) - 6rem);
+  display: grid;
+  align-content: start;
+  gap: 0.7rem;
+  width: 300px;
+  height: 190px;
+  padding: 1.4rem;
+  border: 1px solid rgba(18, 96, 240, 0.14);
+  border-radius: 1.2rem;
+  background: rgba(255, 255, 255, 0.55);
+  box-shadow: 0 20px 50px rgba(10, 52, 135, 0.08);
+
+  i {
+    display: block;
+    height: 12px;
+    border-radius: 999px;
+    background: rgba(18, 96, 240, 0.14);
+
+    &:nth-child(1) {
+      width: 60%;
+    }
+
+    &:nth-child(2) {
+      width: 85%;
+      background: rgba(18, 96, 240, 0.08);
+    }
+
+    &:nth-child(3) {
+      width: 40%;
+      background: rgba(18, 96, 240, 0.08);
+    }
+  }
+}
+
+/* The hero's signature navy bar, low left, under the button. */
+.shape--bar {
+  bottom: 4%;
+  left: calc(var(--logo-x, 12rem) - 4rem);
+  width: 360px;
+  height: 34px;
+  border-radius: 999px;
+  background: linear-gradient(90deg, #0a3487, #1260f0);
+  box-shadow: 0 16px 36px rgba(10, 52, 135, 0.28);
+  opacity: 0.9;
+}
+
+.shape--bar2 {
+  bottom: 1.5%;
+  left: calc(var(--logo-x, 12rem) + 2rem);
+  width: 240px;
+  height: 14px;
+  border-radius: 999px;
+  background: rgba(18, 96, 240, 0.18);
+}
+
+/* A soft blue orb behind the card's lower right. */
+.shape--orb {
+  right: 6%;
+  bottom: 6%;
+  width: 260px;
+  aspect-ratio: 1;
+  border-radius: 50%;
+  background: radial-gradient(
+    circle at 35% 30%,
+    rgba(91, 147, 255, 0.55),
+    rgba(18, 96, 240, 0.18) 60%,
+    transparent 72%
+  );
+}
+
+/* A small notification chip, top right. */
+.shape--mini {
+  top: 10%;
+  right: 9%;
+  display: grid;
+  gap: 0.45rem;
+  width: 170px;
+  padding: 0.9rem 1rem;
+  border: 1px solid rgba(18, 96, 240, 0.16);
+  border-radius: 0.9rem;
+  background: #fff;
+  box-shadow: 0 14px 34px rgba(10, 52, 135, 0.12);
+
+  i {
+    display: block;
+    height: 9px;
+    border-radius: 999px;
+    background: rgba(18, 96, 240, 0.16);
+
+    &:nth-child(2) {
+      width: 60%;
+      background: rgba(14, 138, 79, 0.35);
+    }
+  }
+}
+
 .closing__inner {
   position: relative;
+  z-index: 1;
   display: grid;
   gap: clamp(2rem, 5vw, 4rem);
   align-items: center;
