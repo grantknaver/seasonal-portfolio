@@ -11,6 +11,8 @@ const hasVideo = computed(() => !!embedUrl.value);
 /* Mount Loom's player about a screen before the section arrives, so it's ready by the time
    someone presses play, but never during the hero animation. */
 const loadPlayer = ref(false);
+/* The next-step line follows the results' reveal. */
+const resultsIn = ref(false);
 let nearScreen = false;
 let heroDone = false;
 const maybeLoad = () => {
@@ -150,10 +152,10 @@ onBeforeUnmount(() => {
     </div>
 
     <!-- The payoff: what clients reported once that friction was fixed. -->
-    <ClientResultsStrip class="loom-intro__results" />
+    <ClientResultsStrip class="loom-intro__results" animate @shown="resultsIn = true" />
 
     <!-- A next step for anyone convinced by the results. -->
-    <p class="loom-intro__next q-ma-none">
+    <p class="loom-intro__next q-ma-none" :class="{ 'is-in': resultsIn }">
       Want to see where your product is losing people?
       <button type="button" class="loom-intro__cta" @click="openTeardownBooking()">
         Book a free Teardown <span aria-hidden="true">&rarr;</span>
@@ -195,9 +197,12 @@ $ease: cubic-bezier(0.22, 1, 0.36, 1);
 
     /* Wide and short: the content spans most of the width, and the video's height is set from
        the screen height, so there's more room above and below than at the sides. */
-    --content-w: min(84.6vw, 1680px);
-    --vid-h: clamp(15rem, calc(100vh - 34rem), 27rem);
-    --vid-h: clamp(15rem, calc(100svh - 34rem), 27rem);
+    /* Content lines up with the glkFreelance logo (fixed at 2% from the left edge) and keeps
+       the same distance on the right. */
+    padding-inline: var(--logo-x, 2vw);
+    --content-w: 100%;
+    --vid-h: clamp(16rem, calc(100vh - 29rem), 32rem);
+    --vid-h: clamp(16rem, calc(100svh - 29rem), 32rem);
   }
 }
 
@@ -529,6 +534,27 @@ $ease: cubic-bezier(0.22, 1, 0.36, 1);
 
 .loom-intro__media {
   transform: translateY(16px) scale(0.98);
+}
+
+.loom-intro__next {
+  opacity: 0;
+  transform: translateY(6px);
+  transition:
+    opacity 0.7s cubic-bezier(0.22, 1, 0.36, 1) 1.2s,
+    transform 0.7s cubic-bezier(0.22, 1, 0.36, 1) 1.2s;
+}
+
+.loom-intro__next.is-in {
+  opacity: 1;
+  transform: none;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .loom-intro__next {
+    opacity: 1;
+    transform: none;
+    transition: none;
+  }
 }
 
 .loom-intro.is-in {
