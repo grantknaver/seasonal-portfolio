@@ -1099,16 +1099,19 @@ const toExamples = () => {
               <button type="button" class="cta cta--message" @click="toContact()">
                 or send me a message &rarr;
               </button>
-              <p class="cta cta--def q-ma-none">
-                Free. I review one screen of your product and send you a one-page summary of what to
-                fix first.
-              </p>
             </div>
           </div>
         </div>
 
         <p class="proofs-caption q-mb-none">
-          Clear words, backed by visuals and motion that show people how your product works.
+          <!-- What the free offer actually gives you, right under the button that books it. -->
+          <span class="gets-row">
+            <b>Your free Decision Snapshot:</b>
+            <span>2–3 key issues</span>
+            <span>An annotated screenshot</span>
+            <span>Patterns that point the way</span>
+            <span>The next decision to make</span>
+          </span>
           <button type="button" class="see-work" @click="toExamples()">See the work &rarr;</button>
         </p>
         <q-list v-if="isTabletView" class="tablet-expandable-menu full-width font-primary">
@@ -1410,14 +1413,6 @@ const toExamples = () => {
   }
 }
 
-.cta--def {
-  max-width: 44ch;
-  white-space: normal !important; /* hero CTAs are nowrap; this line may wrap */
-  color: rgb(247 249 254 / 0.78); /* sits on the dark hero card */
-  font-size: 0.8rem;
-  line-height: 1.35;
-}
-
 .cta--message {
   padding: 0.4rem 0;
   border: 0;
@@ -1437,6 +1432,32 @@ const toExamples = () => {
 
   @media (max-width: calc(#{tokens.$breakpoint-lg} - 0.02px)) {
     text-align: center;
+  }
+}
+
+.gets-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.25rem 0.9rem;
+  align-items: baseline;
+  justify-content: center;
+  margin-bottom: 0.35rem;
+  text-wrap: wrap;
+
+  b {
+    color: var(--q-dark);
+    font-weight: 700;
+  }
+
+  span {
+    white-space: nowrap;
+
+    &::before {
+      content: '✓';
+      margin-right: 0.3rem;
+      color: var(--q-accent);
+      font-weight: 800;
+    }
   }
 }
 
@@ -1605,8 +1626,7 @@ const toExamples = () => {
           }
 
           /* Keep the collapsed hero compact: just the menu and the booking button. */
-          .cta--message,
-          .cta--def {
+          .cta--message {
             display: none;
           }
         }
