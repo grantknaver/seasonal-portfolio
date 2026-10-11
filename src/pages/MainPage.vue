@@ -1,5 +1,14 @@
 <script setup lang="ts">
-import { ref, watch, nextTick, onBeforeUnmount, computed, onMounted, onUnmounted } from 'vue';
+import {
+  ref,
+  reactive,
+  watch,
+  nextTick,
+  onBeforeUnmount,
+  computed,
+  onMounted,
+  onUnmounted,
+} from 'vue';
 import { useMainStore } from '../stores/main';
 import { type Topic } from '../shared/types/topic';
 import { v4 as uuidv4 } from 'uuid';
@@ -151,6 +160,62 @@ const trustCard2Ref = ref<HTMLElement | null>(null);
 const trustCard2A = ref<HTMLElement | null>(null);
 const trustCard2B = ref<HTMLElement | null>(null);
 
+/* The notice cards can be closed. Scroll mostly out of the trust section and back, and any
+   closed card pops back in. */
+type CardKey = 'bottom' | 'top';
+const dismissedCards = reactive<Record<CardKey, boolean>>({ bottom: false, top: false });
+let cardsAwaitReturn = false;
+const cardEl = (k: CardKey) => (k === 'bottom' ? trustCardRef.value : trustCard2Ref.value);
+const dismissCard = (k: CardKey) => {
+  const el = cardEl(k);
+  if (!el || dismissedCards[k]) return;
+  dismissedCards[k] = true;
+  gsap.to(el, {
+    autoAlpha: 0,
+    scale: 0.82,
+    duration: 0.35,
+    ease: 'back.in(1.7)',
+    overwrite: 'auto',
+  });
+};
+const returnCards = () => {
+  (['bottom', 'top'] as CardKey[]).forEach((k, i) => {
+    if (!dismissedCards[k]) return;
+    const el = cardEl(k);
+    dismissedCards[k] = false;
+    if (!el) return;
+    gsap.fromTo(
+      el,
+      { autoAlpha: 0, scale: 0.7 },
+      {
+        autoAlpha: 1,
+        scale: 1,
+        duration: 0.65,
+        ease: 'back.out(1.9)',
+        delay: 0.15 + i * 0.12,
+        overwrite: 'auto',
+      },
+    );
+  });
+};
+let cardsIo: IntersectionObserver | null = null;
+
+/* When the cards switch states, each gives a small bounce: up a touch, then settles. */
+const pulseCards = () => {
+  (['bottom', 'top'] as CardKey[]).forEach((k, i) => {
+    const el = cardEl(k);
+    if (!el || dismissedCards[k]) return;
+    gsap.to(el, {
+      keyframes: [
+        { scale: 1.08, duration: 0.18, ease: 'power2.out' },
+        { scale: 1, duration: 0.6, ease: 'back.out(3)' },
+      ],
+      delay: i * 0.12,
+      overwrite: 'auto',
+    });
+  });
+};
+
 /* Phones: after the trust section autoplays, two small arrows let people go back to the first
    message ("why people hesitate") and forward again. 0 = still autoplaying. */
 const trustStep = ref<0 | 1 | 2>(0);
@@ -168,6 +233,7 @@ const goTrust = (step: 1 | 2) => {
   on(trustImageB.value, !first);
   [trustCardA.value, trustCard2A.value].forEach((el) => on(el, first));
   [trustCardB.value, trustCard2B.value].forEach((el) => on(el, !first));
+  pulseCards();
 };
 
 /* ---------- Lifecycle-scoped GSAP state ---------- */
@@ -641,7 +707,8 @@ const buildScene = () => {
             2.0,
           )
           .to(cardAs, { opacity: 0, duration: 0.6, ease: 'none', stagger: 0.15 }, 4.6)
-          .to(cardBs, { opacity: 1, duration: 0.6, ease: 'none', stagger: 0.15 }, 4.9);
+          .to(cardBs, { opacity: 1, duration: 0.6, ease: 'none', stagger: 0.15 }, 4.9)
+          .call(pulseCards, undefined, 4.85);
       }
 
       const trustIo = new IntersectionObserver(
@@ -886,7 +953,9 @@ const buildScene = () => {
           { opacity: 0 },
           { opacity: 1, ease: 'none', duration: 0.6, stagger: 0.12, immediateRender: false },
           D + 0.95,
-        );
+        )
+        /* Fires as the scroll passes the switch, in either direction. */
+        .call(pulseCards, undefined, D + 0.9);
     }
     trustTl.fromTo(
       glow,
@@ -903,6 +972,23 @@ onMounted(async () => {
   const footerElement = document.getElementById('footer');
   if (footerElement) observer.observe(footerElement);
   window.addEventListener('resize', handleResize);
+
+  /* Closed notice cards come back once you've mostly left the trust section and return. */
+  if (trustSectionRef.value && 'IntersectionObserver' in window) {
+    cardsIo = new IntersectionObserver(
+      ([entry]) => {
+        if (!entry) return;
+        if (entry.intersectionRatio < 0.3) {
+          if (dismissedCards.bottom || dismissedCards.top) cardsAwaitReturn = true;
+        } else if (entry.intersectionRatio > 0.6 && cardsAwaitReturn) {
+          cardsAwaitReturn = false;
+          returnCards();
+        }
+      },
+      { threshold: [0, 0.3, 0.6, 1] },
+    );
+    cardsIo.observe(trustSectionRef.value);
+  }
 
   /* 2. Create every pin and ScrollTrigger and measure FIRST.
         Pin-spacers reflow the hero's own container — doing this while the
@@ -956,6 +1042,7 @@ onMounted(async () => {
 onBeforeUnmount(() => {
   disposed = true;
   io.value?.disconnect();
+  cardsIo?.disconnect();
   observer.disconnect();
   window.removeEventListener('resize', handleResize);
 
@@ -1215,35 +1302,6 @@ const toExamples = () => {
             product does line up, there’s nothing left to guess and nothing in the way.
           </p>
         </div>
-        <div ref="trustCardRef" class="trust-card" aria-hidden="true">
-          <div ref="trustCardA" class="trust-card__state">
-            <div class="tc-row"><b>Order #4821</b></div>
-            <div class="tc-row">
-              <span class="tc-status">Processing&hellip;</span><em class="tc-q">?</em>
-            </div>
-            <p class="tc-guess">Did it go through? When will it arrive?</p>
-          </div>
-          <div ref="trustCardB" class="trust-card__state">
-            <div class="tc-row"><b>Order #4821</b></div>
-            <div class="tc-row"><span class="tc-paid">&#10003; Paid $86.00</span></div>
-            <p class="tc-src">Arrives Thursday</p>
-            <div class="tc-row"><span class="tc-btn tc-btn--on">Track package</span></div>
-          </div>
-        </div>
-        <div ref="trustCard2Ref" class="trust-card trust-card--top" aria-hidden="true">
-          <div ref="trustCard2A" class="trust-card__state">
-            <div class="tc-row"><b>Sign up failed.</b><em class="tc-q">?</em></div>
-            <div class="tc-row"><span class="tc-btn">Try again</span></div>
-            <p class="tc-guess">What went wrong? What do I fix?</p>
-          </div>
-          <div ref="trustCard2B" class="trust-card__state">
-            <div class="tc-row"><b>Almost there</b></div>
-            <p class="tc-src">Add one number to your password</p>
-            <div class="tc-checks">
-              <span>&#10003; 8+ characters</span><span>&#10003; Email looks good</span>
-            </div>
-          </div>
-        </div>
         <div ref="trustGlowRef" class="trust-glow" aria-hidden="true"></div>
         <!-- Phones: step back to the first message and forward again once autoplay is done. -->
         <div
@@ -1286,6 +1344,67 @@ const toExamples = () => {
           <span class="trust-signal"></span>
         </div>
         <div ref="trustBeamRef" class="trust-beam" aria-hidden="true"><span></span></div>
+      </div>
+      <!-- The two notice cards sit on their own layer, lined up with the photo frame but not
+           clipped by it, so on large screens they can hang off its edges. -->
+      <div class="trust-cards">
+        <div
+          ref="trustCardRef"
+          class="trust-card trust-card--bottom"
+          :class="{ 'is-dismissed': dismissedCards.bottom }"
+          role="group"
+          aria-label="Example notice: an order that leaves people guessing"
+        >
+          <button
+            type="button"
+            class="tc-close"
+            aria-label="Close this example notice"
+            @click="dismissCard('bottom')"
+          >
+            &times;
+          </button>
+          <div ref="trustCardA" class="trust-card__state">
+            <div class="tc-row"><b>Order #4821</b></div>
+            <div class="tc-row">
+              <span class="tc-status">Processing&hellip;</span><em class="tc-q">?</em>
+            </div>
+            <p class="tc-guess">Did it go through? When will it arrive?</p>
+          </div>
+          <div ref="trustCardB" class="trust-card__state">
+            <div class="tc-row"><b>Order #4821</b></div>
+            <div class="tc-row"><span class="tc-paid">&#10003; Paid $86.00</span></div>
+            <p class="tc-src">Arrives Thursday</p>
+            <div class="tc-row"><span class="tc-btn tc-btn--on">Track package</span></div>
+          </div>
+        </div>
+        <div
+          ref="trustCard2Ref"
+          class="trust-card trust-card--top"
+          :class="{ 'is-dismissed': dismissedCards.top }"
+          role="group"
+          aria-label="Example notice: a sign-up error that leaves people guessing"
+        >
+          <button
+            type="button"
+            class="tc-close"
+            aria-label="Close this example notice"
+            @click="dismissCard('top')"
+          >
+            &times;
+          </button>
+          <div ref="trustCard2A" class="trust-card__state">
+            <div class="tc-row"><b>Sign up failed.</b><em class="tc-q">?</em></div>
+            <div class="tc-row"><span class="tc-btn">Try again</span></div>
+            <p class="tc-guess">What went wrong? What do I fix?</p>
+          </div>
+          <div ref="trustCard2B" class="trust-card__state">
+            <div class="tc-row"><b>Almost there</b></div>
+            <p class="tc-src">Add one number to your password</p>
+            <div class="tc-checks">
+              <span>&#10003; 8+ characters</span><span>&#10003; Email looks good</span>
+            </div>
+          </div>
+        </div>
       </div>
     </section>
 
@@ -1843,6 +1962,126 @@ const toExamples = () => {
   @media (min-width: tokens.$breakpoint-lg) {
     height: 100vh;
     height: 100svh;
+  }
+
+  /* ---------- Notice cards ---------- */
+  /* Their layer matches the photo frame's box exactly (same insets as .trust-viewport), but
+     doesn't clip, so cards can hang off the frame's edges on large screens. */
+  .trust-cards {
+    position: absolute;
+    top: 1.25rem;
+    right: 1rem;
+    bottom: 1.25rem;
+    left: 1rem;
+    z-index: 3;
+    pointer-events: none;
+
+    @media #{tokens.$tablet-only} {
+      top: 2.25rem;
+      right: 2rem;
+      bottom: 2.25rem;
+      left: 2rem;
+    }
+
+    @media (min-width: tokens.$breakpoint-lg) {
+      top: clamp(5.4rem, 10.8vh, 8.4rem);
+      right: clamp(8.2rem, 13.8vw, 13.2rem);
+      bottom: clamp(4.2rem, 8.4vh, 7.2rem);
+      left: clamp(8rem, 13.8vw, 16.2rem);
+    }
+
+    .trust-card {
+      pointer-events: auto;
+      /* Hover lift uses the CSS scale property, separate from GSAP's transform. */
+      transition: scale 0.35s cubic-bezier(0.34, 1.56, 0.64, 1);
+
+      &:hover,
+      &:focus-within {
+        scale: 1.06;
+      }
+    }
+
+    /* Large screens: two different sizes, each hanging off a different edge of the frame. */
+    @media (min-width: tokens.$breakpoint-lg) {
+      .trust-card--bottom {
+        left: calc(-1 * clamp(1.25rem, 2vw, 2.5rem));
+        bottom: calc(-1 * clamp(1.5rem, 3.2vh, 2.75rem));
+        width: clamp(250px, 18.5vw, 300px);
+        padding: 0.95rem 1.05rem;
+        box-shadow:
+          0 24px 50px rgb(0 0 0 / 0.38),
+          0 4px 12px rgb(0 0 0 / 0.18);
+
+        .tc-row b {
+          font-size: 1rem;
+        }
+
+        .tc-status,
+        .tc-paid {
+          font-size: 0.92rem;
+        }
+      }
+
+      .trust-card--top {
+        top: calc(-1 * clamp(1.25rem, 2.8vh, 2.25rem));
+        right: calc(-1 * clamp(2rem, 3.4vw, 4rem));
+        width: clamp(200px, 13.5vw, 232px);
+        padding: 0.7rem 0.8rem;
+        box-shadow:
+          0 18px 40px rgb(0 0 0 / 0.32),
+          0 3px 10px rgb(0 0 0 / 0.16);
+
+        .tc-row b {
+          font-size: 0.84rem;
+        }
+
+        .tc-guess,
+        .tc-src {
+          font-size: 0.72rem;
+        }
+      }
+    }
+  }
+
+  /* Close badge on each card's corner, like a notification. */
+  .tc-close {
+    position: absolute;
+    top: -0.6rem;
+    right: -0.6rem;
+    z-index: 2;
+    display: grid;
+    place-items: center;
+    width: 1.6rem;
+    height: 1.6rem;
+    padding: 0;
+    border: 1px solid rgb(11 31 46 / 0.12);
+    border-radius: 50%;
+    background: #fff;
+    color: #0b1f2e;
+    font-size: 1.05rem;
+    font-weight: 700;
+    line-height: 1;
+    box-shadow: 0 4px 12px rgb(0 0 0 / 0.25);
+    cursor: pointer;
+    transition:
+      transform 0.25s cubic-bezier(0.34, 1.56, 0.64, 1),
+      background 0.2s ease,
+      color 0.2s ease;
+
+    &:hover {
+      transform: scale(1.12);
+      background: #0b1f2e;
+      color: #fff;
+    }
+
+    &:focus-visible {
+      outline: 2px solid #1260f0;
+      outline-offset: 2px;
+    }
+  }
+
+  .trust-card.is-dismissed {
+    pointer-events: none;
   }
 
   /* ---------- AI card inside the trust frame ---------- */
