@@ -46,6 +46,13 @@ const routes: Record<Mode, { states: [NodeState, NodeState, NodeState]; caption:
 };
 
 const mode = ref<Mode>('unclear');
+/* Signal that the card is interactive: once it has arrived, the other answers give a gentle
+   nudge a few times, until someone picks one. */
+const interacted = ref(false);
+const hinting = ref(false);
+const startHint = () => {
+  hinting.value = true;
+};
 const route = computed(() => routes[mode.value]);
 
 const rootRef = ref<HTMLElement | null>(null);
@@ -53,6 +60,7 @@ const nodesRef = ref<HTMLElement | null>(null);
 
 /* A small bounce on the nodes that light up when the answer changes. */
 const choose = async (m: Mode) => {
+  interacted.value = true;
   if (m === mode.value) return;
   mode.value = m;
   await nextTick();
@@ -81,71 +89,94 @@ let ctx: gsap.Context | null = null;
 let mm: gsap.MatchMedia | null = null;
 let enterIo: IntersectionObserver | null = null;
 
-/* Desktop: once the section is mostly on screen, the main copy plays in first (eyebrow,
-   headline, lead, button), then the card slides in from the right and its route draws. While the section
-   is on screen, the card, grid and glow drift at different speeds for a little depth. */
+/* Desktop: like the Loom section, everything is tied to the scroll and reverses when you scroll
+   back up. As the section rises, the eyebrow and headline arrive. Then it holds for about a
+   screen while the lead and button come in, and only after that the card slides in from the
+   right and its route draws. The background shapes drift in at different speeds throughout. */
+const holdLength = () => Math.round(window.innerHeight * 1.1);
+
 const buildScrub = (root: HTMLElement) => {
-  /* Plays once the section is mostly on screen, in a clear order: the copy rises in and
-     settles, then (only then) the card slides in from the right and its route draws. */
-  /* Start hidden explicitly: a paused timeline doesn't apply its starting values on its own. */
-  gsap.set('.closing__copy > *', { autoAlpha: 0, y: 40 });
-  gsap.set('.closing__panel', { autoAlpha: 0, x: 160, rotate: 2 });
-  gsap.set('.node', { autoAlpha: 0, scale: 0.8 });
-  gsap.set('.link__fill', { scaleX: 0 });
-  const enter = gsap.timeline({ paused: true, defaults: { ease: 'power3.out' } });
-  enter
-    .fromTo(
-      '.closing__copy > *',
-      { autoAlpha: 0, y: 40 },
-      { autoAlpha: 1, y: 0, duration: 0.75, stagger: 0.14 },
+  const q = (sel: string) => root.querySelector<HTMLElement>(sel);
+  const eyebrow = q('.closing__eyebrow');
+  const title = q('.closing__title');
+  const rest = [q('.closing__lead'), q('.closing__cta'), q('.closing__meta')].filter(
+    (el): el is HTMLElement => !!el,
+  );
+
+  /* 1. Rising: the headline arrives, so the section never scrolls in empty. */
+  const rise = gsap.timeline({
+    defaults: { ease: 'power2.out' },
+    scrollTrigger: {
+      trigger: root,
+      start: 'top 80%',
+      end: 'top 10%',
+      scrub: 0.6,
+      refreshPriority: -3, // measured after every pin above it
+    },
+  });
+  if (eyebrow)
+    rise.fromTo(eyebrow, { autoAlpha: 0, y: 24 }, { autoAlpha: 1, y: 0, duration: 0.4 }, 0);
+  if (title)
+    rise.fromTo(title, { autoAlpha: 0, y: 40 }, { autoAlpha: 1, y: 0, duration: 0.6 }, 0.15);
+
+  /* 2. The hold: the rest of the copy, a beat, then the card and its route. */
+  const hold = gsap.timeline({
+    defaults: { ease: 'power2.out' },
+    scrollTrigger: {
+      trigger: root,
+      start: 'top top',
+      end: () => `+=${holdLength()}`,
+      pin: true,
+      pinSpacing: true,
+      anticipatePin: 1,
+      scrub: 0.6,
+      refreshPriority: -3,
+      invalidateOnRefresh: true,
+    },
+  });
+  if (rest.length) {
+    hold.fromTo(
+      rest,
+      { autoAlpha: 0, y: 28 },
+      { autoAlpha: 1, y: 0, duration: 0.3, stagger: 0.14 },
       0,
-    )
+    );
+  }
+  hold
     .fromTo(
       '.closing__panel',
-      { autoAlpha: 0, x: 160, rotate: 2 },
-      { autoAlpha: 1, x: 0, rotate: 0, duration: 0.9, ease: 'back.out(1.2)' },
-      '+=0.25',
+      { autoAlpha: 0, x: 180, rotate: 2 },
+      { autoAlpha: 1, x: 0, rotate: 0, duration: 0.5 },
+      0.75,
     )
     .fromTo(
       '.node',
       { autoAlpha: 0, scale: 0.8 },
-      { autoAlpha: 1, scale: 1, duration: 0.5, stagger: 0.14, ease: 'back.out(2)' },
-      '-=0.3',
+      { autoAlpha: 1, scale: 1, duration: 0.22, stagger: 0.1, ease: 'back.out(2)' },
+      1.1,
     )
-    .fromTo(
-      '.link__fill',
-      { scaleX: 0 },
-      { scaleX: 1, duration: 0.4, stagger: 0.14, ease: 'power1.inOut' },
-      '-=0.45',
-    );
-  ScrollTrigger.create({
-    trigger: root,
-    start: 'top 30%', // nearly all of the section is on screen
-    once: true,
-    refreshPriority: -3, // measured after every pin above it
-    onEnter: () => enter.play(),
-  });
+    .fromTo('.link__fill', { scaleX: 0 }, { scaleX: 1, duration: 0.18, stagger: 0.1 }, 1.2)
+    .call(startHint, undefined, 1.4)
+    .to({}, { duration: 0.35 }); // rest on the finished state
 
-  /* Parallax across the section's whole arrival. */
+  /* 3. Depth: shapes, grid and glow drift in across the rise and the hold. */
   const drift = gsap.timeline({
     defaults: { ease: 'none' },
     scrollTrigger: {
       trigger: root,
       start: 'top bottom',
-      end: 'bottom bottom',
+      end: () => `+=${window.innerHeight + holdLength()}`,
       scrub: true,
       refreshPriority: -3,
+      invalidateOnRefresh: true,
     },
   });
-  /* Nearer things move more: the card most, then the shapes, the grid least. */
   drift
-    .fromTo('.closing__panel', { y: 240 }, { y: 0 }, 0)
-    .fromTo('.closing__copy', { y: 80 }, { y: 0 }, 0)
     .fromTo('.shape--card', { y: 320, rotate: -9 }, { y: 0, rotate: -3 }, 0)
     .fromTo('.shape--bar', { y: 420, rotate: -7 }, { y: 0, rotate: -2 }, 0)
     .fromTo('.shape--bar2', { y: 260 }, { y: 0 }, 0)
     .fromTo('.shape--orb', { y: 460, scale: 0.8 }, { y: 0, scale: 1 }, 0)
-    .fromTo('.shape--mini', { y: 200, rotate: 7 }, { y: 0, rotate: 2 }, 0)
+    .fromTo('.shape--mini', { y: 220, rotate: 7 }, { y: 0, rotate: 2 }, 0)
     .fromTo('.closing__grid', { y: 120 }, { y: 0 }, 0)
     .fromTo('.closing__glow', { translate: '0px 240px' }, { translate: '0px 0px' }, 0);
 };
@@ -189,6 +220,7 @@ const buildOnce = (root: HTMLElement) => {
     (entries) => {
       if (entries.some((e) => e.isIntersecting)) {
         enterIo?.disconnect();
+        tl.eventCallback('onComplete', startHint);
         tl.play();
       }
     },
@@ -262,8 +294,16 @@ onBeforeUnmount(() => {
       </div>
 
       <div class="closing__panel">
-        <p id="closing-q" class="closing__q q-ma-none">Where are you now?</p>
-        <div class="modes" role="radiogroup" aria-labelledby="closing-q">
+        <div class="closing__qrow">
+          <p id="closing-q" class="closing__q q-ma-none">Where are you now?</p>
+          <p class="closing__hint q-ma-none">Pick one. Your route updates below.</p>
+        </div>
+        <div
+          class="modes"
+          :class="{ 'is-hinting': hinting && !interacted }"
+          role="radiogroup"
+          aria-labelledby="closing-q"
+        >
           <button
             v-for="m in modes"
             :key="m.key"
@@ -274,6 +314,7 @@ onBeforeUnmount(() => {
             :aria-checked="mode === m.key"
             @click="choose(m.key)"
           >
+            <span class="mode__dot" aria-hidden="true"></span>
             {{ m.label }}
           </button>
         </div>
@@ -343,10 +384,12 @@ $bounce: cubic-bezier(0.34, 1.56, 0.64, 1);
   @media (min-width: tokens.$breakpoint-lg) {
     display: flex;
     align-items: center;
-    min-height: 92vh;
-    min-height: 92svh;
-    padding-block: clamp(5rem, 12vh, 8rem);
-    padding-inline: var(--logo-x, calc(2vw + 11.5rem));
+    height: 100vh;
+    height: 100svh;
+    padding-block: clamp(4rem, 10vh, 7rem);
+    /* A little more room from the side rail than the logo edge alone gives. */
+    padding-left: calc(var(--logo-x, calc(2vw + 11.5rem)) + 3rem);
+    padding-right: var(--logo-x, calc(2vw + 11.5rem));
   }
 }
 
@@ -399,26 +442,26 @@ $bounce: cubic-bezier(0.34, 1.56, 0.64, 1);
   will-change: transform;
 }
 
-/* A pale UI card behind the headline's top-left. */
+/* A pale UI card up between the columns, well clear of the copy. */
 .shape--card {
-  top: 8%;
-  left: calc(var(--logo-x, 12rem) - 6rem);
+  top: 7%;
+  left: 44%;
   display: grid;
   align-content: start;
-  gap: 0.7rem;
-  width: 300px;
-  height: 190px;
-  padding: 1.4rem;
-  border: 1px solid rgba(18, 96, 240, 0.14);
-  border-radius: 1.2rem;
-  background: rgba(255, 255, 255, 0.55);
-  box-shadow: 0 20px 50px rgba(10, 52, 135, 0.08);
+  gap: 0.6rem;
+  width: 220px;
+  height: 130px;
+  padding: 1.1rem;
+  border: 1px solid rgba(18, 96, 240, 0.08);
+  border-radius: 1rem;
+  background: rgba(255, 255, 255, 0.6);
+  box-shadow: 0 16px 40px rgba(10, 52, 135, 0.08);
 
   i {
     display: block;
-    height: 12px;
+    height: 10px;
     border-radius: 999px;
-    background: rgba(18, 96, 240, 0.14);
+    background: rgba(18, 96, 240, 0.09);
 
     &:nth-child(1) {
       width: 60%;
@@ -426,74 +469,72 @@ $bounce: cubic-bezier(0.34, 1.56, 0.64, 1);
 
     &:nth-child(2) {
       width: 85%;
-      background: rgba(18, 96, 240, 0.08);
+      background: rgba(18, 96, 240, 0.05);
     }
 
     &:nth-child(3) {
       width: 40%;
-      background: rgba(18, 96, 240, 0.08);
+      background: rgba(18, 96, 240, 0.05);
     }
   }
 }
 
-/* The hero's signature navy bar, low left, under the button. */
+/* The hero's bar, lightened, low under the card. */
 .shape--bar {
-  bottom: 4%;
-  left: calc(var(--logo-x, 12rem) - 4rem);
-  width: 360px;
-  height: 34px;
+  right: 9%;
+  bottom: 7%;
+  width: 300px;
+  height: 22px;
   border-radius: 999px;
-  background: linear-gradient(90deg, #0a3487, #1260f0);
-  box-shadow: 0 16px 36px rgba(10, 52, 135, 0.28);
-  opacity: 0.9;
+  background: linear-gradient(90deg, rgba(18, 96, 240, 0.45), rgba(18, 96, 240, 0.15));
 }
 
 .shape--bar2 {
-  bottom: 1.5%;
-  left: calc(var(--logo-x, 12rem) + 2rem);
-  width: 240px;
-  height: 14px;
+  right: 16%;
+  bottom: 3.5%;
+  width: 180px;
+  height: 10px;
   border-radius: 999px;
-  background: rgba(18, 96, 240, 0.18);
+  background: rgba(18, 96, 240, 0.1);
 }
 
 /* A soft blue orb behind the card's lower right. */
 .shape--orb {
-  right: 6%;
-  bottom: 6%;
-  width: 260px;
+  right: 5%;
+  bottom: 10%;
+  width: 240px;
   aspect-ratio: 1;
   border-radius: 50%;
   background: radial-gradient(
     circle at 35% 30%,
-    rgba(91, 147, 255, 0.55),
-    rgba(18, 96, 240, 0.18) 60%,
+    rgba(91, 147, 255, 0.4),
+    rgba(18, 96, 240, 0.12) 60%,
     transparent 72%
   );
 }
 
-/* A small notification chip, top right. */
+/* A small notification chip, low and to the left, below the copy. */
 .shape--mini {
-  top: 10%;
-  right: 9%;
+  bottom: 6%;
+  left: calc(var(--logo-x, 12rem) + 3rem);
   display: grid;
-  gap: 0.45rem;
-  width: 170px;
-  padding: 0.9rem 1rem;
-  border: 1px solid rgba(18, 96, 240, 0.16);
-  border-radius: 0.9rem;
-  background: #fff;
-  box-shadow: 0 14px 34px rgba(10, 52, 135, 0.12);
+  gap: 0.4rem;
+  width: 150px;
+  padding: 0.75rem 0.9rem;
+  border: 1px solid rgba(18, 96, 240, 0.1);
+  border-radius: 0.8rem;
+  background: rgba(255, 255, 255, 0.7);
+  box-shadow: 0 10px 24px rgba(10, 52, 135, 0.07);
 
   i {
     display: block;
-    height: 9px;
+    height: 8px;
     border-radius: 999px;
-    background: rgba(18, 96, 240, 0.16);
+    background: rgba(18, 96, 240, 0.12);
 
     &:nth-child(2) {
       width: 60%;
-      background: rgba(14, 138, 79, 0.35);
+      background: rgba(14, 138, 79, 0.28);
     }
   }
 }
@@ -638,6 +679,16 @@ $bounce: cubic-bezier(0.34, 1.56, 0.64, 1);
     0 2px 6px rgba(10, 52, 135, 0.05);
 }
 
+.closing__qrow {
+  display: grid;
+  gap: 0.25rem;
+}
+
+.closing__hint {
+  color: $muted;
+  font-size: 0.82rem;
+}
+
 .closing__q {
   color: $blue;
   font-size: 0.72rem;
@@ -653,7 +704,10 @@ $bounce: cubic-bezier(0.34, 1.56, 0.64, 1);
 }
 
 .mode {
-  padding: 0.55rem 0.95rem;
+  display: inline-flex;
+  gap: 0.5rem;
+  align-items: center;
+  padding: 0.55rem 0.95rem 0.55rem 0.75rem;
   border: 1px solid $line;
   border-radius: 999px;
   background: transparent;
@@ -684,6 +738,64 @@ $bounce: cubic-bezier(0.34, 1.56, 0.64, 1);
   &:focus-visible {
     outline: 2px solid $blue;
     outline-offset: 2px;
+  }
+}
+
+/* A radio dot, so each answer reads as a choice. */
+.mode__dot {
+  position: relative;
+  flex: none;
+  width: 0.95rem;
+  height: 0.95rem;
+  border: 2px solid rgba(18, 96, 240, 0.45);
+  border-radius: 50%;
+  background: #fff;
+  transition: border-color 0.25s ease;
+
+  &::after {
+    content: '';
+    position: absolute;
+    inset: 2px;
+    border-radius: 50%;
+    background: $blue;
+    transform: scale(0);
+    transition: transform 0.3s $bounce;
+  }
+
+  .mode.is-active & {
+    border-color: #fff;
+
+    &::after {
+      background: #fff;
+      transform: scale(1);
+    }
+  }
+}
+
+/* The nudge: unselected answers lift and ring softly, one after another, three times. */
+.modes.is-hinting .mode:not(.is-active) {
+  animation: nudge 1.8s ease-in-out 3;
+
+  &:nth-child(2) {
+    animation-delay: 0.25s;
+  }
+
+  &:nth-child(3) {
+    animation-delay: 0.5s;
+  }
+}
+
+@keyframes nudge {
+  0%,
+  60%,
+  100% {
+    transform: none;
+    box-shadow: 0 0 0 0 rgba(18, 96, 240, 0);
+  }
+  20% {
+    transform: translateY(-3px);
+    box-shadow: 0 0 0 5px rgba(18, 96, 240, 0.16);
+    border-color: rgba(18, 96, 240, 0.6);
   }
 }
 
@@ -862,6 +974,10 @@ $bounce: cubic-bezier(0.34, 1.56, 0.64, 1);
   .closing__book,
   .bypass {
     transition: none;
+  }
+
+  .modes.is-hinting .mode {
+    animation: none;
   }
 }
 </style>

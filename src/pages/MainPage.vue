@@ -1931,11 +1931,9 @@ const toExamples = () => {
 /* ---------- Section Transition ---------- */
 
 .section-transition {
-  /* Desktop: no band. It cut across the fixed logo and side rail; the Loom section flows
-     straight into the trust section instead. */
-  @media (min-width: tokens.$breakpoint-lg) {
-    display: none;
-  }
+  /* Retired: the Loom section now melds straight into the trust section (see the fades on
+     .trust-section). Kept in the markup in case a divider is wanted again. */
+  display: none;
 
   position: relative;
   z-index: 1;
@@ -1957,6 +1955,7 @@ const toExamples = () => {
    fixed header and the footer: you never land with its top hidden under the header. */
 .trust-section {
   position: relative;
+  isolation: isolate; /* so the edge fades below sit above the background, under the content */
   width: 100%;
   height: calc(100vh - 56px - 50px);
   height: calc(100svh - 56px - 50px);
@@ -1966,6 +1965,40 @@ const toExamples = () => {
   @media (min-width: tokens.$breakpoint-lg) {
     height: 100vh;
     height: 100svh;
+  }
+
+  /* Soft edges: the background fades in from the Loom section's colour at the top and out to
+     the closing section's colour at the bottom, so the three read as one surface. */
+  &::before,
+  &::after {
+    content: '';
+    position: absolute;
+    left: 0;
+    right: 0;
+    z-index: -1;
+    pointer-events: none;
+  }
+
+  &::before {
+    top: 0;
+    height: 24%;
+    background: linear-gradient(
+      180deg,
+      #eef3fd 0%,
+      rgba(238, 243, 253, 0.7) 40%,
+      rgba(238, 243, 253, 0) 100%
+    );
+  }
+
+  &::after {
+    bottom: 0;
+    height: 26%;
+    background: linear-gradient(
+      0deg,
+      #f2f6fe 0%,
+      rgba(242, 246, 254, 0.75) 40%,
+      rgba(242, 246, 254, 0) 100%
+    );
   }
 
   /* ---------- Notice cards ---------- */

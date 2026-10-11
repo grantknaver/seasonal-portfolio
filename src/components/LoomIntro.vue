@@ -785,6 +785,9 @@ $ease: cubic-bezier(0.22, 1, 0.36, 1);
   width: 100%;
   height: 100%;
   pointer-events: none;
+  /* Fade out before the section's bottom edge, so nothing is cut off where the trust section
+     begins. */
+  mask-image: linear-gradient(180deg, #000 62%, transparent 96%);
 
   .is-scrub > & {
     display: block;
