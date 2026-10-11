@@ -106,7 +106,7 @@ onBeforeUnmount(() => {
 <template>
   <section
     ref="rootRef"
-    :style="logoGutter ? { '--logo-x': logoGutter } : undefined"
+:style="{ '--vid-ratio': INTRO_LOOM_ASPECT, ...(logoGutter ? { '--logo-x': logoGutter } : {}) }"
     class="loom-intro"
     :class="{ 'is-in': isIn }"
     aria-labelledby="loom-intro-title"
@@ -307,12 +307,12 @@ $ease: cubic-bezier(0.22, 1, 0.36, 1);
 .loom-intro__media {
   @media (min-width: tokens.$breakpoint-md) {
     justify-self: end;
-    width: min(100%, calc(48vh * 4 / 3));
+    width: min(100%, calc(48vh * 16 / 9));
   }
 
   @media (min-width: tokens.$breakpoint-lg) {
     justify-self: end;
-    width: calc(var(--vid-h) * 4 / 3);
+    width: calc(var(--vid-h) * var(--vid-ratio, 16 / 9));
   }
 }
 

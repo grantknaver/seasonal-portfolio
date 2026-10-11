@@ -3,8 +3,8 @@
    While it's empty, the section only shows in dev (npm run dev), never on the live site. */
 export const INTRO_LOOM_URL = 'https://www.loom.com/share/210459f40dad4bf9828fea35b65851ce';
 
-/* The recording's shape (Loom reports 1920 × 1440), so the player has no black bars. */
-export const INTRO_LOOM_ASPECT = '4 / 3';
+/* The recording's actual video shape (1920 × 1080), so the player has no black bars. */
+export const INTRO_LOOM_ASPECT = '16 / 9';
 
 /* Turns a share link into the embeddable player URL. */
 export const loomEmbedUrl = (shareUrl: string) => {
