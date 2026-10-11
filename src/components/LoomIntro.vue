@@ -2,6 +2,7 @@
 import { computed, onBeforeUnmount, onMounted, ref } from 'vue';
 import { INTRO_LOOM_ASPECT, INTRO_LOOM_URL, loomEmbedUrl } from '../shared/constants/loom';
 import ClientResultsStrip from './ClientResultsStrip.vue';
+import { openTeardownBooking } from '../shared/constants/booking';
 
 /* The glue between the hero ("what I do") and the trust section ("why people hesitate"):
    the business cost of friction, in Grant's own voice. */
@@ -150,6 +151,14 @@ onBeforeUnmount(() => {
 
     <!-- The payoff: what clients reported once that friction was fixed. -->
     <ClientResultsStrip class="loom-intro__results" />
+
+    <!-- A next step for anyone convinced by the results. -->
+    <p class="loom-intro__next q-ma-none">
+      Want to see where your product is losing people?
+      <button type="button" class="loom-intro__cta" @click="openTeardownBooking()">
+        Book a free Teardown <span aria-hidden="true">&rarr;</span>
+      </button>
+    </p>
   </section>
 </template>
 
@@ -205,6 +214,47 @@ $ease: cubic-bezier(0.22, 1, 0.36, 1);
   margin: clamp(1.25rem, 3.5vh, 2.25rem) auto 0;
 }
 
+.loom-intro__next {
+  width: 100%;
+  max-width: 1180px;
+  margin: clamp(0.9rem, 2vh, 1.25rem) auto 0;
+  color: $muted;
+  font-size: 0.95rem;
+  line-height: 1.4;
+}
+
+.loom-intro__cta {
+  margin-left: 0.35rem;
+  padding: 0;
+  border: 0;
+  background: none;
+  color: $blue;
+  font: inherit;
+  font-weight: 700;
+  white-space: nowrap;
+  cursor: pointer;
+
+  span {
+    display: inline-block;
+    transition: transform 0.25s ease;
+  }
+
+  &:hover span,
+  &:focus-visible span {
+    transform: translateX(3px);
+  }
+
+  &:hover {
+    text-decoration: underline;
+  }
+
+  &:focus-visible {
+    outline: 2px solid $blue;
+    outline-offset: 3px;
+    border-radius: 4px;
+  }
+}
+
 .loom-intro__copy {
   display: grid;
   gap: 0.75rem;
@@ -219,8 +269,8 @@ $ease: cubic-bezier(0.22, 1, 0.36, 1);
   }
 
   @media (min-width: tokens.$breakpoint-lg) {
-    width: min(100%, calc((100vh - 26rem) * 4 / 3), 640px);
-    width: min(100%, calc((100svh - 26rem) * 4 / 3), 640px);
+    width: min(100%, calc((100vh - 28.5rem) * 4 / 3), 640px);
+    width: min(100%, calc((100svh - 28.5rem) * 4 / 3), 640px);
   }
 }
 
