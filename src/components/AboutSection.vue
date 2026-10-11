@@ -34,8 +34,8 @@ const fits = [
 
 const steps = [
   {
-    label: 'Teardown Review',
-    text: 'Free. I review one surface before we talk, bring 2–3 observations, and send a one-page Decision Snapshot after.',
+    label: 'Free Decision Snapshot',
+    text: 'A focused review of one surface: I study it before we talk, walk you through 2–3 observations, then send a one-page summary.',
   },
   {
     label: 'Diagnostic, only if needed',

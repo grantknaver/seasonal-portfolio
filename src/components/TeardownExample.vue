@@ -1,10 +1,8 @@
 <script lang="ts" setup>
 import DecisionSnapshot from './DecisionSnapshot.vue';
 
-/* Mirrors the sample Teardown PDF (Cairnwell Atlas): one screen,
-   two things I noticed, one simple idea, what we talk about on the call, then the
-   Decision Snapshot every attendee gets afterward. */
-const PDF = '/samples/sample-teardown-cairnwell-atlas.pdf';
+/* One Decision Snapshot, start to finish, on a made-up product (Cairnwell Atlas): what I prepare
+   before the call, what we talk about on it, and the one-page summary you get afterward. */
 
 const context = ['Canada', 'Healthcare', 'Ontario', 'Moderate AI usage'];
 
@@ -18,8 +16,9 @@ const rules = [
 
 <template>
   <div class="teardown">
+    <p class="mini-label q-ma-none">1 · Before the call, I prepare</p>
     <div class="td-head">
-      <span class="sample-tag">Sample Teardown · made-up product</span>
+      <span class="sample-tag">Sample · made-up product</span>
       <h3 class="q-my-none">Cairnwell Atlas: keep the user’s main details in view.</h3>
       <p class="q-ma-none">
         A compliance app that asks for the right details at setup, then hides them on every screen
@@ -90,7 +89,7 @@ const rules = [
 
     <div class="teardown__live">
       <div>
-        <p class="mini-label q-ma-none">On the call, we talk about</p>
+        <p class="mini-label q-ma-none">2 · On the call, we talk about</p>
         <ul class="q-ma-none">
           <li>Does this match what you’re seeing?</li>
           <li>Which one is hurting you most?</li>
@@ -101,7 +100,7 @@ const rules = [
 
     <!-- What every attendee leaves with. -->
     <div class="after">
-      <p class="mini-label q-ma-none">After the call, you get a Decision Snapshot</p>
+      <p class="mini-label q-ma-none">3 · After the call, your one-page summary</p>
       <DecisionSnapshot />
     </div>
 
@@ -113,14 +112,9 @@ const rules = [
         <span>“This showed us where we’ve been losing users.”</span>
         <span>“It gave us a clear, practical way to reduce friction.”</span>
       </div>
-      <p class="heard__note q-ma-none">Common reactions from 150 Teardowns, paraphrased.</p>
+      <p class="heard__note q-ma-none">Common reactions from 150 reviews, paraphrased.</p>
     </div>
 
-    <div class="teardown__foot">
-      <a class="pdf-link" :href="PDF" target="_blank" rel="noopener">
-        See the full sample Teardown (PDF, 3 pages) &rarr;
-      </a>
-    </div>
   </div>
 </template>
 

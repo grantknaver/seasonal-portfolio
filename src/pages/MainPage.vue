@@ -1080,7 +1080,7 @@ const toExamples = () => {
 
           <div class="hero-copy column justify-center q-pa-lg">
             <p class="text-caption kicker q-mt-none q-mb-sm">
-              150 Teardowns for technical founders
+              150 product reviews for technical founders
             </p>
 
             <h1 class="headline text-h1 q-mt-none q-mb-md">LESS TO FIGURE OUT. MORE TO ACT ON.</h1>
@@ -1094,11 +1094,14 @@ const toExamples = () => {
 
             <div class="cta-wrap q-mt-md">
               <q-btn class="cta" @click="openTeardownBooking()" color="accent" size="lg" glossy>
-                <span class="text-body-2">BOOK A FREE TEARDOWN</span>
+                <span class="text-body-2">GET MY FREE DECISION SNAPSHOT</span>
               </q-btn>
               <button type="button" class="cta cta--message" @click="toContact()">
                 or send me a message &rarr;
               </button>
+              <p class="cta cta--def q-ma-none">
+                A focused review of one screen of your product, plus a one-page takeaway.
+              </p>
             </div>
           </div>
         </div>
@@ -1407,6 +1410,14 @@ const toExamples = () => {
   }
 }
 
+.cta--def {
+  max-width: 44ch;
+  white-space: normal !important; /* hero CTAs are nowrap; this line may wrap */
+  color: rgb(247 249 254 / 0.78); /* sits on the dark hero card */
+  font-size: 0.8rem;
+  line-height: 1.35;
+}
+
 .cta--message {
   padding: 0.4rem 0;
   border: 0;
@@ -1594,7 +1605,8 @@ const toExamples = () => {
           }
 
           /* Keep the collapsed hero compact: just the menu and the booking button. */
-          .cta--message {
+          .cta--message,
+          .cta--def {
             display: none;
           }
         }

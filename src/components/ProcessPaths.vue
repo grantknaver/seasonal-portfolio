@@ -1,5 +1,5 @@
 <script lang="ts" setup>
-/* The decision tree: everyone starts with a Teardown Review, then takes the path that fits.
+/* The decision tree: everyone starts with a free Decision Snapshot, then takes the path that fits.
    Nobody has to buy a Diagnostic first. */
 withDefaults(defineProps<{ compact?: boolean }>(), { compact: false });
 </script>
@@ -8,8 +8,8 @@ withDefaults(defineProps<{ compact?: boolean }>(), { compact: false });
   <div class="paths" :class="{ 'paths--compact': compact }">
     <div class="paths__start">
       <span class="node node--start">
-        <b>Teardown Review</b>
-        <small>Free · one screen · 2–3 things I noticed</small>
+        <b>Free Decision Snapshot</b>
+        <small>One screen · a one-page summary</small>
       </span>
       <i class="stem" aria-hidden="true"></i>
       <span class="question">Do you know what needs to change?</span>

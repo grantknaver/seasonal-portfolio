@@ -87,7 +87,7 @@ const directions = [
     </div>
 
     <div class="dirs">
-      <p class="snap__label q-ma-none">Directions to explore <small>from the Pattern Index</small></p>
+      <p class="snap__label q-ma-none">Directions to explore <small>examples from my pattern library</small></p>
       <div class="dirs__row">
         <a
           v-for="d in directions"

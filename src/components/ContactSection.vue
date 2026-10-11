@@ -37,7 +37,7 @@ const { isHuman, packageInterestText } = storeToRefs(mainStore);
 const { lgBreakpoint, width } = useViewport();
 const isResponsive = computed(() => width.value < lgBreakpoint);
 
-/* One way to start: book a free Teardown. Scope (Diagnostic or build) gets discussed there.
+/* One way to start: a free Decision Snapshot. Scope (Diagnostic or build) gets discussed there.
    Anyone who already knows what they want can send a message instead. */
 const BOOKING_URL = TEARDOWN_BOOKING_URL;
 const formRef = ref<HTMLElement | null>(null);
@@ -128,17 +128,17 @@ const sendEmail = async () => {
     <div class="contact-sheet">
       <header class="contact-intro">
         <p class="kicker q-mt-none q-mb-sm">I find where people get stuck in your product, and fix it.</p>
-        <h1 class="q-mt-none q-mb-md">Start with a free Teardown.</h1>
+        <h1 class="q-mt-none q-mb-md">Start with a free Decision Snapshot.</h1>
         <p class="lead q-ma-none">
-          I study one screen of your product before we talk and bring 2–3 things I noticed. On the
-          call, we figure out together whether you need a Diagnostic, a build, or neither. If I
-          don’t see anything worth pursuing, I’ll tell you. I’ve done 150 of these.
+          A Decision Snapshot is a free, focused review of one screen of your product. I study it
+          before we meet, walk you through the 2–3 things that matter most on a 20-minute call, and
+          send you a one-page summary afterward. I’ve done 150 of these.
         </p>
       </header>
 
       <div class="book">
         <q-btn class="book__btn" color="accent" size="lg" glossy @click="bookTeardown">
-          <span class="text-body-2">Book a free Teardown</span>
+          <span class="text-body-2">Get my free Decision Snapshot</span>
         </q-btn>
         <div class="book__info">
           <span class="book__meta">Free · 20 minutes · just send one link</span>
@@ -151,12 +151,17 @@ const sendEmail = async () => {
       <!-- What every attendee leaves with. -->
       <div class="takeaway">
         <div class="takeaway__copy">
-          <p class="takeaway__title q-ma-none">You leave with a Decision Snapshot</p>
-          <p class="q-ma-none">
-            One page, sent after the call: the key issues, an annotated view of where they show up,
-            a few directions from the Pattern Index, and the next decision I think matters most.
-            Yours to share with your team, whether or not we work together.
-          </p>
+          <p class="takeaway__title q-ma-none">After the call: one page your team can use</p>
+          <ul class="takeaway__list q-ma-none">
+            <li><b>2–3 highest-leverage issues</b> on the surface you sent</li>
+            <li><b>One annotated screenshot</b> showing where the friction appears</li>
+            <li>
+              <b>1–3 pattern directions</b> from my Pattern Index, a library of interaction
+              patterns (a direction, not a finished design)
+            </li>
+            <li><b>The next decision</b> that matters most</li>
+          </ul>
+          <p class="takeaway__own q-ma-none">Yours to keep, whether or not we work together.</p>
           <PatternIndexLink class="takeaway__link" text="Browse the Pattern Index" />
         </div>
         <!-- A small, inert preview of the real one-pager (the full sample lives in Lens). -->
@@ -371,6 +376,37 @@ $line: rgba(18, 96, 240, 0.18);
   .takeaway {
     grid-template-columns: 1fr;
   }
+}
+
+.takeaway__list {
+  display: grid;
+  gap: 0.3rem;
+  padding: 0;
+  list-style: none;
+
+  li {
+    position: relative;
+    padding-left: 1.3rem;
+    font-size: 0.88rem;
+    line-height: 1.4;
+
+    &::before {
+      content: '✓';
+      position: absolute;
+      left: 0;
+      color: $blue;
+      font-weight: 700;
+    }
+  }
+
+  b {
+    color: $ink;
+  }
+}
+
+.takeaway__own {
+  color: rgba(11, 31, 46, 0.6);
+  font-size: 0.82rem;
 }
 
 .takeaway__title {

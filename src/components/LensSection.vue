@@ -31,8 +31,8 @@ const chapters = [
   },
   {
     id: 'lens-teardown',
-    title: 'What a Teardown Review looks like',
-    sub: 'I study one screen before we talk, bring 2–3 things I noticed, and send a one-page Decision Snapshot after.',
+    title: 'What a Decision Snapshot looks like',
+    sub: 'A focused review of one screen: I study it before we talk, walk you through it, and send a one-page summary after.',
   },
   {
     id: 'lens-lenses',
@@ -243,7 +243,7 @@ onBeforeUnmount(() => io?.disconnect());
 
       <!-- What 150 Teardowns taught me -->
       <aside class="lesson">
-        <p class="lesson__label q-ma-none">What 150 Teardowns taught me</p>
+        <p class="lesson__label q-ma-none">What 150 product reviews taught me</p>
         <p class="lesson__big q-ma-none">Most products tell too much and show too little.</p>
         <p class="lesson__body q-ma-none">
           The most common problem I find is leaning on copy to explain things the product could just
@@ -433,14 +433,14 @@ onBeforeUnmount(() => io?.disconnect());
       <div class="lens-close">
         <p class="q-ma-none">
           <b>Priority clear? I build the fix.</b> Not sure yet? A Diagnostic finds it first. Either
-          way, it starts with a free Teardown.
+          way, it starts with a free Decision Snapshot.
         </p>
         <div class="lens-close__btns">
           <q-btn class="lens-cta lens-cta--ghost" flat size="lg" @click="toExamples">
             <span class="text-body-2">See the builds</span>
           </q-btn>
           <q-btn class="lens-cta" color="accent" size="lg" glossy @click="toContact">
-            <span class="text-body-2">Start with a Teardown</span>
+            <span class="text-body-2">Get a free Decision Snapshot</span>
           </q-btn>
         </div>
       </div>

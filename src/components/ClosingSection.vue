@@ -5,24 +5,42 @@ import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import { useViewport } from 'src/shared/utils/viewWidth';
 import { openTeardownBooking } from '../shared/constants/booking';
 
-/* The close of the page: one question ("where are you now?") and the route that answer takes.
-   Everyone starts with a free Teardown; what follows depends on what we find. */
+/* The close of the page. Left: what the free Decision Snapshot is, in four steps, and the one
+   button to get it. Right: what can happen after it (diagnose or build), as a small interactive
+   route. */
 const emit = defineEmits<{ message: [] }>();
 
 gsap.registerPlugin(ScrollTrigger);
 const { lgBreakpoint } = useViewport();
 
-type Mode = 'unclear' | 'clear' | 'opinion';
+type Mode = 'unclear' | 'clear';
 type NodeState = 'on' | 'maybe' | 'skip' | 'off';
 
 const modes: { key: Mode; label: string }[] = [
-  { key: 'unclear', label: 'Something feels off' },
-  { key: 'clear', label: 'I know what’s broken' },
-  { key: 'opinion', label: 'I want a second opinion' },
+  { key: 'unclear', label: 'It’s not clear what’s wrong' },
+  { key: 'clear', label: 'We know what needs fixing' },
+];
+
+/* What a Decision Snapshot is, start to finish. */
+/* What's on the one page, spelled out. */
+const gets = [
+  { b: '2–3 highest-leverage issues', s: 'on the surface you sent' },
+  { b: 'One annotated screenshot', s: 'where the friction appears' },
+  {
+    b: '1–3 pattern directions',
+    s: 'from my Pattern Index of interaction patterns',
+  },
+  { b: 'The next decision', s: 'the one that matters most' },
+];
+
+const steps = [
+  'You send one screen, flow, or AI feature.',
+  'I review it before we meet.',
+  'We walk through what matters most, live.',
 ];
 
 const nodes = [
-  { key: 'teardown', title: 'Free Teardown', meta: '20 min · one surface' },
+  { key: 'teardown', title: 'Decision Snapshot', meta: 'Free · one surface · one page' },
   { key: 'diag', title: 'Diagnostic', meta: 'When the problem is unclear' },
   { key: 'build', title: 'Build the fix', meta: 'When the problem is clear' },
 ] as const;
@@ -32,16 +50,12 @@ const routes: Record<Mode, { states: [NodeState, NodeState, NodeState]; caption:
   unclear: {
     states: ['on', 'on', 'maybe'],
     caption:
-      'We find what’s actually wrong before you spend on a fix. The Diagnostic can stand on its own, or I carry it into the build.',
+      'The Diagnostic pins down what’s wrong and what to change first. It can stand on its own, or I carry it into the build.',
   },
   clear: {
     states: ['on', 'skip', 'on'],
-    caption: 'No Diagnostic needed. We scope the fix on the call, then I build it.',
-  },
-  opinion: {
-    states: ['on', 'off', 'off'],
     caption:
-      'You leave with a one-page Decision Snapshot your team can use, whether or not we work together.',
+      'No Diagnostic needed. I build the fix: UI and interaction work, frontend, motion, workflow, and trust and AI-legibility improvements.',
   },
 };
 
@@ -68,7 +82,7 @@ const startHint = () => {
   const panel = panelRef.value;
   const cursor = cursorRef.value;
   const opts = panel?.querySelectorAll<HTMLElement>('.mode');
-  if (!panel || !cursor || !opts || opts.length < 3) return;
+  if (!panel || !cursor || !opts || opts.length < 2) return;
   demoPlayed = true;
   const at = (i: number) => {
     const p = panel.getBoundingClientRect();
@@ -92,9 +106,7 @@ const startHint = () => {
     .to(cursor, { autoAlpha: 1, duration: 0.3 })
     .to(cursor, { x: start.x, y: start.y, duration: 0.7, ease: 'power3.inOut' }, '<')
     .add(press(1))
-    .to(cursor, { x: at(2).x, y: at(2).y, duration: 0.7, ease: 'power3.inOut' }, '+=1.1')
-    .add(press(2))
-    .to(cursor, { x: at(0).x, y: at(0).y, duration: 0.7, ease: 'power3.inOut' }, '+=1.1')
+    .to(cursor, { x: at(0).x, y: at(0).y, duration: 0.7, ease: 'power3.inOut' }, '+=1.3')
     .add(press(0))
     .to(cursor, { autoAlpha: 0, y: '+=20', duration: 0.4 }, '+=0.6');
 };
@@ -154,9 +166,11 @@ const buildScrub = (root: HTMLElement) => {
   const q = (sel: string) => root.querySelector<HTMLElement>(sel);
   const eyebrow = q('.closing__eyebrow');
   const title = q('.closing__title');
-  const rest = [q('.closing__lead'), q('.closing__cta'), q('.closing__meta')].filter(
-    (el): el is HTMLElement => !!el,
-  );
+  const rest = [
+    ...root.querySelectorAll<HTMLElement>('.closing__steps > li'),
+    q('.closing__cta'),
+    q('.closing__meta'),
+  ].filter((el): el is HTMLElement => !!el);
 
   /* 1. Rising: the headline arrives, so the section never scrolls in empty. */
   const rise = gsap.timeline({
@@ -342,35 +356,50 @@ onBeforeUnmount(() => {
 
     <div class="closing__inner">
       <div class="closing__copy">
-        <p class="closing__eyebrow q-ma-none">Where to start</p>
+        <p class="closing__eyebrow q-ma-none">The free Decision Snapshot</p>
         <h2 id="closing-title" class="closing__title q-ma-none">
           Show me one surface. I’ll show you where people get stuck.
         </h2>
-        <p class="closing__lead q-ma-none">
-          Every engagement starts the same way: a free Teardown. What happens next depends on what
-          we find.
-        </p>
+        <ol class="closing__steps q-ma-none">
+          <li v-for="st in steps" :key="st">{{ st }}</li>
+          <li class="closing__steps-last">
+            You get one page with:
+            <ul class="gets q-ma-none">
+              <li v-for="g in gets" :key="g.b">
+                <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12.5l4.2 4.2L19 7" /></svg>
+                <span
+                  ><b>{{ g.b }}</b> <small>{{ g.s }}</small></span
+                >
+              </li>
+            </ul>
+          </li>
+        </ol>
         <div class="closing__cta">
           <button type="button" class="closing__book" @click="openTeardownBooking()">
-            Book a free Teardown <span aria-hidden="true">&rarr;</span>
+            Get my free Decision Snapshot <span aria-hidden="true">&rarr;</span>
           </button>
           <button type="button" class="closing__msg" @click="emit('message')">
             or send me a message
           </button>
         </div>
-        <p class="closing__meta q-ma-none">Free · 20 minutes · just send one link</p>
+        <p class="closing__meta q-ma-none">
+          Free · 20 minutes. If I don’t see anything meaningful enough to pursue, I’ll tell you.
+        </p>
       </div>
 
       <div ref="panelRef" class="closing__panel" @pointerdown="stopDemo">
         <!-- Outside the card: a quiet hand-drawn note pointing into the answers. -->
         <div class="try-note" aria-hidden="true">
-          <span class="try-note__text">Try it: pick where you are</span>
+          <span class="try-note__text">Try it: pick your situation</span>
           <svg class="try-note__arrow" viewBox="0 0 60 50">
             <path class="try-note__line" pathLength="1" d="M52 6 C 34 4, 14 12, 12 40" />
             <path class="try-note__head" pathLength="1" d="M4 32 L12 42 L20 33" />
           </svg>
         </div>
-        <h3 id="closing-q" class="closing__q q-ma-none">Where are you now?</h3>
+        <p class="closing__after q-ma-none">After your Decision Snapshot</p>
+        <h3 id="closing-q" class="closing__q q-ma-none">
+          If the problem is unclear, we diagnose it. If it’s already clear, we build the fix.
+        </h3>
         <div class="modes" role="radiogroup" aria-labelledby="closing-q">
           <button
             v-for="m in modes"
@@ -408,9 +437,6 @@ onBeforeUnmount(() => {
               </span>
               <b>{{ n.title }}</b>
               <small>{{ route.states[i] === 'skip' ? 'Skipped' : n.meta }}</small>
-              <span v-if="n.key === 'teardown' && mode === 'opinion'" class="node__extra">
-                + Decision Snapshot
-              </span>
             </div>
             <span
               v-if="i < nodes.length - 1"
@@ -458,7 +484,7 @@ $bounce: cubic-bezier(0.34, 1.56, 0.64, 1);
     align-items: center;
     height: 100vh;
     height: 100svh;
-    padding-block: clamp(4rem, 10vh, 7rem);
+    padding-block: clamp(3rem, 7vh, 5rem);
     /* A little more room from the side rail than the logo edge alone gives. */
     padding-left: calc(var(--logo-x, calc(2vw + 11.5rem)) + 3rem);
     padding-right: var(--logo-x, calc(2vw + 11.5rem));
@@ -597,8 +623,8 @@ $bounce: cubic-bezier(0.34, 1.56, 0.64, 1);
 
 /* A small notification chip, low and to the left, below the copy. */
 .shape--mini {
-  bottom: 6%;
-  left: calc(var(--logo-x, 12rem) + 3rem);
+  bottom: 5%;
+  left: 40%;
   display: grid;
   gap: 0.4rem;
   width: 150px;
@@ -644,7 +670,7 @@ $bounce: cubic-bezier(0.34, 1.56, 0.64, 1);
 
 .closing__copy {
   display: grid;
-  gap: 1rem;
+  gap: 0.85rem;
   justify-items: start;
 }
 
@@ -657,12 +683,123 @@ $bounce: cubic-bezier(0.34, 1.56, 0.64, 1);
 }
 
 .closing__title {
-  max-width: 18ch;
-  font-size: clamp(2rem, 3.2vw, 3rem);
+  max-width: 20ch;
+  font-size: clamp(1.7rem, 2.25vw, 2.2rem);
   font-weight: 600;
   letter-spacing: -0.025em;
   line-height: 1.08;
   text-wrap: balance;
+}
+
+.closing__steps {
+  display: grid;
+  gap: 0.4rem;
+  max-width: 46ch;
+  padding: 0;
+  list-style: none;
+  counter-reset: step;
+
+  li {
+    position: relative;
+    padding-left: 2.1rem;
+    color: $muted;
+    font-size: 1rem;
+    line-height: 1.45;
+    counter-increment: step;
+
+    &::before {
+      content: counter(step);
+      position: absolute;
+      top: 0.05rem;
+      left: 0;
+      display: grid;
+      place-items: center;
+      width: 1.45rem;
+      height: 1.45rem;
+      border: 1.5px solid rgba(18, 96, 240, 0.35);
+      border-radius: 50%;
+      background: #fff;
+      color: $blue;
+      font-size: 0.75rem;
+      font-weight: 700;
+    }
+  }
+
+  .closing__steps-last {
+    color: $ink;
+    font-weight: 600;
+
+    &::before {
+      border-color: $blue;
+      background: $blue;
+      color: #fff;
+    }
+  }
+}
+
+/* The four things on the one page: a compact two-by-two checklist. */
+.gets {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0.55rem 1rem;
+  margin-top: 0.55rem !important;
+  padding: 0.8rem 0.9rem;
+  border: 1px solid rgba(18, 96, 240, 0.16);
+  border-radius: 0.8rem;
+  background: rgba(255, 255, 255, 0.75);
+  list-style: none;
+
+  @media (max-width: 599px) {
+    grid-template-columns: 1fr;
+  }
+
+  li {
+    display: flex;
+    gap: 0.45rem;
+    align-items: flex-start;
+    padding: 0 !important;
+    font-weight: 400;
+
+    &::before {
+      content: none !important;
+    }
+  }
+
+  svg {
+    flex: none;
+    width: 1rem;
+    height: 1rem;
+    margin-top: 0.15rem;
+    fill: none;
+    stroke: $blue;
+    stroke-width: 3;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+  }
+
+  span {
+    display: grid;
+    line-height: 1.3;
+  }
+
+  b {
+    color: $ink;
+    font-size: 0.88rem;
+    font-weight: 700;
+  }
+
+  small {
+    color: $muted;
+    font-size: 0.76rem;
+  }
+}
+
+.closing__after {
+  color: $blue;
+  font-size: 0.7rem;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
 }
 
 .closing__lead {
@@ -1022,17 +1159,6 @@ $bounce: cubic-bezier(0.34, 1.56, 0.64, 1);
   }
 }
 
-.node__extra {
-  margin-top: 0.25rem;
-  padding: 0.2rem 0.6rem;
-  border-radius: 999px;
-  background: rgba(18, 96, 240, 0.1);
-  color: $navy;
-  font-size: 0.72rem;
-  font-weight: 700;
-  white-space: nowrap;
-}
-
 /* Connectors sit level with the dots. */
 .link {
   position: relative;
@@ -1067,7 +1193,7 @@ $bounce: cubic-bezier(0.34, 1.56, 0.64, 1);
   }
 }
 
-/* "I know what's broken": an arc hops over the Diagnostic, Teardown straight to the build. */
+/* "I know what's broken": an arc hops over the Diagnostic, straight from the Snapshot to the build. */
 .bypass {
   position: absolute;
   top: 0.35rem;

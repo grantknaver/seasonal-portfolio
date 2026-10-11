@@ -395,7 +395,7 @@ onBeforeUnmount(() => {
     <p class="loom-intro__next q-ma-none" :class="{ 'is-in': resultsIn || scrubMode }">
       Want to see where your product is losing people?
       <button type="button" class="loom-intro__cta" @click="openTeardownBooking()">
-        Book a free Teardown <span aria-hidden="true">&rarr;</span>
+        Get your free Decision Snapshot <span aria-hidden="true">&rarr;</span>
       </button>
     </p>
   </section>
