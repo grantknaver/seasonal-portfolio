@@ -16,7 +16,7 @@ const mainStore = useMainStore();
 const { activeTopic } = storeToRefs(mainStore);
 const labelsVisible = ref(false);
 
-const props = withDefaults(defineProps<{ layout?: 'grid' | 'row' }>(), {
+const props = withDefaults(defineProps<{ layout?: 'grid' | 'row' | 'column' }>(), {
   layout: 'grid',
 });
 
@@ -141,6 +141,29 @@ onMounted(() => {
 
     .simon-link .q-icon {
       font-size: 60px;
+    }
+  }
+
+  /* ---------- Column (the side rail after the hero) ---------- */
+
+  &--column {
+    display: flex;
+    flex-direction: column;
+    gap: 0.6rem;
+
+    .simon-quadrant {
+      position: static;
+      width: 88px;
+      height: 88px;
+      padding: 0.4rem;
+    }
+
+    .simon-link .q-icon {
+      font-size: 44px;
+    }
+
+    .label {
+      font-size: 0.6rem;
     }
   }
 }

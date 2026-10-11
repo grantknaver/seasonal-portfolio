@@ -3,6 +3,11 @@ import { onBeforeUnmount, onMounted, ref } from 'vue';
 import { INTRO_LOOM_ASPECT, INTRO_VIDEO_SRC } from '../shared/constants/loom';
 import ClientResultsStrip from './ClientResultsStrip.vue';
 import { openTeardownBooking } from '../shared/constants/booking';
+import gsap from 'gsap';
+import { ScrollTrigger } from 'gsap/ScrollTrigger';
+import { useViewport } from 'src/shared/utils/viewWidth';
+
+gsap.registerPlugin(ScrollTrigger);
 
 /* The glue between the hero ("what I do") and the trust section ("why people hesitate"):
    the business cost of friction, in Grant's own voice. */
@@ -29,12 +34,178 @@ const onEnded = () => {
   watched.value = true;
 };
 
-const costs = ['Signups that stall', 'Demos that need explaining', 'Support tickets that shouldn’t exist'];
+const costs = [
+  'Signups that stall',
+  'Demos that need explaining',
+  'Support tickets that shouldn’t exist',
+];
 
 /* One gentle reveal as the section scrolls in, like the panels. */
 const rootRef = ref<HTMLElement | null>(null);
 const isIn = ref(false);
 let io: IntersectionObserver | null = null;
+const gridRef = ref<HTMLElement | null>(null);
+
+/* Desktop: the section holds for about a screen of scrolling, like the hero, and the content
+   sequences in with the scroll while a faint network of lines draws itself behind it.
+   Phones and reduced motion keep the simple one-time reveal. */
+const { lgBreakpoint } = useViewport();
+const scrubMode = ref(false);
+let mm: gsap.MatchMedia | null = null;
+
+/* Background imagery (viewBox 1600×900): the friction story at low opacity. A funnel that
+   thins out, a conversion line that dips below where it was heading, a progress card stuck
+   partway, and a few dots drifting off like people leaving. */
+const funnelBars = [220, 186, 150, 110, 70, 42].map((h, i) => ({ x: 190 + i * 58, h }));
+const leavers = [
+  [470, 640],
+  [520, 700],
+  [560, 610],
+  [610, 680],
+  [650, 730],
+  [700, 650],
+  [745, 700],
+] as const;
+
+/* Hold length: a little more than one screen of scrolling. */
+const holdLength = () => Math.round(window.innerHeight * 1.1);
+
+const buildScrub = (root: HTMLElement) => {
+  const q = <T extends Element = HTMLElement>(sel: string) =>
+    root.querySelector<T & HTMLElement>(sel);
+  const qa = (sel: string) => [...root.querySelectorAll<HTMLElement>(sel)];
+  const eyebrow = q('.loom-intro__eyebrow');
+  const title = q('.loom-intro__title');
+  const lead = q('.loom-intro__lead');
+  const costs = q('.loom-intro__costs');
+  const media = q('.loom-intro__media');
+  const rTitle = q('.results__title');
+  const rItems = qa('.results__list li');
+  const rNote = q('.results__note');
+  const next = q('.loom-intro__next');
+
+  /* refreshPriority -1: measured after the hero's pin above it (the trust section's triggers
+     use -2 so they measure after this pin). */
+  /* 1. While it rises: the headline arrives, so the section never scrolls in empty. */
+  const entry = gsap.timeline({
+    defaults: { ease: 'power2.out' },
+    scrollTrigger: {
+      trigger: root,
+      start: 'top 75%',
+      end: 'top 10%',
+      scrub: 0.6,
+      refreshPriority: -1,
+    },
+  });
+  if (eyebrow)
+    entry.fromTo(eyebrow, { autoAlpha: 0, y: 18 }, { autoAlpha: 1, y: 0, duration: 0.4 }, 0);
+  if (title)
+    entry.fromTo(title, { autoAlpha: 0, y: 28 }, { autoAlpha: 1, y: 0, duration: 0.6 }, 0.12);
+
+  /* 2. The hold: everything else sequences in with the scroll, then a short rest on the
+     finished state before the section moves on. */
+  const hold = gsap.timeline({
+    defaults: { ease: 'power2.out' },
+    scrollTrigger: {
+      trigger: root,
+      start: 'top top',
+      end: () => `+=${holdLength()}`,
+      pin: true,
+      pinSpacing: true,
+      anticipatePin: 1,
+      scrub: 0.6,
+      refreshPriority: -1,
+      invalidateOnRefresh: true,
+    },
+  });
+  if (lead) hold.fromTo(lead, { autoAlpha: 0, y: 18 }, { autoAlpha: 1, y: 0, duration: 0.35 }, 0);
+  if (costs)
+    hold.fromTo(costs, { autoAlpha: 0, y: 18 }, { autoAlpha: 1, y: 0, duration: 0.35 }, 0.12);
+  if (media)
+    hold.fromTo(
+      media,
+      { autoAlpha: 0, y: 40, scale: 0.94 },
+      { autoAlpha: 1, y: 0, scale: 1, duration: 0.55 },
+      0.2,
+    );
+  if (rTitle)
+    hold.fromTo(rTitle, { autoAlpha: 0, y: 10 }, { autoAlpha: 1, y: 0, duration: 0.25 }, 0.62);
+  if (rItems.length)
+    hold.fromTo(
+      rItems,
+      { autoAlpha: 0, x: 28 },
+      { autoAlpha: 1, x: 0, duration: 0.3, stagger: 0.12 },
+      0.7,
+    );
+  if (rNote) hold.fromTo(rNote, { autoAlpha: 0 }, { autoAlpha: 1, duration: 0.25 }, 1.16);
+  if (next) hold.fromTo(next, { autoAlpha: 0, y: 8 }, { autoAlpha: 1, y: 0, duration: 0.25 }, 1.3);
+  hold.to({}, { duration: 0.35 }); // rest on the finished state
+
+  /* 3. Background: the grid drifts and the network draws in, across the rise and the hold. */
+  const bg = gsap.timeline({
+    defaults: { ease: 'none' },
+    scrollTrigger: {
+      trigger: root,
+      start: 'top 45%',
+      end: () => `+=${Math.round(window.innerHeight * 0.45) + holdLength()}`,
+      scrub: 1,
+      refreshPriority: -1,
+      invalidateOnRefresh: true,
+    },
+  });
+  if (gridRef.value) bg.fromTo(gridRef.value, { yPercent: -6 }, { yPercent: 6, duration: 1 }, 0);
+  const bars = qa('.bgi__bar');
+  const card = q('.bgi__card');
+  const fill = q('.bgi__fill');
+  const line = q('.bgi__line');
+  const area = q('.bgi__area');
+  const expect = q('.bgi__expect');
+  const dots = qa('.bgi__dot');
+  if (bars.length) {
+    bg.fromTo(
+      bars,
+      { scaleY: 0, transformOrigin: '50% 100%' },
+      { scaleY: 1, duration: 0.2, stagger: 0.04, ease: 'back.out(1.4)' },
+      0.08,
+    );
+  }
+  if (card)
+    bg.fromTo(
+      card,
+      { autoAlpha: 0, y: 40 },
+      { autoAlpha: 1, y: 0, duration: 0.18, ease: 'power2.out' },
+      0.22,
+    );
+  if (fill)
+    bg.fromTo(
+      fill,
+      { scaleX: 0, transformOrigin: '0% 50%' },
+      { scaleX: 1, duration: 0.2, ease: 'power1.out' },
+      0.4,
+    );
+  if (line) bg.fromTo(line, { strokeDashoffset: 1 }, { strokeDashoffset: 0, duration: 0.42 }, 0.3);
+  if (area) bg.fromTo(area, { autoAlpha: 0 }, { autoAlpha: 1, duration: 0.3 }, 0.45);
+  if (expect) bg.fromTo(expect, { autoAlpha: 0 }, { autoAlpha: 1, duration: 0.2 }, 0.55);
+  if (dots.length) {
+    gsap.set(dots, { autoAlpha: 0 });
+    bg.to(
+      dots,
+      {
+        keyframes: [
+          { autoAlpha: 1, duration: 0.1 },
+          {
+            x: () => gsap.utils.random(90, 200),
+            y: () => gsap.utils.random(-140, -60),
+            autoAlpha: 0,
+            duration: 0.22,
+          },
+        ],
+        stagger: 0.04,
+      },
+      0.6,
+    );
+  }
+};
 
 /* Desktop: the content starts where the glkFreelance logo ends, with the same space on the
    right. The logo is fixed, so measure its right edge and keep it in sync on resize. */
@@ -49,7 +220,20 @@ const measureLogo = () => {
 onMounted(() => {
   measureLogo();
   window.addEventListener('resize', measureLogo);
-  if ("fonts" in document) void document.fonts.ready.then(measureLogo);
+  if ('fonts' in document) void document.fonts.ready.then(measureLogo);
+  const root = rootRef.value;
+  if (root) {
+    mm = gsap.matchMedia();
+    mm.add(`(min-width: ${lgBreakpoint}px) and (prefers-reduced-motion: no-preference)`, () => {
+      scrubMode.value = true;
+      isIn.value = true;
+      buildScrub(root);
+      return () => {
+        scrubMode.value = false;
+      };
+    });
+    if (scrubMode.value) return;
+  }
   if (!rootRef.value || !('IntersectionObserver' in window)) {
     isIn.value = true;
     return;
@@ -69,17 +253,74 @@ onMounted(() => {
 onBeforeUnmount(() => {
   window.removeEventListener('resize', measureLogo);
   io?.disconnect();
+  mm?.revert();
 });
 </script>
 
 <template>
   <section
     ref="rootRef"
-:style="{ '--vid-ratio': INTRO_LOOM_ASPECT, ...(logoGutter ? { '--logo-x': logoGutter } : {}) }"
+    :style="{ '--vid-ratio': INTRO_LOOM_ASPECT, ...(logoGutter ? { '--logo-x': logoGutter } : {}) }"
     class="loom-intro"
-    :class="{ 'is-in': isIn }"
+    :class="{ 'is-in': isIn, 'is-scrub': scrubMode }"
     aria-labelledby="loom-intro-title"
   >
+    <span ref="gridRef" class="loom-intro__grid" aria-hidden="true"></span>
+    <svg
+      class="loom-intro__net"
+      viewBox="0 0 1600 900"
+      preserveAspectRatio="xMidYMid slice"
+      aria-hidden="true"
+    >
+      <defs>
+        <linearGradient id="bgi-area" x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0" stop-color="#1260f0" stop-opacity="0.12" />
+          <stop offset="1" stop-color="#1260f0" stop-opacity="0" />
+        </linearGradient>
+      </defs>
+      <!-- Funnel that thins out -->
+      <g class="bgi__funnel">
+        <rect
+          v-for="(b, i) in funnelBars"
+          :key="i"
+          class="bgi__bar"
+          :x="b.x"
+          :y="880 - b.h"
+          width="44"
+          :height="b.h"
+          rx="6"
+        />
+      </g>
+      <!-- Conversion: where it was heading (dashed) vs where it went -->
+      <path
+        class="bgi__area"
+        d="M420 770 C 620 700, 780 630, 940 640 S 1240 700, 1320 760 S 1500 820, 1580 830 L1580 900 L420 900 Z"
+      />
+      <path class="bgi__expect" d="M940 640 L1580 540" />
+      <path
+        class="bgi__line"
+        pathLength="1"
+        d="M420 770 C 620 700, 780 630, 940 640 S 1240 700, 1320 760 S 1500 820, 1580 830"
+      />
+      <!-- A progress card stuck partway -->
+      <g class="bgi__card">
+        <rect x="1250" y="40" width="300" height="104" rx="14" class="bgi__panel" />
+        <rect x="1276" y="66" width="150" height="10" rx="5" class="bgi__text" />
+        <rect x="1276" y="86" width="96" height="8" rx="4" class="bgi__text bgi__text--soft" />
+        <rect x="1276" y="112" width="248" height="10" rx="5" class="bgi__track" />
+        <rect x="1276" y="112" width="152" height="10" rx="5" class="bgi__fill" />
+        <circle cx="1520" cy="72" r="9" class="bgi__spin" />
+      </g>
+      <!-- People leaving -->
+      <circle
+        v-for="([x, y], i) in leavers"
+        :key="`d${i}`"
+        class="bgi__dot"
+        :cx="x"
+        :cy="y"
+        r="7"
+      />
+    </svg>
     <div class="loom-intro__inner">
       <div class="loom-intro__copy">
         <p class="loom-intro__eyebrow q-ma-none" style="--i: 0">60 seconds with Grant</p>
@@ -118,19 +359,25 @@ onBeforeUnmount(() => {
             type="button"
             class="video__poster"
             :disabled="!hasVideo"
-            :aria-label="hasVideo ? (watched ? 'Watch the video again' : 'Play the 60-second video') : 'Video coming soon'"
+            :aria-label="
+              hasVideo
+                ? watched
+                  ? 'Watch the video again'
+                  : 'Play the 60-second video'
+                : 'Video coming soon'
+            "
             @click="play"
           >
             <span class="video__grid" aria-hidden="true"></span>
-            <span class="video__brand" aria-hidden="true">
-              <i>glk</i><span>Freelance</span>
-            </span>
+            <span class="video__brand" aria-hidden="true"> <i>glk</i><span>Freelance</span> </span>
             <span class="video__play" aria-hidden="true">
               <svg viewBox="0 0 24 24"><path d="M8 5.5v13l11-6.5z" /></svg>
             </span>
             <span class="video__caption" aria-hidden="true">
               <b>Why friction costs more than it looks</b>
-              <small>{{ hasVideo ? (watched ? 'Watch again' : '1 min') : 'Video coming soon' }}</small>
+              <small>{{
+                hasVideo ? (watched ? 'Watch again' : '1 min') : 'Video coming soon'
+              }}</small>
             </span>
           </button>
         </div>
@@ -138,10 +385,14 @@ onBeforeUnmount(() => {
     </div>
 
     <!-- The payoff: what clients reported once that friction was fixed. -->
-    <ClientResultsStrip class="loom-intro__results" animate @shown="resultsIn = true" />
+    <ClientResultsStrip
+      class="loom-intro__results"
+      :animate="!scrubMode"
+      @shown="resultsIn = true"
+    />
 
     <!-- A next step for anyone convinced by the results. -->
-    <p class="loom-intro__next q-ma-none" :class="{ 'is-in': resultsIn }">
+    <p class="loom-intro__next q-ma-none" :class="{ 'is-in': resultsIn || scrubMode }">
       Want to see where your product is losing people?
       <button type="button" class="loom-intro__cta" @click="openTeardownBooking()">
         Book a free Teardown <span aria-hidden="true">&rarr;</span>
@@ -167,6 +418,7 @@ $ease: cubic-bezier(0.22, 1, 0.36, 1);
   z-index: 1;
   width: 100%;
   padding: clamp(3rem, 8vh, 5rem) 1rem;
+  overflow: hidden;
   background: linear-gradient(180deg, #f7f9fe 0%, #eef3fd 100%);
   color: $ink;
   font-family: tokens.$primary-font;
@@ -186,7 +438,7 @@ $ease: cubic-bezier(0.22, 1, 0.36, 1);
     /* Content starts where the glkFreelance logo ends (measured in script), with the same
        distance on the right. Fallback: roughly the logo's width plus its 2% offset. */
     padding-inline: var(--logo-x, calc(2vw + 11.5rem));
-    --content-w: 100%;
+    --content-w: min(100%, 1000px);
     --vid-h: clamp(16rem, calc(100vh - 29rem), 32rem);
     --vid-h: clamp(16rem, calc(100svh - 29rem), 32rem);
   }
@@ -505,6 +757,115 @@ $ease: cubic-bezier(0.22, 1, 0.36, 1);
   50% {
     opacity: 0.8;
     transform: scale(1.06);
+  }
+}
+
+/* ---------- Background grid ---------- */
+
+/* The video cover's grid, carried faintly into the section. Taller than the section so the
+   parallax drift never shows an edge. */
+.loom-intro__grid {
+  position: absolute;
+  inset: -12% 0;
+  z-index: 0;
+  pointer-events: none;
+  background-image:
+    linear-gradient(rgba(18, 96, 240, 0.07) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(18, 96, 240, 0.07) 1px, transparent 1px);
+  background-size: 56px 56px;
+  mask-image: radial-gradient(70% 60% at 50% 45%, #000 15%, transparent 100%);
+}
+
+/* Background imagery: pale blue shapes in the same family as the hero's background. */
+.loom-intro__net {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  display: none;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+
+  .is-scrub > & {
+    display: block;
+  }
+
+  opacity: 0.6;
+
+  .bgi__bar {
+    fill: #d3e0fa;
+  }
+
+  .bgi__bar:nth-child(n + 5) {
+    fill: #e2eafb;
+  }
+
+  .bgi__area {
+    fill: url(#bgi-area);
+  }
+
+  .bgi__line {
+    fill: none;
+    stroke: rgba(18, 96, 240, 0.3);
+    stroke-width: 3;
+    stroke-linecap: round;
+    stroke-dasharray: 1;
+    stroke-dashoffset: 1;
+  }
+
+  .bgi__expect {
+    fill: none;
+    stroke: rgba(18, 96, 240, 0.22);
+    stroke-width: 2;
+    stroke-dasharray: 8 10;
+  }
+
+  .bgi__panel {
+    fill: rgba(255, 255, 255, 0.7);
+    stroke: rgba(18, 96, 240, 0.16);
+  }
+
+  .bgi__text {
+    fill: #d3e0fa;
+
+    &--soft {
+      fill: #e6edfb;
+    }
+  }
+
+  .bgi__track {
+    fill: #e9effb;
+  }
+
+  .bgi__fill {
+    fill: rgba(18, 96, 240, 0.3);
+  }
+
+  .bgi__spin {
+    fill: none;
+    stroke: rgba(18, 96, 240, 0.28);
+    stroke-width: 3;
+    stroke-dasharray: 36 20;
+  }
+
+  .bgi__dot {
+    fill: rgba(18, 96, 240, 0.28);
+  }
+}
+
+.loom-intro__inner,
+.loom-intro__results,
+.loom-intro__next {
+  position: relative;
+  z-index: 1;
+}
+
+/* Scroll-driven mode: GSAP owns opacity and position, so CSS transitions step aside. */
+.loom-intro.is-scrub {
+  .loom-intro__copy > *,
+  .loom-intro__media,
+  .loom-intro__next {
+    transition: none;
   }
 }
 

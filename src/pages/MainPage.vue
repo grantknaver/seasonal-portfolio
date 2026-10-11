@@ -62,6 +62,10 @@ const VIEWPORT_DROP = 40; // px the framed viewport rests below its final positi
 const NAV_AT = 0.85; // when the menu buttons start popping in
 const COPY_AT = 1.2; // when the first line of copy starts
 const COPY_STAGGER = 0.2; // gap between each line, top to bottom
+const INTRO_START = 'top 75%'; // trust intro starts when the section is a quarter of the way into view
+const INTRO_SPEED = 1.25; // trust intro playback speed while the section rises
+const INTRO_CATCH_UP = 2.6; // ...and if the pin engages before it's finished
+const PIN_HOLD = 0.6; // opening hold of the trust pin, in timeline units (~300px of scroll)
 
 const mainStore = useMainStore();
 const cacheStore = useCacheStore();
@@ -113,6 +117,15 @@ const homeContainerRef = ref<HTMLElement | null>(null);
 const trustSectionRef = ref<HTMLElement | null>(null);
 const trustViewportRef = ref<HTMLElement | null>(null);
 const trustNavRef = ref<HTMLElement | null>(null);
+const railRef = ref<HTMLElement | null>(null);
+/* The rail lines up with the left edge of the glkFreelance logo. */
+const railLeft = ref<string | undefined>(undefined);
+const measureRail = () => {
+  const logo = [...document.querySelectorAll<HTMLElement>('.logo-text')].find(
+    (el) => el.getBoundingClientRect().width > 0,
+  );
+  railLeft.value = logo ? `${Math.round(logo.getBoundingClientRect().left)}px` : undefined;
+};
 const trustGlowRef = ref<HTMLElement | null>(null);
 const trustImageA = ref<HTMLElement | null>(null);
 const trustImageB = ref<HTMLElement | null>(null);
@@ -270,27 +283,7 @@ const applyHomeScale = () => {
 
 const handleResize = () => {
   requestAnimationFrame(applyHomeScale);
-};
-
-const lockScroll = () => {
-  const stop = (e: Event) => e.preventDefault();
-  const stopKeys = (e: KeyboardEvent) => {
-    if (['ArrowDown', 'ArrowUp', 'PageDown', 'PageUp', 'Space', 'Home', 'End'].includes(e.code)) {
-      e.preventDefault();
-    }
-  };
-  window.addEventListener('wheel', stop, { passive: false });
-  window.addEventListener('touchmove', stop, { passive: false });
-  window.addEventListener('keydown', stopKeys);
-
-  let released = false;
-  return () => {
-    if (released) return;
-    released = true;
-    window.removeEventListener('wheel', stop);
-    window.removeEventListener('touchmove', stop);
-    window.removeEventListener('keydown', stopKeys);
-  };
+  measureRail();
 };
 
 const setBeamRunning = (running: boolean) => {
@@ -549,6 +542,45 @@ const buildScene = () => {
           scrollTrigger: { start: 0, end: 3000, scrub: true },
         });
       }
+
+      /* Side rail: once the hero has handed off and the next section has settled into its
+         pin, the menu tiles bounce in from off the left edge, top first. Scrolling back up
+         sends them out the same way, bottom first. Uses the CSS translate property so it never
+         fights the tiles' own hover transform. */
+      const rail = railRef.value;
+      const tiles = rail ? [...rail.querySelectorAll<HTMLElement>('.simon-quadrant')] : [];
+      const afterHero =
+        document.querySelector<HTMLElement>('.loom-intro') ?? trustSectionRef.value ?? null;
+      if (rail && tiles.length && afterHero) {
+        measureRail();
+        const OFF = '-180px 0px';
+        gsap.set(tiles, { autoAlpha: 0, translate: OFF });
+        const showRail = () =>
+          gsap.to(tiles, {
+            autoAlpha: 1,
+            translate: '0px 0px',
+            duration: 0.6,
+            ease: 'back.out(1.7)',
+            stagger: 0.09,
+            overwrite: true,
+          });
+        const hideRail = () =>
+          gsap.to(tiles, {
+            autoAlpha: 0,
+            translate: OFF,
+            duration: 0.45,
+            ease: 'back.in(1.7)',
+            stagger: { each: 0.07, from: 'end' },
+            overwrite: true,
+          });
+        ScrollTrigger.create({
+          trigger: afterHero,
+          start: 'top top',
+          refreshPriority: -1,
+          onEnter: showRail,
+          onLeaveBack: hideRail,
+        });
+      }
     }
 
     const section = trustSectionRef.value;
@@ -678,9 +710,6 @@ const buildScene = () => {
       if (usesNavItems) gsap.set(navItems, { willChange: 'auto', clearProps: 'transform,scale' });
     };
 
-    let introPlayed = false;
-    let scrubBuilt = false;
-
     /* Decode the two trust photos a screen before the pin, not at it: decoding large images
        right as the pin engages was part of the hitch on a fast scroll. */
     const preIo = new IntersectionObserver(
@@ -693,6 +722,100 @@ const buildScene = () => {
     );
     preIo.observe(section);
 
+    /* The intro plays on time (not on scroll) as the section rises into view, so it's done or
+       nearly done by the time the pin engages. Scrolling is never locked. If someone arrives fast
+       enough to catch the intro still running, it simply finishes quicker. */
+    const introTl = gsap.timeline({
+      paused: true,
+      onComplete: () => {
+        clearIntroHints();
+      },
+    });
+
+    /* 1. The framed viewport rises into its resting position. */
+    if (viewport) {
+      introTl.to(viewport, { y: 0, duration: 1.15, ease: 'power3.out', force3D: true }, 0);
+    }
+
+    /* Ambience rides along with the lift. */
+    introTl
+      .fromTo(
+        glow,
+        { opacity: 0, scale: 1.18 },
+        { opacity: 1, scale: 1, duration: 1.25, ease: 'power2.out' },
+        0,
+      )
+      .fromTo(beam, { opacity: 0 }, { opacity: 1, duration: 1.6, ease: 'power2.out' }, 0.55);
+
+    /* 2. Menu buttons pop in. */
+    if (navTargets.length) {
+      introTl.to(
+        navTargets,
+        usesNavItems
+          ? { autoAlpha: 1, y: 0, scale: 1, duration: 0.55, ease: 'back.out(1.8)', stagger: 0.08 }
+          : { autoAlpha: 1, duration: 0.6, ease: 'power2.out' },
+        NAV_AT,
+      );
+    }
+
+    /* 3. Copy comes in line by line, top to bottom. */
+    if (copyALines.length) {
+      introTl.to(
+        copyALines,
+        { autoAlpha: 1, y: 0, duration: 0.75, ease: 'power2.out', stagger: COPY_STAGGER },
+        COPY_AT,
+      );
+    } else {
+      introTl.to(copyA, { opacity: 1, duration: 1, ease: 'power1.out' }, COPY_AT);
+    }
+
+    /* 4. Cards, then the scroll cue, once the frame has settled. */
+    const cueAt = COPY_AT + COPY_STAGGER * Math.max(copyALines.length - 1, 0) + 0.55;
+    if (hasCards) {
+      introTl.to(
+        cards,
+        { opacity: 1, y: 0, scale: 1, duration: 0.6, ease: 'back.out(1.6)', stagger: 0.22 },
+        cueAt - 0.2,
+      );
+    }
+    if (cue) {
+      introTl.fromTo(cue, { opacity: 0 }, { opacity: 1, duration: 0.6, ease: 'power1.out' }, cueAt);
+    }
+
+    /* A touch quicker than before, since it now plays while the section is still moving. */
+    introTl.timeScale(INTRO_SPEED);
+
+    let introStarted = false;
+    let pinned = false;
+    const startIntro = () => {
+      if (introStarted) return;
+      introStarted = true;
+      /* Decode both trust frames + settle one frame before the intro plays. */
+      void decodeImagesIn(section)
+        .then(twoFrames)
+        .then(() => {
+          if (disposed) {
+            if (viewport) gsap.set(viewport, { y: 0, willChange: 'auto' });
+            return;
+          }
+          setBeamRunning(true);
+          watchJank(introTl, 'trust-desktop');
+          if (pinned) introTl.timeScale(INTRO_CATCH_UP);
+          introTl.play();
+        });
+    };
+
+    /* Start the intro while the section is still rising into view. */
+    ScrollTrigger.create({
+      trigger: section,
+      start: INTRO_START,
+      once: true,
+      refreshPriority: -2, // measured after the Loom section's pin above it
+      onEnter: startIntro,
+    });
+
+    /* The pinned crossfade, built up front so it can never be skipped. It opens with a short
+       hold (nothing changes) so the first state settles before anything fades. */
     const trustTl = gsap.timeline({
       scrollTrigger: {
         trigger: section,
@@ -700,185 +823,77 @@ const buildScene = () => {
         end: '+=1500',
         pin: true,
         pinSpacing: true,
+        anticipatePin: 1,
         scrub: 0.6,
-        onEnter: (self) => {
-          if (introPlayed) return;
-          introPlayed = true;
-
-          /* A fast scroll overshoots the pin start before this fires. Put it back at the start
-             (invisible, since the section is pinned) so the intro and the scrub begin at 0. */
-          if (window.scrollY > self.start + 1) window.scrollTo(0, self.start);
-
-          const unlock = lockScroll();
-
-          const introTl = gsap.timeline({
-            paused: true,
-            onComplete: () => {
-              unlock();
-              clearIntroHints();
-              if (scrubBuilt) return;
-              scrubBuilt = true;
-
-              trustTl
-                .fromTo(
-                  section,
-                  { backgroundPositionY: '46%' },
-                  {
-                    backgroundPositionY: '56%',
-                    ease: 'none',
-                    duration: 2.4,
-                    immediateRender: false,
-                  },
-                  0,
-                )
-                .fromTo(
-                  cue,
-                  { opacity: 1 },
-                  { opacity: 0, ease: 'none', duration: 0.4, immediateRender: false },
-                  0.1,
-                )
-                .fromTo(
-                  copyA,
-                  { opacity: 1 },
-                  { opacity: 0, ease: 'none', duration: 0.9, immediateRender: false },
-                  0.2,
-                )
-                .fromTo(
-                  imgB,
-                  { opacity: 0 },
-                  { opacity: 1, ease: 'none', duration: 0.8, immediateRender: false },
-                  0.7,
-                )
-                .fromTo(
-                  copyB,
-                  { opacity: 0 },
-                  { opacity: 1, ease: 'none', duration: 1.1, immediateRender: false },
-                  1.0,
-                )
-                /* The card clears up in step with the copy. */
-                .fromTo(
-                  cardAs,
-                  { opacity: 1 },
-                  {
-                    opacity: 0,
-                    ease: 'none',
-                    duration: 0.5,
-                    stagger: 0.12,
-                    immediateRender: false,
-                  },
-                  0.6,
-                )
-                .fromTo(
-                  cardBs,
-                  { opacity: 0 },
-                  {
-                    opacity: 1,
-                    ease: 'none',
-                    duration: 0.6,
-                    stagger: 0.12,
-                    immediateRender: false,
-                  },
-                  0.95,
-                )
-                .fromTo(
-                  glow,
-                  { opacity: 1, scale: 1 },
-                  {
-                    opacity: 0,
-                    scale: 1.25,
-                    ease: 'none',
-                    duration: 0.9,
-                    immediateRender: false,
-                  },
-                  1.5,
-                );
-            },
-          });
-
-          /* 1. The framed viewport rises into its resting position. */
-          if (viewport) {
-            introTl.to(viewport, { y: 0, duration: 1.15, ease: 'power3.out', force3D: true }, 0);
-          }
-
-          /* Ambience rides along with the lift. */
-          introTl
-            .fromTo(
-              glow,
-              { opacity: 0, scale: 1.18 },
-              { opacity: 1, scale: 1, duration: 1.25, ease: 'power2.out' },
-              0,
-            )
-            .fromTo(beam, { opacity: 0 }, { opacity: 1, duration: 1.6, ease: 'power2.out' }, 0.55);
-
-          /* 2. Menu buttons pop in. */
-          if (navTargets.length) {
-            introTl.to(
-              navTargets,
-              usesNavItems
-                ? {
-                    autoAlpha: 1,
-                    y: 0,
-                    scale: 1,
-                    duration: 0.55,
-                    ease: 'back.out(1.8)',
-                    stagger: 0.08,
-                  }
-                : { autoAlpha: 1, duration: 0.6, ease: 'power2.out' },
-              NAV_AT,
-            );
-          }
-
-          /* 3. Copy comes in line by line, top to bottom. */
-          if (copyALines.length) {
-            introTl.to(
-              copyALines,
-              {
-                autoAlpha: 1,
-                y: 0,
-                duration: 0.75,
-                ease: 'power2.out',
-                stagger: COPY_STAGGER,
-              },
-              COPY_AT,
-            );
-          } else {
-            introTl.to(copyA, { opacity: 1, duration: 1, ease: 'power1.out' }, COPY_AT);
-          }
-
-          /* 4. Scroll cue last, once the frame has settled. */
-          const cueAt = COPY_AT + COPY_STAGGER * Math.max(copyALines.length - 1, 0) + 0.55;
-          if (hasCards) {
-            introTl.to(
-              cards,
-              { opacity: 1, y: 0, scale: 1, duration: 0.6, ease: 'back.out(1.6)', stagger: 0.22 },
-              cueAt - 0.2,
-            );
-          }
-          if (cue) {
-            introTl.fromTo(
-              cue,
-              { opacity: 0 },
-              { opacity: 1, duration: 0.6, ease: 'power1.out' },
-              cueAt,
-            );
-          }
-
-          /* Decode both trust frames + settle one frame before the intro plays. */
-          void decodeImagesIn(section)
-            .then(twoFrames)
-            .then(() => {
-              if (disposed) {
-                unlock();
-                if (viewport) gsap.set(viewport, { y: 0, willChange: 'auto' });
-                return;
-              }
-              setBeamRunning(true);
-              watchJank(introTl, 'trust-desktop');
-              introTl.play();
-            });
+        refreshPriority: -2, // measured after the Loom section's pin above it
+        onEnter: () => {
+          pinned = true;
+          startIntro();
+          /* Arrived while the intro is still playing: let it finish quickly instead of
+             holding the page. */
+          if (introTl.isActive()) introTl.timeScale(INTRO_CATCH_UP);
         },
       },
     });
+
+    const D = PIN_HOLD; // every crossfade step starts after the opening hold
+    trustTl
+      .to({}, { duration: D }, 0)
+      .fromTo(
+        section,
+        { backgroundPositionY: '46%' },
+        { backgroundPositionY: '56%', ease: 'none', duration: 2.4, immediateRender: false },
+        D,
+      );
+    if (cue) {
+      trustTl.fromTo(
+        cue,
+        { opacity: 1 },
+        { opacity: 0, ease: 'none', duration: 0.4, immediateRender: false },
+        D + 0.1,
+      );
+    }
+    trustTl
+      .fromTo(
+        copyA,
+        { opacity: 1 },
+        { opacity: 0, ease: 'none', duration: 0.9, immediateRender: false },
+        D + 0.2,
+      )
+      .fromTo(
+        imgB,
+        { opacity: 0 },
+        { opacity: 1, ease: 'none', duration: 0.8, immediateRender: false },
+        D + 0.7,
+      )
+      .fromTo(
+        copyB,
+        { opacity: 0 },
+        { opacity: 1, ease: 'none', duration: 1.1, immediateRender: false },
+        D + 1.0,
+      );
+    if (hasCards) {
+      /* The card clears up in step with the copy. */
+      trustTl
+        .fromTo(
+          cardAs,
+          { opacity: 1 },
+          { opacity: 0, ease: 'none', duration: 0.5, stagger: 0.12, immediateRender: false },
+          D + 0.6,
+        )
+        .fromTo(
+          cardBs,
+          { opacity: 0 },
+          { opacity: 1, ease: 'none', duration: 0.6, stagger: 0.12, immediateRender: false },
+          D + 0.95,
+        );
+    }
+    trustTl.fromTo(
+      glow,
+      { opacity: 1, scale: 1 },
+      { opacity: 0, scale: 1.25, ease: 'none', duration: 0.9, immediateRender: false },
+      D + 1.5,
+    );
   });
 };
 
@@ -1272,10 +1287,18 @@ const toExamples = () => {
         </div>
         <div ref="trustBeamRef" class="trust-beam" aria-hidden="true"><span></span></div>
       </div>
-      <div v-if="!isResponsive" class="trust-nav">
-        <SimonMenu :layout="'row'" />
-      </div>
     </section>
+
+    <!-- Desktop: after the hero, the menu moves to a rail under the logo and stays there. -->
+    <nav
+      v-if="!isResponsive"
+      ref="railRef"
+      class="side-rail"
+      :style="railLeft ? { left: railLeft } : undefined"
+      aria-label="Sections"
+    >
+      <SimonMenu layout="column" />
+    </nav>
   </q-page>
 </template>
 
@@ -1772,9 +1795,25 @@ const toExamples = () => {
   }
 }
 
+/* ---------- Side rail (desktop, after the hero) ---------- */
+
+.side-rail {
+  position: fixed;
+  top: 50%;
+  left: 2vw;
+  z-index: 6;
+  transform: translateY(-50%);
+}
+
 /* ---------- Section Transition ---------- */
 
 .section-transition {
+  /* Desktop: no band. It cut across the fixed logo and side rail; the Loom section flows
+     straight into the trust section instead. */
+  @media (min-width: tokens.$breakpoint-lg) {
+    display: none;
+  }
+
   position: relative;
   z-index: 1;
   height: 28px;
@@ -2323,16 +2362,6 @@ const toExamples = () => {
         rgba(255, 255, 255, 0) 100%
       );
     }
-  }
-
-  .trust-nav {
-    position: absolute;
-    bottom: clamp(0.75rem, 2vh, 1.75rem);
-    left: calc(50% - var(--panel-offset, 0px) / 2);
-    transform: translateX(-50%);
-    z-index: 4;
-    width: max-content;
-    transition: left 0.32s cubic-bezier(0.4, 0, 0.2, 1);
   }
 
   /* Frosted pill on the right edge; fades in once the autoplay finishes. */
