@@ -33,7 +33,7 @@ $line: rgba(18, 96, 240, 0.16);
 
 .results {
   display: grid;
-  gap: 0.75rem;
+  gap: 0.6rem;
   font-family: tokens.$primary-font;
   color: $ink;
 }
@@ -70,7 +70,7 @@ $line: rgba(18, 96, 240, 0.16);
 }
 
 .results__stat {
-  font-size: clamp(1.6rem, 2.4vw, 2.1rem);
+  font-size: clamp(1.4rem, 1.9vw, 1.75rem);
   font-weight: 600;
   letter-spacing: -0.02em;
   line-height: 1.1;
@@ -92,7 +92,7 @@ $line: rgba(18, 96, 240, 0.16);
 
 /* Band: a quiet row with hairline dividers between results. */
 .results--band {
-  padding-top: clamp(1.5rem, 3vw, 2.25rem);
+  padding-top: clamp(1rem, 2.5vh, 1.5rem);
   border-top: 1px solid $line;
 
   .results__list li + li {

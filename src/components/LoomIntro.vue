@@ -169,7 +169,7 @@ $ease: cubic-bezier(0.22, 1, 0.36, 1);
   position: relative;
   z-index: 1;
   width: 100%;
-  padding: clamp(3.5rem, 9vh, 7rem) 1rem;
+  padding: clamp(2.25rem, 6vh, 4.5rem) 1rem;
   background: linear-gradient(180deg, #f7f9fe 0%, #eef3fd 100%);
   color: $ink;
   font-family: tokens.$primary-font;
@@ -177,7 +177,7 @@ $ease: cubic-bezier(0.22, 1, 0.36, 1);
 
 .loom-intro__inner {
   display: grid;
-  gap: clamp(1.75rem, 4vw, 3.5rem);
+  gap: clamp(1.5rem, 3.5vw, 3rem);
   align-items: center;
   width: 100%;
   max-width: 1180px;
@@ -191,12 +191,21 @@ $ease: cubic-bezier(0.22, 1, 0.36, 1);
 .loom-intro__results {
   width: 100%;
   max-width: 1180px;
-  margin: clamp(2rem, 5vh, 3.25rem) auto 0;
+  margin: clamp(1.25rem, 3.5vh, 2.25rem) auto 0;
 }
 
 .loom-intro__copy {
   display: grid;
-  gap: 0.9rem;
+  gap: 0.75rem;
+}
+
+/* Keep the player from setting the section's height: cap it to a share of the screen
+   so the copy, video and results fit together on a laptop. */
+.loom-intro__media {
+  @media (min-width: tokens.$breakpoint-md) {
+    justify-self: end;
+    width: min(100%, calc(48vh * 4 / 3));
+  }
 }
 
 .loom-intro__eyebrow {
@@ -209,7 +218,7 @@ $ease: cubic-bezier(0.22, 1, 0.36, 1);
 
 .loom-intro__title {
   max-width: 18ch;
-  font-size: clamp(1.75rem, 3.2vw, 2.75rem);
+  font-size: clamp(1.75rem, 2.8vw, 2.4rem);
   font-weight: 600;
   letter-spacing: -0.02em;
   line-height: 1.12;
