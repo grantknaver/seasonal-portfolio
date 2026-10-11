@@ -169,10 +169,21 @@ $ease: cubic-bezier(0.22, 1, 0.36, 1);
   position: relative;
   z-index: 1;
   width: 100%;
-  padding: clamp(2.25rem, 6vh, 4.5rem) 1rem;
+  padding: clamp(3rem, 8vh, 5rem) 1rem;
   background: linear-gradient(180deg, #f7f9fe 0%, #eef3fd 100%);
   color: $ink;
   font-family: tokens.$primary-font;
+
+  /* Desktop: exactly one screen tall, content centred with generous room above and below,
+     so the section's height is predictable for the pinned hero and trust sections around it. */
+  @media (min-width: tokens.$breakpoint-lg) {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    height: 100vh;
+    height: 100svh;
+    padding-block: clamp(3rem, 9vh, 6rem);
+  }
 }
 
 .loom-intro__inner {
@@ -199,12 +210,17 @@ $ease: cubic-bezier(0.22, 1, 0.36, 1);
   gap: 0.75rem;
 }
 
-/* Keep the player from setting the section's height: cap it to a share of the screen
-   so the copy, video and results fit together on a laptop. */
+/* Size the player from the screen height so copy, video and results always fit inside the
+   one-screen section with breathing room. */
 .loom-intro__media {
   @media (min-width: tokens.$breakpoint-md) {
     justify-self: end;
     width: min(100%, calc(48vh * 4 / 3));
+  }
+
+  @media (min-width: tokens.$breakpoint-lg) {
+    width: min(100%, calc((100vh - 26rem) * 4 / 3), 640px);
+    width: min(100%, calc((100svh - 26rem) * 4 / 3), 640px);
   }
 }
 
