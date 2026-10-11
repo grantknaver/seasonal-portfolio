@@ -1963,6 +1963,54 @@ const toExamples = () => {
     }
   }
 
+  /* Phones and tablets: smaller, lighter notice cards so they don't crowd the photo and copy. */
+  @media (max-width: tokens.$breakpoint-lg - 0.02px) {
+    .trust-card {
+      width: min(66%, 224px);
+      padding: 0.5rem 0.65rem;
+      border-radius: 0.65rem;
+      box-shadow: 0 10px 24px rgb(0 0 0 / 0.3);
+    }
+
+    .trust-card__state {
+      gap: 0.3rem;
+    }
+
+    .tc-row b {
+      font-size: 0.78rem;
+    }
+
+    .tc-status,
+    .tc-paid {
+      font-size: 0.74rem;
+    }
+
+    .tc-checks {
+      gap: 0.15rem 0.5rem;
+      font-size: 0.66rem;
+    }
+
+    .tc-btn {
+      padding: 0.18rem 0.55rem;
+      font-size: 0.68rem;
+    }
+
+    .tc-guess {
+      font-size: 0.68rem;
+    }
+
+    .tc-src {
+      padding: 0.2rem 0.4rem;
+      font-size: 0.66rem;
+    }
+
+    .tc-q {
+      width: 0.95rem;
+      height: 0.95rem;
+      font-size: 0.6rem;
+    }
+  }
+
   .trust-viewport {
     position: absolute;
     top: 1.25rem;
