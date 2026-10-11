@@ -193,12 +193,11 @@ $ease: cubic-bezier(0.22, 1, 0.36, 1);
     height: 100svh;
     padding-block: clamp(3.5rem, 11vh, 7.5rem);
 
-    /* One content width for the copy + video row, the results and the next step, so they
-       share edges and there's no dead gap between copy and video. */
-    --copy-w: 23rem;
-    --vid-w: min(46rem, calc((100vh - 30rem) * 4 / 3));
-    --vid-w: min(46rem, calc((100svh - 30rem) * 4 / 3));
-    --content-w: min(1180px, calc(var(--copy-w) + 2.5rem + var(--vid-w)));
+    /* Wide and short: the content spans most of the width, and the video's height is set from
+       the screen height, so there's more room above and below than at the sides. */
+    --content-w: min(86vw, 1680px);
+    --vid-h: clamp(15rem, calc(100vh - 34rem), 27rem);
+    --vid-h: clamp(15rem, calc(100svh - 34rem), 27rem);
   }
 }
 
@@ -215,8 +214,8 @@ $ease: cubic-bezier(0.22, 1, 0.36, 1);
   }
 
   @media (min-width: tokens.$breakpoint-lg) {
-    grid-template-columns: var(--copy-w) var(--vid-w);
-    gap: 2.5rem;
+    grid-template-columns: minmax(0, 1fr) auto;
+    gap: 3rem;
     max-width: var(--content-w);
   }
 }
@@ -292,8 +291,8 @@ $ease: cubic-bezier(0.22, 1, 0.36, 1);
   }
 
   @media (min-width: tokens.$breakpoint-lg) {
-    justify-self: stretch;
-    width: 100%;
+    justify-self: end;
+    width: calc(var(--vid-h) * 4 / 3);
   }
 }
 
@@ -308,6 +307,12 @@ $ease: cubic-bezier(0.22, 1, 0.36, 1);
 .loom-intro__title {
   max-width: 18ch;
   font-size: clamp(1.7rem, 2.3vw, 2.15rem);
+
+  /* Desktop: two wide lines instead of four narrow ones, to keep the section short. */
+  @media (min-width: tokens.$breakpoint-lg) {
+    max-width: 30ch;
+    font-size: clamp(2rem, 2.3vw, 2.5rem);
+  }
   font-weight: 600;
   letter-spacing: -0.02em;
   line-height: 1.12;
@@ -315,6 +320,11 @@ $ease: cubic-bezier(0.22, 1, 0.36, 1);
 
 .loom-intro__lead {
   max-width: 34ch;
+
+  @media (min-width: tokens.$breakpoint-lg) {
+    max-width: 48ch;
+  }
+
   color: $muted;
   font-size: clamp(1rem, 1.2vw, 1.12rem);
   line-height: 1.5;
