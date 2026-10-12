@@ -142,6 +142,53 @@ const signalHeroCopyIn = () => {
   window.dispatchEvent(new Event('hero:copy-in'));
 };
 const trustCueRef = ref<HTMLElement | null>(null);
+/* Soft light behind the photo that slowly swells and settles, like a breath. */
+const trustBreathRef = ref<HTMLElement | null>(null);
+/* Large screens: a small breathing guide between the words and the photo. On the first message
+   it's tight and quick ("holding your breath"); once trust is established it breathes slowly. */
+const trustOrbInner = ref<HTMLElement | null>(null);
+const trustOrbCore = ref<HTMLElement | null>(null);
+const orbLabel = ref('Holding your breath');
+let breathPhase: 'in' | 'out' = 'in';
+
+/* ---------- The breath ----------
+   First message ("people hesitate"): shallow, quicker breathing, and the photo sits a touch
+   close, as if held in. Second message ("trust is established"): the breath slows and deepens,
+   and the photo eases back. That's the breathe-in / breathe-out idea behind the two photos. */
+const BREATH_TENSE = 1.6; // timeScale while the first message shows
+const BREATH_CALM = 0.8; // timeScale once trust is established
+const PHOTO_HELD = 1.06; // photo scale on the first message
+let breathTl: gsap.core.Timeline | null = null;
+let breathCalm = false;
+
+const trustPhotos = () =>
+  [trustImageA.value, trustImageB.value]
+    .map((w) => w?.querySelector<HTMLImageElement>('img'))
+    .filter((el): el is HTMLImageElement => !!el);
+
+const syncOrbLabel = () => {
+  orbLabel.value = !breathCalm
+    ? 'Holding your breath'
+    : breathPhase === 'in'
+      ? 'Breathe in'
+      : 'Breathe out';
+};
+
+const setBreathCalm = (calm: boolean) => {
+  if (calm === breathCalm) return;
+  breathCalm = calm;
+  syncOrbLabel();
+  if (trustOrbInner.value) {
+    gsap.to(trustOrbInner.value, { scale: calm ? 1 : 0.62, duration: 1.4, ease: 'power2.inOut' });
+  }
+  if (breathTl) {
+    gsap.to(breathTl, {
+      timeScale: calm ? BREATH_CALM : BREATH_TENSE,
+      duration: 1.4,
+      ease: 'power1.inOut',
+    });
+  }
+};
 /* Phones: after the trust section autoplays, two small arrows let people go back to the first
    message ("why people hesitate") and forward again. 0 = still autoplaying. */
 const trustStep = ref<0 | 1 | 2>(0);
@@ -157,6 +204,13 @@ const goTrust = (step: 1 | 2) => {
   on(trustCopyB.value, !first);
   on(trustImageA.value, first);
   on(trustImageB.value, !first);
+  gsap.to(trustPhotos(), {
+    scale: first ? PHOTO_HELD : 1,
+    duration: 1.8,
+    ease: 'sine.inOut',
+    overwrite: 'auto',
+  });
+  setBreathCalm(!first);
 };
 
 /* ---------- Lifecycle-scoped GSAP state ---------- */
@@ -576,8 +630,47 @@ const buildScene = () => {
     const copyB = trustCopyB.value;
     const glow = trustGlowRef.value;
     const cue = trustCueRef.value;
+    const breath = trustBreathRef.value;
+    const photos = trustPhotos();
 
     if (!(section && imgA && imgB && copyA && copyB && glow)) return;
+
+    /* The breath loop: in for 4s, out for 6s (a longer out-breath is the calming one). */
+    breathCalm = false;
+    breathPhase = 'in';
+    syncOrbLabel();
+    gsap.set(photos, { scale: PHOTO_HELD, transformOrigin: '50% 45%' });
+    if (trustOrbInner.value) gsap.set(trustOrbInner.value, { scale: 0.62 });
+    const orbCore = trustOrbCore.value;
+    if (breath && !prefersReducedMotion) {
+      gsap.set(breath, { scale: 1.02, opacity: 0.3 });
+      if (orbCore) gsap.set(orbCore, { scale: 0.55 });
+      const phase = (p: 'in' | 'out') => () => {
+        breathPhase = p;
+        syncOrbLabel();
+      };
+      breathTl = gsap
+        .timeline({ repeat: -1, paused: true })
+        .call(phase('in'), undefined, 0)
+        .to(breath, { scale: 1.16, opacity: 1, duration: 4, ease: 'sine.inOut' }, 0)
+        .call(phase('out'), undefined, 4)
+        .to(breath, { scale: 1.02, opacity: 0.3, duration: 6, ease: 'sine.inOut' }, 4);
+      if (orbCore) {
+        breathTl
+          .to(orbCore, { scale: 1, duration: 4, ease: 'sine.inOut' }, 0)
+          .to(orbCore, { scale: 0.55, duration: 6, ease: 'sine.inOut' }, 4);
+      }
+      breathTl.timeScale(BREATH_TENSE);
+      const loop = breathTl;
+      /* Only breathe while the section is on screen. */
+      ScrollTrigger.create({
+        trigger: section,
+        start: 'top bottom',
+        end: 'bottom top',
+        refreshPriority: -2,
+        onToggle: (self) => (self.isActive ? loop.play() : loop.pause()),
+      });
+    }
 
     gsap.set(imgB, { opacity: 0 });
     gsap.set(glow, { opacity: 0, scale: 1.18 });
@@ -601,7 +694,9 @@ const buildScene = () => {
         .to(copyA, { opacity: 0, duration: 0.8, ease: 'power1.in' }, 4.2)
         .to(imgA, { opacity: 0, duration: 0.9, ease: 'none' }, 4.6)
         .to(imgB, { opacity: 1, duration: 0.9, ease: 'none' }, 4.6)
-        .to(copyB, { opacity: 1, duration: 1.1, ease: 'power1.out' }, 5.2);
+        .to(copyB, { opacity: 1, duration: 1.1, ease: 'power1.out' }, 5.2)
+        .to(photos, { scale: 1, duration: 2.2, ease: 'sine.inOut' }, 4.4)
+        .call(() => setBreathCalm(true), undefined, 4.6);
 
       const trustIo = new IntersectionObserver(
         ([entry]) => {
@@ -774,6 +869,11 @@ const buildScene = () => {
         anticipatePin: 1,
         scrub: 0.6,
         refreshPriority: -2, // measured after the Loom section's pin above it
+        /* Past the switch to the second message, the breath slows; back above it, it quickens. */
+        onUpdate: (self) => {
+          const dur = trustTl.duration();
+          if (dur) setBreathCalm(self.progress * dur > PIN_HOLD + 0.9);
+        },
         onEnter: () => {
           pinned = true;
           startIntro();
@@ -813,6 +913,13 @@ const buildScene = () => {
         { opacity: 0 },
         { opacity: 1, ease: 'none', duration: 0.8, immediateRender: false },
         D + 0.7,
+      )
+      /* The exhale: the photo eases back from slightly close. */
+      .fromTo(
+        photos,
+        { scale: PHOTO_HELD },
+        { scale: 1, ease: 'sine.inOut', duration: 1.6, immediateRender: false },
+        D + 0.3,
       )
       .fromTo(
         copyB,
@@ -1135,6 +1242,15 @@ const toExamples = () => openTopic(TopicName.Examples);
     <LoomIntro v-if="showLoomIntro" />
     <div class="section-transition"></div>
     <section ref="trustSectionRef" class="trust-section">
+      <div ref="trustBreathRef" class="trust-breath" aria-hidden="true"></div>
+      <div class="trust-orb" aria-hidden="true">
+        <span class="trust-orb__ring">
+          <span ref="trustOrbInner" class="trust-orb__inner">
+            <span ref="trustOrbCore" class="trust-orb__core"></span>
+          </span>
+        </span>
+        <span class="trust-orb__label">{{ orbLabel }}</span>
+      </div>
       <div ref="trustViewportRef" class="trust-viewport">
         <div ref="trustImageA" class="trust-image-wrap">
           <img src="../assets/trust-breathing-in.avif" alt="" class="trust-image" />
@@ -1505,8 +1621,20 @@ const toExamples = () => openTopic(TopicName.Examples);
             margin-top: 0;
           }
 
-          .cta {
+          /* The card is only 250px wide here, so the label wraps onto two lines instead of
+             spilling out of the card. */
+          .cta-wrap .cta {
             width: 100%;
+            min-width: 0;
+            white-space: normal;
+
+            .text-body-2 {
+              display: block;
+              font-size: 0.82rem;
+              line-height: 1.3;
+              white-space: normal;
+              text-wrap: balance;
+            }
           }
 
           /* Keep the collapsed hero compact: just the menu and the booking button. */
@@ -1803,6 +1931,31 @@ const toExamples = () => openTopic(TopicName.Examples);
    resized the hero and this section and shifted everything.
    On phones and tablets this is the last section (not pinned), so it fits exactly between the
    fixed header and the footer: you never land with its top hidden under the header. */
+/* The photo's box (shared by the photo and the breath light behind it). Phones and tablets: the
+   top part, with the words below. Large screens: the right half, with the words on the left. */
+@mixin trust-photo-box {
+  position: absolute;
+  top: 1.25rem;
+  right: 1rem;
+  bottom: auto;
+  left: 1rem;
+  height: 44%;
+
+  @media #{tokens.$tablet-only} {
+    top: 2.25rem;
+    right: 2rem;
+    left: 2rem;
+  }
+
+  @media (min-width: tokens.$breakpoint-lg) {
+    top: clamp(7rem, 15vh, 10.5rem);
+    right: clamp(4rem, 7vw, 9rem);
+    bottom: clamp(6rem, 13vh, 9.5rem);
+    left: 52%;
+    height: auto;
+  }
+}
+
 .trust-section {
   position: relative;
   isolation: isolate; /* so the edge fades below sit above the background, under the content */
@@ -1873,11 +2026,7 @@ const toExamples = () => openTopic(TopicName.Examples);
   }
 
   .trust-viewport {
-    position: absolute;
-    top: 1.25rem;
-    right: 1rem;
-    bottom: 1.25rem;
-    left: 1rem;
+    z-index: 1;
     overflow: hidden;
     border-radius: 1.25rem;
     background-color: #e8eefb;
@@ -1887,25 +2036,92 @@ const toExamples = () => openTopic(TopicName.Examples);
       0 6px 18px -8px rgb(10 30 60 / 0.12),
       0 30px 64px -30px rgb(10 30 60 / 0.32);
 
-    /* Phones and tablets: the photo takes the top part, the words sit below it. */
-    bottom: auto;
-    height: 44%;
+    @include trust-photo-box;
+  }
 
-    @media #{tokens.$tablet-only} {
-      top: 2.25rem;
-      right: 2rem;
-      left: 2rem;
-      height: 44%;
-    }
+  /* The breath: soft light behind the photo that swells and settles. Only opacity and transform
+     are animated, so it stays cheap. */
+  .trust-breath {
+    @include trust-photo-box;
+    z-index: 0;
+    opacity: 0;
+    pointer-events: none;
+    border-radius: 2rem;
+    background: radial-gradient(
+      closest-side,
+      rgb(91 147 255 / 0.7) 0%,
+      rgb(91 147 255 / 0.5) 60%,
+      rgb(150 185 255 / 0.3) 82%,
+      rgb(91 147 255 / 0) 100%
+    );
+    filter: blur(36px);
+    will-change: transform, opacity;
+    translate: 0 4%;
+  }
+
+  /* The breathing guide: straddles the photo's left edge, low down, so it bridges the gap
+     between the words and the photo. Large screens only. */
+  .trust-orb {
+    display: none;
 
     @media (min-width: tokens.$breakpoint-lg) {
-      /* Large screens: the photo on the right half, the words on the left. */
-      top: clamp(7rem, 15vh, 10.5rem);
-      right: clamp(4rem, 7vw, 9rem);
-      bottom: clamp(6rem, 13vh, 9.5rem);
-      left: 52%;
-      height: auto;
+      position: absolute;
+      bottom: calc(clamp(6rem, 13vh, 9.5rem) + 2.5rem);
+      left: calc(52% - 4.25rem);
+      z-index: 3;
+      display: grid;
+      justify-items: center;
+      gap: 0.7rem;
+      pointer-events: none;
     }
+  }
+
+  .trust-orb__ring {
+    display: grid;
+    place-items: center;
+    width: 8.5rem;
+    aspect-ratio: 1;
+    border: 1px solid rgb(255 255 255 / 0.8);
+    border-radius: 50%;
+    background: rgb(244 248 255 / 0.88);
+    box-shadow:
+      0 10px 30px -10px rgb(10 30 60 / 0.25),
+      inset 0 0 0 6px rgb(255 255 255 / 0.35);
+    backdrop-filter: blur(10px) saturate(1.1);
+  }
+
+  .trust-orb__inner {
+    display: grid;
+    place-items: center;
+    width: 82%;
+    aspect-ratio: 1;
+  }
+
+  .trust-orb__core {
+    width: 100%;
+    aspect-ratio: 1;
+    border-radius: 50%;
+    background: radial-gradient(
+      circle at 40% 35%,
+      rgb(150 190 255 / 0.95) 0%,
+      rgb(18 96 240 / 0.75) 60%,
+      rgb(18 96 240 / 0.45) 100%
+    );
+    box-shadow: 0 0 24px rgb(18 96 240 / 0.35);
+    will-change: transform;
+  }
+
+  .trust-orb__label {
+    padding: 0.25rem 0.7rem;
+    border-radius: 999px;
+    background: rgb(255 255 255 / 0.85);
+    color: #0a3487;
+    font-size: 0.72rem;
+    font-weight: 700;
+    letter-spacing: 0.12em;
+    white-space: nowrap;
+    text-transform: uppercase;
+    box-shadow: 0 4px 12px -4px rgb(10 30 60 / 0.18);
   }
 
   .trust-text {
@@ -1924,8 +2140,9 @@ const toExamples = () => openTopic(TopicName.Examples);
     }
 
     @media (min-width: tokens.$breakpoint-lg) {
+      /* The free space between the menu rail and the photo; the copy block is centred in it. */
       top: clamp(7rem, 15vh, 10.5rem);
-      right: calc(48% + clamp(2.5rem, 4vw, 5rem));
+      right: calc(48% + 2rem);
       bottom: clamp(6rem, 13vh, 9.5rem);
       left: clamp(10rem, 13vw, 16rem);
     }
@@ -1992,6 +2209,10 @@ const toExamples = () => openTopic(TopicName.Examples);
     will-change: transform, opacity;
 
     @media (min-width: tokens.$breakpoint-lg) {
+      right: 0;
+      left: 0;
+      width: min(100%, 31rem);
+      margin-inline: auto;
       font-size: clamp(1.9rem, 2.6vw, 2.6rem);
     }
 
