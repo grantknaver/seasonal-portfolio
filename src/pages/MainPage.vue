@@ -2135,8 +2135,8 @@ $trust-radius: clamp(1.75rem, 2.6vw, 3rem); /* soft, organic corners on the phot
   }
 
   .trust-box {
-    @include trust-photo-box;
     z-index: 1;
+    @include trust-photo-box;
   }
 
   .trust-viewport {
@@ -2156,7 +2156,6 @@ $trust-radius: clamp(1.75rem, 2.6vw, 3rem); /* soft, organic corners on the phot
   /* Exhale cloud: a very light, soft glow just behind the photo. Mostly hidden while the photo
      sits on top; as it scales up it spills out past the edges and fades. */
   .trust-cloud {
-    @include trust-photo-box;
     z-index: 0;
     opacity: 0;
     pointer-events: none;
@@ -2169,6 +2168,7 @@ $trust-radius: clamp(1.75rem, 2.6vw, 3rem); /* soft, organic corners on the phot
     );
     filter: blur(40px);
     will-change: transform, opacity;
+    @include trust-photo-box;
   }
 
   &.is-established .trust-copy .trust-link {

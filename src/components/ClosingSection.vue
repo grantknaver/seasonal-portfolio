@@ -1034,17 +1034,17 @@ $bounce: cubic-bezier(0.34, 1.56, 0.64, 1);
   height: 2.6rem;
   margin-bottom: 0.2rem;
   border: 2px solid rgba(18, 96, 240, 0.28);
-
-  @media (max-width: 599px) {
-    width: 2.1rem;
-    height: 2.1rem;
-  }
   border-radius: 50%;
   background: #fff;
   transition:
     background 0.3s ease,
     border-color 0.3s ease,
     box-shadow 0.3s ease;
+
+  @media (max-width: 599px) {
+    width: 2.1rem;
+    height: 2.1rem;
+  }
 
   svg {
     width: 55%;

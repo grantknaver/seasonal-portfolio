@@ -474,26 +474,24 @@ $ease: cubic-bezier(0.22, 1, 0.36, 1);
 .loom-intro__results {
   width: 100%;
   max-width: 1180px;
+  margin: clamp(1.25rem, 3.5vh, 2.25rem) auto 0;
 
   @media (min-width: tokens.$breakpoint-lg) {
     max-width: var(--content-w);
   }
-
-  margin: clamp(1.25rem, 3.5vh, 2.25rem) auto 0;
 }
 
 .loom-intro__next {
   width: 100%;
   max-width: 1180px;
-
-  @media (min-width: tokens.$breakpoint-lg) {
-    max-width: var(--content-w);
-  }
-
   margin: clamp(0.9rem, 2vh, 1.25rem) auto 0;
   color: $muted;
   font-size: 0.95rem;
   line-height: 1.4;
+
+  @media (min-width: tokens.$breakpoint-lg) {
+    max-width: var(--content-w);
+  }
 }
 
 .loom-intro__cta {
@@ -563,27 +561,26 @@ $ease: cubic-bezier(0.22, 1, 0.36, 1);
 .loom-intro__title {
   max-width: 18ch;
   font-size: clamp(1.7rem, 2.3vw, 2.15rem);
+  font-weight: 600;
+  letter-spacing: -0.02em;
+  line-height: 1.12;
 
   /* Desktop: two wide lines instead of four narrow ones, to keep the section short. */
   @media (min-width: tokens.$breakpoint-lg) {
     max-width: 30ch;
     font-size: clamp(2rem, 2.3vw, 2.5rem);
   }
-  font-weight: 600;
-  letter-spacing: -0.02em;
-  line-height: 1.12;
 }
 
 .loom-intro__lead {
   max-width: 34ch;
+  color: $muted;
+  font-size: clamp(1rem, 1.2vw, 1.12rem);
+  line-height: 1.5;
 
   @media (min-width: tokens.$breakpoint-lg) {
     max-width: 48ch;
   }
-
-  color: $muted;
-  font-size: clamp(1rem, 1.2vw, 1.12rem);
-  line-height: 1.5;
 }
 
 .loom-intro__costs {
