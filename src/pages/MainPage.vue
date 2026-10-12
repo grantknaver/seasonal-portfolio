@@ -2499,14 +2499,25 @@ $trust-radius: clamp(1.75rem, 2.6vw, 3rem); /* soft, organic corners on the phot
   }
 
   /* ---------- Phones and tablets ----------
-     A plain flowing section on its own pale band (clearly separate from its neighbours). The
-     photo sticks below the header while the two messages scroll up under it; the script
-     switches the photo when the second message arrives. Large screens are untouched. */
+     A plain flowing section on its own pale band. The photo sticks below the header while the
+     first message scrolls up under it; the script switches the photo as the second message
+     arrives. The second message then sticks just below the photo, and the two hold together
+     for a moment (the final, settled state) before leaving together. Large screens untouched.
+
+     Sizes: --pt photo top, --ph photo height, --gap photo → message, --mh message height
+     (fills the rest of the screen, so the photo and message can be released at the same time). */
   @media (max-width: tokens.$breakpoint-lg - 0.02px) {
+    --pt: calc(56px + 0.75rem);
+    --ph: 42svh;
+    --gap: 1.25rem;
+    --mh: calc(100svh - var(--pt) - var(--ph) - var(--gap) - 0.75rem);
+    --hold: 45svh; /* how long the final state holds */
+
     height: auto;
     overflow: clip; /* clips like hidden, but keeps position: sticky working */
-    /* The bottom padding matches the negative margin on .trust-text (see there). */
-    padding: 1.25rem 0 calc(56svh + 1rem);
+    /* Gives back the room taken by .trust-text's negative margin (see there), plus breathing
+       room before the next section. */
+    padding: 2rem 0 calc(var(--gap) + var(--mh) + 2.5rem);
     border-top: 1px solid rgb(18 96 240 / 0.12);
     background: #eaf1fd;
 
@@ -2518,17 +2529,17 @@ $trust-radius: clamp(1.75rem, 2.6vw, 3rem); /* soft, organic corners on the phot
     .trust-cloud,
     .trust-box {
       position: sticky;
-      top: calc(56px + 0.75rem);
+      top: var(--pt);
       right: auto;
       bottom: auto;
       left: auto;
-      height: 42svh;
-      margin-inline: 1rem;
+      height: var(--ph);
+      margin-inline: 1.25rem;
     }
 
     .trust-box {
       z-index: 2;
-      margin-top: -42svh; /* sits exactly over the cloud, which sticks with it */
+      margin-top: calc(-1 * var(--ph)); /* sits exactly over the cloud, which sticks with it */
 
       /* Covers the strip between the header and the photo, so the words scrolling up under
          the photo don't peek out above it. */
@@ -2536,8 +2547,8 @@ $trust-radius: clamp(1.75rem, 2.6vw, 3rem); /* soft, organic corners on the phot
         content: '';
         position: absolute;
         top: calc(-0.75rem - 2px);
-        right: -1rem;
-        left: -1rem;
+        right: -1.25rem;
+        left: -1.25rem;
         z-index: -1;
         height: calc(0.75rem + 40px);
         background: #eaf1fd;
@@ -2552,12 +2563,18 @@ $trust-radius: clamp(1.75rem, 2.6vw, 3rem); /* soft, organic corners on the phot
       position: relative;
       inset: auto;
       z-index: 1;
-      padding: 0 1.5rem;
-      /* The photo sticks until the end of the section's content. Pulling that end up by about
-         the second message's height (and giving the room back as padding) lets the photo move
-         on as soon as that message sits just below it, so its label and headline never slide
-         under the photo. */
-      margin-bottom: -56svh;
+      padding: 0 2rem;
+      /* The photo is released when the section's content ends. Ending it one message-height
+         early releases the photo at the same moment the second message is released, so they
+         leave together and the message never slides under the photo. */
+      margin-bottom: calc(-1 * (var(--gap) + var(--mh)));
+
+      /* The hold: scroll room during which the photo and second message both stay put. */
+      &::after {
+        content: '';
+        display: block;
+        height: var(--hold);
+      }
     }
 
     .trust-copy {
@@ -2569,27 +2586,38 @@ $trust-radius: clamp(1.75rem, 2.6vw, 3rem); /* soft, organic corners on the phot
       opacity: 1;
     }
 
-    /* The second message: extra room above its label lets the photo stay pinned about 10% of
-       a screen longer (about a third of a screen) while it breathes, and the label still lands just below the photo. */
+    /* The second message: a short gap first (the photo exhales on its own), then it sticks
+       just below the photo for the hold. */
     .trust-copy + .trust-copy {
-      min-height: 80svh;
-      padding-top: 26svh;
+      position: sticky;
+      top: calc(var(--pt) + var(--ph) + var(--gap));
+      height: var(--mh);
+      min-height: 0;
+      margin-top: 14svh;
+      padding-top: 0;
     }
   }
 
+  /* Short phones (iPhone SE): a slightly shorter photo leaves room for the message. */
+  @media (max-width: tokens.$breakpoint-sm - 0.02px) and (max-height: 760px) {
+    --ph: 36svh;
+  }
+
   @media #{tokens.$tablet-only} {
+    --ph: 44svh;
+
     .trust-cloud,
     .trust-box {
-      height: 46svh;
-      margin-inline: 2rem;
+      margin-inline: 3rem;
     }
 
-    .trust-box {
-      margin-top: -46svh;
+    .trust-box::before {
+      right: -3rem;
+      left: -3rem;
     }
 
     .trust-text {
-      padding: 0 3rem;
+      padding: 0 4rem;
     }
   }
 }
