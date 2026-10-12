@@ -22,10 +22,10 @@ withDefaults(defineProps<{ compact?: boolean }>(), { compact: false });
       <img class="sample__page sample__page--back2" :src="decision" alt="" loading="lazy" />
       <img class="sample__page sample__page--back1" :src="finding" alt="" loading="lazy" />
       <img class="sample__page sample__page--front" :src="cover" alt="" loading="lazy" />
-      <span class="sample__tag">Sample · fictional</span>
+      <span class="sample__tag">Sample · fictional product</span>
     </span>
     <span v-if="!compact" class="sample__copy">
-      <b>A real Decision Snapshot, for a made-up company</b>
+      <b>A sample Decision Snapshot, for a fictional product</b>
       <span
         >Surface reviewed, three findings with annotated evidence, pattern directions, and the one
         decision.</span
