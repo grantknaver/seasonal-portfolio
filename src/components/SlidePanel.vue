@@ -80,7 +80,9 @@ onBeforeUnmount(unlock);
   display: flex;
   flex-direction: column;
   transform: translateX(100%);
-  background: color-mix(in srgb, var(--q-dark) 75%, white 25%);
+  /* Light, like the page: the same pale blue as the sections, with a soft edge shadow. */
+  background: linear-gradient(180deg, #eef3fd 0%, #e4ecfc 100%);
+  box-shadow: -18px 0 50px rgba(10, 52, 135, 0.14);
   transition: transform 0.32s cubic-bezier(0.4, 0, 0.2, 1);
   will-change: transform;
 
@@ -96,6 +98,6 @@ onBeforeUnmount(unlock);
   overscroll-behavior: contain;
   padding: 1rem 1rem 1rem;
   scrollbar-width: thin;
-  scrollbar-color: rgba(255, 255, 255, 0.5) transparent;
+  scrollbar-color: rgba(11, 31, 46, 0.25) transparent;
 }
 </style>

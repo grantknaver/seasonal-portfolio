@@ -1993,19 +1993,24 @@ const toExamples = () => {
         left: clamp(1rem, 2vw, 2rem);
         bottom: clamp(1rem, 2.6vh, 2rem);
         background: rgb(255 255 255 / 0.9);
-        width: clamp(220px, 16vw, 260px);
-        padding: 0.85rem 0.95rem;
+        width: clamp(190px, 12.5vw, 220px);
+        padding: 0.7rem 0.8rem;
         box-shadow:
           0 10px 24px rgb(10 30 60 / 0.16),
           0 2px 6px rgb(10 30 60 / 0.1);
 
         .tc-row b {
-          font-size: 0.92rem;
+          font-size: 0.84rem;
         }
 
         .tc-status,
         .tc-paid {
-          font-size: 0.86rem;
+          font-size: 0.8rem;
+        }
+
+        .tc-guess,
+        .tc-src {
+          font-size: 0.72rem;
         }
       }
 
@@ -2097,7 +2102,7 @@ const toExamples = () => {
     grid-area: 1 / 1;
     display: grid;
     gap: 0.45rem;
-    align-content: start;
+    align-content: center; /* the card is sized by its taller state; keep the shorter one centred */
   }
 
   .tc-row {
