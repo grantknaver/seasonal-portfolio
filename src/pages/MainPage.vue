@@ -1144,24 +1144,6 @@ const toExamples = () => openTopic(TopicName.Examples);
           <img src="../assets/trust-breathing-out.avif" alt="" class="trust-image" />
         </div>
 
-        <div ref="trustCopyA" class="trust-copy">
-          <span class="eyebrow">Why people hesitate</span>
-          <p>People hesitate when they have to guess.</p>
-          <p class="trust-support">
-            Every visitor is trusting you with their time and attention. Each question your product
-            leaves open (what is this, what is it doing, what happens next) spends some of it.
-          </p>
-        </div>
-
-        <div ref="trustCopyB" class="trust-copy">
-          <span class="eyebrow">Where trust comes from</span>
-          <p>Trust isn’t claimed.</p>
-          <p><span class="trust-fill">It’s established.</span></p>
-          <p class="trust-support">
-            Say clearly who you are and what you do. Then show it. When what you say and what the
-            product does line up, there’s nothing left to guess and nothing in the way.
-          </p>
-        </div>
         <div ref="trustGlowRef" class="trust-glow" aria-hidden="true"></div>
         <!-- Phones: step back to the first message and forward again once autoplay is done. -->
         <div
@@ -1197,6 +1179,28 @@ const toExamples = () => openTopic(TopicName.Examples);
           <ScrollCue :is-dark="false" :has-text="false" minimal />
         </div>
         <div class="trust-frame" aria-hidden="true"></div>
+      </div>
+      <!-- The words sit on the page itself, beside the photo (above it on phones), in the
+           site's own type. -->
+      <div class="trust-text">
+        <div ref="trustCopyA" class="trust-copy">
+          <span class="eyebrow">Why people hesitate</span>
+          <p>People hesitate when they have to guess.</p>
+          <p class="trust-support">
+            Every visitor is trusting you with their time and attention. Each question your product
+            leaves open (what is this, what is it doing, what happens next) spends some of it.
+          </p>
+        </div>
+
+        <div ref="trustCopyB" class="trust-copy">
+          <span class="eyebrow">Where trust comes from</span>
+          <p>Trust isn’t claimed.</p>
+          <p><span class="trust-fill">It’s established.</span></p>
+          <p class="trust-support">
+            Say clearly who you are and what you do. Then show it. When what you say and what the
+            product does line up, there’s nothing left to guess and nothing in the way.
+          </p>
+        </div>
       </div>
     </section>
 
@@ -1806,7 +1810,28 @@ const toExamples = () => openTopic(TopicName.Examples);
   height: calc(100vh - 56px - 50px);
   height: calc(100svh - 56px - 50px);
   overflow: hidden;
-  background: url('../assets/trust-section-background.avif') center 46% / cover no-repeat;
+  /* The background artwork stays, but a pale wash keeps it quiet behind the words: below the
+     photo on phones, on the left half on large screens. */
+  background:
+    linear-gradient(
+      180deg,
+      rgb(242 246 254 / 0) 30%,
+      rgb(242 246 254 / 0.9) 52%,
+      rgb(242 246 254 / 0.96) 100%
+    ),
+    url('../assets/trust-section-background.avif') center 46% / cover no-repeat;
+
+  @media (min-width: tokens.$breakpoint-lg) {
+    background:
+      linear-gradient(
+        90deg,
+        rgb(242 246 254 / 0.96) 0%,
+        rgb(242 246 254 / 0.9) 42%,
+        rgb(242 246 254 / 0.35) 58%,
+        rgb(242 246 254 / 0) 72%
+      ),
+      url('../assets/trust-section-background.avif') center 46% / cover no-repeat;
+  }
 
   @media (min-width: tokens.$breakpoint-lg) {
     height: 100vh;
@@ -1862,20 +1887,47 @@ const toExamples = () => openTopic(TopicName.Examples);
       0 6px 18px -8px rgb(10 30 60 / 0.12),
       0 30px 64px -30px rgb(10 30 60 / 0.32);
 
+    /* Phones and tablets: the photo takes the top part, the words sit below it. */
+    bottom: auto;
+    height: 44%;
+
     @media #{tokens.$tablet-only} {
       top: 2.25rem;
       right: 2rem;
-      bottom: 2.25rem;
       left: 2rem;
+      height: 44%;
     }
 
     @media (min-width: tokens.$breakpoint-lg) {
-      /* Smaller than the screen on purpose: room to breathe around the photo, like the rest
-         of the site. */
+      /* Large screens: the photo on the right half, the words on the left. */
       top: clamp(7rem, 15vh, 10.5rem);
-      right: clamp(11rem, 19vw, 22rem);
+      right: clamp(4rem, 7vw, 9rem);
       bottom: clamp(6rem, 13vh, 9.5rem);
-      left: clamp(11rem, 19vw, 22rem);
+      left: 52%;
+      height: auto;
+    }
+  }
+
+  .trust-text {
+    position: absolute;
+    top: calc(44% + 1.25rem);
+    right: 1.5rem;
+    bottom: 1.25rem;
+    left: 1.5rem;
+    z-index: 2;
+
+    @media #{tokens.$tablet-only} {
+      top: calc(44% + 4.5rem);
+      right: 3rem;
+      bottom: 2.25rem;
+      left: 3rem;
+    }
+
+    @media (min-width: tokens.$breakpoint-lg) {
+      top: clamp(7rem, 15vh, 10.5rem);
+      right: calc(48% + clamp(2.5rem, 4vw, 5rem));
+      bottom: clamp(6rem, 13vh, 9.5rem);
+      left: clamp(10rem, 13vw, 16rem);
     }
   }
   .trust-image-wrap {
@@ -1915,6 +1967,7 @@ const toExamples = () => openTopic(TopicName.Examples);
     width: 100%;
     height: 100%;
     object-fit: cover;
+    object-position: 42% 40%;
     filter: saturate(0.82) contrast(0.9) brightness(1.12);
   }
 
@@ -1926,87 +1979,75 @@ const toExamples = () => openTopic(TopicName.Examples);
     opacity: 0;
     position: absolute;
     inset: 0;
-    z-index: 2;
     display: flex;
     flex-direction: column;
-    align-items: center;
+    align-items: flex-start;
     justify-content: center;
-    padding-inline: 2rem;
-    text-align: center;
-    color: tokens.$ivory;
-
-    /* Phones: leave room on both sides for the back/forward arrows (kept symmetric so the
-       copy stays centered). */
-    @media (max-width: tokens.$breakpoint-lg) {
-      padding-inline: 3.6rem;
-    }
-    font-size: clamp(1.3rem, 4.3vw, 1.7rem);
-    line-height: 1.25;
-    letter-spacing: -0.01em;
+    text-align: left;
+    color: #0b1f2e;
+    font-size: clamp(1.45rem, 5.4vw, 1.8rem);
+    font-weight: 600;
+    line-height: 1.12;
+    letter-spacing: -0.025em;
     will-change: transform, opacity;
-    /* Just enough shadow to read on the lighter photo. A faint, wide pool of shade sits behind
-       the block for the same reason, and fades with the copy. */
-    text-shadow:
-      0 1px 2px rgb(11 31 59 / 0.3),
-      0 2px 18px rgb(11 31 59 / 0.4);
-    background: radial-gradient(
-      44% 40% at 50% 50%,
-      rgb(11 31 59 / 0.3) 0%,
-      rgb(11 31 59 / 0.12) 55%,
-      rgb(11 31 59 / 0) 100%
-    );
 
     @media (min-width: tokens.$breakpoint-lg) {
-      font-size: clamp(1.7rem, 2.4vw, 2.2rem);
+      font-size: clamp(1.9rem, 2.6vw, 2.6rem);
     }
 
     .trust-fill {
-      color: tokens.$champagne;
+      color: #1260f0;
     }
 
     .eyebrow {
-      font-size: 0.8rem;
-      letter-spacing: 0.2em;
-      text-transform: uppercase;
-      font-weight: 500;
+      margin-bottom: 0.9rem;
+      color: #1260f0;
+      font-size: 0.72rem;
+      font-weight: 700;
+      letter-spacing: 0.14em;
       line-height: 1.4;
-      margin-bottom: 1.1rem;
-      color: rgb(from tokens.$ivory r g b / 0.9);
-      text-shadow: 0 1px 6px rgb(11 31 59 / 0.5);
+      text-transform: uppercase;
+
       @media (min-width: tokens.$breakpoint-lg) {
-        font-size: 0.85rem;
+        margin-bottom: 1.2rem;
+        font-size: 0.78rem;
       }
     }
 
     p {
       margin: 0;
-      max-width: 24ch;
+      max-width: 20ch;
+      text-wrap: balance;
     }
 
     .trust-support {
-      font-size: clamp(0.9rem, 1.1vw, 1.05rem);
-      line-height: 1.65;
-      max-width: 50ch;
-      margin-top: 1.5rem;
-      color: rgb(from tokens.$ivory r g b / 0.92);
+      max-width: 44ch;
+      margin-top: 1rem;
+      color: rgb(11 31 46 / 0.68);
+      font-size: 0.98rem;
+      font-weight: 400;
       letter-spacing: 0;
-      text-shadow:
-        0 1px 2px rgb(11 31 59 / 0.35),
-        0 1px 12px rgb(11 31 59 / 0.4);
+      line-height: 1.6;
+      text-wrap: pretty;
+
+      @media (min-width: tokens.$breakpoint-lg) {
+        margin-top: 1.5rem;
+        font-size: clamp(1rem, 1.1vw, 1.12rem);
+      }
     }
 
     /* Short phones: a more compact block. */
     @media (max-height: 760px) and (max-width: tokens.$breakpoint-lg) {
-      font-size: clamp(1.2rem, 4vw, 1.5rem);
+      font-size: clamp(1.25rem, 4.8vw, 1.5rem);
 
       .eyebrow {
-        margin-bottom: 0.6rem;
-        font-size: 0.72rem;
+        margin-bottom: 0.5rem;
+        font-size: 0.68rem;
       }
 
       .trust-support {
-        margin-top: 0.8rem;
-        font-size: 0.85rem;
+        margin-top: 0.6rem;
+        font-size: 0.86rem;
         line-height: 1.5;
       }
     }
