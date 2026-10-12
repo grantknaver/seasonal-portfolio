@@ -1212,6 +1212,9 @@ const toExamples = () => {
       </q-list>
     </div>
     <!-- Glue between "what I do" and "why people hesitate": the cost of friction, in my voice. -->
+    <!-- Soft edge: the hero's fixed artwork dissolves into the Loom section's colour instead of
+         being cut off where the section slides up over it. -->
+    <div class="hero-fade" aria-hidden="true"></div>
     <LoomIntro v-if="showLoomIntro" />
     <div class="section-transition"></div>
     <section ref="trustSectionRef" class="trust-section">
@@ -1852,6 +1855,35 @@ const toExamples = () => {
       min-width: 0;
       padding-right: 0;
     }
+  }
+}
+
+/* ---------- Hero → Loom soft edge ---------- */
+
+.hero-fade {
+  position: relative;
+  z-index: 1;
+  display: none; /* desktop only: phones have no fixed hero artwork to dissolve */
+  height: 0;
+  pointer-events: none;
+
+  @media (min-width: tokens.$breakpoint-lg) {
+    display: block;
+  }
+
+  &::after {
+    content: '';
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    height: clamp(120px, 20vh, 200px);
+    background: linear-gradient(
+      180deg,
+      rgba(247, 249, 254, 0) 0%,
+      rgba(247, 249, 254, 0.75) 55%,
+      #f7f9fe 100%
+    );
   }
 }
 
