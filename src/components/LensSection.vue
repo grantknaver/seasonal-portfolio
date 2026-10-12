@@ -408,11 +408,11 @@ onBeforeUnmount(() => io?.disconnect());
           way, it starts with a free Decision Snapshot.
         </p>
         <div class="lens-close__btns">
-          <q-btn class="lens-cta lens-cta--ghost" flat size="lg" @click="toExamples">
-            <span class="text-body-2">See the builds</span>
-          </q-btn>
           <q-btn class="lens-cta" color="accent" size="lg" glossy @click="toContact">
             <span class="text-body-2">Get a free Decision Snapshot</span>
+          </q-btn>
+          <q-btn class="lens-cta lens-cta--ghost" flat size="lg" @click="toExamples">
+            <span class="text-body-2">See the builds</span>
           </q-btn>
         </div>
       </div>
@@ -1206,9 +1206,11 @@ $ease: cubic-bezier(0.22, 1, 0.36, 1);
 }
 
 .lens-close__btns {
+  /* Stacked: the main action on top, the secondary one under it, same width. */
   display: flex;
-  flex: none;
+  flex-direction: column;
   gap: 0.5rem;
+  width: min(100%, 340px);
 }
 
 .lens-cta--ghost {
@@ -1218,10 +1220,10 @@ $ease: cubic-bezier(0.22, 1, 0.36, 1);
 
 .lens-close {
   display: flex;
-  gap: 1rem;
-  align-items: center;
-  justify-content: space-between;
-  padding: 0.9rem 1rem;
+  flex-direction: column;
+  gap: 0.9rem;
+  align-items: flex-start;
+  padding: 1.1rem 1.2rem;
   border: 1px solid $line;
   border-radius: 0.8rem;
   background: #fff;
