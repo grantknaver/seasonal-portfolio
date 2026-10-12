@@ -26,6 +26,7 @@ import LoomIntro from '../components/LoomIntro.vue';
 import ClosingSection from '../components/ClosingSection.vue';
 import { INTRO_LOOM_URL } from '../shared/constants/loom';
 import { openTeardownBooking } from 'src/shared/constants/booking';
+import { CLIENT_RESULTS } from 'src/shared/constants/clientResults';
 
 gsap.registerPlugin(ScrollTrigger);
 /* No auto-refresh on window 'load'. On a cold (uncached) visit 'load' fires
@@ -142,6 +143,9 @@ const signalHeroCopyIn = () => {
   window.dispatchEvent(new Event('hero:copy-in'));
 };
 const trustCueRef = ref<HTMLElement | null>(null);
+/* Proof under "It's established.": the client-reported trust result. */
+const trustProof = CLIENT_RESULTS.find((r) => r.label === 'Trust') ?? CLIENT_RESULTS[0]!;
+const trustProofWhy = trustProof.text.split(' after ')[1]?.replace(/\.$/, '') ?? '';
 /* ---------- The breath ----------
    First message ("people hesitate"): breath held. The photo sits a touch close and still.
    Second message ("trust is established"): the photo eases back and starts to breathe, drifting
@@ -186,6 +190,8 @@ const updateBreath = () => {
 const setBreathCalm = (calm: boolean) => {
   if (calm === breathCalm) return;
   breathCalm = calm;
+  /* Marks which message is showing, so only the visible one's link can be clicked. */
+  trustSectionRef.value?.classList.toggle('is-established', calm);
   if (calm && breathTl) breathTl.restart(true).pause(); // start a fresh breath, from the top
   updateBreath();
 };
@@ -376,6 +382,26 @@ const heroTargets = () => {
 
 const release = () => claritySectionRef.value?.removeAttribute('data-hero');
 
+/* Desktop: no scrolling until the hero card and the four menu tiles have settled, so the rest
+   of the page can't slide into view mid-entrance. Always released: by the timeline, when the
+   hero is done, or by a timeout as a last resort. */
+let scrollLocked = false;
+let scrollLockTimer = 0;
+const lockScroll = () => {
+  if (scrollLocked) return;
+  scrollLocked = true;
+  document.documentElement.style.overflow = 'hidden';
+  document.body.style.overflow = 'hidden';
+  scrollLockTimer = window.setTimeout(() => unlockScroll(), 5000);
+};
+const unlockScroll = () => {
+  if (!scrollLocked) return;
+  scrollLocked = false;
+  window.clearTimeout(scrollLockTimer);
+  document.documentElement.style.overflow = '';
+  document.body.style.overflow = '';
+};
+
 const buildHero = (mode: ViewType, animate = true) => {
   const t = heroTargets();
   if (!t) {
@@ -536,6 +562,8 @@ const buildHero = (mode: ViewType, animate = true) => {
 
       /* After the card has finished settling (its move/scale ends at 2.2s). */
       tl.call(signalHeroCopyIn, undefined, 2.2);
+      /* Card settled (2.2s) and the menu tiles in (1.6s + 0.9s): scrolling can start. */
+      tl.call(unlockScroll, undefined, 2.5);
 
       if (clarityCueRef.value) {
         tl.fromTo(clarityCueRef.value, { opacity: 0 }, { opacity: 1, duration: 0.6 }, 2.9);
@@ -654,6 +682,7 @@ const buildScene = () => {
        photo box inside it, so the two never fight. */
     breathCalm = false;
     breathOnScreen = false;
+    section?.classList.remove('is-established');
     gsap.set(photos, { scale: PHOTO_HELD, transformOrigin: '50% 45%' });
     const box = trustBoxRef.value;
     if (box) gsap.set(box, { scale: BOX_HELD });
@@ -973,6 +1002,9 @@ onMounted(async () => {
   /* 2. Create every pin and ScrollTrigger and measure FIRST.
         Pin-spacers reflow the hero's own container — doing this while the
         entrance was already running was the mid-timeline hitch. */
+  if (!isResponsive.value && !prefersReducedMotion && window.scrollY < 40) lockScroll();
+  void heroDone.then(unlockScroll);
+
   await nextTick();
   await twoFrames();
   if (disposed) return;
@@ -1020,6 +1052,7 @@ onMounted(async () => {
 });
 
 onBeforeUnmount(() => {
+  unlockScroll();
   breathIo?.disconnect();
   breathIo = null;
   breathTl = null;
@@ -1331,8 +1364,13 @@ const toExamples = () => openTopic(TopicName.Examples);
           <p>People hesitate when they have to guess.</p>
           <p class="trust-support">
             Every visitor is trusting you with their time and attention. Each question your product
-            leaves open (what is this, what is it doing, what happens next) spends some of it.
+            leaves open spends some of it.
           </p>
+          <ul class="trust-questions">
+            <li>What is this?</li>
+            <li>What’s it doing?</li>
+            <li>What happens next?</li>
+          </ul>
         </div>
 
         <div ref="trustCopyB" class="trust-copy">
@@ -1343,6 +1381,14 @@ const toExamples = () => openTopic(TopicName.Examples);
             Say clearly who you are and what you do. Then show it. When what you say and what the
             product does line up, there’s nothing left to guess and nothing in the way.
           </p>
+          <p class="trust-proof">
+            <b>{{ trustProof.stat }}</b>
+            <span>{{ trustProof.short }} after {{ trustProofWhy }}</span>
+            <em>Client-reported</em>
+          </p>
+          <button type="button" class="trust-link" @click="openTeardownBooking()">
+            See where your product makes people guess &rarr;
+          </button>
         </div>
       </div>
     </section>
@@ -1937,6 +1983,12 @@ const toExamples = () => openTopic(TopicName.Examples);
   :deep(.simon-quadrant) {
     visibility: hidden;
   }
+
+  /* Solid white tiles here: they sit over every section, so the frosted glass from the hero
+     read as murky. Hover and the open-section state keep their own colours. */
+  :deep(.simon-quadrant:not(:hover):not(.active-topic)) {
+    background: #fff;
+  }
 }
 
 /* ---------- Section Transition ---------- */
@@ -2069,6 +2121,7 @@ $trust-radius: clamp(1.75rem, 2.6vw, 3rem); /* soft, organic corners on the phot
     position: absolute;
     inset: 0;
     overflow: hidden;
+    border: 6px solid rgb(255 255 255 / 0.92); /* a thin white edge, like a print */
     border-radius: $trust-radius;
     background-color: #e8eefb;
     /* A thin outline and a soft drop shadow, like the other cards on the site. */
@@ -2094,6 +2147,10 @@ $trust-radius: clamp(1.75rem, 2.6vw, 3rem); /* soft, organic corners on the phot
     );
     filter: blur(40px);
     will-change: transform, opacity;
+  }
+
+  &.is-established .trust-copy .trust-link {
+    pointer-events: auto;
   }
 
   .trust-text {
@@ -2229,9 +2286,129 @@ $trust-radius: clamp(1.75rem, 2.6vw, 3rem); /* soft, organic corners on the phot
       }
     }
 
+    /* The three questions people are left guessing at. */
+    .trust-questions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.4rem;
+      margin: 1rem 0 0;
+      padding: 0;
+      list-style: none;
+
+      li {
+        padding: 0.3rem 0.75rem 0.3rem 0.4rem;
+        border: 1px solid rgb(18 96 240 / 0.18);
+        border-radius: 999px;
+        background: rgb(255 255 255 / 0.7);
+        color: rgb(11 31 46 / 0.75);
+        font-size: 0.84rem;
+        font-weight: 500;
+        letter-spacing: 0;
+        line-height: 1.3;
+
+        &::before {
+          content: '?';
+          display: inline-grid;
+          place-items: center;
+          width: 1.15rem;
+          height: 1.15rem;
+          margin-right: 0.4rem;
+          border-radius: 50%;
+          background: rgb(18 96 240 / 0.1);
+          color: #1260f0;
+          font-size: 0.72rem;
+          font-weight: 700;
+        }
+      }
+
+      @media (min-width: tokens.$breakpoint-lg) {
+        margin-top: 1.4rem;
+      }
+    }
+
+    /* One client-reported result, so the claim has something behind it. */
+    .trust-proof {
+      display: grid;
+      grid-template-columns: auto 1fr;
+      column-gap: 0.75rem;
+      align-items: baseline;
+      max-width: 44ch;
+      margin-top: 1.25rem;
+      padding-top: 1rem;
+      border-top: 1px solid rgb(18 96 240 / 0.15);
+      letter-spacing: 0;
+
+      b {
+        grid-row: span 2;
+        color: #1260f0;
+        font-size: 1.6rem;
+        font-weight: 700;
+        line-height: 1;
+      }
+
+      span {
+        color: rgb(11 31 46 / 0.75);
+        font-size: 0.9rem;
+        font-weight: 400;
+        line-height: 1.45;
+      }
+
+      em {
+        color: rgb(11 31 46 / 0.5);
+        font-size: 0.72rem;
+        font-style: normal;
+        font-weight: 600;
+        letter-spacing: 0.06em;
+        text-transform: uppercase;
+      }
+    }
+
+    .trust-link {
+      margin-top: 1rem;
+      padding: 0;
+      border: 0;
+      background: none;
+      color: #1260f0;
+      font: inherit;
+      font-size: 0.95rem;
+      text-align: left;
+      font-weight: 700;
+      letter-spacing: 0;
+      cursor: pointer;
+      pointer-events: none; /* only clickable while this message shows (see .is-established) */
+
+      &:hover,
+      &:focus-visible {
+        text-decoration: underline;
+        text-underline-offset: 0.2em;
+      }
+    }
+
     /* Short phones: a more compact block. */
     @media (max-height: 760px) and (max-width: tokens.$breakpoint-lg) {
       font-size: clamp(1.25rem, 4.8vw, 1.5rem);
+
+      .trust-questions li {
+        font-size: 0.74rem;
+      }
+
+      .trust-proof {
+        margin-top: 0.7rem;
+        padding-top: 0.6rem;
+
+        b {
+          font-size: 1.25rem;
+        }
+
+        span {
+          font-size: 0.8rem;
+        }
+      }
+
+      .trust-link {
+        margin-top: 0.6rem;
+        font-size: 0.85rem;
+      }
 
       .eyebrow {
         margin-bottom: 0.5rem;
