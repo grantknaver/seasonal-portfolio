@@ -24,13 +24,10 @@ const modes: { key: Mode; label: string }[] = [
 /* What a Decision Snapshot is, start to finish. */
 /* What's on the one page, spelled out. */
 const gets = [
-  { b: '2–3 highest-leverage issues', s: 'on the surface you sent' },
-  { b: 'One annotated screenshot', s: 'where the friction appears' },
-  {
-    b: '1–3 pattern directions',
-    s: 'from my Pattern Index of interaction patterns',
-  },
-  { b: 'The next decision', s: 'the one that matters most' },
+  '2–3 highest-leverage issues',
+  'One annotated screenshot',
+  '1–3 pattern directions',
+  'The next decision',
 ];
 
 const steps = [
@@ -40,9 +37,9 @@ const steps = [
 ];
 
 const nodes = [
-  { key: 'teardown', title: 'Decision Snapshot', meta: 'Free · one surface · one page' },
-  { key: 'diag', title: 'Diagnostic', meta: 'When the problem is unclear' },
-  { key: 'build', title: 'Build the fix', meta: 'When the problem is clear' },
+  { key: 'teardown', title: 'Decision Snapshot', meta: 'Free' },
+  { key: 'diag', title: 'Diagnostic', meta: 'If it’s unclear' },
+  { key: 'build', title: 'Build the fix', meta: 'If it’s clear' },
 ] as const;
 
 /* What each answer lights up, and what it means in plain words. */
@@ -159,7 +156,7 @@ let enterIo: IntersectionObserver | null = null;
 /* Desktop: like the Loom section, everything is tied to the scroll and reverses when you scroll
    back up. As the section rises, the eyebrow and headline arrive. Then it holds for about a
    screen while the lead and button come in, and only after that the card slides in from the
-   right and its route draws. The background shapes drift in at different speeds throughout. */
+   right and its route draws. The grid and glow drift in behind it. */
 const holdLength = () => Math.round(window.innerHeight * 1.1);
 
 const buildScrub = (root: HTMLElement) => {
@@ -240,7 +237,7 @@ const buildScrub = (root: HTMLElement) => {
     .call(startHint, undefined, 1.4)
     .to({}, { duration: 0.35 }); // rest on the finished state
 
-  /* 3. Depth: shapes, grid and glow drift in across the rise and the hold. */
+  /* 3. Depth: the grid and one soft glow drift in across the rise and the hold. */
   const drift = gsap.timeline({
     defaults: { ease: 'none' },
     scrollTrigger: {
@@ -253,11 +250,6 @@ const buildScrub = (root: HTMLElement) => {
     },
   });
   drift
-    .fromTo('.shape--card', { y: 320, rotate: -9 }, { y: 0, rotate: -3 }, 0)
-    .fromTo('.shape--bar', { y: 420, rotate: -7 }, { y: 0, rotate: -2 }, 0)
-    .fromTo('.shape--bar2', { y: 260 }, { y: 0 }, 0)
-    .fromTo('.shape--orb', { y: 460, scale: 0.8 }, { y: 0, scale: 1 }, 0)
-    .fromTo('.shape--mini', { y: 220, rotate: 7 }, { y: 0, rotate: 2 }, 0)
     .fromTo('.closing__grid', { y: 120 }, { y: 0 }, 0)
     .fromTo('.closing__glow', { translate: '0px 240px' }, { translate: '0px 0px' }, 0);
 };
@@ -345,15 +337,6 @@ onBeforeUnmount(() => {
   >
     <span class="closing__grid" aria-hidden="true"></span>
     <span class="closing__glow" aria-hidden="true"></span>
-    <!-- Depth: shapes from the hero's background, each drifting at its own speed. -->
-    <div class="closing__depth" aria-hidden="true">
-      <span class="shape shape--card"><i></i><i></i><i></i></span>
-      <span class="shape shape--bar"></span>
-      <span class="shape shape--bar2"></span>
-      <span class="shape shape--orb"></span>
-      <span class="shape shape--mini"><i></i><i></i></span>
-    </div>
-
     <div class="closing__inner">
       <div class="closing__copy">
         <p class="closing__eyebrow q-ma-none">The free Decision Snapshot</p>
@@ -365,10 +348,10 @@ onBeforeUnmount(() => {
           <li class="closing__steps-last">
             You get one page with:
             <ul class="gets q-ma-none">
-              <li v-for="g in gets" :key="g.b">
+              <li v-for="g in gets" :key="g">
                 <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12.5l4.2 4.2L19 7" /></svg>
                 <span
-                  ><b>{{ g.b }}</b> <small>{{ g.s }}</small></span
+                  ><b>{{ g }}</b></span
                 >
               </li>
             </ul>
@@ -535,122 +518,6 @@ $bounce: cubic-bezier(0.34, 1.56, 0.64, 1);
 @keyframes drift {
   to {
     transform: translate(-8%, 10%) scale(1.08);
-  }
-}
-
-/* ---------- Depth shapes (desktop) ---------- */
-
-.closing__depth {
-  position: absolute;
-  inset: 0;
-  display: none;
-  pointer-events: none;
-
-  @media (min-width: tokens.$breakpoint-lg) {
-    display: block;
-  }
-}
-
-.shape {
-  position: absolute;
-  display: block;
-  will-change: transform;
-}
-
-/* A pale UI card up between the columns, well clear of the copy. */
-.shape--card {
-  top: 7%;
-  left: 44%;
-  display: grid;
-  align-content: start;
-  gap: 0.6rem;
-  width: 220px;
-  height: 130px;
-  padding: 1.1rem;
-  border: 1px solid rgba(18, 96, 240, 0.08);
-  border-radius: 1rem;
-  background: rgba(255, 255, 255, 0.6);
-  box-shadow: 0 16px 40px rgba(10, 52, 135, 0.08);
-
-  i {
-    display: block;
-    height: 10px;
-    border-radius: 999px;
-    background: rgba(18, 96, 240, 0.09);
-
-    &:nth-child(1) {
-      width: 60%;
-    }
-
-    &:nth-child(2) {
-      width: 85%;
-      background: rgba(18, 96, 240, 0.05);
-    }
-
-    &:nth-child(3) {
-      width: 40%;
-      background: rgba(18, 96, 240, 0.05);
-    }
-  }
-}
-
-/* The hero's bar, lightened, low under the card. */
-.shape--bar {
-  right: 9%;
-  bottom: 7%;
-  width: 300px;
-  height: 22px;
-  border-radius: 999px;
-  background: linear-gradient(90deg, rgba(18, 96, 240, 0.45), rgba(18, 96, 240, 0.15));
-}
-
-.shape--bar2 {
-  right: 16%;
-  bottom: 3.5%;
-  width: 180px;
-  height: 10px;
-  border-radius: 999px;
-  background: rgba(18, 96, 240, 0.1);
-}
-
-/* A soft blue orb behind the card's lower right. */
-.shape--orb {
-  right: 5%;
-  bottom: 10%;
-  width: 240px;
-  aspect-ratio: 1;
-  border-radius: 50%;
-  background: radial-gradient(
-    circle at 35% 30%,
-    rgba(91, 147, 255, 0.4),
-    rgba(18, 96, 240, 0.12) 60%,
-    transparent 72%
-  );
-}
-
-/* A small notification chip, low and to the left, below the copy. */
-.shape--mini {
-  bottom: 5%;
-  left: 40%;
-  display: grid;
-  gap: 0.4rem;
-  width: 150px;
-  padding: 0.75rem 0.9rem;
-  border: 1px solid rgba(18, 96, 240, 0.1);
-  border-radius: 0.8rem;
-  background: rgba(255, 255, 255, 0.7);
-  box-shadow: 0 10px 24px rgba(10, 52, 135, 0.07);
-
-  i {
-    display: block;
-    height: 8px;
-    border-radius: 999px;
-    background: rgba(18, 96, 240, 0.12);
-
-    &:nth-child(2) {
-      width: 60%;
-      background: rgba(14, 138, 79, 0.28);
-    }
   }
 }
 
@@ -1090,9 +957,9 @@ $bounce: cubic-bezier(0.34, 1.56, 0.64, 1);
   align-items: start;
   padding-top: 1.6rem; /* room for the bypass arc */
 
+  /* Phones: still one row (Snapshot → Diagnostic → Build), just tighter. */
   @media (max-width: 599px) {
-    grid-template-columns: 1fr;
-    padding-top: 0;
+    grid-template-columns: minmax(0, 1fr) 1.25rem minmax(0, 1fr) 1.25rem minmax(0, 1fr);
   }
 }
 
@@ -1111,12 +978,21 @@ $bounce: cubic-bezier(0.34, 1.56, 0.64, 1);
     font-size: 0.95rem;
     font-weight: 700;
     line-height: 1.2;
+
+    @media (max-width: 599px) {
+      font-size: 0.8rem;
+    }
   }
 
   small {
     color: $muted;
     font-size: 0.74rem;
     line-height: 1.3;
+    white-space: nowrap;
+
+    @media (max-width: 599px) {
+      font-size: 0.68rem;
+    }
   }
 
   &.is-off > *,
@@ -1132,6 +1008,11 @@ $bounce: cubic-bezier(0.34, 1.56, 0.64, 1);
   height: 2.6rem;
   margin-bottom: 0.2rem;
   border: 2px solid rgba(18, 96, 240, 0.28);
+
+  @media (max-width: 599px) {
+    width: 2.1rem;
+    height: 2.1rem;
+  }
   border-radius: 50%;
   background: #fff;
   transition:
@@ -1175,9 +1056,7 @@ $bounce: cubic-bezier(0.34, 1.56, 0.64, 1);
   border-radius: 2px;
 
   @media (max-width: 599px) {
-    width: 2px;
-    height: 1.4rem;
-    margin: 0.5rem auto;
+    margin-top: 1.05rem;
   }
 }
 
@@ -1224,8 +1103,10 @@ $bounce: cubic-bezier(0.34, 1.56, 0.64, 1);
     transform: none;
   }
 
+  /* Phones: the link columns are 1.25rem, not 2.5rem. */
   @media (max-width: 599px) {
-    display: none;
+    left: calc((100% - 2.5rem) / 6);
+    right: calc((100% - 2.5rem) / 6);
   }
 }
 
