@@ -35,7 +35,7 @@ const fits = [
 const steps = [
   {
     label: 'Free Decision Snapshot',
-    text: 'A focused review of one surface: I study it before we talk, walk you through 2–3 observations, then send a one-page summary.',
+    text: 'A focused review of one surface: I study it before we talk, walk you through 2–3 observations, then send a short written Snapshot within 24 hours.',
   },
   {
     label: 'Diagnostic, only if needed',

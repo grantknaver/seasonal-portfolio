@@ -3,6 +3,7 @@ import { computed, nextTick, onBeforeUnmount, onMounted, ref } from 'vue';
 import gsap from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import { useViewport } from 'src/shared/utils/viewWidth';
+import { SAMPLE_SNAPSHOT_URL } from 'src/shared/constants/sampleSnapshot';
 import { openTeardownBooking } from '../shared/constants/booking';
 
 /* The close of the page. Left: what the free Decision Snapshot is, in four steps, and the one
@@ -22,7 +23,7 @@ const modes: { key: Mode; label: string }[] = [
 ];
 
 /* What a Decision Snapshot is, start to finish. */
-/* What's on the one page, spelled out. */
+/* What's in the Snapshot, spelled out. */
 const gets = [
   '2–3 highest-leverage issues',
   'One annotated screenshot',
@@ -346,7 +347,7 @@ onBeforeUnmount(() => {
         <ol class="closing__steps q-ma-none">
           <li v-for="st in steps" :key="st">{{ st }}</li>
           <li class="closing__steps-last">
-            You get one page with:
+            Within 24 hours, you get a short Snapshot with:
             <ul class="gets q-ma-none">
               <li v-for="g in gets" :key="g">
                 <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12.5l4.2 4.2L19 7" /></svg>
@@ -355,6 +356,9 @@ onBeforeUnmount(() => {
                 >
               </li>
             </ul>
+            <a class="closing__sample" :href="SAMPLE_SNAPSHOT_URL" target="_blank" rel="noopener"
+              >See a sample first <span aria-hidden="true">&rarr;</span></a
+            >
           </li>
         </ol>
         <div class="closing__cta">
@@ -611,7 +615,23 @@ $bounce: cubic-bezier(0.34, 1.56, 0.64, 1);
   }
 }
 
-/* The four things on the one page: a compact two-by-two checklist. */
+/* "See a sample first": a quiet text link under the checklist, for people not ready to book. */
+.closing__sample {
+  display: inline-block;
+  margin-top: 0.6rem;
+  color: $blue;
+  font-size: 0.92rem;
+  font-weight: 700;
+  text-decoration: none;
+
+  &:hover,
+  &:focus-visible {
+    text-decoration: underline;
+    text-underline-offset: 0.2em;
+  }
+}
+
+/* The four things in the Snapshot: a compact two-by-two checklist. */
 .gets {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));

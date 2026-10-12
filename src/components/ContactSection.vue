@@ -13,7 +13,8 @@ import { useViewport } from 'src/shared/utils/viewWidth';
 import { TEARDOWN_BOOKING_URL } from 'src/shared/constants/booking';
 import PatternIndexLink from './PatternIndexLink.vue';
 import ClientResultsStrip from './ClientResultsStrip.vue';
-import DecisionSnapshot from './DecisionSnapshot.vue';
+import SampleSnapshotPreview from './SampleSnapshotPreview.vue';
+import { SAMPLE_SNAPSHOT_URL } from 'src/shared/constants/sampleSnapshot';
 
 const form = reactive({
   name: '',
@@ -131,7 +132,8 @@ const sendEmail = async () => {
         <h1 class="q-mt-none q-mb-md">Start with a free Decision Snapshot.</h1>
         <p class="lead q-ma-none">
           A free, focused review of one screen of your product. I study it before we meet, walk you
-          through what matters most on a 20-minute call, and send you one page afterward.
+          through what matters most on a 20-minute call, and within 24 hours send you a short
+          Snapshot your team can use.
         </p>
       </header>
 
@@ -150,7 +152,7 @@ const sendEmail = async () => {
       <!-- What every attendee leaves with. -->
       <div class="takeaway">
         <div class="takeaway__copy">
-          <p class="takeaway__title q-ma-none">After the call: one page your team can use</p>
+          <p class="takeaway__title q-ma-none">Within 24 hours: a Snapshot your team can use</p>
           <ul class="takeaway__list q-ma-none">
             <li><b>2–3 highest-leverage issues</b> on the surface you sent</li>
             <li><b>One annotated screenshot</b> showing where the friction appears</li>
@@ -161,11 +163,14 @@ const sendEmail = async () => {
             <li><b>The next decision</b> that matters most</li>
           </ul>
           <p class="takeaway__own q-ma-none">Yours to keep, whether or not we work together.</p>
+          <a class="takeaway__sample" :href="SAMPLE_SNAPSHOT_URL" target="_blank" rel="noopener"
+            >See a sample Snapshot (made-up company) &rarr;</a
+          >
           <PatternIndexLink class="takeaway__link" text="Browse the Pattern Index" />
         </div>
-        <!-- A small, inert preview of the real one-pager (the full sample lives in Lens). -->
-        <div class="takeaway__thumb" aria-hidden="true" inert>
-          <DecisionSnapshot />
+        <!-- The sample Snapshot (a made-up company): opens the full PDF. -->
+        <div class="takeaway__thumb">
+          <SampleSnapshotPreview compact />
         </div>
       </div>
 
@@ -345,26 +350,9 @@ $line: rgba(18, 96, 240, 0.18);
   gap: 0.35rem;
 }
 
-/* The full Snapshot, rendered at 640px and scaled to a thumbnail, tilted slightly like a page
-   on a desk. */
+/* The sample Snapshot's pages, fanned like paper on a desk; clicking opens the PDF. */
 .takeaway__thumb {
-  position: relative;
-  width: 166px;
-  height: 186px;
-  overflow: hidden;
-  border-radius: 0.35rem;
-  transform: rotate(1.5deg);
-  box-shadow: 0 10px 24px rgba(10, 52, 135, 0.16);
-  pointer-events: none;
-
-  > * {
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 640px;
-    transform: scale(0.26);
-    transform-origin: top left;
-  }
+  align-self: center;
 
   @media (max-width: 599px) {
     display: none;
@@ -400,6 +388,18 @@ $line: rgba(18, 96, 240, 0.18);
 
   b {
     color: $ink;
+  }
+}
+
+.takeaway__sample {
+  color: var(--q-accent);
+  font-size: 0.9rem;
+  font-weight: 700;
+  text-decoration: none;
+
+  &:hover,
+  &:focus-visible {
+    text-decoration: underline;
   }
 }
 

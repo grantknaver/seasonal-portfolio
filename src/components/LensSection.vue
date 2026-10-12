@@ -31,7 +31,7 @@ const chapters = [
   {
     id: 'lens-teardown',
     title: 'What a Decision Snapshot looks like',
-    sub: 'A free, focused review of one screen, and the one page you get afterward.',
+    sub: 'A free, focused review of one screen, and the short Snapshot you get within 24 hours.',
   },
   {
     id: 'lens-lenses',

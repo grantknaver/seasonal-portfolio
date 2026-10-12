@@ -9,7 +9,7 @@ withDefaults(defineProps<{ compact?: boolean }>(), { compact: false });
     <div class="paths__start">
       <span class="node node--start">
         <b>Free Decision Snapshot</b>
-        <small>One screen · a one-page summary</small>
+        <small>One screen · a short written Snapshot</small>
       </span>
       <i class="stem" aria-hidden="true"></i>
       <span class="question">Do you know what needs to change?</span>

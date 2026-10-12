@@ -1,8 +1,8 @@
 <script lang="ts" setup>
-import DecisionSnapshot from './DecisionSnapshot.vue';
+import SampleSnapshotPreview from './SampleSnapshotPreview.vue';
 
-/* The Decision Snapshot chapter: one line on how it works, then the one-page sample itself
-   (made-up product). The sample shows the four things you get. */
+/* The Decision Snapshot chapter: one line on how it works, then the sample itself (a made-up
+   company, clearly labelled), which shows exactly what you get. */
 
 
 </script>
@@ -11,9 +11,9 @@ import DecisionSnapshot from './DecisionSnapshot.vue';
   <div class="teardown">
     <p class="how q-ma-none">
       You send one screen. I review it before we meet, walk you through it on a 20-minute call,
-      then send you this:
+      and within 24 hours send you a short Snapshot your team can use. Here’s one:
     </p>
-    <DecisionSnapshot />
+    <SampleSnapshotPreview />
   </div>
 </template>
 

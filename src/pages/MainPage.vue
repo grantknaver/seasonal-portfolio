@@ -27,6 +27,7 @@ import ClosingSection from '../components/ClosingSection.vue';
 import { INTRO_LOOM_URL } from '../shared/constants/loom';
 import { openTeardownBooking } from 'src/shared/constants/booking';
 import { CLIENT_RESULTS } from 'src/shared/constants/clientResults';
+import { SAMPLE_SNAPSHOT_URL } from 'src/shared/constants/sampleSnapshot';
 
 gsap.registerPlugin(ScrollTrigger);
 /* No auto-refresh on window 'load'. On a cold (uncached) visit 'load' fires
@@ -1180,9 +1181,16 @@ const toExamples = () => openTopic(TopicName.Examples);
               <q-btn class="cta" @click="openTeardownBooking()" color="accent" size="lg" glossy>
                 <span class="text-body-2">GET MY FREE DECISION SNAPSHOT</span>
               </q-btn>
-              <button type="button" class="cta cta--message" @click="toContact()">
-                or send me a message &rarr;
-              </button>
+              <!-- Secondary: for people who want to see what they'd get before booking. -->
+              <a
+                class="cta cta--message"
+                :href="SAMPLE_SNAPSHOT_URL"
+                target="_blank"
+                rel="noopener"
+                aria-label="See a sample Decision Snapshot (PDF, made-up company)"
+              >
+                See a sample Snapshot &rarr;
+              </a>
             </div>
           </div>
         </div>
@@ -1456,6 +1464,7 @@ const toExamples = () => openTopic(TopicName.Examples);
 .cta--message {
   padding: 0.4rem 0;
   border: 0;
+  text-decoration: none;
   background: none;
   color: var(--q-primary);
   font: inherit;
