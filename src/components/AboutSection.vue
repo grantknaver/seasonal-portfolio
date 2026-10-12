@@ -169,10 +169,10 @@ onBeforeUnmount(() => {
 
       <!-- CTAs -->
       <div class="about-ctas">
-        <q-btn class="about-cta" color="accent" size="lg" glossy @click="toContact">
-          <span class="text-body-2">Let’s Talk</span>
+        <q-btn class="about-cta btn-primary" color="accent" size="lg" no-caps unelevated @click="toContact">
+          <span class="text-body-2">Let’s talk</span>
         </q-btn>
-        <q-btn class="about-cta about-cta--ghost" flat size="lg" @click="toExamples">
+        <q-btn class="about-cta about-cta--ghost" flat no-caps size="lg" @click="toExamples">
           <span class="text-body-2">See it in action &rarr;</span>
         </q-btn>
       </div>

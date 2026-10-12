@@ -337,8 +337,8 @@ onBeforeUnmount(() => {
 
       <div class="ex-close">
         <p class="q-ma-none"><b>Know what needs fixing?</b> Let’s talk about building it. <b>Not sure yet?</b> Start with a free Decision Snapshot.</p>
-        <q-btn class="ex-cta" color="accent" size="lg" glossy @click="toContact">
-          <span class="text-body-2">Let’s Talk</span>
+        <q-btn class="ex-cta btn-primary" color="accent" size="lg" no-caps unelevated @click="toContact">
+          <span class="text-body-2">Let’s talk</span>
         </q-btn>
       </div>
     </div>

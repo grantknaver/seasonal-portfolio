@@ -395,7 +395,7 @@ onBeforeUnmount(() => {
     <p class="loom-intro__next q-ma-none" :class="{ 'is-in': resultsIn || scrubMode }">
       Want to see where your product is losing people?
       <button type="button" class="loom-intro__cta" @click="openTeardownBooking()">
-        Get your free Decision Snapshot <span aria-hidden="true">&rarr;</span>
+        Get my free Decision Snapshot <span aria-hidden="true">&rarr;</span>
       </button>
     </p>
   </section>
@@ -464,7 +464,8 @@ $ease: cubic-bezier(0.22, 1, 0.36, 1);
   }
 
   @media (min-width: tokens.$breakpoint-lg) {
-    grid-template-columns: minmax(0, 1fr) auto;
+    /* The words always keep a real column (18rem); the video takes what's left. */
+    grid-template-columns: minmax(18rem, 1fr) auto;
     gap: 3rem;
     max-width: var(--content-w);
   }
@@ -542,7 +543,12 @@ $ease: cubic-bezier(0.22, 1, 0.36, 1);
 
   @media (min-width: tokens.$breakpoint-lg) {
     justify-self: end;
-    width: calc(var(--vid-h) * var(--vid-ratio, 16 / 9));
+    /* Sized from the screen height, but never wider than the content width minus the text
+       column and the gap, so it can't crowd or cover the headline on large screens. */
+    width: min(
+      calc(var(--vid-h) * var(--vid-ratio, 16 / 9)),
+      calc(min(100vw - 2 * var(--logo-x, calc(2vw + 11.5rem)), 1000px) - 21rem)
+    );
   }
 }
 

@@ -1015,9 +1015,15 @@ $bounce: cubic-bezier(0.34, 1.56, 0.64, 1);
     }
   }
 
-  &.is-off > *,
-  &.is-skip > * {
+  /* Skipped / off steps: the dot fades, the words stay readable (just quieter). */
+  &.is-off .node__dot,
+  &.is-skip .node__dot {
     opacity: 0.38;
+  }
+
+  &.is-off b,
+  &.is-skip b {
+    color: $muted;
   }
 }
 

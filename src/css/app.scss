@@ -104,3 +104,32 @@ body::-webkit-scrollbar {
 .u-gap-md {
   gap: 16px;
 }
+
+/* One primary-button style across the site: the bright blue, rounded, sentence-case button from
+   the closing section (replaces Quasar's glossy, all-caps default). */
+.q-btn.btn-primary {
+  border-radius: 0.6rem;
+  background: #1260f0 !important;
+  color: #fff !important;
+  font-weight: 700;
+  letter-spacing: 0;
+  text-transform: none;
+  box-shadow:
+    0 10px 26px rgba(18, 96, 240, 0.3),
+    inset 0 1px 0 rgba(255, 255, 255, 0.25) !important;
+  transition:
+    background 0.2s ease,
+    box-shadow 0.2s ease;
+
+  .q-btn__content,
+  .text-body-2 {
+    font-weight: 700;
+    letter-spacing: 0;
+    text-transform: none;
+  }
+
+  &:hover,
+  &:focus-visible {
+    background: #0b52d6 !important;
+  }
+}

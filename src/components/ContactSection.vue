@@ -138,7 +138,7 @@ const sendEmail = async () => {
       </header>
 
       <div class="book">
-        <q-btn class="book__btn" color="accent" size="lg" glossy @click="bookTeardown">
+        <q-btn class="book__btn btn-primary" color="accent" size="lg" no-caps unelevated @click="bookTeardown">
           <span class="text-body-2">Get my free Decision Snapshot</span>
         </q-btn>
         <div class="book__info">
@@ -255,11 +255,12 @@ const sendEmail = async () => {
 
         <q-btn
           v-show="isHuman"
-          class="submit-btn q-mt-sm full-width"
+          class="submit-btn btn-primary q-mt-sm full-width"
           color="accent"
           type="submit"
           size="lg"
-          glossy
+          no-caps
+          unelevated
           :loading="sending"
           :disable="sending"
         >

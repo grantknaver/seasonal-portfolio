@@ -186,7 +186,7 @@ onBeforeUnmount(() => {
           rel="noopener"
           >Pattern Index <span aria-hidden="true">&#8599;</span></a
         >
-        <a href="https://github.com/grantknaver">
+        <a href="https://github.com/grantknaver" target="_blank" rel="noopener">
           <q-btn
             flat
             round
@@ -197,7 +197,7 @@ onBeforeUnmount(() => {
           />
         </a>
 
-        <a href="https://www.linkedin.com/in/grant-knaver/" target="_blank">
+        <a href="https://www.linkedin.com/in/grant-knaver/" target="_blank" rel="noopener">
           <q-btn
             flat
             round

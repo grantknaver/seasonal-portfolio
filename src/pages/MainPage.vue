@@ -1178,8 +1178,15 @@ const toExamples = () => openTopic(TopicName.Examples);
             </div>
 
             <div class="cta-wrap q-mt-md">
-              <q-btn class="cta" @click="openTeardownBooking()" color="accent" size="lg" glossy>
-                <span class="text-body-2">GET MY FREE DECISION SNAPSHOT</span>
+              <q-btn
+                class="cta btn-primary"
+                @click="openTeardownBooking()"
+                color="accent"
+                size="lg"
+                no-caps
+                unelevated
+              >
+                <span class="text-body-2">Get my free Decision Snapshot</span>
               </q-btn>
               <!-- Secondary: for people who want to see what they'd get before booking. -->
               <a
@@ -1315,11 +1322,23 @@ const toExamples = () => openTopic(TopicName.Examples);
       <div ref="trustBoxRef" class="trust-box">
         <div ref="trustViewportRef" class="trust-viewport">
           <div ref="trustImageA" class="trust-image-wrap">
-            <img src="../assets/trust-breathing-in.avif" alt="" class="trust-image" />
+            <img
+              src="../assets/trust-breathing-in.avif"
+              alt=""
+              class="trust-image"
+              decoding="async"
+              fetchpriority="low"
+            />
           </div>
 
           <div ref="trustImageB" class="trust-image-wrap trust-image-wrap--b">
-            <img src="../assets/trust-breathing-out.avif" alt="" class="trust-image" />
+            <img
+              src="../assets/trust-breathing-out.avif"
+              alt=""
+              class="trust-image"
+              decoding="async"
+              fetchpriority="low"
+            />
           </div>
 
           <!-- Window light: brightens on each out-breath. -->
@@ -1336,7 +1355,7 @@ const toExamples = () => openTopic(TopicName.Examples);
       <div class="trust-text">
         <div ref="trustCopyA" class="trust-copy">
           <span class="eyebrow">Why people hesitate</span>
-          <p>People hesitate when they have to guess.</p>
+          <h2 class="trust-title">People hesitate when they have to guess.</h2>
           <p class="trust-support">
             Every visitor is trusting you with their time and attention. Each question your product
             leaves open spends some of it.
@@ -1350,8 +1369,9 @@ const toExamples = () => openTopic(TopicName.Examples);
 
         <div ref="trustCopyB" class="trust-copy">
           <span class="eyebrow">Where trust comes from</span>
-          <p>Trust isn’t claimed.</p>
-          <p><span class="trust-fill">It’s established.</span></p>
+          <h2 class="trust-title">
+            Trust isn’t claimed.<br /><span class="trust-fill">It’s established.</span>
+          </h2>
           <p class="trust-support">
             Say clearly who you are and what you do. Then show it. When what you say and what the
             product does line up, there’s nothing left to guess and nothing in the way.
@@ -2266,10 +2286,17 @@ $trust-radius: clamp(1.75rem, 2.6vw, 3rem); /* soft, organic corners on the phot
       }
     }
 
-    p {
+    p,
+    .trust-title {
       margin: 0;
       max-width: 20ch;
       text-wrap: balance;
+    }
+
+    /* Real headings (for search engines and screen readers), styled exactly like the copy. */
+    .trust-title {
+      font: inherit;
+      letter-spacing: inherit;
     }
 
     .trust-support {

@@ -209,7 +209,7 @@ onMounted(() => {
     letter-spacing: 0.09em;
     text-transform: uppercase;
     text-align: center;
-    color: color-mix(in srgb, var(--q-dark) 60%, transparent);
+    color: color-mix(in srgb, var(--q-dark) 74%, transparent);
     font-weight: 700;
   }
 
@@ -225,7 +225,7 @@ onMounted(() => {
     }
 
     .label {
-      color: color-mix(in srgb, var(--q-dark) 60%, transparent);
+      color: color-mix(in srgb, var(--q-dark) 74%, transparent);
       font-weight: 800;
 
       :deep(svg path) {
@@ -249,7 +249,7 @@ onMounted(() => {
     }
 
     .label {
-      color: color-mix(in srgb, var(--q-dark) 60%, transparent);
+      color: color-mix(in srgb, var(--q-dark) 74%, transparent);
       font-weight: 800;
     }
   }

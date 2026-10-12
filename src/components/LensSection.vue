@@ -408,10 +408,10 @@ onBeforeUnmount(() => io?.disconnect());
           way, it starts with a free Decision Snapshot.
         </p>
         <div class="lens-close__btns">
-          <q-btn class="lens-cta" color="accent" size="lg" glossy @click="toContact">
-            <span class="text-body-2">Get a free Decision Snapshot</span>
+          <q-btn class="lens-cta btn-primary" color="accent" size="lg" no-caps unelevated @click="toContact">
+            <span class="text-body-2">Get my free Decision Snapshot</span>
           </q-btn>
-          <q-btn class="lens-cta lens-cta--ghost" flat size="lg" @click="toExamples">
+          <q-btn class="lens-cta lens-cta--ghost" flat no-caps size="lg" @click="toExamples">
             <span class="text-body-2">See the builds</span>
           </q-btn>
         </div>
