@@ -430,6 +430,11 @@ $ease: cubic-bezier(0.22, 1, 0.36, 1);
     background: #fff;
   }
 
+  /* Tablets: more room at the sides, so the video doesn't run edge to edge. */
+  @media #{tokens.$tablet-only} {
+    padding-inline: clamp(2.5rem, 7vw, 4.5rem);
+  }
+
   /* Desktop: exactly one screen tall, content centred with generous room above and below,
      so the section's height is predictable for the pinned hero and trust sections around it. */
   @media (min-width: tokens.$breakpoint-lg) {

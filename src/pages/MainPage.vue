@@ -747,7 +747,7 @@ const buildScene = () => {
       const trustIo = new IntersectionObserver(
         ([entry]) => {
           if (!entry) return;
-          /* In view (top above ~55% of the screen): second message. Below the screen: first.
+          /* In view (top above ~92% of the screen): second message. Below the screen: first.
              Scrolled past the top: stay on the second. */
           const next = entry.isIntersecting
             ? true
@@ -758,7 +758,7 @@ const buildScene = () => {
           second = next;
           showTrustSecond(second);
         },
-        { rootMargin: '0px 0px -45% 0px' },
+        { rootMargin: '0px 0px -8% 0px' },
       );
       trustIo.observe(copyB);
       io.value = trustIo;
@@ -1557,8 +1557,9 @@ const toExamples = () => openTopic(TopicName.Examples);
   background: url('../assets/monitor.avif') center / cover no-repeat;
   animation: bg-fade 2500ms ease-out both;
 
-  /* Phones: the site's pale blue with two soft glows, instead of the busy monitor photo. */
-  @media (max-width: tokens.$breakpoint-sm - 0.02px) {
+  /* Phones and tablets: the site's pale blue with two soft glows, instead of the busy monitor
+     photo. */
+  @media (max-width: tokens.$breakpoint-lg - 0.02px) {
     background:
       radial-gradient(80% 45% at 85% 12%, rgb(91 147 255 / 0.16), transparent 70%),
       radial-gradient(70% 40% at 10% 85%, rgb(91 147 255 / 0.12), transparent 70%), #f4f7fe;
@@ -1654,16 +1655,14 @@ const toExamples = () => openTopic(TopicName.Examples);
     background-color: transparent;
   }
 
+  /* Tablets: like phones, no dark panel around everything; only the hero card is dark, and the
+     checklist and section rows sit on the pale page. */
   @media #{tokens.$tablet-only} {
     max-width: 640px;
     min-height: 0;
     justify-content: flex-start;
     padding: 1.5rem;
-    background: color-mix(in srgb, tokens.$ink-soft 82%, tokens.$ivory 6%);
-    border: 1px solid var(--q-accent);
-    box-shadow:
-      0 0 64px color-mix(in srgb, var(--q-accent) 38%, transparent),
-      0 28px 80px color-mix(in srgb, var(--q-accent) 38%, transparent);
+    background: transparent;
   }
 
   @media (min-width: tokens.$breakpoint-lg) {
@@ -1789,11 +1788,7 @@ const toExamples = () => openTopic(TopicName.Examples);
       @media #{tokens.$tablet-only} {
         flex: 0 1 auto;
         max-width: none;
-        padding: 0;
-        background: none;
-        border: none;
-        border-radius: 0;
-        box-shadow: none;
+        padding: 1.75rem 2rem;
       }
 
       @media (min-width: tokens.$breakpoint-lg) {
@@ -2569,13 +2564,16 @@ $trust-radius: clamp(1.75rem, 2.6vw, 3rem); /* soft, organic corners on the phot
       position: relative;
       inset: auto;
       justify-content: flex-start;
-      min-height: 48svh;
+      min-height: 70svh; /* time to read the first message before the photo switches */
       padding-top: 2rem;
       opacity: 1;
     }
 
+    /* The second message: extra room above its label lets the photo stay pinned about 10% of
+       a screen longer (about a third of a screen) while it breathes, and the label still lands just below the photo. */
     .trust-copy + .trust-copy {
-      min-height: 56svh;
+      min-height: 80svh;
+      padding-top: 26svh;
     }
   }
 
