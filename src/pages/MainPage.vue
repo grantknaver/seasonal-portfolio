@@ -672,11 +672,11 @@ const buildScene = () => {
         breathTl
           .fromTo(
             cloud,
-            { opacity: 0, scale: 0.9 },
-            { opacity: 1, scale: 1.12, duration: 2.4, ease: 'sine.out' },
+            { opacity: 0, scale: 0.95 },
+            { opacity: 1, scale: 1.18, duration: 2.6, ease: 'sine.out' },
             0,
           )
-          .to(cloud, { opacity: 0, scale: 1.3, duration: 3.6, ease: 'sine.in' }, 2.4);
+          .to(cloud, { opacity: 0, scale: 1.34, duration: 3.4, ease: 'sine.in' }, 2.6);
       }
       if (light) {
         breathTl
@@ -2088,11 +2088,11 @@ $trust-radius: clamp(1.75rem, 2.6vw, 3rem); /* soft, organic corners on the phot
     border-radius: $trust-radius;
     background: radial-gradient(
       ellipse at 50% 50%,
-      rgb(175 200 255 / 0.5) 0%,
-      rgb(190 210 255 / 0.42) 70%,
-      rgb(205 222 255 / 0.3) 100%
+      rgb(91 147 255 / 0.55) 0%,
+      rgb(110 160 255 / 0.5) 65%,
+      rgb(140 180 255 / 0.4) 100%
     );
-    filter: blur(30px);
+    filter: blur(40px);
     will-change: transform, opacity;
   }
 
