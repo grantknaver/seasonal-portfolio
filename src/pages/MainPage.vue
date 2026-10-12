@@ -195,19 +195,14 @@ const setBreathCalm = (calm: boolean) => {
   if (calm && breathTl) breathTl.restart(true).pause(); // start a fresh breath, from the top
   updateBreath();
 };
-/* Phones: after the trust section autoplays, two small arrows let people go back to the first
-   message ("why people hesitate") and forward again. 0 = still autoplaying. */
-const trustStep = ref<0 | 1 | 2>(0);
-const goTrust = (step: 1 | 2) => {
-  if (trustStep.value === 0 || trustStep.value === step) return;
-  trustStep.value = step;
-  const first = step === 1;
-  const fade = { duration: 0.6, ease: 'power1.inOut', overwrite: 'auto' as const };
+/* Phones and tablets: switch the photo between the two messages as they scroll past. Second
+   message: the photo changes, the box exhales and the breathing starts. */
+const showTrustSecond = (second: boolean) => {
+  const first = !second;
+  const fade = { duration: 0.9, ease: 'power1.inOut', overwrite: 'auto' as const };
   const on = (el: HTMLElement | null, visible: boolean) => {
     if (el) gsap.to(el, { ...fade, opacity: visible ? 1 : 0 });
   };
-  on(trustCopyA.value, first);
-  on(trustCopyB.value, !first);
   on(trustImageA.value, first);
   on(trustImageB.value, !first);
   gsap.to(trustPhotos(), {
@@ -451,12 +446,14 @@ const buildHero = (mode: ViewType, animate = true) => {
       },
     });
 
+    /* Phones and tablets: a plain fade, no slide. Sliding made the copy look like it came in
+       from outside the card. */
     if (mode === ViewType.Responsive) {
       if (kickerEl) {
         tl.fromTo(
           kickerEl,
-          { y: 35, autoAlpha: 0 },
-          { y: 0, autoAlpha: 1, ease: 'power2.out', duration: 0.65, overwrite: 'auto' },
+          { autoAlpha: 0 },
+          { autoAlpha: 1, ease: 'power2.out', duration: 0.65, overwrite: 'auto' },
           0,
         );
       }
@@ -464,8 +461,8 @@ const buildHero = (mode: ViewType, animate = true) => {
       if (headlineEl) {
         tl.fromTo(
           headlineEl,
-          { y: 75, autoAlpha: 0 },
-          { y: 0, autoAlpha: 1, ease: 'power2.out', duration: 1.25, overwrite: 'auto' },
+          { autoAlpha: 0 },
+          { autoAlpha: 1, ease: 'power2.out', duration: 1.25, overwrite: 'auto' },
           0.15,
         );
       }
@@ -473,8 +470,8 @@ const buildHero = (mode: ViewType, animate = true) => {
       if (subheadlineEl) {
         tl.fromTo(
           subheadlineEl,
-          { y: 50, autoAlpha: 0 },
-          { y: 0, autoAlpha: 1, ease: 'power2.out', duration: 1.25 },
+          { autoAlpha: 0 },
+          { autoAlpha: 1, ease: 'power2.out', duration: 1.25 },
           '-=0.25',
         );
       }
@@ -482,18 +479,33 @@ const buildHero = (mode: ViewType, animate = true) => {
       if (ctaEls.length) {
         tl.fromTo(
           ctaEls,
-          { y: 50, autoAlpha: 0 },
-          { y: 0, autoAlpha: 1, ease: 'power2.out', duration: 3, stagger: 0.25 },
-          '-=1',
+          { autoAlpha: 0 },
+          { autoAlpha: 1, ease: 'power2.out', duration: 1, stagger: 0.2 },
+          '-=0.7',
         );
       }
 
+      /* Then the checklist under the card... */
       if (proofEls.length) {
         tl.fromTo(
           proofEls,
-          { y: 32, autoAlpha: 0 },
-          { y: 0, autoAlpha: 1, ease: 'power2.out', duration: 0.5, stagger: 0.18 },
-          '-=2.25',
+          { autoAlpha: 0 },
+          { autoAlpha: 1, ease: 'power2.out', duration: 0.7, stagger: 0.15 },
+          '-=0.3',
+        );
+      }
+
+      /* ...and only once all of that has settled, the section rows rise in from below, one by
+         one, so the eye stays on the main message first. */
+      const menuRows = Array.from(
+        claritySectionRef.value?.querySelectorAll<HTMLElement>('.q-list > .q-item') ?? [],
+      );
+      if (menuRows.length) {
+        tl.fromTo(
+          menuRows,
+          { autoAlpha: 0, y: 36 },
+          { autoAlpha: 1, y: 0, ease: 'power2.out', duration: 0.6, stagger: 0.12 },
+          '+=0.15',
         );
       }
       tl.call(signalHeroCopyIn);
@@ -725,44 +737,29 @@ const buildScene = () => {
     if (cue) gsap.set(cue, { opacity: 0 });
 
     if (isResponsive.value) {
-      /* ---------- Mobile: autoplay on entry ---------- */
-      gsap.set([copyA, copyB], { opacity: 0 });
-
-      trustStep.value = 0;
-      const mobileTl = gsap
-        .timeline({
-          paused: true,
-          onComplete: () => {
-            gsap.set([copyA, copyB], { willChange: 'auto' });
-            trustStep.value = 2; // autoplay done: show the back/forward arrows
-          },
-        })
-        .to(glow, { opacity: 1, scale: 1, duration: 1.2, ease: 'power2.out' }, 0)
-        .to(copyA, { opacity: 1, duration: 1.1, ease: 'power1.out' }, 1.2)
-        .to(copyA, { opacity: 0, duration: 0.8, ease: 'power1.in' }, 4.2)
-        .to(imgA, { opacity: 0, duration: 0.9, ease: 'none' }, 4.6)
-        .to(imgB, { opacity: 1, duration: 0.9, ease: 'none' }, 4.6)
-        .to(copyB, { opacity: 1, duration: 1.1, ease: 'power1.out' }, 5.2)
-        .to(photos, { scale: 1, duration: 2.2, ease: 'sine.inOut' }, 4.4)
-        .to(box, { scale: 1, duration: 2.2, ease: 'sine.inOut' }, 4.4)
-        .call(() => setBreathCalm(true), undefined, 4.6);
-
+      /* ---------- Phones and tablets: led by the scroll ----------
+         The photo stays put (CSS sticky) while the two messages scroll up beneath it. When the
+         second message comes into view, the photo switches and the breath is let go; scrolling
+         back above it holds the breath again. */
+      gsap.set(glow, { opacity: 1, scale: 1 });
+      let second = false;
       const trustIo = new IntersectionObserver(
         ([entry]) => {
-          if (!entry?.isIntersecting) return;
-          trustIo.disconnect();
-
-          /* Decode both frames before playing — the A→B crossfade is where it used to hitch. */
-          void decodeImagesIn(section).then(() => {
-            if (disposed) return;
-            watchJank(mobileTl, 'trust-mobile');
-            mobileTl.play();
-          });
+          if (!entry) return;
+          /* In view (top above ~55% of the screen): second message. Below the screen: first.
+             Scrolled past the top: stay on the second. */
+          const next = entry.isIntersecting
+            ? true
+            : entry.boundingClientRect.top > 0
+              ? false
+              : second;
+          if (next === second) return;
+          second = next;
+          showTrustSecond(second);
         },
-        { threshold: 0.55 },
+        { rootMargin: '0px 0px -45% 0px' },
       );
-
-      trustIo.observe(section);
+      trustIo.observe(copyB);
       io.value = trustIo;
       return;
     }
@@ -1320,36 +1317,6 @@ const toExamples = () => openTopic(TopicName.Examples);
           <!-- Window light: brightens on each out-breath. -->
           <div ref="trustLightRef" class="trust-light" aria-hidden="true"></div>
           <div ref="trustGlowRef" class="trust-glow" aria-hidden="true"></div>
-          <!-- Phones: step back to the first message and forward again once autoplay is done. -->
-          <div
-            v-if="isResponsive"
-            class="trust-steps"
-            :class="{ 'is-on': trustStep > 0 }"
-            role="group"
-            aria-label="Trust section messages"
-          >
-            <button
-              type="button"
-              class="trust-steps__btn"
-              :disabled="trustStep !== 2"
-              aria-label="Show the first message: why people hesitate"
-              @click="goTrust(1)"
-            >
-              <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 15l6-6 6 6" /></svg>
-            </button>
-            <span class="trust-steps__dots" aria-hidden="true">
-              <i :class="{ on: trustStep === 1 }"></i><i :class="{ on: trustStep === 2 }"></i>
-            </span>
-            <button
-              type="button"
-              class="trust-steps__btn"
-              :disabled="trustStep !== 1"
-              aria-label="Show the second message: where trust comes from"
-              @click="goTrust(2)"
-            >
-              <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 9l6 6 6-6" /></svg>
-            </button>
-          </div>
           <div ref="trustCueRef" class="trust-cue">
             <ScrollCue :is-dark="false" :has-text="false" minimal />
           </div>
@@ -1561,6 +1528,13 @@ const toExamples = () => openTopic(TopicName.Examples);
   background: url('../assets/monitor.avif') center / cover no-repeat;
   animation: bg-fade 2500ms ease-out both;
 
+  /* Phones: the site's pale blue with two soft glows, instead of the busy monitor photo. */
+  @media (max-width: tokens.$breakpoint-sm - 0.02px) {
+    background:
+      radial-gradient(80% 45% at 85% 12%, rgb(91 147 255 / 0.16), transparent 70%),
+      radial-gradient(70% 40% at 10% 85%, rgb(91 147 255 / 0.12), transparent 70%), #f4f7fe;
+  }
+
   @media (min-width: tokens.$breakpoint-lg) {
     background: #f7f9fe;
     animation: bg-fade 900ms ease-out both;
@@ -1617,6 +1591,16 @@ const toExamples = () => openTopic(TopicName.Examples);
   display: none !important;
 }
 
+/* Phones and tablets: the section list as clean white rows, not flat blue bars. */
+@media (max-width: tokens.$breakpoint-lg - 0.02px) {
+  .expansion-item :deep(.q-expansion-item__container > .q-item) {
+    border: 1px solid rgb(18 96 240 / 0.14);
+    border-radius: 12px;
+    background: #fff !important;
+    box-shadow: 0 4px 14px -8px rgb(10 30 60 / 0.18);
+  }
+}
+
 /* ---------- Home Container ---------- */
 
 .home-container {
@@ -1631,6 +1615,15 @@ const toExamples = () => openTopic(TopicName.Examples);
   text-align: center;
   box-shadow: none;
   flex-wrap: nowrap;
+
+  /* Phones: no flat blue panel; the dark card sits straight on the pale page, and the
+     section list follows right after it instead of a screen further down. */
+  @media (max-width: tokens.$breakpoint-sm - 0.02px) {
+    min-height: 0;
+    margin-bottom: 0;
+    padding-block: 2.5rem 1.25rem;
+    background-color: transparent;
+  }
 
   @media #{tokens.$tablet-only} {
     max-width: 640px;
@@ -2463,97 +2456,6 @@ $trust-radius: clamp(1.75rem, 2.6vw, 3rem); /* soft, organic corners on the phot
     border-radius: $trust-radius;
   }
 
-  /* Frosted pill on the right edge; fades in once the autoplay finishes. */
-  .trust-steps {
-    position: absolute;
-    top: 50%;
-    right: 0.5rem;
-    z-index: 4;
-    display: grid;
-    justify-items: center;
-    gap: 0.35rem;
-    padding: 0.35rem;
-    border: 1px solid rgb(255 255 255 / 0.4);
-    border-radius: 999px;
-    background: rgb(255 255 255 / 0.18);
-    backdrop-filter: blur(8px);
-    opacity: 0;
-    pointer-events: none;
-    transform: translateY(-50%) translateX(6px);
-    transition:
-      opacity 0.5s ease,
-      transform 0.5s cubic-bezier(0.22, 1, 0.36, 1);
-
-    &.is-on {
-      opacity: 1;
-      pointer-events: auto;
-      transform: translateY(-50%);
-    }
-  }
-
-  .trust-steps__btn {
-    display: grid;
-    place-items: center;
-    width: 2.25rem;
-    height: 2.25rem;
-    padding: 0;
-    border: 0;
-    border-radius: 50%;
-    background: rgb(255 255 255 / 0.14);
-    color: tokens.$ivory;
-    cursor: pointer;
-    transition:
-      background 0.2s ease,
-      opacity 0.2s ease;
-
-    svg {
-      width: 1.1rem;
-      height: 1.1rem;
-      fill: none;
-      stroke: currentColor;
-      stroke-width: 2.2;
-      stroke-linecap: round;
-      stroke-linejoin: round;
-    }
-
-    &:disabled {
-      opacity: 0.3;
-      cursor: default;
-    }
-
-    &:not(:disabled):active {
-      background: rgb(255 255 255 / 0.28);
-    }
-
-    &:focus-visible {
-      outline: 2px solid tokens.$champagne;
-      outline-offset: 2px;
-    }
-  }
-
-  .trust-steps__dots {
-    display: grid;
-    gap: 0.3rem;
-
-    i {
-      width: 0.35rem;
-      height: 0.35rem;
-      border-radius: 50%;
-      background: rgb(255 255 255 / 0.35);
-      transition: background 0.3s ease;
-
-      &.on {
-        background: tokens.$champagne;
-      }
-    }
-  }
-
-  @media (prefers-reduced-motion: reduce) {
-    .trust-steps {
-      transition: none;
-    }
-  }
-
   .trust-cue {
     position: absolute;
     bottom: 16%;
@@ -2563,6 +2465,98 @@ $trust-radius: clamp(1.75rem, 2.6vw, 3rem); /* soft, organic corners on the phot
     opacity: 0;
     color: tokens.$ivory;
     margin-top: 1rem;
+  }
+
+  /* ---------- Phones and tablets ----------
+     A plain flowing section on its own pale band (clearly separate from its neighbours). The
+     photo sticks below the header while the two messages scroll up under it; the script
+     switches the photo when the second message arrives. Large screens are untouched. */
+  @media (max-width: tokens.$breakpoint-lg - 0.02px) {
+    height: auto;
+    overflow: clip; /* clips like hidden, but keeps position: sticky working */
+    /* The bottom padding matches the negative margin on .trust-text (see there). */
+    padding: 1.25rem 0 calc(56svh + 1rem);
+    border-top: 1px solid rgb(18 96 240 / 0.12);
+    background: #eaf1fd;
+
+    &::before,
+    &::after {
+      display: none;
+    }
+
+    .trust-cloud,
+    .trust-box {
+      position: sticky;
+      top: calc(56px + 0.75rem);
+      right: auto;
+      bottom: auto;
+      left: auto;
+      height: 42svh;
+      margin-inline: 1rem;
+    }
+
+    .trust-box {
+      z-index: 2;
+      margin-top: -42svh; /* sits exactly over the cloud, which sticks with it */
+
+      /* Covers the strip between the header and the photo, so the words scrolling up under
+         the photo don't peek out above it. */
+      &::before {
+        content: '';
+        position: absolute;
+        top: calc(-0.75rem - 2px);
+        right: -1rem;
+        left: -1rem;
+        z-index: -1;
+        height: calc(0.75rem + 40px);
+        background: #eaf1fd;
+      }
+    }
+
+    .trust-cue {
+      display: none;
+    }
+
+    .trust-text {
+      position: relative;
+      inset: auto;
+      z-index: 1;
+      padding: 0 1.5rem;
+      /* The photo sticks until the end of the section's content. Pulling that end up by about
+         the second message's height (and giving the room back as padding) lets the photo move
+         on as soon as that message sits just below it, so its label and headline never slide
+         under the photo. */
+      margin-bottom: -56svh;
+    }
+
+    .trust-copy {
+      position: relative;
+      inset: auto;
+      justify-content: flex-start;
+      min-height: 48svh;
+      padding-top: 2rem;
+      opacity: 1;
+    }
+
+    .trust-copy + .trust-copy {
+      min-height: 56svh;
+    }
+  }
+
+  @media #{tokens.$tablet-only} {
+    .trust-cloud,
+    .trust-box {
+      height: 46svh;
+      margin-inline: 2rem;
+    }
+
+    .trust-box {
+      margin-top: -46svh;
+    }
+
+    .trust-text {
+      padding: 0 3rem;
+    }
   }
 }
 

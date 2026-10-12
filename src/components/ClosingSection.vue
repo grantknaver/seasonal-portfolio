@@ -479,6 +479,13 @@ $bounce: cubic-bezier(0.34, 1.56, 0.64, 1);
   color: $white;
   font-family: tokens.$primary-font;
 
+  /* Phones and tablets: a white band with a hairline on top, clearly separate from the pale
+     trust band above it. */
+  @media (max-width: tokens.$breakpoint-lg - 0.02px) {
+    border-top: 1px solid rgb(18 96 240 / 0.12);
+    background: #fff;
+  }
+
   @media (min-width: tokens.$breakpoint-lg) {
     display: flex;
     align-items: center;

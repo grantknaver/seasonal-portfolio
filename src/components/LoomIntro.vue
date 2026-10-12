@@ -423,6 +423,13 @@ $ease: cubic-bezier(0.22, 1, 0.36, 1);
   color: $ink;
   font-family: tokens.$primary-font;
 
+  /* Phones and tablets: its own white band with a hairline on top, so it reads as a separate
+     section from the hero above and the pale trust band below. */
+  @media (max-width: tokens.$breakpoint-lg - 0.02px) {
+    border-top: 1px solid rgb(18 96 240 / 0.12);
+    background: #fff;
+  }
+
   /* Desktop: exactly one screen tall, content centred with generous room above and below,
      so the section's height is predictable for the pinned hero and trust sections around it. */
   @media (min-width: tokens.$breakpoint-lg) {
