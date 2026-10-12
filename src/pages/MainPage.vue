@@ -147,6 +147,11 @@ const trustCueRef = ref<HTMLElement | null>(null);
    Second message ("trust is established"): the photo eases back and starts to breathe, drifting
    in and out, with the window light brightening on each out-breath. */
 const PHOTO_HELD = 1.06; // photo scale on the first message
+const BOX_HELD = 1.035; // photo box scale on the first message: a held breath, chest full
+const trustCloudRef = ref<HTMLElement | null>(null);
+/* Holds the photo box: carries the held / exhale scale, so the breath scale on the box inside
+   (and its intro rise) never fight it. */
+const trustBoxRef = ref<HTMLElement | null>(null);
 const trustLightRef = ref<HTMLElement | null>(null);
 let breathTl: gsap.core.Timeline | null = null;
 let breathCalm = false;
@@ -167,8 +172,12 @@ const updateBreath = () => {
     return;
   }
   breathTl.pause();
-  const wraps = [trustImageA.value, trustImageB.value].filter((el): el is HTMLElement => !!el);
-  gsap.to(wraps, { scale: 1, duration: 1.2, ease: 'sine.out', overwrite: 'auto' });
+  if (trustViewportRef.value) {
+    gsap.to(trustViewportRef.value, { scale: 1, duration: 1.2, ease: 'sine.out' });
+  }
+  if (trustCloudRef.value) {
+    gsap.to(trustCloudRef.value, { opacity: 0, duration: 0.8, ease: 'sine.out' });
+  }
   if (trustLightRef.value) {
     gsap.to(trustLightRef.value, { opacity: 0.2, duration: 1.2, ease: 'sine.out' });
   }
@@ -201,6 +210,14 @@ const goTrust = (step: 1 | 2) => {
     ease: 'sine.inOut',
     overwrite: 'auto',
   });
+  if (trustBoxRef.value) {
+    gsap.to(trustBoxRef.value, {
+      scale: first ? BOX_HELD : 1,
+      duration: 1.8,
+      ease: 'sine.inOut',
+      overwrite: 'auto',
+    });
+  }
   setBreathCalm(!first);
 };
 
@@ -471,6 +488,8 @@ const buildHero = (mode: ViewType, animate = true) => {
           { x: 0, scale: 1, duration: 2.2, ease: 'power2.inOut', force3D: true },
           0,
         );
+        /* Fade the card in rather than popping it on frame one. */
+        tl.fromTo(heroCopyEl, { opacity: 0 }, { opacity: 1, duration: 0.6, ease: 'power1.out' }, 0);
       }
 
       if (kickerEl) {
@@ -625,26 +644,44 @@ const buildScene = () => {
 
     if (!(section && imgA && imgB && copyA && copyB && glow)) return;
 
-    /* The breath loop: in for 4s, out for 6s (a longer out-breath is the calming one). The
-       photo drifts in a touch and back, and the window light brightens through the out-breath,
-       then settles. Scale goes on the image wrappers, so it never fights the
-       scroll-tied scale on the images themselves. */
+    /* The breath. On the first message the box is held slightly large (chest full) and still.
+       When the message switches, the box exhales: it shrinks back as you scroll (see trustTl).
+       After that it keeps breathing, starting with an out-breath:
+         out (6s): the box settles a touch smaller, a soft cloud of light blooms out from
+                   behind it and fades, and the window light brightens then settles;
+         in (4s):  the box returns to rest.
+       The held / exhale scale goes on the outer box (trustBox); the ongoing breath on the
+       photo box inside it, so the two never fight. */
     breathCalm = false;
     breathOnScreen = false;
     gsap.set(photos, { scale: PHOTO_HELD, transformOrigin: '50% 45%' });
+    const box = trustBoxRef.value;
+    if (box) gsap.set(box, { scale: BOX_HELD });
     const light = trustLightRef.value;
+    const cloud = trustCloudRef.value;
     if (light) gsap.set(light, { opacity: 0.2 });
+    if (cloud) gsap.set(cloud, { opacity: 0, scale: 0.9 });
     if (!prefersReducedMotion) {
-      const wraps = [imgA, imgB];
-      gsap.set(wraps, { scale: 1, transformOrigin: '50% 50%' });
-      breathTl = gsap
-        .timeline({ repeat: -1, paused: true })
-        .fromTo(wraps, { scale: 1 }, { scale: 1.03, duration: 4, ease: 'sine.inOut' }, 0)
-        .fromTo(wraps, { scale: 1.03 }, { scale: 1, duration: 6, ease: 'sine.inOut' }, 4);
+      breathTl = gsap.timeline({ repeat: -1, paused: true });
+      if (viewport) {
+        breathTl
+          .fromTo(viewport, { scale: 1 }, { scale: 0.985, duration: 6, ease: 'sine.inOut' }, 0)
+          .fromTo(viewport, { scale: 0.985 }, { scale: 1, duration: 4, ease: 'sine.inOut' }, 6);
+      }
+      if (cloud) {
+        breathTl
+          .fromTo(
+            cloud,
+            { opacity: 0, scale: 0.9 },
+            { opacity: 1, scale: 1.12, duration: 2.4, ease: 'sine.out' },
+            0,
+          )
+          .to(cloud, { opacity: 0, scale: 1.3, duration: 3.6, ease: 'sine.in' }, 2.4);
+      }
       if (light) {
         breathTl
-          .fromTo(light, { opacity: 0.2 }, { opacity: 0.85, duration: 3, ease: 'sine.inOut' }, 4)
-          .fromTo(light, { opacity: 0.85 }, { opacity: 0.2, duration: 3, ease: 'sine.inOut' }, 7);
+          .fromTo(light, { opacity: 0.2 }, { opacity: 0.85, duration: 3, ease: 'sine.inOut' }, 0)
+          .fromTo(light, { opacity: 0.85 }, { opacity: 0.2, duration: 3, ease: 'sine.inOut' }, 3);
       }
       breathIo?.disconnect();
       breathIo = new IntersectionObserver(([entry]) => {
@@ -678,6 +715,7 @@ const buildScene = () => {
         .to(imgB, { opacity: 1, duration: 0.9, ease: 'none' }, 4.6)
         .to(copyB, { opacity: 1, duration: 1.1, ease: 'power1.out' }, 5.2)
         .to(photos, { scale: 1, duration: 2.2, ease: 'sine.inOut' }, 4.4)
+        .to(box, { scale: 1, duration: 2.2, ease: 'sine.inOut' }, 4.4)
         .call(() => setBreathCalm(true), undefined, 4.6);
 
       const trustIo = new IntersectionObserver(
@@ -896,7 +934,14 @@ const buildScene = () => {
         { opacity: 1, ease: 'none', duration: 0.8, immediateRender: false },
         D + 0.7,
       )
-      /* The exhale: the photo eases back from slightly close. */
+      /* The exhale: the box shrinks back from held-large... */
+      .fromTo(
+        box,
+        { scale: BOX_HELD },
+        { scale: 1, ease: 'sine.inOut', duration: 1.6, immediateRender: false },
+        D + 0.3,
+      )
+      /* ...and the photo inside eases back from slightly close. */
       .fromTo(
         photos,
         { scale: PHOTO_HELD },
@@ -1227,52 +1272,56 @@ const toExamples = () => openTopic(TopicName.Examples);
     <LoomIntro v-if="showLoomIntro" />
     <div class="section-transition"></div>
     <section ref="trustSectionRef" class="trust-section">
-      <div ref="trustViewportRef" class="trust-viewport">
-        <div ref="trustImageA" class="trust-image-wrap">
-          <img src="../assets/trust-breathing-in.avif" alt="" class="trust-image" />
-        </div>
+      <!-- Exhale cloud: very light glow that blooms from behind the photo on each out-breath. -->
+      <div ref="trustCloudRef" class="trust-cloud" aria-hidden="true"></div>
+      <div ref="trustBoxRef" class="trust-box">
+        <div ref="trustViewportRef" class="trust-viewport">
+          <div ref="trustImageA" class="trust-image-wrap">
+            <img src="../assets/trust-breathing-in.avif" alt="" class="trust-image" />
+          </div>
 
-        <div ref="trustImageB" class="trust-image-wrap trust-image-wrap--b">
-          <img src="../assets/trust-breathing-out.avif" alt="" class="trust-image" />
-        </div>
+          <div ref="trustImageB" class="trust-image-wrap trust-image-wrap--b">
+            <img src="../assets/trust-breathing-out.avif" alt="" class="trust-image" />
+          </div>
 
-        <!-- Window light: brightens on each out-breath. -->
-        <div ref="trustLightRef" class="trust-light" aria-hidden="true"></div>
-        <div ref="trustGlowRef" class="trust-glow" aria-hidden="true"></div>
-        <!-- Phones: step back to the first message and forward again once autoplay is done. -->
-        <div
-          v-if="isResponsive"
-          class="trust-steps"
-          :class="{ 'is-on': trustStep > 0 }"
-          role="group"
-          aria-label="Trust section messages"
-        >
-          <button
-            type="button"
-            class="trust-steps__btn"
-            :disabled="trustStep !== 2"
-            aria-label="Show the first message: why people hesitate"
-            @click="goTrust(1)"
+          <!-- Window light: brightens on each out-breath. -->
+          <div ref="trustLightRef" class="trust-light" aria-hidden="true"></div>
+          <div ref="trustGlowRef" class="trust-glow" aria-hidden="true"></div>
+          <!-- Phones: step back to the first message and forward again once autoplay is done. -->
+          <div
+            v-if="isResponsive"
+            class="trust-steps"
+            :class="{ 'is-on': trustStep > 0 }"
+            role="group"
+            aria-label="Trust section messages"
           >
-            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 15l6-6 6 6" /></svg>
-          </button>
-          <span class="trust-steps__dots" aria-hidden="true">
-            <i :class="{ on: trustStep === 1 }"></i><i :class="{ on: trustStep === 2 }"></i>
-          </span>
-          <button
-            type="button"
-            class="trust-steps__btn"
-            :disabled="trustStep !== 1"
-            aria-label="Show the second message: where trust comes from"
-            @click="goTrust(2)"
-          >
-            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 9l6 6 6-6" /></svg>
-          </button>
+            <button
+              type="button"
+              class="trust-steps__btn"
+              :disabled="trustStep !== 2"
+              aria-label="Show the first message: why people hesitate"
+              @click="goTrust(1)"
+            >
+              <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 15l6-6 6 6" /></svg>
+            </button>
+            <span class="trust-steps__dots" aria-hidden="true">
+              <i :class="{ on: trustStep === 1 }"></i><i :class="{ on: trustStep === 2 }"></i>
+            </span>
+            <button
+              type="button"
+              class="trust-steps__btn"
+              :disabled="trustStep !== 1"
+              aria-label="Show the second message: where trust comes from"
+              @click="goTrust(2)"
+            >
+              <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 9l6 6 6-6" /></svg>
+            </button>
+          </div>
+          <div ref="trustCueRef" class="trust-cue">
+            <ScrollCue :is-dark="false" :has-text="false" minimal />
+          </div>
+          <div class="trust-frame" aria-hidden="true"></div>
         </div>
-        <div ref="trustCueRef" class="trust-cue">
-          <ScrollCue :is-dark="false" :has-text="false" minimal />
-        </div>
-        <div class="trust-frame" aria-hidden="true"></div>
       </div>
       <!-- The words sit on the page itself, beside the photo (above it on phones), in the
            site's own type. -->
@@ -1468,7 +1517,7 @@ const toExamples = () => openTopic(TopicName.Examples);
 
   @media (min-width: tokens.$breakpoint-lg) {
     background: #f7f9fe;
-    animation: none;
+    animation: bg-fade 900ms ease-out both;
   }
 
   &.is-collapsed {
@@ -1882,6 +1931,12 @@ const toExamples = () => openTopic(TopicName.Examples);
   left: 2vw;
   z-index: 6;
   transform: translateY(-50%);
+
+  /* Hidden until the script brings the tiles in after the hero. Without this they showed for a
+     frame on page load, before GSAP hid them. (GSAP's inline visibility overrides this.) */
+  :deep(.simon-quadrant) {
+    visibility: hidden;
+  }
 }
 
 /* ---------- Section Transition ---------- */
@@ -1909,6 +1964,8 @@ const toExamples = () => openTopic(TopicName.Examples);
    resized the hero and this section and shifted everything.
    On phones and tablets this is the last section (not pinned), so it fits exactly between the
    fixed header and the footer: you never land with its top hidden under the header. */
+$trust-radius: clamp(1.75rem, 2.6vw, 3rem); /* soft, organic corners on the photo */
+
 /* The photo's box. Phones and tablets: the
    top part, with the words below. Large screens: the right half, with the words on the left. */
 @mixin trust-photo-box {
@@ -2003,18 +2060,40 @@ const toExamples = () => openTopic(TopicName.Examples);
     );
   }
 
-  .trust-viewport {
+  .trust-box {
+    @include trust-photo-box;
     z-index: 1;
+  }
+
+  .trust-viewport {
+    position: absolute;
+    inset: 0;
     overflow: hidden;
-    border-radius: 1.25rem;
+    border-radius: $trust-radius;
     background-color: #e8eefb;
     /* A thin outline and a soft drop shadow, like the other cards on the site. */
     box-shadow:
       0 0 0 1px rgb(18 60 140 / 0.1),
       0 6px 18px -8px rgb(10 30 60 / 0.12),
       0 30px 64px -30px rgb(10 30 60 / 0.32);
+  }
 
+  /* Exhale cloud: a very light, soft glow just behind the photo. Mostly hidden while the photo
+     sits on top; as it scales up it spills out past the edges and fades. */
+  .trust-cloud {
     @include trust-photo-box;
+    z-index: 0;
+    opacity: 0;
+    pointer-events: none;
+    border-radius: $trust-radius;
+    background: radial-gradient(
+      ellipse at 50% 50%,
+      rgb(175 200 255 / 0.5) 0%,
+      rgb(190 210 255 / 0.42) 70%,
+      rgb(205 222 255 / 0.3) 100%
+    );
+    filter: blur(30px);
+    will-change: transform, opacity;
   }
 
   .trust-text {
@@ -2191,7 +2270,7 @@ const toExamples = () => openTopic(TopicName.Examples);
     z-index: 1;
     pointer-events: none;
     opacity: 0;
-    border-radius: 1.25rem;
+    border-radius: $trust-radius;
     will-change: opacity, transform;
     background: none;
     /* Barely there now: a soft inner edge, not a dark vignette. */
@@ -2204,7 +2283,7 @@ const toExamples = () => openTopic(TopicName.Examples);
     z-index: 3;
     pointer-events: none;
     border: 1px solid rgb(255 255 255 / 0.4);
-    border-radius: 1.25rem;
+    border-radius: $trust-radius;
   }
 
   /* Frosted pill on the right edge; fades in once the autoplay finishes. */
