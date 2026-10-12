@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { computed, onBeforeUnmount, onMounted, reactive, ref } from 'vue';
-import { mdiOpenInNew, mdiPlayCircleOutline, mdiArrowRightThin } from '@quasar/extras/mdi-v7';
+import { mdiOpenInNew, mdiPlayCircleOutline } from '@quasar/extras/mdi-v7';
 import { useViewport } from '../shared/utils/viewWidth';
 import { useMainStore } from '../stores/main';
 import { TopicName } from 'src/shared/constants/topicName';
@@ -209,8 +209,7 @@ onBeforeUnmount(() => {
         <h1 class="q-mt-none q-mb-md">Find the problem. Plan the fix. Build it.</h1>
         <p class="lead q-ma-none">
           Finding the problem is half the work. Building the fix is the other half, and it’s most of
-          what I do: animation, visuals, and interface work that show people what’s happening
-          instead of telling them.
+          what I do.
         </p>
         <p class="quality q-mt-md q-mb-none">
           <span class="quality__mark" aria-hidden="true">&#10003;</span>
@@ -261,7 +260,7 @@ onBeforeUnmount(() => {
               {{ resolved[it.id] ? it.stateB : it.stateA }}
             </span>
           </a>
-          <div class="ex-body ex-body--split">
+          <div class="ex-body">
             <div class="ex-col">
               <div class="ex-meta">
                 <span class="ex-kind">{{ it.kind }}</span>
@@ -272,12 +271,6 @@ onBeforeUnmount(() => {
               <a class="ex-link" :href="it.url" target="_blank" rel="noopener noreferrer">
                 Open live <q-icon :name="mdiOpenInNew" size="16px" />
               </a>
-            </div>
-            <div class="ex-col">
-              <p class="ex-why q-ma-none"><b>Why it’s here</b>{{ it.why }}</p>
-              <p class="ex-momentum q-ma-none">
-                <q-icon :name="mdiArrowRightThin" size="18px" /><span><b>Momentum</b> {{ it.momentum }}</span>
-              </p>
             </div>
           </div>
         </article>
@@ -335,10 +328,6 @@ onBeforeUnmount(() => {
             </div>
             <h2 class="q-my-none">{{ it.title }}</h2>
             <p class="ex-what q-ma-none">{{ it.what }}</p>
-            <p class="ex-why q-ma-none"><b>Why it’s here</b>{{ it.why }}</p>
-            <p class="ex-momentum q-ma-none">
-              <q-icon :name="mdiArrowRightThin" size="18px" /><span><b>Momentum</b> {{ it.momentum }}</span>
-            </p>
             <a class="ex-link" :href="it.url" target="_blank" rel="noopener noreferrer">
               Open live <q-icon :name="mdiOpenInNew" size="16px" />
             </a>

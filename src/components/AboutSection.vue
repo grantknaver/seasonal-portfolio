@@ -98,12 +98,6 @@ onBeforeUnmount(() => {
           I find where people get stuck in your product, and fix it. Designed and built by one
           person.
         </p>
-        <p class="lead-sub q-mt-sm q-mb-none">
-          I find where people are left guessing, then build the fix myself: product thinking, design,
-          motion, and code. Most of that is momentum work, meaning animation and visuals that show
-          people what’s happening instead of telling them. Clients consistently point out the
-          quality and polish of the finished work.
-        </p>
       </header>
 
       <!-- Handoff diagram -->

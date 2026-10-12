@@ -3,7 +3,8 @@ import { useMainStore } from '../stores/main';
 import { TopicName } from '../shared/constants/topicName';
 import PatternIndexLink from './PatternIndexLink.vue';
 
-/* Mirrors the sample Diagnostic PDF (AegisFlow). The full 8-page version is linked below.
+/* A short version of the sample Diagnostic PDF (AegisFlow): the quick read, the top problems,
+   and what to fix first. The full 8-page version is linked below.
    Each problem links to a real build that fixes the same kind of thing. */
 const PDF = '/samples/sample-diagnostic-aegisflow.pdf';
 const mainStore = useMainStore();
@@ -46,13 +47,6 @@ const findings = [
   },
 ];
 
-const chain = [
-  'What’s being decided?',
-  'What did the AI find?',
-  'What has a person confirmed?',
-  'What’s still open?',
-  'What happens next?',
-];
 
 const firstSteps = [
   { n: 1, what: 'Replace “Ready” with clear stages', lens: 'Clarity + Trust' },
@@ -90,44 +84,9 @@ const firstSteps = [
       </div>
     </section>
 
-    <!-- 2. What users see now -->
+    <!-- 2. Top problems -->
     <section class="part">
       <span class="part__n">2</span>
-      <div class="part__body">
-        <p class="part__label q-ma-none">What people see today</p>
-        <div class="console" aria-label="Sample review screen with three problem spots">
-          <div class="console__top">
-            <b>Credit Assist v3</b><span>Review AG-2937</span>
-          </div>
-          <div class="console__grid">
-            <div class="tile">
-              <em>Readiness</em><b class="ok">READY</b><small>12 / 12 checks passed</small>
-              <i class="mark">1</i>
-            </div>
-            <div class="tile">
-              <em>AI risk rating</em><b class="hot">HIGH</b><small>AI-generated</small>
-              <i class="mark">2</i>
-            </div>
-            <div class="tile">
-              <em>Approvals</em><b>2 of 3</b><small>Legal review pending</small>
-              <i class="mark">3</i>
-            </div>
-            <div class="tile">
-              <em>Evidence</em><b>18 files</b><small>Updated today</small>
-            </div>
-          </div>
-        </div>
-        <div class="questions">
-          <span><i>1</i>What does “Ready” actually mean?</span>
-          <span><i>2</i>Why is it “High” risk?</span>
-          <span><i>3</i>What should I do next?</span>
-        </div>
-      </div>
-    </section>
-
-    <!-- 3. Top problems -->
-    <section class="part">
-      <span class="part__n">3</span>
       <div class="part__body">
         <p class="part__label q-ma-none">The biggest problems, in order</p>
         <ol class="findings q-ma-none">
@@ -137,7 +96,6 @@ const firstSteps = [
               <span v-for="l in f.lenses" :key="l" class="lens-tag">{{ l }}</span>
             </div>
             <b>{{ f.title }}</b>
-            <span class="ftext">{{ f.text }}</span>
             <span class="ffix"><em>Fix:</em> {{ f.fix }}</span>
             <button type="button" class="fix-link" @click="toExamples">
               See this kind of fix in <u>{{ f.build }}</u> &rarr;
@@ -148,38 +106,13 @@ const firstSteps = [
       </div>
     </section>
 
-    <!-- 4. Where it should go -->
+    <!-- 3. What to fix first -->
     <section class="part">
-      <span class="part__n">4</span>
-      <div class="part__body">
-        <p class="part__label q-ma-none">Where it should go</p>
-        <p class="direction q-ma-none">Make every review read as one clear decision.</p>
-        <div class="chain">
-          <template v-for="(c, i) in chain" :key="c">
-            <span>{{ c }}</span>
-            <i v-if="i < chain.length - 1" aria-hidden="true">&rarr;</i>
-          </template>
-        </div>
-        <p class="rule q-ma-none">
-          Whenever the AI makes a call, people should see what it decided, what it used, how sure it
-          is, and where a person takes over.
-        </p>
-        <!-- The direction step: related interaction directions, not a one-to-one fix. -->
-        <PatternIndexLink
-          kicker="Pattern Index"
-          path="/lenses/ai-legibility"
-          text="Explore directions like this one"
-        />
-      </div>
-    </section>
-
-    <!-- 5. What to fix first -->
-    <section class="part">
-      <span class="part__n">5</span>
+      <span class="part__n">3</span>
       <div class="part__body">
         <p class="part__label q-ma-none">What to fix first</p>
         <ol class="steps q-ma-none">
-          <li v-for="s in firstSteps" :key="s.n">
+          <li v-for="s in firstSteps.slice(0, 3)" :key="s.n">
             <span class="steps__n">{{ s.n }}</span>
             <span class="steps__what">{{ s.what }}</span>
             <span class="steps__lens">{{ s.lens }}</span>
@@ -188,25 +121,16 @@ const firstSteps = [
       </div>
     </section>
 
-    <!-- 6. What happens next -->
-    <section class="part">
-      <span class="part__n">6</span>
-      <div class="part__body">
-        <p class="part__label q-ma-none">What happens next</p>
-        <div class="path">
-          <span>Diagnostic</span><i>&rarr;</i><span>Clear plan</span><i>&rarr;</i>
-          <span>Scope</span><i>&rarr;</i><span class="is-end">Build</span>
-        </div>
-        <p class="skip q-ma-none">Already know what to fix? Skip the Diagnostic and start at Scope.</p>
-      </div>
-    </section>
-
     <div class="diag__foot">
       <p class="q-ma-none">
-        This is a made-up product, but it’s the same format I use for real client Diagnostics. It
-        tells you what to build and in what order. Building it is a separate step, by your team or
-        by me.
+        A made-up product, in the same format I use for real Diagnostics: what to build, in what
+        order. The build is a separate step, by your team or by me.
       </p>
+      <PatternIndexLink
+        kicker="Pattern Index"
+        path="/lenses/ai-legibility"
+        text="Explore directions like this one"
+      />
       <a class="pdf-link" :href="PDF" target="_blank" rel="noopener">
         See the full sample Diagnostic (PDF, 8 pages) &rarr;
       </a>

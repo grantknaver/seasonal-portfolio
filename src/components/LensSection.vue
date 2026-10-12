@@ -12,7 +12,6 @@ import TeardownExample from './TeardownExample.vue';
 import SampleDiagnostic from './SampleDiagnostic.vue';
 import PatternIndexLink from './PatternIndexLink.vue';
 import { PATTERN_INDEX_LENS } from '../shared/constants/patternIndex';
-import { CLIENT_RESULTS, CLIENT_RESULTS_NOTE } from '../shared/constants/clientResults';
 
 const mainStore = useMainStore();
 const { lgBreakpoint, width } = useViewport();
@@ -32,7 +31,7 @@ const chapters = [
   {
     id: 'lens-teardown',
     title: 'What a Decision Snapshot looks like',
-    sub: 'A focused review of one screen: I study it before we talk, walk you through it, and send a one-page summary after.',
+    sub: 'A free, focused review of one screen, and the one page you get afterward.',
   },
   {
     id: 'lens-lenses',
@@ -46,7 +45,6 @@ const chapters = [
   },
 ] as const;
 
-const clientResults = CLIENT_RESULTS;
 
 const sheetRef = ref<HTMLElement | null>(null);
 
@@ -221,7 +219,7 @@ onBeforeUnmount(() => io?.disconnect());
         </div>
       </q-expansion-item>
 
-      <!-- 2. Teardown (with what 150 of them taught me) -->
+      <!-- 2. Decision Snapshot (with what 150 reviews taught me) -->
       <q-expansion-item
         :id="chapters[1].id"
         class="chapter"
@@ -241,15 +239,10 @@ onBeforeUnmount(() => io?.disconnect());
         <div class="chapter__body">
           <TeardownExample />
 
-      <!-- What 150 Teardowns taught me -->
+      <!-- What 150 reviews taught me -->
       <aside class="lesson">
         <p class="lesson__label q-ma-none">What 150 product reviews taught me</p>
         <p class="lesson__big q-ma-none">Most products tell too much and show too little.</p>
-        <p class="lesson__body q-ma-none">
-          The most common problem I find is leaning on copy to explain things the product could just
-          show. Words alone make people stop and work it out. Show it and tell it, and people get it
-          faster, and more completely, with less to think about.
-        </p>
         <div class="lesson__vs" aria-hidden="true">
           <div class="lesson__col">
             <em>Just telling</em>
@@ -384,27 +377,6 @@ onBeforeUnmount(() => io?.disconnect());
         </article>
       </Transition>
 
-          <!-- From my client work: client-reported and anonymous. -->
-          <section class="lens-results" aria-labelledby="lens-results-title">
-            <header class="lens-results__head">
-              <p class="lens-results__kicker q-ma-none">From my client work</p>
-              <h3 id="lens-results-title" class="q-ma-none">What clients have reported</h3>
-              <p class="lens-results__lead q-ma-none">
-                Small surface improvements can create measurable movement. These are results clients
-                reported back after changes I made, shared without names.
-              </p>
-            </header>
-            <ul class="lens-results__grid">
-              <li v-for="r in clientResults" :key="r.label" class="res-card">
-                <span class="res-card__label">{{ r.label }}</span>
-                <p class="res-card__stat q-ma-none">
-                  <b>{{ r.stat }}</b> <span>{{ r.text }}</span>
-                </p>
-                <span class="res-card__src">Client-reported</span>
-              </li>
-            </ul>
-            <p class="lens-results__note q-ma-none">{{ CLIENT_RESULTS_NOTE }}</p>
-          </section>
         </div>
       </q-expansion-item>
 

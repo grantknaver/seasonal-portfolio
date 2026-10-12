@@ -1,120 +1,19 @@
 <script lang="ts" setup>
 import DecisionSnapshot from './DecisionSnapshot.vue';
 
-/* One Decision Snapshot, start to finish, on a made-up product (Cairnwell Atlas): what I prepare
-   before the call, what we talk about on it, and the one-page summary you get afterward. */
+/* The Decision Snapshot chapter: one line on how it works, then the one-page sample itself
+   (made-up product). The sample shows the four things you get. */
 
-const context = ['Canada', 'Healthcare', 'Ontario', 'Moderate AI usage'];
 
-const rules = [
-  { source: 'Canada', what: 'Federal law', why: 'Main location' },
-  { source: 'Ontario', what: 'Health privacy law', why: 'Main operating region' },
-  { source: 'EU', what: 'Regulation', why: 'May also apply' },
-  { source: 'Global', what: 'Standard', why: 'Chosen standard' },
-];
 </script>
 
 <template>
   <div class="teardown">
-    <p class="mini-label q-ma-none">1 · Before the call, I prepare</p>
-    <div class="td-head">
-      <span class="sample-tag">Sample · made-up product</span>
-      <h3 class="q-my-none">Cairnwell Atlas: keep the user’s main details in view.</h3>
-      <p class="q-ma-none">
-        A compliance app that asks for the right details at setup, then hides them on every screen
-        after.
-      </p>
-      <div class="ctx">
-        <span v-for="c in context" :key="c">{{ c }}</span>
-      </div>
-    </div>
-
-    <!-- Observation 1 -->
-    <div class="obs">
-      <span class="obs__n">01</span>
-      <div class="obs__body">
-        <b>The setup details disappear.</b>
-        <span class="obs__text">
-          Your location, industry, and AI use decide which rules you see. But after setup, they’re
-          gone. People have to remember what each page is based on.
-        </span>
-        <div class="compare" aria-hidden="true">
-          <div class="compare__col">
-            <em>Now</em>
-            <span class="screen">Setup: Canada · Healthcare · Ontario</span>
-            <i class="down">&darr;</i>
-            <span class="screen screen--lost">Requirements page: details gone</span>
-          </div>
-          <span class="compare__arrow">&rarr;</span>
-          <div class="compare__col">
-            <em>Simple fix</em>
-            <span class="screen screen--fixed">
-              <span class="pin-ctx">Canada · Healthcare · Ontario</span>
-              Requirements page
-            </span>
-            <small>A small label that stays on screen.</small>
-          </div>
-        </div>
-      </div>
-    </div>
-
-    <!-- Observation 2 -->
-    <div class="obs">
-      <span class="obs__n">02</span>
-      <div class="obs__body">
-        <b>Every rule looks equally important.</b>
-        <span class="obs__text">
-          Laws, standards, and extra guidance all use the same cards, so people can’t tell which one
-          actually applies to them.
-        </span>
-        <div class="rules" role="table" aria-label="Simple fix: say what each rule is and why it's shown">
-          <div class="rules__row rules__row--head" role="row">
-            <span role="columnheader">Rule from</span>
-            <span role="columnheader">What it is</span>
-            <span role="columnheader">Why you see it</span>
-          </div>
-          <div v-for="r in rules" :key="r.source" class="rules__row" role="row">
-            <span role="cell"><b>{{ r.source }}</b></span>
-            <span role="cell">{{ r.what }}</span>
-            <span role="cell">{{ r.why }}</span>
-          </div>
-        </div>
-      </div>
-    </div>
-
-    <p class="idea q-ma-none">
-      <b>The simple idea</b>Keep the main details on screen, and say why each extra rule shows up.
-      The app already has this information. It just isn’t showing it.
+    <p class="how q-ma-none">
+      You send one screen. I review it before we meet, walk you through it on a 20-minute call,
+      then send you this:
     </p>
-
-    <div class="teardown__live">
-      <div>
-        <p class="mini-label q-ma-none">2 · On the call, we talk about</p>
-        <ul class="q-ma-none">
-          <li>Does this match what you’re seeing?</li>
-          <li>Which one is hurting you most?</li>
-          <li>Do you already know the fix, or do we need a closer look?</li>
-        </ul>
-      </div>
-    </div>
-
-    <!-- What every attendee leaves with. -->
-    <div class="after">
-      <p class="mini-label q-ma-none">3 · After the call, your one-page summary</p>
-      <DecisionSnapshot />
-    </div>
-
-    <div class="heard">
-      <p class="mini-label q-ma-none">What founders usually tell me afterward</p>
-      <div class="heard__list">
-        <span>“You put your finger on exactly what’s been holding us back.”</span>
-        <span>“We’re already implementing your recommendations.”</span>
-        <span>“This showed us where we’ve been losing users.”</span>
-        <span>“It gave us a clear, practical way to reduce friction.”</span>
-      </div>
-      <p class="heard__note q-ma-none">Common reactions from 150 reviews, paraphrased.</p>
-    </div>
-
+    <DecisionSnapshot />
   </div>
 </template>
 
@@ -126,6 +25,12 @@ $navy: #0a3487;
 $soft: #e5ecfd;
 $line: rgba(18, 96, 240, 0.18);
 $warn: #e8590c;
+
+.how {
+  color: rgba(11, 31, 46, 0.72);
+  font-size: 0.92rem;
+  line-height: 1.5;
+}
 
 .teardown {
   display: grid;

@@ -130,9 +130,8 @@ const sendEmail = async () => {
         <p class="kicker q-mt-none q-mb-sm">I find where people get stuck in your product, and fix it.</p>
         <h1 class="q-mt-none q-mb-md">Start with a free Decision Snapshot.</h1>
         <p class="lead q-ma-none">
-          A Decision Snapshot is a free, focused review of one screen of your product. I study it
-          before we meet, walk you through the 2–3 things that matter most on a 20-minute call, and
-          send you a one-page summary afterward. I’ve done 150 of these.
+          A free, focused review of one screen of your product. I study it before we meet, walk you
+          through what matters most on a 20-minute call, and send you one page afterward.
         </p>
       </header>
 
