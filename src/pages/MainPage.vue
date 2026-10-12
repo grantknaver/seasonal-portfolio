@@ -142,32 +142,6 @@ const signalHeroCopyIn = () => {
   window.dispatchEvent(new Event('hero:copy-in'));
 };
 const trustCueRef = ref<HTMLElement | null>(null);
-const trustBeamRef = ref<HTMLElement | null>(null);
-/* Small order card: vague on the first screen, clear on the second. */
-const trustCardRef = ref<HTMLElement | null>(null);
-const trustCardA = ref<HTMLElement | null>(null);
-const trustCardB = ref<HTMLElement | null>(null);
-/* Second card (sign-up error), upper right. */
-const trustCard2Ref = ref<HTMLElement | null>(null);
-const trustCard2A = ref<HTMLElement | null>(null);
-const trustCard2B = ref<HTMLElement | null>(null);
-
-/* When the cards switch states, each gives a small bounce: up a touch, then settles. It's the
-   cue that the cards changed along with the copy. */
-const pulseCards = () => {
-  [trustCardRef.value, trustCard2Ref.value].forEach((el, i) => {
-    if (!el) return;
-    gsap.to(el, {
-      keyframes: [
-        { scale: 1.08, duration: 0.18, ease: 'power2.out' },
-        { scale: 1, duration: 0.6, ease: 'back.out(3)' },
-      ],
-      delay: i * 0.12,
-      overwrite: 'auto',
-    });
-  });
-};
-
 /* Phones: after the trust section autoplays, two small arrows let people go back to the first
    message ("why people hesitate") and forward again. 0 = still autoplaying. */
 const trustStep = ref<0 | 1 | 2>(0);
@@ -183,9 +157,6 @@ const goTrust = (step: 1 | 2) => {
   on(trustCopyB.value, !first);
   on(trustImageA.value, first);
   on(trustImageB.value, !first);
-  [trustCardA.value, trustCard2A.value].forEach((el) => on(el, first));
-  [trustCardB.value, trustCard2B.value].forEach((el) => on(el, !first));
-  pulseCards();
 };
 
 /* ---------- Lifecycle-scoped GSAP state ---------- */
@@ -302,11 +273,6 @@ const applyHomeScale = () => {
 const handleResize = () => {
   requestAnimationFrame(applyHomeScale);
   measureRail();
-};
-
-const setBeamRunning = (running: boolean) => {
-  const span = trustBeamRef.value?.querySelector<HTMLElement>('span');
-  if (span) span.style.animationPlayState = running ? 'running' : 'paused';
 };
 
 const verifyOnce = () => {
@@ -610,22 +576,9 @@ const buildScene = () => {
     const copyB = trustCopyB.value;
     const glow = trustGlowRef.value;
     const cue = trustCueRef.value;
-    const beam = trustBeamRef.value;
-    const isEl = (el: HTMLElement | null): el is HTMLElement => !!el;
-    const cards = [trustCardRef.value, trustCard2Ref.value].filter(isEl);
-    const cardAs = [trustCardA.value, trustCard2A.value].filter(isEl);
-    const cardBs = [trustCardB.value, trustCard2B.value].filter(isEl);
-    const hasCards = cards.length > 0 && cardAs.length > 0 && cardBs.length > 0;
-    if (hasCards) {
-      /* Like a window opening: starts slightly small and low, settles with a soft bounce. */
-      gsap.set(cards, { opacity: 0, y: 10, scale: 0.9, transformOrigin: '50% 100%' });
-      gsap.set(cardBs, { opacity: 0 });
-    }
 
     if (!(section && imgA && imgB && copyA && copyB && glow)) return;
 
-    /* Don't burn cycles spinning the conic gradient before it's visible. */
-    setBeamRunning(false);
     gsap.set(imgB, { opacity: 0 });
     gsap.set(glow, { opacity: 0, scale: 1.18 });
     if (cue) gsap.set(cue, { opacity: 0 });
@@ -644,24 +597,11 @@ const buildScene = () => {
           },
         })
         .to(glow, { opacity: 1, scale: 1, duration: 1.2, ease: 'power2.out' }, 0)
-        .to(beam, { opacity: 1, duration: 1.4, ease: 'power2.out' }, 0.5)
         .to(copyA, { opacity: 1, duration: 1.1, ease: 'power1.out' }, 1.2)
         .to(copyA, { opacity: 0, duration: 0.8, ease: 'power1.in' }, 4.2)
         .to(imgA, { opacity: 0, duration: 0.9, ease: 'none' }, 4.6)
         .to(imgB, { opacity: 1, duration: 0.9, ease: 'none' }, 4.6)
         .to(copyB, { opacity: 1, duration: 1.1, ease: 'power1.out' }, 5.2);
-
-      if (hasCards) {
-        mobileTl
-          .to(
-            cards,
-            { opacity: 1, y: 0, scale: 1, duration: 0.6, ease: 'back.out(1.6)', stagger: 0.25 },
-            2.0,
-          )
-          .to(cardAs, { opacity: 0, duration: 0.6, ease: 'none', stagger: 0.15 }, 4.6)
-          .to(cardBs, { opacity: 1, duration: 0.6, ease: 'none', stagger: 0.15 }, 4.9)
-          .call(pulseCards, undefined, 4.85);
-      }
 
       const trustIo = new IntersectionObserver(
         ([entry]) => {
@@ -671,7 +611,6 @@ const buildScene = () => {
           /* Decode both frames before playing — the A→B crossfade is where it used to hitch. */
           void decodeImagesIn(section).then(() => {
             if (disposed) return;
-            setBeamRunning(true);
             watchJank(mobileTl, 'trust-mobile');
             mobileTl.play();
           });
@@ -757,14 +696,12 @@ const buildScene = () => {
     }
 
     /* Ambience rides along with the lift. */
-    introTl
-      .fromTo(
-        glow,
-        { opacity: 0, scale: 1.18 },
-        { opacity: 1, scale: 1, duration: 1.25, ease: 'power2.out' },
-        0,
-      )
-      .fromTo(beam, { opacity: 0 }, { opacity: 1, duration: 1.6, ease: 'power2.out' }, 0.55);
+    introTl.fromTo(
+      glow,
+      { opacity: 0, scale: 1.18 },
+      { opacity: 1, scale: 1, duration: 1.25, ease: 'power2.out' },
+      0,
+    );
 
     /* 2. Menu buttons pop in. */
     if (navTargets.length) {
@@ -788,15 +725,8 @@ const buildScene = () => {
       introTl.to(copyA, { opacity: 1, duration: 1, ease: 'power1.out' }, COPY_AT);
     }
 
-    /* 4. Cards, then the scroll cue, once the frame has settled. */
+    /* 4. The scroll cue, once the frame has settled. */
     const cueAt = COPY_AT + COPY_STAGGER * Math.max(copyALines.length - 1, 0) + 0.55;
-    if (hasCards) {
-      introTl.to(
-        cards,
-        { opacity: 1, y: 0, scale: 1, duration: 0.6, ease: 'back.out(1.6)', stagger: 0.22 },
-        cueAt - 0.2,
-      );
-    }
     if (cue) {
       introTl.fromTo(cue, { opacity: 0 }, { opacity: 1, duration: 0.6, ease: 'power1.out' }, cueAt);
     }
@@ -817,7 +747,6 @@ const buildScene = () => {
             if (viewport) gsap.set(viewport, { y: 0, willChange: 'auto' });
             return;
           }
-          setBeamRunning(true);
           watchJank(introTl, 'trust-desktop');
           if (pinned) introTl.timeScale(INTRO_CATCH_UP);
           introTl.play();
@@ -891,24 +820,6 @@ const buildScene = () => {
         { opacity: 1, ease: 'none', duration: 1.1, immediateRender: false },
         D + 1.0,
       );
-    if (hasCards) {
-      /* The card clears up in step with the copy. */
-      trustTl
-        .fromTo(
-          cardAs,
-          { opacity: 1 },
-          { opacity: 0, ease: 'none', duration: 0.5, stagger: 0.12, immediateRender: false },
-          D + 0.6,
-        )
-        .fromTo(
-          cardBs,
-          { opacity: 0 },
-          { opacity: 1, ease: 'none', duration: 0.6, stagger: 0.12, immediateRender: false },
-          D + 0.95,
-        )
-        /* Fires as the scroll passes the switch, in either direction. */
-        .call(pulseCards, undefined, D + 0.9);
-    }
     trustTl.fromTo(
       glow,
       { opacity: 1, scale: 1 },
@@ -1046,15 +957,21 @@ const waitForLayout = async (el: HTMLElement | null, frames = 8): Promise<boolea
   return false;
 };
 
-const toContact = () => {
-  mainStore.SET_ACTIVE_TOPIC(TopicName.Contact);
-  expandedPanel.value = TopicName.Contact;
+/* Open a section from a link on the page. If it's already open (say, opened from the menu
+   earlier), setting the same state changes nothing, so on phones and tablets scroll to it
+   directly; otherwise the link looks dead. */
+const openTopic = (name: TopicName) => {
+  if (activeTopic.value === name && expandedPanel.value === name) {
+    if (isResponsive.value) void scrollToElement(name);
+    return;
+  }
+  mainStore.SET_ACTIVE_TOPIC(name);
+  expandedPanel.value = name;
 };
 
-const toExamples = () => {
-  mainStore.SET_ACTIVE_TOPIC(TopicName.Examples);
-  expandedPanel.value = TopicName.Examples;
-};
+const toContact = () => openTopic(TopicName.Contact);
+
+const toExamples = () => openTopic(TopicName.Examples);
 </script>
 
 <template>
@@ -1228,8 +1145,8 @@ const toExamples = () => {
         </div>
 
         <div ref="trustCopyA" class="trust-copy">
-          <span class="eyebrow">WHY PEOPLE HESITATE</span>
-          <p>PEOPLE HESITATE WHEN THEY HAVE TO GUESS.</p>
+          <span class="eyebrow">Why people hesitate</span>
+          <p>People hesitate when they have to guess.</p>
           <p class="trust-support">
             Every visitor is trusting you with their time and attention. Each question your product
             leaves open (what is this, what is it doing, what happens next) spends some of it.
@@ -1237,9 +1154,9 @@ const toExamples = () => {
         </div>
 
         <div ref="trustCopyB" class="trust-copy">
-          <span class="eyebrow">WHERE TRUST COMES FROM</span>
-          <p>TRUST ISN’T CLAIMED.</p>
-          <p><span class="trust-fill">IT’S ESTABLISHED.</span></p>
+          <span class="eyebrow">Where trust comes from</span>
+          <p>Trust isn’t claimed.</p>
+          <p><span class="trust-fill">It’s established.</span></p>
           <p class="trust-support">
             Say clearly who you are and what you do. Then show it. When what you say and what the
             product does line up, there’s nothing left to guess and nothing in the way.
@@ -1279,47 +1196,7 @@ const toExamples = () => {
         <div ref="trustCueRef" class="trust-cue">
           <ScrollCue :is-dark="false" :has-text="false" minimal />
         </div>
-        <div class="trust-frame" aria-hidden="true">
-          <span class="trust-corner trust-corner--tl"></span>
-          <span class="trust-corner trust-corner--tr"></span>
-          <span class="trust-corner trust-corner--bl"></span>
-          <span class="trust-corner trust-corner--br"></span>
-          <span class="trust-signal"></span>
-        </div>
-        <div ref="trustBeamRef" class="trust-beam" aria-hidden="true"><span></span></div>
-      </div>
-      <!-- The two notice cards sit on their own layer, lined up with the photo frame but not
-           clipped by it, so on large screens they can hang off its edges. -->
-      <div class="trust-cards">
-        <div ref="trustCardRef" class="trust-card trust-card--bottom" aria-hidden="true">
-          <div ref="trustCardA" class="trust-card__state">
-            <div class="tc-row"><b>Order #4821</b></div>
-            <div class="tc-row">
-              <span class="tc-status">Processing&hellip;</span><em class="tc-q">?</em>
-            </div>
-            <p class="tc-guess">Did it go through? When will it arrive?</p>
-          </div>
-          <div ref="trustCardB" class="trust-card__state">
-            <div class="tc-row"><b>Order #4821</b></div>
-            <div class="tc-row"><span class="tc-paid">&#10003; Paid $86.00</span></div>
-            <p class="tc-src">Arrives Thursday</p>
-            <div class="tc-row"><span class="tc-btn tc-btn--on">Track package</span></div>
-          </div>
-        </div>
-        <div ref="trustCard2Ref" class="trust-card trust-card--top" aria-hidden="true">
-          <div ref="trustCard2A" class="trust-card__state">
-            <div class="tc-row"><b>Sign up failed.</b><em class="tc-q">?</em></div>
-            <div class="tc-row"><span class="tc-btn">Try again</span></div>
-            <p class="tc-guess">What went wrong? What do I fix?</p>
-          </div>
-          <div ref="trustCard2B" class="trust-card__state">
-            <div class="tc-row"><b>Almost there</b></div>
-            <p class="tc-src">Add one number to your password</p>
-            <div class="tc-checks">
-              <span>&#10003; 8+ characters</span><span>&#10003; Email looks good</span>
-            </div>
-          </div>
-        </div>
+        <div class="trust-frame" aria-hidden="true"></div>
       </div>
     </section>
 
@@ -1970,308 +1847,6 @@ const toExamples = () => {
     );
   }
 
-  /* ---------- Notice cards ---------- */
-  /* Their layer matches the photo frame's box exactly (same insets as .trust-viewport), but
-     doesn't clip, so cards can hang off the frame's edges on large screens. */
-  .trust-cards {
-    position: absolute;
-    top: 1.25rem;
-    right: 1rem;
-    bottom: 1.25rem;
-    left: 1rem;
-    z-index: 3;
-    pointer-events: none;
-
-    @media #{tokens.$tablet-only} {
-      top: 2.25rem;
-      right: 2rem;
-      bottom: 2.25rem;
-      left: 2rem;
-    }
-
-    @media (min-width: tokens.$breakpoint-lg) {
-      /* Smaller than the screen on purpose: room to breathe around the photo, like the rest
-         of the site. (Kept identical for .trust-viewport and .trust-cards.) */
-      top: clamp(7rem, 15vh, 10.5rem);
-      right: clamp(11rem, 19vw, 22rem);
-      bottom: clamp(6rem, 13vh, 9.5rem);
-      left: clamp(11rem, 19vw, 22rem);
-    }
-
-    .trust-card {
-      /* Supporting cast, not the headline: frosted and a little translucent, with softer text. */
-      --tc-dim: 0.72;
-      border-color: rgb(255 255 255 / 0.6);
-      background: rgb(255 255 255 / 0.74);
-      backdrop-filter: blur(10px) saturate(1.1);
-
-      .tc-row,
-      .tc-guess,
-      .tc-src,
-      .tc-checks {
-        opacity: var(--tc-dim);
-      }
-
-      .tc-q {
-        animation-duration: 2.6s;
-      }
-    }
-
-    /* Large screens: two different sizes, each hanging off a different edge of the frame. */
-    @media (min-width: tokens.$breakpoint-lg) {
-      .trust-card--bottom {
-        /* Tucked inside the frame's bottom-left corner; more solid here, since it sits on the
-           dark photo rather than the light background. */
-        left: clamp(1rem, 2vw, 2rem);
-        bottom: clamp(1rem, 2.6vh, 2rem);
-        background: rgb(255 255 255 / 0.9);
-        width: clamp(190px, 12.5vw, 220px);
-        padding: 0.7rem 0.8rem;
-        box-shadow:
-          0 10px 24px rgb(10 30 60 / 0.16),
-          0 2px 6px rgb(10 30 60 / 0.1);
-
-        .tc-row b {
-          font-size: 0.84rem;
-        }
-
-        .tc-status,
-        .tc-paid {
-          font-size: 0.8rem;
-        }
-
-        .tc-guess,
-        .tc-src {
-          font-size: 0.72rem;
-        }
-      }
-
-      .trust-card--top {
-        top: calc(-1 * clamp(1.25rem, 2.8vh, 2.25rem));
-        right: calc(-1 * clamp(2rem, 3.4vw, 4rem));
-        width: clamp(190px, 12.5vw, 220px);
-        padding: 0.7rem 0.8rem;
-        box-shadow:
-          0 8px 20px rgb(10 30 60 / 0.15),
-          0 2px 5px rgb(10 30 60 / 0.1);
-
-        .tc-row b {
-          font-size: 0.84rem;
-        }
-
-        .tc-guess,
-        .tc-src {
-          font-size: 0.72rem;
-        }
-      }
-    }
-  }
-
-  /* ---------- AI card inside the trust frame ---------- */
-  /* Centered with margin, not CSS translate: GSAP animates transform on these cards and
-     would otherwise keep the narrow-screen centering after a resize. */
-  .trust-card {
-    position: absolute;
-    left: 0;
-    right: 0;
-    margin-inline: auto;
-    bottom: 5%;
-    z-index: 3;
-
-    /* Short phones (iPhone SE): tighter cards that sit closer to the edges. */
-    @media (max-height: 760px) and (max-width: tokens.$breakpoint-lg) {
-      bottom: 3%;
-      padding: 0.6rem 0.75rem;
-    }
-    display: grid;
-    width: min(84%, 270px);
-    padding: 0.8rem 0.9rem;
-    border: 1px solid rgb(255 255 255 / 0.55);
-    border-radius: 0.8rem;
-    background: rgb(255 255 255 / 0.92);
-    box-shadow: 0 10px 24px rgb(10 30 60 / 0.18);
-    color: #0b1f2e;
-    font-family: tokens.$primary-font;
-    text-align: left;
-    opacity: 0;
-    backdrop-filter: blur(6px);
-
-    @media (min-width: tokens.$breakpoint-lg) {
-      left: 3.5%;
-      right: auto;
-      margin-inline: 0;
-      bottom: 5%; /* below the copy block, clear of the text */
-      width: clamp(220px, 17%, 260px);
-    }
-  }
-
-  .trust-card--top {
-    top: 9%;
-    bottom: auto;
-
-    @media (max-height: 760px) and (max-width: tokens.$breakpoint-lg) {
-      top: 3.5%;
-    }
-
-    @media (min-width: tokens.$breakpoint-lg) {
-      top: 7%;
-      right: 3.5%;
-      bottom: auto;
-      left: auto;
-    }
-  }
-
-  .tc-checks {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 0.25rem 0.75rem;
-    color: #0e8a4f;
-    font-size: 0.74rem;
-    font-weight: 700;
-  }
-
-  .trust-card__state {
-    grid-area: 1 / 1;
-    display: grid;
-    gap: 0.45rem;
-    align-content: center; /* the card is sized by its taller state; keep the shorter one centred */
-  }
-
-  .tc-row {
-    display: flex;
-    gap: 0.45rem;
-    align-items: center;
-
-    b {
-      font-size: 0.9rem;
-      line-height: 1.25;
-    }
-  }
-
-  .tc-status {
-    color: rgb(11 31 46 / 0.7);
-    font-size: 0.86rem;
-  }
-
-  .tc-paid {
-    color: #0e8a4f;
-    font-size: 0.86rem;
-    font-weight: 700;
-  }
-
-  .tc-q {
-    display: grid;
-    place-items: center;
-    width: 1.1rem;
-    height: 1.1rem;
-    margin-left: auto;
-    border-radius: 50%;
-    background: #e8590c;
-    color: #fff;
-    font-size: 0.68rem;
-    font-style: normal;
-    font-weight: 700;
-    animation: tc-pulse 1.6s ease-in-out infinite;
-  }
-
-  .tc-btn {
-    padding: 0.25rem 0.7rem;
-    border: 1px solid #c9d6ef;
-    border-radius: 0.4rem;
-    background: #f3f6fc;
-    color: #0a3487;
-    font-size: 0.78rem;
-    font-weight: 700;
-
-    &--on {
-      border-color: #1260f0;
-      background: #1260f0;
-      color: #fff;
-    }
-  }
-
-  .tc-guess {
-    margin: 0;
-    color: #e8590c;
-    font-size: 0.76rem;
-    font-style: italic;
-    line-height: 1.35;
-  }
-
-  .tc-src {
-    margin: 0;
-    padding: 0.3rem 0.5rem;
-    border-radius: 0.35rem;
-    background: #eef3fc;
-    color: rgb(11 31 46 / 0.75);
-    font-size: 0.74rem;
-    line-height: 1.35;
-  }
-
-  @keyframes tc-pulse {
-    0%,
-    100% {
-      transform: scale(1);
-    }
-    50% {
-      transform: scale(1.18);
-    }
-  }
-
-  @media (prefers-reduced-motion: reduce) {
-    .tc-q {
-      animation: none;
-    }
-  }
-
-  /* Phones and tablets: smaller, lighter notice cards so they don't crowd the photo and copy. */
-  @media (max-width: tokens.$breakpoint-lg - 0.02px) {
-    .trust-card {
-      width: min(66%, 224px);
-      padding: 0.5rem 0.65rem;
-      border-radius: 0.65rem;
-      box-shadow: 0 8px 18px rgb(10 30 60 / 0.16);
-    }
-
-    .trust-card__state {
-      gap: 0.3rem;
-    }
-
-    .tc-row b {
-      font-size: 0.78rem;
-    }
-
-    .tc-status,
-    .tc-paid {
-      font-size: 0.74rem;
-    }
-
-    .tc-checks {
-      gap: 0.15rem 0.5rem;
-      font-size: 0.66rem;
-    }
-
-    .tc-btn {
-      padding: 0.18rem 0.55rem;
-      font-size: 0.68rem;
-    }
-
-    .tc-guess {
-      font-size: 0.68rem;
-    }
-
-    .tc-src {
-      padding: 0.2rem 0.4rem;
-      font-size: 0.66rem;
-    }
-
-    .tc-q {
-      width: 0.95rem;
-      height: 0.95rem;
-      font-size: 0.6rem;
-    }
-  }
-
   .trust-viewport {
     position: absolute;
     top: 1.25rem;
@@ -2280,7 +1855,12 @@ const toExamples = () => {
     left: 1rem;
     overflow: hidden;
     border-radius: 1.25rem;
-    background-color: black;
+    background-color: #e8eefb;
+    /* A thin outline and a soft drop shadow, like the other cards on the site. */
+    box-shadow:
+      0 0 0 1px rgb(18 60 140 / 0.1),
+      0 6px 18px -8px rgb(10 30 60 / 0.12),
+      0 30px 64px -30px rgb(10 30 60 / 0.32);
 
     @media #{tokens.$tablet-only} {
       top: 2.25rem;
@@ -2291,7 +1871,7 @@ const toExamples = () => {
 
     @media (min-width: tokens.$breakpoint-lg) {
       /* Smaller than the screen on purpose: room to breathe around the photo, like the rest
-         of the site. (Kept identical for .trust-viewport and .trust-cards.) */
+         of the site. */
       top: clamp(7rem, 15vh, 10.5rem);
       right: clamp(11rem, 19vw, 22rem);
       bottom: clamp(6rem, 13vh, 9.5rem);
@@ -2315,42 +1895,19 @@ const toExamples = () => {
       pointer-events: none;
     }
 
+    /* A pale, cool wash: soft morning light rather than a dark vignette. */
     &::after {
       content: '';
       position: absolute;
       inset: 0;
       z-index: 1;
       pointer-events: none;
-      background:
-        radial-gradient(
-          118% 90% at 60% 46%,
-          rgba(13, 71, 161, 0) 50%,
-          rgba(13, 71, 161, 0.035) 70%,
-          rgba(11, 31, 59, 0.07) 88%,
-          rgba(11, 31, 59, 0.11) 100%
-        ),
-        linear-gradient(
-          to bottom,
-          rgba(11, 31, 59, 0.12) 0%,
-          rgba(13, 71, 161, 0.07) 6%,
-          rgba(187, 222, 251, 0.04) 13%,
-          transparent 22%,
-          transparent 78%,
-          rgba(187, 222, 251, 0.04) 87%,
-          rgba(13, 71, 161, 0.07) 94%,
-          rgba(11, 31, 59, 0.12) 100%
-        ),
-        linear-gradient(
-          to right,
-          rgba(11, 31, 59, 0.12) 0%,
-          rgba(13, 71, 161, 0.07) 5%,
-          rgba(187, 222, 251, 0.035) 11%,
-          transparent 18%,
-          transparent 82%,
-          rgba(187, 222, 251, 0.035) 89%,
-          rgba(13, 71, 161, 0.07) 95%,
-          rgba(11, 31, 59, 0.12) 100%
-        );
+      background: linear-gradient(
+        180deg,
+        rgb(238 243 253 / 0.22) 0%,
+        rgb(238 243 253 / 0.08) 45%,
+        rgb(238 243 253 / 0.14) 100%
+      );
     }
   }
 
@@ -2358,7 +1915,7 @@ const toExamples = () => {
     width: 100%;
     height: 100%;
     object-fit: cover;
-    filter: saturate(0.84) contrast(0.94) brightness(1.01) hue-rotate(3deg);
+    filter: saturate(0.82) contrast(0.9) brightness(1.12);
   }
 
   .trust-image-wrap--b {
@@ -2383,22 +1940,28 @@ const toExamples = () => {
     @media (max-width: tokens.$breakpoint-lg) {
       padding-inline: 3.6rem;
     }
-    font-size: clamp(1.4rem, 4.6vw, 1.9rem);
-    line-height: 1.2;
+    font-size: clamp(1.3rem, 4.3vw, 1.7rem);
+    line-height: 1.25;
+    letter-spacing: -0.01em;
     will-change: transform, opacity;
-    text-shadow: 2px 2px 10px var(--q-dark);
+    /* Just enough shadow to read on the lighter photo. A faint, wide pool of shade sits behind
+       the block for the same reason, and fades with the copy. */
+    text-shadow:
+      0 1px 2px rgb(11 31 59 / 0.3),
+      0 2px 18px rgb(11 31 59 / 0.4);
+    background: radial-gradient(
+      44% 40% at 50% 50%,
+      rgb(11 31 59 / 0.3) 0%,
+      rgb(11 31 59 / 0.12) 55%,
+      rgb(11 31 59 / 0) 100%
+    );
 
     @media (min-width: tokens.$breakpoint-lg) {
-      font-size: clamp(1.9rem, 2.8vw, 2.5rem);
+      font-size: clamp(1.7rem, 2.4vw, 2.2rem);
     }
 
     .trust-fill {
       color: tokens.$champagne;
-      font-size: clamp(1.26rem, 4.14vw, 1.71rem);
-
-      @media (min-width: tokens.$breakpoint-lg) {
-        font-size: clamp(1.71rem, 2.52vw, 2.25rem);
-      }
     }
 
     .eyebrow {
@@ -2408,8 +1971,8 @@ const toExamples = () => {
       font-weight: 500;
       line-height: 1.4;
       margin-bottom: 1.1rem;
-      color: tokens.$champagne;
-      text-shadow: 1px 1px 1px var(--q-dark);
+      color: rgb(from tokens.$ivory r g b / 0.9);
+      text-shadow: 0 1px 6px rgb(11 31 59 / 0.5);
       @media (min-width: tokens.$breakpoint-lg) {
         font-size: 0.85rem;
       }
@@ -2425,14 +1988,16 @@ const toExamples = () => {
       line-height: 1.65;
       max-width: 50ch;
       margin-top: 1.5rem;
-      color: rgb(from tokens.$ivory r g b / 0.78);
-      text-shadow: 1px 1px 6px var(--q-dark);
+      color: rgb(from tokens.$ivory r g b / 0.92);
+      letter-spacing: 0;
+      text-shadow:
+        0 1px 2px rgb(11 31 59 / 0.35),
+        0 1px 12px rgb(11 31 59 / 0.4);
     }
 
-    /* Short phones: a more compact block so it clears both cards. */
+    /* Short phones: a more compact block. */
     @media (max-height: 760px) and (max-width: tokens.$breakpoint-lg) {
-      font-size: clamp(1.25rem, 4.2vw, 1.6rem);
-      padding-bottom: 2rem; /* centers the block between the two cards */
+      font-size: clamp(1.2rem, 4vw, 1.5rem);
 
       .eyebrow {
         margin-bottom: 0.6rem;
@@ -2456,9 +2021,8 @@ const toExamples = () => {
     border-radius: 1.25rem;
     will-change: opacity, transform;
     background: none;
-    box-shadow:
-      inset 0 0 70px 20px rgba($dark, 0.8),
-      inset 0 0 160px 90px rgba($accent-deep, 0.4);
+    /* Barely there now: a soft inner edge, not a dark vignette. */
+    box-shadow: inset 0 0 90px 10px rgba($dark, 0.14);
   }
 
   .trust-frame {
@@ -2466,126 +2030,8 @@ const toExamples = () => {
     inset: 0;
     z-index: 3;
     pointer-events: none;
-    border: 5px solid var(--q-accent);
+    border: 1px solid rgb(255 255 255 / 0.4);
     border-radius: 1.25rem;
-  }
-
-  .trust-beam {
-    position: absolute;
-    inset: 0;
-    z-index: 3;
-    padding: 5px;
-    border-radius: 1.25rem;
-    overflow: hidden;
-    pointer-events: none;
-    opacity: 0;
-    mask:
-      linear-gradient(#000 0 0) content-box,
-      linear-gradient(#000 0 0);
-    mask-composite: exclude;
-    -webkit-mask:
-      linear-gradient(#000 0 0) content-box,
-      linear-gradient(#000 0 0);
-    -webkit-mask-composite: xor;
-
-    span {
-      position: absolute;
-      top: 50%;
-      left: 50%;
-      width: 170%;
-      aspect-ratio: 1;
-      translate: -50% -50%;
-      animation: beam-spin 9s linear infinite;
-      background: conic-gradient(
-        from 0deg,
-        rgb(from $primary r g b / 0) 0deg,
-        rgb(from $primary r g b / 0) 296deg,
-        rgb(from $primary r g b / 0.55) 338deg,
-        rgb(from $primary r g b / 0.95) 352deg,
-        rgb(from $primary r g b / 0) 360deg
-      );
-    }
-  }
-
-  .trust-corner {
-    position: absolute;
-    width: 20px;
-    height: 20px;
-    border: 0 solid rgba(255, 255, 255, 0.32);
-
-    &--tl {
-      top: -1px;
-      left: -1px;
-      border-top-width: 1.5px;
-      border-left-width: 1.5px;
-      border-top-left-radius: 1.25rem;
-    }
-    &--tr {
-      top: -1px;
-      right: -1px;
-      border-top-width: 5vw;
-      border-right-width: 5vw;
-      border-top-right-radius: 1.25rem;
-      @media (min-width: tokens.$breakpoint-lg) {
-        border-top-width: 2.5vw;
-        border-right-width: 2.5vw;
-      }
-    }
-    &--bl {
-      bottom: -1px;
-      left: -1px;
-      border-bottom-width: 1.5px;
-      border-left-width: 1.5px;
-      border-bottom-left-radius: 1.25rem;
-    }
-    &--br {
-      bottom: -1px;
-      right: -1px;
-      border-bottom-width: 5vw;
-      border-left-width: 5vw;
-      @media (min-width: tokens.$breakpoint-lg) {
-        border-bottom-width: 2.5vw;
-        border-left-width: 2.5vw;
-      }
-      // border-bottom-left-radius: 1.25rem;
-    }
-  }
-
-  .trust-signal {
-    position: absolute;
-    top: 5%;
-    left: 2%;
-    display: block;
-    width: 92px;
-    height: 6px;
-
-    &::before {
-      // Circle
-      content: '';
-      position: absolute;
-      top: 0;
-      left: 0;
-      width: 6px;
-      height: 6px;
-      border-radius: 50%;
-      background: var(--q-accent);
-      animation: signal-blink 3.4s ease-in-out infinite;
-    }
-
-    &::after {
-      content: '';
-      position: absolute;
-      top: 2.5px;
-      left: 11px;
-      width: 150px;
-      height: 1px;
-      background: linear-gradient(
-        to right,
-        rgba(255, 255, 255, 0.5) 0%,
-        rgba(255, 255, 255, 0.15) 55%,
-        rgba(255, 255, 255, 0) 100%
-      );
-    }
   }
 
   /* Frosted pill on the right edge; fades in once the autoplay finishes. */
@@ -2598,9 +2044,9 @@ const toExamples = () => {
     justify-items: center;
     gap: 0.35rem;
     padding: 0.35rem;
-    border: 1px solid rgb(255 255 255 / 0.22);
+    border: 1px solid rgb(255 255 255 / 0.4);
     border-radius: 999px;
-    background: rgb(6 17 31 / 0.5);
+    background: rgb(255 255 255 / 0.18);
     backdrop-filter: blur(8px);
     opacity: 0;
     pointer-events: none;
@@ -2696,28 +2142,6 @@ const toExamples = () => {
 }
 
 /* ---------- Keyframes ---------- */
-
-@keyframes signal-blink {
-  0%,
-  100% {
-    opacity: 1;
-  }
-  46% {
-    opacity: 1;
-  }
-  52% {
-    opacity: 0.25;
-  }
-  58% {
-    opacity: 1;
-  }
-}
-
-@keyframes beam-spin {
-  to {
-    rotate: 360deg;
-  }
-}
 
 @keyframes bg-fade {
   from {
